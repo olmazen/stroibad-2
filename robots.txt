@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# ИИ-краулеры (для попадания в ответы нейросетей)
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: YandexBot
+Allow: /
+
+Sitemap: https://stalprom.ru/sitemap.xml
