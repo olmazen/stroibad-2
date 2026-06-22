@@ -1,0 +1,156 @@
+{
+  "createdAt": "2026-06-22T13:07:01.083Z",
+  "category": "kacheli_parkovye",
+  "quality": 80,
+  "maxDimension": 2000,
+  "generatedRoot": "/Users/almazrafikov/Documents/Codex/2026-06-15/files-mentioned-by-the-user-view/outputs/hobbyka-export/site-nomenclature/outputs/generated-ai",
+  "siteRoot": "/Users/almazrafikov/Downloads/stalprom",
+  "report": [
+    {
+      "sku": "12189",
+      "name": "Качели парковые «Сити»",
+      "published": [
+        {
+          "variant": "main",
+          "file": "assets/img/maf/kacheli/12189/main.webp",
+          "source": "00-main-1782078866969.png"
+        },
+        {
+          "variant": "closeup",
+          "file": "assets/img/maf/kacheli/12189/closeup.webp",
+          "source": "01-closeup-1782079335664.png"
+        },
+        {
+          "variant": "white",
+          "file": "assets/img/maf/kacheli/12189/white.webp",
+          "source": "02-white-1782074642724.png"
+        },
+        {
+          "variant": "angle",
+          "file": "assets/img/maf/kacheli/12189/angle.webp",
+          "source": "01-angle-1782079624158.png"
+        }
+      ]
+    },
+    {
+      "sku": "12202",
+      "name": "Качели садово-парковые «Бульвар»",
+      "published": [
+        {
+          "variant": "main",
+          "file": "assets/img/maf/kacheli/12202/main.webp",
+          "source": "00-main-1782077987524.png"
+        },
+        {
+          "variant": "closeup",
+          "file": "assets/img/maf/kacheli/12202/closeup.webp",
+          "source": "01-closeup-1782125414875.png"
+        },
+        {
+          "variant": "white",
+          "file": "assets/img/maf/kacheli/12202/white.webp",
+          "source": "02-white-1782078050372.png"
+        },
+        {
+          "variant": "angle",
+          "file": "assets/img/maf/kacheli/12202/angle.webp",
+          "source": "01-angle-1782126120707.png"
+        }
+      ]
+    },
+    {
+      "sku": "30279",
+      "name": "Качели садово-парковые «Миасс Раунд»",
+      "published": [
+        {
+          "variant": "main",
+          "file": "assets/img/maf/kacheli/30279/main.webp",
+          "source": "00-main-1782131671031.png"
+        },
+        {
+          "variant": "closeup",
+          "file": "assets/img/maf/kacheli/30279/closeup.webp",
+          "source": "01-closeup-1782131781257.png"
+        },
+        {
+          "variant": "white",
+          "file": "assets/img/maf/kacheli/30279/white.webp",
+          "source": "02-white-1782131818576.png"
+        }
+      ]
+    },
+    {
+      "sku": "39606",
+      "name": "Качели «Оазис»",
+      "published": [
+        {
+          "variant": "main",
+          "file": "assets/img/maf/kacheli/39606/main.webp",
+          "source": "00-main-1782131715148.png"
+        },
+        {
+          "variant": "closeup",
+          "file": "assets/img/maf/kacheli/39606/closeup.webp",
+          "source": "01-closeup-1782131804714.png"
+        },
+        {
+          "variant": "white",
+          "file": "assets/img/maf/kacheli/39606/white.webp",
+          "source": "02-white-1782131840173.png"
+        },
+        {
+          "variant": "angle",
+          "file": "assets/img/maf/kacheli/39606/angle.webp",
+          "source": "03-angle-1782131875971.png"
+        }
+      ]
+    },
+    {
+      "sku": "55644",
+      "name": "Качели «Оазис» Тип 7",
+      "published": [
+        {
+          "variant": "main",
+          "file": "assets/img/maf/kacheli/55644/main.webp",
+          "source": "00-main-1782131699062.png"
+        },
+        {
+          "variant": "closeup",
+          "file": "assets/img/maf/kacheli/55644/closeup.webp",
+          "source": "01-closeup-1782131905868.png"
+        },
+        {
+          "variant": "white",
+          "file": "assets/img/maf/kacheli/55644/white.webp",
+          "source": "02-white-1782131942537.png"
+        },
+        {
+          "variant": "angle",
+          "file": "assets/img/maf/kacheli/55644/angle.webp",
+          "source": "03-angle-1782131979639.png"
+        }
+      ]
+    },
+    {
+      "sku": "61962",
+      "name": "Качели парковые «Тандем»",
+      "published": [
+        {
+          "variant": "main",
+          "file": "assets/img/maf/kacheli/61962/main.webp",
+          "source": "00-main-1782131689162.png"
+        },
+        {
+          "variant": "closeup",
+          "file": "assets/img/maf/kacheli/61962/closeup.webp",
+          "source": "01-closeup-1782131919547.png"
+        },
+        {
+          "variant": "white",
+          "file": "assets/img/maf/kacheli/61962/white.webp",
+          "source": "02-white-1782131953189.png"
+        }
+      ]
+    }
+  ]
+}
