@@ -6,11 +6,6 @@
   <url><loc>https://stalprom.ru/maf/</loc><priority>0.9</priority></url>
   <url><loc>https://stalprom.ru/ograzhdeniya/</loc><priority>0.9</priority></url>
   <url><loc>https://stalprom.ru/maf/skamejki/</loc><priority>0.8</priority></url>
-  <url><loc>https://stalprom.ru/maf/skamejki/parkovaya-so-spinkoj/</loc><priority>0.7</priority></url>
-  <url><loc>https://stalprom.ru/maf/skamejki/dvorovaya/</loc><priority>0.6</priority></url>
-  <url><loc>https://stalprom.ru/maf/skamejki/so-stolikom/</loc><priority>0.6</priority></url>
-  <url><loc>https://stalprom.ru/maf/skamejki/brus/</loc><priority>0.6</priority></url>
-  <url><loc>https://stalprom.ru/maf/skamejki/antivandalnaya/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/kacheli/</loc><priority>0.8</priority></url>
   <url><loc>https://stalprom.ru/maf/kacheli/kacheli-siti/</loc><priority>0.7</priority></url>
   <url><loc>https://stalprom.ru/maf/kacheli/kacheli-bulvar/</loc><priority>0.7</priority></url>
@@ -43,4 +38,61 @@
   <url><loc>https://stalprom.ru/about/</loc><priority>0.5</priority></url>
   <url><loc>https://stalprom.ru/dostavka/</loc><priority>0.5</priority></url>
   <url><loc>https://stalprom.ru/contacts/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameika-modern/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameika-modern-bez-podlokotnikov/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-ulichnaya-kolledzh/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/sadovoparkovaya-skameyka-radius/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/sadovoparkovaya-skameyka-duga/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-vokrug-dereva-ekspress/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-pifagor/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/banketka-pifagor/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/divan-stalnoy-kruglyy/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-arkhimed/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/modulnaya-skameyka-ekopolis2/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/modulnaya-skameyka-ekopolis-kombi3/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-madrid/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-parabola/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-chugunnaya-goliaf/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/banketka-chugunnaya-varshava/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-radiusnaya-artek/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-kvadrant/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-flesh/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-kubitum/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/divan-stalnoy-sol/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-mons/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-mekhiko/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-bez-spinki-ulichnaya-kolledzh/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-bez-spinki-khold/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-idilliya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-idilliya-bez-podlokotnikov/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-adonis/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-galaktika/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-kalipso/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-so-spinkoy-ladya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-london/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-s-navesom-filigran-volna/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-leman/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-mons-filigran/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-vizhen/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/banketka-vizhen/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-bez-spinki-avinon/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-so-spinkoy-avinon/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-bez-spinki-gloriya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-so-spinkoy-gloriya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-bez-spinki-tauer/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-prityazhenie/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/banketka-stalnaya-mons-filigran/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-ulichnaya-ursula/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/banketka-paradise/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/tribuna-skameyka-valensiya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/sidene-enigma/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/sadovoparkovaya-skameyka-radius-raund-kruglaya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/kreslo-bez-spinki-simpozium/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-globus/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-london-bez-spinki/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-ladya-bez-spinki/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-fergana-bez-spinki/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-tashkent/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-fergana/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-mons-bez-spinki/</loc><priority>0.6</priority></url>
 </urlset>
