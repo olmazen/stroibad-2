@@ -13,10 +13,6 @@
   <url><loc>https://stalprom.ru/maf/kacheli/kacheli-oazis/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/kacheli/kacheli-oazis-tip-7/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/kacheli/kacheli-tandem/</loc><priority>0.6</priority></url>
-  <url><loc>https://stalprom.ru/maf/urny/</loc><priority>0.8</priority></url>
-  <url><loc>https://stalprom.ru/maf/urny/oprokidyvayushchayasya/</loc><priority>0.6</priority></url>
-  <url><loc>https://stalprom.ru/maf/urny/s-pepelnicej/</loc><priority>0.6</priority></url>
-  <url><loc>https://stalprom.ru/maf/urny/antivandalnaya/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/veloparkovki/</loc><priority>0.8</priority></url>
   <url><loc>https://stalprom.ru/maf/veloparkovki/u-obraznaya/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/veloparkovki/volna/</loc><priority>0.6</priority></url>
@@ -95,4 +91,87 @@
   <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-tashkent/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-fergana/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/skamejki/skameyka-stalnaya-mons-bez-spinki/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/</loc><priority>0.8</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-1/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-2/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-3/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-4/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-volna/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-7/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/lezhak-gorodskoy/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/lezhak-delta/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-nyuton/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/plyazhnaya-razdevalka-komfort/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-shezlong-rakushka/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-8/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-9/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/shezlong-vulkan/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-stalnoy-rastrum/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/shezlong-parabola/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/parkovyy-lezhak-aristotel/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/lezhak-gorodskoy-so-stolikom/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/lezhaki/shezlong-plyazh/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/pavilony-i-navesy/</loc><priority>0.8</priority></url>
+  <url><loc>https://stalprom.ru/maf/pavilony-i-navesy/besedka-atmosfera/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/pavilony-i-navesy/besedka-listopad/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/pavilony-i-navesy/besedka-tetatet/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/pavilony-i-navesy/skameyka-s-navesom-filigran-volna/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/</loc><priority>0.8</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-ulichnaia-geo/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-ulichnaia-radius/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-elegant/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-pepelnica-pa011/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-pepelnica-pa014/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-ulichnaya-akatsiya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-ust-002/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-s-betonnym-osnovaniem-bulvar/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-ulichnaya-kruglaya-palermo/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-park-m-gorkogo/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-ekskrementov-variant1/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-gorod/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stalnaya-novaya-moskva/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-ulichnaya-radius2/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-kvadratnaya-fans/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stalnaya-novichok/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-parkovaya-krakov-kruglaya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-parkovaya-krakov-kvadratnaya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stalnaya-neptun/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-solidum/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-tabula/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-gratiya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-tenoris/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-alvarium/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-estet/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stil/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-shtrikh/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stefano/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-long/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-chikago/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-ring/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-galaktika/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-filigran/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-titaniya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-vizhen/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-red/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-razdelnogo-sbora-fusion/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stalnaya-argo/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-parkovaya-estel-kruglaya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-plast/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stalnaya-dezhavyu/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-korsika/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stalnaya-korsika/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-ekskrementov-korsika/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-batareek-kvadratnaya-astrey/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dvoynaya-gorod/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stellar-kruglaya-s-kryshkoy/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stellar-kvadratnaya-s-kryshkoy/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-stellar-s-kryshkoy/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stellar-kruglaya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stellar-kvadratnaya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-stellar/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stalnaya-stellar-kvadratnaya-s-kryshkoy/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-stalnaya-stellar-kvadratnaya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-soyuz/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-gorod-vud/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/urny/urna-piksel/</loc><priority>0.6</priority></url>
 </urlset>
