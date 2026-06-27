@@ -91,7 +91,75 @@ const CATEGORY_CONFIG = {
     defaultSpecs: [['Материал', 'сталь'], ['Тип товара', 'Урна уличная'], ['Поставка', 'по России']],
     stripNames: [/^Урна уличная\s*/i, /^Урна\s*/i],
   },
+  konteynernye_ploshchadki_dlya_tbo: {
+    source: 'konteynernye_ploshchadki_dlya_tbo',
+    target: 'konteynernye-ploshchadki',
+    imgTarget: 'konteynernye-ploshchadki',
+    section: 'metallokonstrukcii',
+    assetSection: 'metallokonstrukcii',
+    sectionLabel: 'Металлоконструкции',
+    sectionEyebrow: 'Металлоконструкции для благоустройства',
+    label: 'Контейнерные площадки',
+    singular: 'контейнерную площадку',
+    productType: 'контейнерная площадка для ТКО',
+    relatedTitle: 'Другие контейнерные площадки',
+    relatedLink: 'Все контейнерные площадки',
+    indexHeadline: 'Выберите контейнерную площадку',
+    title: 'Контейнерные площадки для ТКО от производителя | СТАЛЬПРОМ',
+    h1: 'Контейнерные площадки для ТКО',
+    lead: 'Закрытые контейнерные шкафы, ограждения и площадки для сбора ТКО и КГМ: изготовление под объект, окраска RAL и поставка по России.',
+    metaDescription: 'Контейнерные площадки для ТКО от производителя: закрытые шкафы, ограждения и модульные решения. Цены, характеристики, окраска RAL и поставка по России.',
+    ogTitle: 'Контейнерные площадки для ТКО',
+    listName: 'Модели контейнерных площадок для ТКО',
+    materialsLabel: 'сталь',
+    productionNote: 'Изготавливаем модель под объект: партия, цвет металла, тип заполнения, крепёж и график поставки согласуются под проект.',
+    defaultSpecs: [['Материал', 'сталь'], ['Тип товара', 'Контейнерная площадка'], ['Поставка', 'по России']],
+    stripNames: [/^Контейнерная площадка для ТБО\s*/i, /^Контейнерная площадка\s*/i, /^Контейнерный шкаф\s*/i, /^Ограждение для ТБО\s*/i],
+  },
+  velosipednye_parkovki: {
+    source: 'velosipednye_parkovki',
+    target: 'veloparkovki',
+    imgTarget: 'veloparkovki',
+    label: 'Велопарковки',
+    singular: 'велопарковку',
+    productType: 'велопарковка для благоустройства',
+    relatedTitle: 'Другие модели велопарковок',
+    relatedLink: 'Все велопарковки',
+    indexHeadline: 'Выберите модель велопарковки',
+    title: 'Велопарковки уличные от производителя — каталог и цены | СТАЛЬПРОМ',
+    h1: 'Велопарковки уличные',
+    lead: 'Уличные велопарковки и парковки для самокатов для дворов ЖК, школ, парков, офисов и общественных пространств.',
+    metaDescription: 'Велопарковки уличные от производителя: модели из стали и нержавейки, парковки для самокатов, навесы, окраска RAL и поставка по России.',
+    ogTitle: 'Велопарковки уличные от производителя',
+    listName: 'Модели уличных велопарковок',
+    defaultSpecs: [['Материал', 'сталь'], ['Тип товара', 'Велопарковка'], ['Поставка', 'по России']],
+    stripNames: [/^Велопарковка\s*/i, /^Парковка для самокатов\s*/i],
+  },
 };
+
+function section(cfg) {
+  return cfg.section || 'maf';
+}
+
+function assetSection(cfg) {
+  return cfg.assetSection || 'maf';
+}
+
+function categoryUrl(cfg) {
+  return `/${section(cfg)}/${cfg.target}/`;
+}
+
+function categoryRelativeUrl(cfg) {
+  return `${section(cfg)}/${cfg.target}`;
+}
+
+function sectionLabel(cfg) {
+  return cfg.sectionLabel || 'МАФ';
+}
+
+function sectionEyebrow(cfg) {
+  return cfg.sectionEyebrow || 'Малые архитектурные формы';
+}
 
 function argValue(name, fallback = '') {
   const exact = process.argv.find((a) => a === `--${name}`);
@@ -191,7 +259,7 @@ function chooseVariant(manifest, variant) {
   const results = (manifest.results || [])
     .filter((r) => r.variant === variant && r.file && existsSync(r.file))
     .sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')));
-  return results.findLast((r) => r.selected) || results.at(-1) || null;
+  return results.findLast((r) => r.selected) || null;
 }
 
 function convertImage(src, dest, format, quality, maxSide) {
@@ -297,7 +365,7 @@ function doc({ title, description, canonical, ogImage, cssPrefix, body, scriptPr
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${esc(canonical)}">
-<meta property="og:image" content="${esc(ogImage)}">
+${ogImage ? `<meta property="og:image" content="${esc(ogImage)}">` : ''}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
@@ -311,10 +379,19 @@ ${body}
 `;
 }
 
+function imageBlock(cfg, product, variant, label, classes = '', loading = 'lazy') {
+  const variantClass = variant === 'white' ? ' contain' : '';
+  if (!product.hasImages) {
+    return `<div class="ph ${classes} r-43"><span class="ph-label">${esc(label)} · фото готовится</span></div>`;
+  }
+  const img = `assets/img/${assetSection(cfg)}/${cfg.imgTarget}/${product.sku}/${variant}.webp`;
+  return `<div class="ph has-img${variantClass} ${classes} r-43"><img src="{{prefix}}${img}" alt="${esc(label)}" loading="${loading}"><span class="ph-label">${esc(label)}</span></div>`;
+}
+
 function card(cfg, product, prefix = '../../') {
-  const img = `${prefix}assets/img/maf/${cfg.imgTarget}/${product.sku}/main.webp`;
-  return `<a class="model-card reveal" href="${prefix}maf/${cfg.target}/${product.pageSlug}/index.html">
-  <div style="position:relative"><span class="mc-badge">${esc(product.badge)}</span><div class="ph has-img r-43"><img src="${img}" alt="${esc(product.name)}" loading="lazy"><span class="ph-label">${esc(product.shortName)}</span></div></div>
+  const visual = imageBlock(cfg, product, 'main', product.shortName).replaceAll('{{prefix}}', prefix);
+  return `<a class="model-card reveal" href="${prefix}${categoryRelativeUrl(cfg)}/${product.pageSlug}/index.html">
+  <div style="position:relative"><span class="mc-badge">${esc(product.badge)}</span>${visual}</div>
   <div class="mc-b">
     <h3>${esc(product.name)}</h3>
     <div class="mc-sub">${esc(product.cardText)}</div>
@@ -326,18 +403,19 @@ function card(cfg, product, prefix = '../../') {
 
 function renderIndex(cfg, products) {
   const prefix = '../../';
-  const items = products.map((p, i) => `{"@type":"ListItem","position":${i + 1},"name":"${esc(p.name)}","url":"https://stalprom.ru/maf/${cfg.target}/${p.pageSlug}/"}`).join(',');
+  const items = products.map((p, i) => `{"@type":"ListItem","position":${i + 1},"name":"${esc(p.name)}","url":"https://stalprom.ru${categoryUrl(cfg)}${p.pageSlug}/"}`).join(',');
+  const hero = imageBlock(cfg, products[0], 'main', products[0].name, '', 'eager').replaceAll('{{prefix}}', prefix);
   const body = `${nav(prefix)}
 <main>
 <div class="shero">
-  <div class="shero-bg"><div class="ph has-img r-169"><img src="${prefix}assets/img/maf/${cfg.imgTarget}/${products[0].sku}/main.webp" alt="${esc(products[0].name)}" loading="lazy"></div></div>
+  <div class="shero-bg">${hero}</div>
   <span class="shero-corner">${esc(cfg.label)} · каталог</span>
   <div class="container"><div class="shero-inner">
-    <nav class="crumbs"><a href="${prefix}index.html">Главная</a> / <a href="${prefix}maf/index.html">МАФ</a> / <span>${esc(cfg.label)}</span></nav>
-    <div class="eyebrow">Малые архитектурные формы</div>
+    <nav class="crumbs"><a href="${prefix}index.html">Главная</a> / <a href="${prefix}${section(cfg)}/index.html">${esc(sectionLabel(cfg))}</a> / <span>${esc(cfg.label)}</span></nav>
+    <div class="eyebrow">${esc(sectionEyebrow(cfg))}</div>
     <h1>${esc(cfg.h1)} <em>от производителя</em></h1>
     <p class="lead">${esc(cfg.lead)}</p>
-    <div class="shero-meta"><span><b>${products.length}</b> моделей</span><span>сталь + дерево</span><span>окраска <b>RAL</b></span><span>поставка по России</span></div>
+    <div class="shero-meta"><span><b>${products.length}</b> моделей</span><span>${esc(cfg.materialsLabel || 'сталь + дерево')}</span><span>окраска <b>RAL</b></span><span>поставка по России</span></div>
   </div></div>
 </div>
 <section>
@@ -348,7 +426,7 @@ function renderIndex(cfg, products) {
   </div>
 </section>
 <section class="dev" style="padding:72px 0"><div class="container"><div class="split">
-  <div class="reveal"><div class="dim on-dark"><span class="tick"></span>Под объект</div><h2 style="margin:22px 0 16px;font-size:clamp(24px,3vw,36px)">Комплектуем территорию МАФ в едином стиле</h2><p style="color:#B5BAC0;font-size:16px;max-width:520px">Подбираем серию под дизайн-код территории: единый RAL, древесина, закладные, крепёж и поставка партиями под график благоустройства.</p><button class="btn btn-primary" style="margin-top:24px" onclick="openModal()">Запросить расчёт серии</button></div>
+  <div class="reveal"><div class="dim on-dark"><span class="tick"></span>Под объект</div><h2 style="margin:22px 0 16px;font-size:clamp(24px,3vw,36px)">Комплектуем территорию изделиями в едином стиле</h2><p style="color:#B5BAC0;font-size:16px;max-width:520px">Подбираем серию под дизайн-код территории: единый RAL, материалы, закладные, крепёж и поставка партиями под график благоустройства.</p><button class="btn btn-primary" style="margin-top:24px" onclick="openModal()">Запросить расчёт серии</button></div>
   <ul class="devlist reveal" style="--d:.1s"><li><span><b>${products.length} моделей.</b> Подбираем решение под двор, парк, ЖК или общественную территорию.</span></li><li><span><b>Единый RAL.</b> Металл окрашиваем в цвет проекта и соседних МАФ.</span></li><li><span><b>Проектная поставка.</b> Считаем партию, логистику, монтажные закладные и сроки.</span></li><li><span><b>Документы.</b> Работаем с НДС, готовим паспорта изделий и спецификации.</span></li></ul>
 </div></div></section>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"${esc(cfg.listName)}","itemListElement":[${items}]}</script>
@@ -357,8 +435,10 @@ ${footer(prefix)}`;
   return doc({
     title: cfg.title,
     description: cfg.metaDescription,
-    canonical: `https://stalprom.ru/maf/${cfg.target}/`,
-    ogImage: `https://stalprom.ru/assets/img/maf/${cfg.imgTarget}/${products[0].sku}/main.webp`,
+    canonical: `https://stalprom.ru${categoryUrl(cfg)}`,
+    ogImage: products.some((p) => p.hasImages)
+      ? `https://stalprom.ru/assets/img/${assetSection(cfg)}/${cfg.imgTarget}/${products.find((p) => p.hasImages).sku}/main.webp`
+      : '',
     cssPrefix: prefix,
     scriptPrefix: prefix,
     body,
@@ -367,26 +447,30 @@ ${footer(prefix)}`;
 
 function renderProduct(cfg, product, allProducts) {
   const prefix = '../../../';
-  const rel = `assets/img/maf/${cfg.imgTarget}/${product.sku}`;
+  const rel = `assets/img/${assetSection(cfg)}/${cfg.imgTarget}/${product.sku}`;
   const others = allProducts.filter((p) => p.sku !== product.sku).slice(0, 3);
   const specRows = product.specs.length ? product.specs : cfg.defaultSpecs;
   const description = cleanDescription(product.raw, cfg.productType);
   const schemaPrice = lowPrice(product.raw.price);
   const schemaOffer = schemaPrice ? `"offers":{"@type":"AggregateOffer","priceCurrency":"RUB","lowPrice":"${schemaPrice}","availability":"https://schema.org/InStock","seller":{"@type":"Organization","name":"СТАЛЬПРОМ"}}` : `"offers":{"@type":"Offer","priceCurrency":"RUB","availability":"https://schema.org/InStock","seller":{"@type":"Organization","name":"СТАЛЬПРОМ"}}`;
+  const mainVisual = imageBlock(cfg, product, 'main', product.name, 'main', 'eager').replaceAll('{{prefix}}', prefix);
+  const detailVisual = imageBlock(cfg, product, 'closeup', `${product.name} — деталь`).replaceAll('{{prefix}}', prefix);
+  const whiteVisual = imageBlock(cfg, product, 'white', `${product.name} — белый фон`).replaceAll('{{prefix}}', prefix);
+  const angleVisual = imageBlock(cfg, product, 'angle', `${product.name} на объекте`).replaceAll('{{prefix}}', prefix);
   const body = `${nav(prefix)}
 <main>
 <div class="page-head"><div class="container">
-  <nav class="crumbs"><a href="${prefix}index.html">Главная</a> / <a href="${prefix}maf/index.html">МАФ</a> / <a href="${prefix}maf/${cfg.target}/index.html">${esc(cfg.label)}</a> / <span>${esc(product.name)}</span></nav>
+  <nav class="crumbs"><a href="${prefix}index.html">Главная</a> / <a href="${prefix}${section(cfg)}/index.html">${esc(sectionLabel(cfg))}</a> / <a href="${prefix}${categoryRelativeUrl(cfg)}/index.html">${esc(cfg.label)}</a> / <span>${esc(product.name)}</span></nav>
   <h1>${esc(product.name)}</h1>
   <p>${esc(product.cardText)}</p>
 </div></div>
 <section><div class="container"><div class="prodpage">
   <div class="gallery">
-    <div class="ph has-img main r-43"><img src="${prefix}${rel}/main.webp" alt="${esc(product.name)}" loading="eager"><span class="ph-label">${esc(product.name)}</span></div>
+    ${mainVisual}
     <div class="thumbs">
-      <div class="ph has-img r-43"><img src="${prefix}${rel}/closeup.webp" alt="${esc(product.name)} — деталь" loading="lazy"><span class="ph-label">деталь</span></div>
-      <div class="ph has-img contain r-43"><img src="${prefix}${rel}/white.webp" alt="${esc(product.name)} — белый фон" loading="lazy"><span class="ph-label">белый фон</span></div>
-      <div class="ph has-img r-43"><img src="${prefix}${rel}/angle.webp" alt="${esc(product.name)} на объекте" loading="lazy"><span class="ph-label">на объекте</span></div>
+      ${detailVisual}
+      ${whiteVisual}
+      ${angleVisual}
     </div>
   </div>
   <div class="pp-info">
@@ -401,18 +485,18 @@ function renderProduct(cfg, product, allProducts) {
 </div></div></section>
 <section style="padding-top:0"><div class="container"><div class="split">
   <div><div class="sec-head"><div><h2>Характеристики</h2></div></div><table class="specs">${specRows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table></div>
-  <div><div class="sec-head"><div><h2>Описание</h2></div></div><div class="prose"><p>${esc(description)}</p><p>Изготавливаем модель под объект: партия, цвет металла, покрытие древесины, крепёж и график поставки согласуются под проект.</p></div></div>
+  <div><div class="sec-head"><div><h2>Описание</h2></div></div><div class="prose"><p>${esc(description)}</p><p>${esc(cfg.productionNote || 'Изготавливаем модель под объект: партия, цвет металла, покрытие древесины, крепёж и график поставки согласуются под проект.')}</p></div></div>
 </div></div></section>
-<section style="padding-top:0"><div class="container"><div class="sec-head"><div><h2>${esc(cfg.relatedTitle)}</h2></div><a class="btn btn-sm" href="${prefix}maf/${cfg.target}/index.html">${esc(cfg.relatedLink)}</a></div><div class="tiles3">${others.map((p) => `<a class="tile" href="${prefix}maf/${cfg.target}/${p.pageSlug}/index.html"><div class="ph has-img r-43"><img src="${prefix}assets/img/maf/${cfg.imgTarget}/${p.sku}/main.webp" alt="${esc(p.name)}" loading="lazy"><span class="ph-label">${esc(p.shortName)}</span></div><h3>${esc(p.name)}</h3><p>${esc(p.priceText)}</p></a>`).join('')}</div></div></section>
-<section style="padding-top:0"><div class="container"><div class="formpanel"><h3>Рассчитать ${esc(product.name.toLowerCase())} под ваш объект</h3><p>Укажите количество, город поставки и требования — пришлём смету за 1 рабочий день.</p><form onsubmit="return submitLead(this)"><div class="row2"><div class="field"><label>Имя</label><input type="text" required></div><div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div></div><div class="field"><label>Количество и требования</label><textarea rows="2" placeholder="Например: ${esc(product.name)}, 10 шт, RAL 7016"></textarea></div><button class="btn btn-primary btn-block" type="submit">Отправить заявку</button><p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p></form><div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div></div></div></section>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"${esc(product.name)}","description":"${esc(product.cardText)}","category":"Малые архитектурные формы / ${esc(cfg.label)}","brand":{"@type":"Brand","name":"СТАЛЬПРОМ"},"manufacturer":{"@type":"Organization","name":"СТАЛЬПРОМ"},${schemaOffer}}</script>
+<section style="padding-top:0"><div class="container"><div class="sec-head"><div><h2>${esc(cfg.relatedTitle)}</h2></div><a class="btn btn-sm" href="${prefix}${categoryRelativeUrl(cfg)}/index.html">${esc(cfg.relatedLink)}</a></div><div class="tiles3">${others.map((p) => `<a class="tile" href="${prefix}${categoryRelativeUrl(cfg)}/${p.pageSlug}/index.html">${imageBlock(cfg, p, 'main', p.shortName).replaceAll('{{prefix}}', prefix)}<h3>${esc(p.name)}</h3><p>${esc(p.priceText)}</p></a>`).join('')}</div></div></section>
+<section style="padding-top:0"><div class="container"><div class="formpanel"><h3>Получить расчёт: ${esc(product.name)}</h3><p>Укажите количество, город поставки и требования — пришлём смету за 1 рабочий день.</p><form onsubmit="return submitLead(this)"><div class="row2"><div class="field"><label>Имя</label><input type="text" required></div><div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div></div><div class="field"><label>Количество и требования</label><textarea rows="2" placeholder="Например: ${esc(product.name)}, 10 шт, RAL 7016"></textarea></div><button class="btn btn-primary btn-block" type="submit">Отправить заявку</button><p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p></form><div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div></div></div></section>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"${esc(product.name)}","description":"${esc(product.cardText)}","category":"${esc(sectionLabel(cfg))} / ${esc(cfg.label)}","brand":{"@type":"Brand","name":"СТАЛЬПРОМ"},"manufacturer":{"@type":"Organization","name":"СТАЛЬПРОМ"},${schemaOffer}}</script>
 </main>
 ${footer(prefix)}`;
   return doc({
     title: `${product.name} — производство и поставка | СТАЛЬПРОМ`,
     description: `${product.name} от производителя для благоустройства. ${product.priceText}, окраска RAL, поставка по России.`,
-    canonical: `https://stalprom.ru/maf/${cfg.target}/${product.pageSlug}/`,
-    ogImage: `https://stalprom.ru/${rel}/main.webp`,
+    canonical: `https://stalprom.ru${categoryUrl(cfg)}${product.pageSlug}/`,
+    ogImage: product.hasImages ? `https://stalprom.ru/${rel}/main.webp` : '',
     cssPrefix: prefix,
     scriptPrefix: prefix,
     body,
@@ -470,11 +554,12 @@ function updateSitemap(siteRoot, cfg, products) {
   }
   if (!existing.size) for (const [u, pr] of fallbackUrls) existing.set(u, pr);
 
+  const baseUrl = categoryUrl(cfg);
   for (const key of [...existing.keys()]) {
-    if (key === `/maf/${cfg.target}/` || key.startsWith(`/maf/${cfg.target}/`)) existing.delete(key);
+    if (key === baseUrl || key.startsWith(baseUrl)) existing.delete(key);
   }
-  existing.set(`/maf/${cfg.target}/`, '0.8');
-  for (const p of products) existing.set(`/maf/${cfg.target}/${p.pageSlug}/`, '0.6');
+  existing.set(baseUrl, '0.8');
+  for (const p of products) existing.set(`${baseUrl}${p.pageSlug}/`, '0.6');
 
   const urls = [...existing.entries()];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(([u, pr]) => `  <url><loc>https://stalprom.ru${u}</loc><priority>${pr}</priority></url>`).join('\n')}\n</urlset>\n`;
@@ -501,6 +586,7 @@ function normalizeProducts(products, propertiesBySku, manifests, cfg) {
       sku,
       raw: product,
       manifest,
+      hasImages: cfg.publishImages && VARIANTS.every(([variant]) => chooseVariant(manifest || {}, variant)),
       pageSlug,
       name: product.name,
       shortName,
@@ -515,8 +601,8 @@ function normalizeProducts(products, propertiesBySku, manifests, cfg) {
 
 function main() {
   const category = argValue('category', 'skameyki');
-  const cfg = CATEGORY_CONFIG[category];
-  if (!cfg) throw new Error(`Unknown category: ${category}`);
+  const categoryConfig = CATEGORY_CONFIG[category];
+  if (!categoryConfig) throw new Error(`Unknown category: ${category}`);
 
   const siteRoot = argValue('site-root', process.cwd());
   const sourceRoot = argValue('source-root', DEFAULT_SOURCE_ROOT);
@@ -524,6 +610,9 @@ function main() {
   const format = argValue('format', 'webp');
   const quality = Number(argValue('quality', '82'));
   const maxSide = Number(argValue('max-side', '2000'));
+  const imagesArg = argValue('images', 'auto');
+  const publishImages = imagesArg === 'false' ? false : true;
+  const cfg = { ...categoryConfig, publishImages };
 
   const categorySource = join(sourceRoot, cfg.source);
   const generatedCategory = join(generatedRoot, cfg.source);
@@ -531,7 +620,7 @@ function main() {
   const propertiesCsv = join(categorySource, 'product_properties.csv');
 
   if (!existsSync(productsCsv)) throw new Error(`Missing products.csv: ${productsCsv}`);
-  if (!existsSync(generatedCategory)) throw new Error(`Missing generated category: ${generatedCategory}`);
+  if (publishImages && !existsSync(generatedCategory)) throw new Error(`Missing generated category: ${generatedCategory}`);
 
   const productsRaw = readCsv(productsCsv);
   const propertiesRaw = existsSync(propertiesCsv) ? readCsv(propertiesCsv) : [];
@@ -543,26 +632,29 @@ function main() {
   }
 
   const manifests = new Map();
-  for (const dir of readdirSync(generatedCategory)) {
-    if (!/^\d+$/.test(dir)) continue;
-    const file = join(generatedCategory, dir, 'manifest.json');
-    if (existsSync(file)) manifests.set(dir, JSON.parse(readFileSync(file, 'utf8')));
+  if (existsSync(generatedCategory)) {
+    for (const dir of readdirSync(generatedCategory)) {
+      if (!/^\d+$/.test(dir)) continue;
+      const file = join(generatedCategory, dir, 'manifest.json');
+      if (existsSync(file)) manifests.set(dir, JSON.parse(readFileSync(file, 'utf8')));
+    }
   }
 
   const products = normalizeProducts(
-    productsRaw.filter((p) => manifests.has(text(p.sku || p.bitrix_sku))),
+    productsRaw,
     propertiesBySku,
     manifests,
     cfg,
   );
 
-  const imgRoot = join(siteRoot, 'assets/img/maf', cfg.imgTarget);
-  const pageRoot = join(siteRoot, 'maf', cfg.target);
+  const imgRoot = join(siteRoot, 'assets/img', assetSection(cfg), cfg.imgTarget);
+  const pageRoot = join(siteRoot, section(cfg), cfg.target);
   mkdirSync(imgRoot, { recursive: true });
   mkdirSync(pageRoot, { recursive: true });
 
   const report = { createdAt: new Date().toISOString(), category, products: products.length, images: 0, skipped: [] };
   for (const product of products) {
+    if (!publishImages) continue;
     for (const [variant] of VARIANTS) {
       const result = chooseVariant(product.manifest, variant);
       if (!result) {
@@ -592,6 +684,7 @@ function main() {
     category,
     products: products.length,
     images: report.images,
+    productsWithCompleteImages: products.filter((product) => product.hasImages).length,
     skipped: report.skipped.length,
     pageRoot: relative(siteRoot, pageRoot),
     imageRoot: relative(siteRoot, imgRoot),

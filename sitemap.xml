@@ -13,10 +13,6 @@
   <url><loc>https://stalprom.ru/maf/kacheli/kacheli-oazis/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/kacheli/kacheli-oazis-tip-7/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/kacheli/kacheli-tandem/</loc><priority>0.6</priority></url>
-  <url><loc>https://stalprom.ru/maf/veloparkovki/</loc><priority>0.8</priority></url>
-  <url><loc>https://stalprom.ru/maf/veloparkovki/u-obraznaya/</loc><priority>0.6</priority></url>
-  <url><loc>https://stalprom.ru/maf/veloparkovki/volna/</loc><priority>0.6</priority></url>
-  <url><loc>https://stalprom.ru/maf/veloparkovki/s-navesom/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/parkovochnye-stolbiki/</loc><priority>0.8</priority></url>
   <url><loc>https://stalprom.ru/maf/parkovochnye-stolbiki/betoniruemyj/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/parkovochnye-stolbiki/semnyj/</loc><priority>0.6</priority></url>
@@ -24,7 +20,6 @@
   <url><loc>https://stalprom.ru/maf/parkovochnye-stolbiki/s-cepyu/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/metallokonstrukcii/korziny-dlya-konditsionerov/</loc><priority>0.8</priority></url>
   <url><loc>https://stalprom.ru/metallokonstrukcii/pochtovye-yashchiki/</loc><priority>0.8</priority></url>
-  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/</loc><priority>0.8</priority></url>
   <url><loc>https://stalprom.ru/metallokonstrukcii/metalloizdeliya-na-zakaz/</loc><priority>0.7</priority></url>
   <url><loc>https://stalprom.ru/ograzhdeniya/gazonnye/</loc><priority>0.7</priority></url>
   <url><loc>https://stalprom.ru/ograzhdeniya/perila/</loc><priority>0.6</priority></url>
@@ -174,4 +169,31 @@
   <url><loc>https://stalprom.ru/maf/urny/urna-soyuz/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/urny/urna-gorod-vud/</loc><priority>0.6</priority></url>
   <url><loc>https://stalprom.ru/maf/urny/urna-piksel/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/</loc><priority>0.8</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-xl/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-maf-8/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-maf-9/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/ograzhdenie-ploshchadki-dlya-kgm/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-vertikal/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/ograzhdenie-dlya-tbo/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-xl-stalnoy/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-stalnoy/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-panel/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-ekologiya/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-nero/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-split-kh-s-khozblokom/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/metallokonstrukcii/konteynernye-ploshchadki/ograzhdenie-dlya-tbo-bunker/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/</loc><priority>0.8</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/veloparkovka-lokus-iz-nerzhaveyki/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/parkovka-dlya-samokatov-19i-mestnaya-velo19/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/parkovka-dlya-samokatov-s-navesom-lyutik/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/veloparkovka-tur/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/veloparkovka-stil/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/veloparkovka-freym/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/veloparkovka-vozdukh/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/veloparkovka-gorod/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/veloparkovka-fast/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/veloparkovka-tauer1/</loc><priority>0.6</priority></url>
+  <url><loc>https://stalprom.ru/maf/veloparkovki/veloparkovka-s-logotipom-tauer2/</loc><priority>0.6</priority></url>
 </urlset>
