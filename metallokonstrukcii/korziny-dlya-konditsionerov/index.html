@@ -36,9 +36,12 @@
 </script>
 <style id="kz-css">
 .kz-showcase{padding-bottom:0}
-.kz-stage-wrap{display:grid;grid-template-columns:1fr 300px;gap:18px;margin-top:8px}
+.kz-air{padding-top:84px;padding-bottom:78px}
+.kz-stage-wrap{display:grid;grid-template-columns:1fr 300px;gap:18px;margin-top:30px}
 .kz-stage{position:relative;aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);background:#0A0D10}
-.kz-stage-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transition:opacity .5s cubic-bezier(.4,0,.2,1);will-change:transform}
+.kz-stage-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);will-change:transform,clip-path}
+.kz-wipe .kz-stage-img{clip-path:inset(0 0 0 100%);transition:clip-path 1.05s cubic-bezier(.16,.8,.3,1) .12s,opacity .5s}
+.kz-wipe.kz-in .kz-stage-img{clip-path:inset(0 0 0 0)}
 .kz-stage-glow{position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 18% 110%,rgba(242,111,29,.22),transparent 55%),linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55))}
 .kz-stage-cap{position:absolute;left:0;bottom:0;padding:30px 32px;z-index:2}
 .kz-stage-art{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.18em;color:var(--amber-h);text-transform:uppercase}
@@ -47,7 +50,7 @@
 .kz-stage-price{position:absolute;right:26px;top:24px;z-index:2;font-family:'Oswald',sans-serif;font-weight:700;font-size:19px;color:#fff;background:rgba(14,17,20,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line-2);padding:9px 15px;display:flex;flex-direction:column;line-height:1.05}
 .kz-stage-price small{font-size:10.5px;font-weight:400;letter-spacing:.04em;color:var(--steel)}
 .kz-picks{display:flex;flex-direction:column;gap:10px}
-.kz-pick{position:relative;display:flex;align-items:center;gap:12px;padding:8px;background:var(--srf);border:1px solid var(--line);cursor:pointer;color:var(--tx2);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;font-size:12.5px;text-align:left;transition:border-color .25s,background .25s,transform .25s;overflow:hidden}
+.kz-pick{position:relative;display:flex;align-items:center;gap:12px;padding:8px;background:rgba(24,29,35,.72);border:1px solid var(--line);cursor:pointer;color:var(--tx2);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;font-size:12.5px;text-align:left;transition:border-color .25s,background .25s,transform .25s;overflow:hidden;backdrop-filter:blur(4px)}
 .kz-pick img{width:64px;height:48px;object-fit:cover;flex:none;filter:saturate(.9)}
 .kz-pick>span{flex:1}
 .kz-pick::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--amber);transform:scaleY(0);transform-origin:top;transition:.3s}
@@ -61,9 +64,16 @@
 .kz-rise>*{opacity:0;transform:translateY(34px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
 .kz-rise.kz-in>*{opacity:1;transform:none}
 .kz-rise.kz-in>*:nth-child(1){transition-delay:.0s}.kz-rise.kz-in>*:nth-child(2){transition-delay:.05s}.kz-rise.kz-in>*:nth-child(3){transition-delay:.1s}.kz-rise.kz-in>*:nth-child(4){transition-delay:.15s}.kz-rise.kz-in>*:nth-child(5){transition-delay:.2s}.kz-rise.kz-in>*:nth-child(6){transition-delay:.25s}.kz-rise.kz-in>*:nth-child(7){transition-delay:.29s}.kz-rise.kz-in>*:nth-child(8){transition-delay:.33s}.kz-rise.kz-in>*:nth-child(n+9){transition-delay:.37s}
-/* ---- 3D cursor-tilt cards + glare + hover-wall ---- */
+/* card hover: white -> facade photo */
+.kz-swap{position:relative;overflow:hidden}
+.kz-swap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .5s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.kz-swap .kz-img-b{opacity:0}
+.kz-card:hover .kz-swap .kz-img-a{opacity:0}
+.kz-card:hover .kz-swap .kz-img-b{opacity:1;transform:scale(1.04)}
+.kz-hint{position:absolute;left:12px;bottom:12px;z-index:3;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgba(242,111,29,.92);padding:3px 9px;border-radius:20px;opacity:0;transform:translateY(6px);transition:.3s}
+.kz-card:hover .kz-hint{opacity:1;transform:none}
+/* 3D cursor-tilt + glare + hover-wall */
 .kz-card{perspective:1000px;background:transparent;border:none;box-shadow:none;overflow:visible}
-.kz-card::after{display:none}
 .kz-card .kz-card-in{position:relative;display:flex;flex-direction:column;height:100%;background:var(--srf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,border-color .35s;transform-style:preserve-3d;will-change:transform}
 .kz-card .kz-card-in::before{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(420px circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.22),transparent 42%)}
 .kz-card.tilt .kz-card-in::before{opacity:1}
@@ -73,19 +83,25 @@
 .artdeco .kz-card .kz-card-in{background:#12161b}
 .kz-wall:hover .kz-card:not(:hover){opacity:.45;filter:saturate(.7) brightness(.82)}
 .kz-wall .kz-card{transition:opacity .35s,filter .35s}
-/* ---- Cinematic Art-Deco ---- */
-.kzc-dark{position:fixed;inset:0;background:#05070a;opacity:0;pointer-events:none;z-index:60;transition:opacity .12s linear}
-.kzc{position:relative;z-index:70;overflow:visible}
-.kzc-intro{position:relative;text-align:center;padding:96px 16px 30px;overflow:visible}
+/* floating parallax background */
+.kzc-bg{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.kzc-orb{position:absolute;border-radius:50%;will-change:transform}
+.kzc-orb.o1{width:640px;height:640px;left:-14%;top:2%;background:radial-gradient(circle,rgba(242,111,29,.26),transparent 66%);filter:blur(40px)}
+.kzc-orb.o2{width:520px;height:520px;right:-12%;top:38%;background:radial-gradient(circle,rgba(72,116,196,.18),transparent 66%);filter:blur(50px)}
+.kzc-orb.o3{width:420px;height:420px;left:52%;top:74%;background:radial-gradient(circle,rgba(242,111,29,.18),transparent 66%);filter:blur(46px)}
+.kzc-lines{position:absolute;inset:-18%;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:56px 56px;will-change:transform}
+.kz-showcase>.container,.kz-showcase .reveal,.kzc-intro,.kzc .container{position:relative;z-index:2}
+/* Cinematic Art-Deco */
+.kzc{position:relative;z-index:1;overflow:visible}
+.kzc-intro{position:relative;text-align:center;padding:104px 16px 34px;overflow:visible;z-index:2}
 .kzc-title{position:relative;display:inline-block;will-change:transform}
-.kzc-word{display:inline-block;font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(64px,17vw,210px);letter-spacing:.04em;line-height:.9;
+.kzc-word{display:inline-block;font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(64px,17vw,220px);letter-spacing:.04em;line-height:.9;
   background:linear-gradient(95deg,#ffffff 0%,#ffcf9a calc(var(--p,0)*100% - 3%),#ffffff calc(var(--p,0)*100%),rgba(255,255,255,.07) calc(var(--p,0)*100%));
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
-  -webkit-text-stroke:1.4px rgba(255,255,255,.22);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;-webkit-text-stroke:1.4px rgba(255,255,255,.22);
   filter:drop-shadow(0 2px 0 rgba(0,0,0,.55)) drop-shadow(0 10px 26px rgba(0,0,0,.55)) drop-shadow(0 0 46px rgba(242,111,29,calc(.15 + var(--p,0)*.4)))}
 .kzc-title::after{content:"";position:absolute;inset:-22% -8%;z-index:-1;background:radial-gradient(58% 78% at 50% 50%,rgba(242,111,29,calc(.08 + var(--p,0)*.22)),transparent 70%);filter:blur(26px);pointer-events:none}
 .kzc-sub{color:var(--tx2);margin-top:18px;font-size:14.5px;letter-spacing:.05em;opacity:calc(.25 + var(--p,0)*.75)}
-.kzc-adv{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:6px 0 42px;perspective:1000px}
+.kzc-adv{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0 48px;perspective:1000px}
 .adv-plate{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px 20px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transform:translateY(46px) translateX(var(--sx,0)) rotateY(var(--ry,0));transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1),border-color .3s,box-shadow .3s;transition-delay:var(--d,0s)}
 .adv-plate[data-side="l"]{--sx:-44px;--ry:9deg}.adv-plate[data-side="r"]{--sx:44px;--ry:-9deg}
 .kzc-adv.in .adv-plate{opacity:1;transform:none}
@@ -94,9 +110,9 @@
 .adv-ic svg{width:22px;height:22px}
 .adv-plate h4{font-family:'Oswald',sans-serif;font-size:16px;color:#fff;margin:0 0 4px;letter-spacing:.01em}
 .adv-plate p{margin:0;font-size:12.5px;color:var(--steel)}
-@media(prefers-reduced-motion:reduce){.kz-rise>*{opacity:1!important;transform:none!important}.kzc-word{--p:1}.kzc-dark{display:none}.adv-plate{opacity:1!important;transform:none!important}}
-@media(hover:none){.kz-wall:hover .kz-card:not(:hover){opacity:1;filter:none}.kzc-dark{display:none}}
-@media(max-width:900px){.kz-stage-wrap{grid-template-columns:1fr}.kz-picks{flex-direction:row;overflow-x:auto}.kz-pick{flex-direction:column;min-width:120px;gap:7px;text-align:center;font-size:11px}.kz-pick img{width:100%;height:60px}.kz-pick::before{display:none}.kzc-intro{padding-top:60px}}
+@media(prefers-reduced-motion:reduce){.kz-rise>*{opacity:1!important;transform:none!important}.kzc-word{--p:1}.adv-plate{opacity:1!important;transform:none!important}.kz-wipe .kz-stage-img{clip-path:none}.kzc-orb,.kzc-lines{display:none}}
+@media(hover:none){.kz-wall:hover .kz-card:not(:hover){opacity:1;filter:none}.kz-card:hover .kz-swap .kz-img-a{opacity:1}.kz-card:hover .kz-swap .kz-img-b{opacity:0}}
+@media(max-width:900px){.kz-stage-wrap{grid-template-columns:1fr}.kz-picks{flex-direction:row;overflow-x:auto}.kz-pick{flex-direction:column;min-width:120px;gap:7px;text-align:center;font-size:11px}.kz-pick img{width:100%;height:60px}.kz-pick::before{display:none}.kzc-intro{padding-top:66px}.kz-air{padding-top:60px;padding-bottom:54px}.kzc-orb{filter:blur(60px);opacity:.7}}
 </style>
 </head>
 <body>
@@ -148,11 +164,17 @@
 </div>
 
 <!-- SHOWCASE (витрина) -->
-<section class="kz-showcase artdeco">
+<section class="kz-showcase artdeco kzc-air" id="kz-showcase">
+  <div class="kzc-bg" aria-hidden="true">
+      <span class="kzc-orb o1" data-spd="-60"></span>
+      <span class="kzc-orb o2" data-spd="95"></span>
+      <span class="kzc-orb o3" data-spd="-140"></span>
+      <span class="kzc-lines" data-spd="-34"></span>
+    </div>
   <div class="container">
     <div class="reveal"><div class="dim"><span class="tick"></span>Серия Art Deco · витрина</div></div>
-    <div class="sec-head reveal" style="margin-top:22px"><div><h2>Корзина, которую не прячут,<br>а показывают</h2></div><p class="lead-wide">Цельногнутый экран без швов, лазерный узор перетекает по всем граням. Выберите рисунок — изготовим под размер блока и в цвет фасада.</p></div>
-    <div class="kz-stage-wrap kz-rise">
+    <div class="sec-head reveal" style="margin-top:26px"><div><h2>Корзина, которую не прячут,<br>а показывают</h2></div><p class="lead-wide">Цельногнутый экран без швов, лазерный узор перетекает по всем граням. Выберите рисунок — изготовим под размер блока и в цвет фасада.</p></div>
+    <div class="kz-stage-wrap kz-rise kz-wipe">
       <div class="kz-stage" id="kzStage">
         <img class="kz-stage-img" src="../../assets/img/korziny/art-deco/ART14-volnenie/main.webp" alt="Дизайнерская корзина «Волнение», артикул ART14">
         <div class="kz-stage-glow"></div>
@@ -203,7 +225,7 @@
     <div class="model-grid kz-wall kz-rise">
       <a class="model-card kz-card" href="STN01-romb/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/standart/STN01-romb/white.webp" alt="Корзина для кондиционера «Ромб» — Стандарт, артикул STN01" loading="lazy"><span class="ph-label">«Ромб»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/standart/STN01-romb/white.webp" alt="Корзина для кондиционера «Ромб» — Стандарт, артикул STN01" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/standart/STN01-romb/main.webp" alt="Корзина для кондиционера «Ромб» — Стандарт, артикул STN01 — на фасаде" loading="lazy"><span class="ph-label">«Ромб»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Ромб</h3><div class="mc-sub">STN01 · оцинковка + RAL</div>
           <ul class="mc-spec"><li><span>Углы</span><b>прямые</b></li><li><span>Экран</span><b>сварной каркас</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 7 500 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -211,7 +233,7 @@
       </a>
       <a class="model-card kz-card" href="STN02-reshetka/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/standart/STN02-reshetka/white.webp" alt="Корзина для кондиционера «Решётка» — Стандарт, артикул STN02" loading="lazy"><span class="ph-label">«Решётка»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/standart/STN02-reshetka/white.webp" alt="Корзина для кондиционера «Решётка» — Стандарт, артикул STN02" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/standart/STN02-reshetka/main.webp" alt="Корзина для кондиционера «Решётка» — Стандарт, артикул STN02 — на фасаде" loading="lazy"><span class="ph-label">«Решётка»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Решётка</h3><div class="mc-sub">STN02 · оцинковка + RAL</div>
           <ul class="mc-spec"><li><span>Углы</span><b>прямые</b></li><li><span>Экран</span><b>сварной каркас</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 7 500 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -219,7 +241,7 @@
       </a>
       <a class="model-card kz-card" href="STN03-treugolnik/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/standart/STN03-treugolnik/white.webp" alt="Корзина для кондиционера «Треугольник» — Стандарт, артикул STN03" loading="lazy"><span class="ph-label">«Треугольник»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/standart/STN03-treugolnik/white.webp" alt="Корзина для кондиционера «Треугольник» — Стандарт, артикул STN03" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/standart/STN03-treugolnik/main.webp" alt="Корзина для кондиционера «Треугольник» — Стандарт, артикул STN03 — на фасаде" loading="lazy"><span class="ph-label">«Треугольник»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Треугольник</h3><div class="mc-sub">STN03 · оцинковка + RAL</div>
           <ul class="mc-spec"><li><span>Углы</span><b>прямые</b></li><li><span>Экран</span><b>сварной каркас</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 7 500 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -227,7 +249,7 @@
       </a>
       <a class="model-card kz-card" href="STN04-zvezda/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/standart/STN04-zvezda/white.webp" alt="Корзина для кондиционера «Звезда» — Стандарт, артикул STN04" loading="lazy"><span class="ph-label">«Звезда»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/standart/STN04-zvezda/white.webp" alt="Корзина для кондиционера «Звезда» — Стандарт, артикул STN04" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/standart/STN04-zvezda/main.webp" alt="Корзина для кондиционера «Звезда» — Стандарт, артикул STN04 — на фасаде" loading="lazy"><span class="ph-label">«Звезда»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Звезда</h3><div class="mc-sub">STN04 · оцинковка + RAL</div>
           <ul class="mc-spec"><li><span>Углы</span><b>прямые</b></li><li><span>Экран</span><b>сварной каркас</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 7 500 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -235,7 +257,7 @@
       </a>
       <a class="model-card kz-card" href="STN05-kirpich/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/standart/STN05-kirpich/white.webp" alt="Корзина для кондиционера «Кирпич» — Стандарт, артикул STN05" loading="lazy"><span class="ph-label">«Кирпич»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/standart/STN05-kirpich/white.webp" alt="Корзина для кондиционера «Кирпич» — Стандарт, артикул STN05" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/standart/STN05-kirpich/main.webp" alt="Корзина для кондиционера «Кирпич» — Стандарт, артикул STN05 — на фасаде" loading="lazy"><span class="ph-label">«Кирпич»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Кирпич</h3><div class="mc-sub">STN05 · оцинковка + RAL</div>
           <ul class="mc-spec"><li><span>Углы</span><b>прямые</b></li><li><span>Экран</span><b>сварной каркас</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 7 500 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -243,7 +265,7 @@
       </a>
       <a class="model-card kz-card" href="STN06-palma/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/standart/STN06-palma/white.webp" alt="Корзина для кондиционера «Пальма» — Стандарт, артикул STN06" loading="lazy"><span class="ph-label">«Пальма»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/standart/STN06-palma/white.webp" alt="Корзина для кондиционера «Пальма» — Стандарт, артикул STN06" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/standart/STN06-palma/main.webp" alt="Корзина для кондиционера «Пальма» — Стандарт, артикул STN06 — на фасаде" loading="lazy"><span class="ph-label">«Пальма»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Пальма</h3><div class="mc-sub">STN06 · оцинковка + RAL</div>
           <ul class="mc-spec"><li><span>Углы</span><b>прямые</b></li><li><span>Экран</span><b>сварной каркас</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 7 500 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -251,7 +273,7 @@
       </a>
       <a class="model-card kz-card" href="STN07-safari/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/standart/STN07-safari/white.webp" alt="Корзина для кондиционера «Сафари» — Стандарт, артикул STN07" loading="lazy"><span class="ph-label">«Сафари»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/standart/STN07-safari/white.webp" alt="Корзина для кондиционера «Сафари» — Стандарт, артикул STN07" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/standart/STN07-safari/main.webp" alt="Корзина для кондиционера «Сафари» — Стандарт, артикул STN07 — на фасаде" loading="lazy"><span class="ph-label">«Сафари»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Сафари</h3><div class="mc-sub">STN07 · оцинковка + RAL</div>
           <ul class="mc-spec"><li><span>Углы</span><b>прямые</b></li><li><span>Экран</span><b>сварной каркас</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 7 500 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -259,7 +281,7 @@
       </a>
       <a class="model-card kz-card" href="STN08-lepestok/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/standart/STN08-lepestok/white.webp" alt="Корзина для кондиционера «Лепесток» — Стандарт, артикул STN08" loading="lazy"><span class="ph-label">«Лепесток»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/standart/STN08-lepestok/white.webp" alt="Корзина для кондиционера «Лепесток» — Стандарт, артикул STN08" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/standart/STN08-lepestok/main.webp" alt="Корзина для кондиционера «Лепесток» — Стандарт, артикул STN08 — на фасаде" loading="lazy"><span class="ph-label">«Лепесток»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Лепесток</h3><div class="mc-sub">STN08 · оцинковка + RAL</div>
           <ul class="mc-spec"><li><span>Углы</span><b>прямые</b></li><li><span>Экран</span><b>сварной каркас</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 7 500 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -267,7 +289,7 @@
       </a>
       <a class="model-card kz-card" href="STN09-organika/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><span class="mc-badge">хит</span><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/standart/STN09-organika/white.webp" alt="Корзина для кондиционера «Органика» — Стандарт, артикул STN09" loading="lazy"><span class="ph-label">«Органика»</span></div></div>
+        <div style="position:relative"><span class="mc-badge">хит</span><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/standart/STN09-organika/white.webp" alt="Корзина для кондиционера «Органика» — Стандарт, артикул STN09" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/standart/STN09-organika/main.webp" alt="Корзина для кондиционера «Органика» — Стандарт, артикул STN09 — на фасаде" loading="lazy"><span class="ph-label">«Органика»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Органика</h3><div class="mc-sub">STN09 · оцинковка + RAL</div>
           <ul class="mc-spec"><li><span>Углы</span><b>прямые</b></li><li><span>Экран</span><b>сварной каркас</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 7 500 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -275,7 +297,7 @@
       </a>
       <a class="model-card kz-card" href="STN10-simmetriya/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/standart/STN10-simmetriya/white.webp" alt="Корзина для кондиционера «Симметрия» — Стандарт, артикул STN10" loading="lazy"><span class="ph-label">«Симметрия»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/standart/STN10-simmetriya/white.webp" alt="Корзина для кондиционера «Симметрия» — Стандарт, артикул STN10" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/standart/STN10-simmetriya/main.webp" alt="Корзина для кондиционера «Симметрия» — Стандарт, артикул STN10 — на фасаде" loading="lazy"><span class="ph-label">«Симметрия»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Симметрия</h3><div class="mc-sub">STN10 · оцинковка + RAL</div>
           <ul class="mc-spec"><li><span>Углы</span><b>прямые</b></li><li><span>Экран</span><b>сварной каркас</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 7 500 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -286,8 +308,13 @@
 </section>
 
 <!-- ART DECO catalog -->
-<div class="kzc-dark" aria-hidden="true"></div>
 <section class="artdeco kzc" id="kz-artdeco">
+  <div class="kzc-bg" aria-hidden="true">
+      <span class="kzc-orb o1" data-spd="-60"></span>
+      <span class="kzc-orb o2" data-spd="95"></span>
+      <span class="kzc-orb o3" data-spd="-140"></span>
+      <span class="kzc-lines" data-spd="-34"></span>
+    </div>
   <div class="kzc-intro">
     <div class="kzc-title"><span class="kzc-word">ART DECO</span></div>
     <p class="kzc-sub">14 ажурных узоров · лазер перетекает по всем граням · цельногнутый экран</p>
@@ -299,7 +326,7 @@
     <div class="model-grid kz-wall kz-rise">
       <a class="model-card kz-card" href="ART06-novaciya/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART06-novaciya/white.webp" alt="Корзина для кондиционера «Новация» — Art Deco, артикул ART06" loading="lazy"><span class="ph-label">«Новация»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART06-novaciya/white.webp" alt="Корзина для кондиционера «Новация» — Art Deco, артикул ART06" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART06-novaciya/main.webp" alt="Корзина для кондиционера «Новация» — Art Deco, артикул ART06 — на фасаде" loading="lazy"><span class="ph-label">«Новация»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Новация</h3><div class="mc-sub">ART06 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -307,7 +334,7 @@
       </a>
       <a class="model-card kz-card" href="ART07-astra/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART07-astra/white.webp" alt="Корзина для кондиционера «Астра» — Art Deco, артикул ART07" loading="lazy"><span class="ph-label">«Астра»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART07-astra/white.webp" alt="Корзина для кондиционера «Астра» — Art Deco, артикул ART07" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART07-astra/main.webp" alt="Корзина для кондиционера «Астра» — Art Deco, артикул ART07 — на фасаде" loading="lazy"><span class="ph-label">«Астра»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Астра</h3><div class="mc-sub">ART07 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -315,7 +342,7 @@
       </a>
       <a class="model-card kz-card" href="ART08-dinamika/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART08-dinamika/white.webp" alt="Корзина для кондиционера «Динамика» — Art Deco, артикул ART08" loading="lazy"><span class="ph-label">«Динамика»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART08-dinamika/white.webp" alt="Корзина для кондиционера «Динамика» — Art Deco, артикул ART08" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART08-dinamika/main.webp" alt="Корзина для кондиционера «Динамика» — Art Deco, артикул ART08 — на фасаде" loading="lazy"><span class="ph-label">«Динамика»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Динамика</h3><div class="mc-sub">ART08 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -323,7 +350,7 @@
       </a>
       <a class="model-card kz-card" href="ART09-rezonans/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART09-rezonans/white.webp" alt="Корзина для кондиционера «Резонанс» — Art Deco, артикул ART09" loading="lazy"><span class="ph-label">«Резонанс»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART09-rezonans/white.webp" alt="Корзина для кондиционера «Резонанс» — Art Deco, артикул ART09" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART09-rezonans/main.webp" alt="Корзина для кондиционера «Резонанс» — Art Deco, артикул ART09 — на фасаде" loading="lazy"><span class="ph-label">«Резонанс»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Резонанс</h3><div class="mc-sub">ART09 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -331,7 +358,7 @@
       </a>
       <a class="model-card kz-card" href="ART10-fleksibl/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART10-fleksibl/white.webp" alt="Корзина для кондиционера «Флексибл» — Art Deco, артикул ART10" loading="lazy"><span class="ph-label">«Флексибл»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART10-fleksibl/white.webp" alt="Корзина для кондиционера «Флексибл» — Art Deco, артикул ART10" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART10-fleksibl/main.webp" alt="Корзина для кондиционера «Флексибл» — Art Deco, артикул ART10 — на фасаде" loading="lazy"><span class="ph-label">«Флексибл»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Флексибл</h3><div class="mc-sub">ART10 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -339,7 +366,7 @@
       </a>
       <a class="model-card kz-card" href="ART11-serkil/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><span class="mc-badge">хит</span><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART11-serkil/white.webp" alt="Корзина для кондиционера «Сёркил» — Art Deco, артикул ART11" loading="lazy"><span class="ph-label">«Сёркил»</span></div></div>
+        <div style="position:relative"><span class="mc-badge">хит</span><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART11-serkil/white.webp" alt="Корзина для кондиционера «Сёркил» — Art Deco, артикул ART11" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART11-serkil/main.webp" alt="Корзина для кондиционера «Сёркил» — Art Deco, артикул ART11 — на фасаде" loading="lazy"><span class="ph-label">«Сёркил»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Сёркил</h3><div class="mc-sub">ART11 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -347,7 +374,7 @@
       </a>
       <a class="model-card kz-card" href="ART12-arabika/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART12-arabika/white.webp" alt="Корзина для кондиционера «Арабика» — Art Deco, артикул ART12" loading="lazy"><span class="ph-label">«Арабика»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART12-arabika/white.webp" alt="Корзина для кондиционера «Арабика» — Art Deco, артикул ART12" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART12-arabika/main.webp" alt="Корзина для кондиционера «Арабика» — Art Deco, артикул ART12 — на фасаде" loading="lazy"><span class="ph-label">«Арабика»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Арабика</h3><div class="mc-sub">ART12 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -355,7 +382,7 @@
       </a>
       <a class="model-card kz-card" href="ART13-liaf/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART13-liaf/white.webp" alt="Корзина для кондиционера «Лиаф» — Art Deco, артикул ART13" loading="lazy"><span class="ph-label">«Лиаф»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART13-liaf/white.webp" alt="Корзина для кондиционера «Лиаф» — Art Deco, артикул ART13" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART13-liaf/main.webp" alt="Корзина для кондиционера «Лиаф» — Art Deco, артикул ART13 — на фасаде" loading="lazy"><span class="ph-label">«Лиаф»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Лиаф</h3><div class="mc-sub">ART13 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -363,7 +390,7 @@
       </a>
       <a class="model-card kz-card" href="ART14-volnenie/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><span class="mc-badge">хит</span><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART14-volnenie/white.webp" alt="Корзина для кондиционера «Волнение» — Art Deco, артикул ART14" loading="lazy"><span class="ph-label">«Волнение»</span></div></div>
+        <div style="position:relative"><span class="mc-badge">хит</span><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART14-volnenie/white.webp" alt="Корзина для кондиционера «Волнение» — Art Deco, артикул ART14" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART14-volnenie/main.webp" alt="Корзина для кондиционера «Волнение» — Art Deco, артикул ART14 — на фасаде" loading="lazy"><span class="ph-label">«Волнение»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Волнение</h3><div class="mc-sub">ART14 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -371,7 +398,7 @@
       </a>
       <a class="model-card kz-card" href="ART15-bereza/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART15-bereza/white.webp" alt="Корзина для кондиционера «Берёза» — Art Deco, артикул ART15" loading="lazy"><span class="ph-label">«Берёза»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART15-bereza/white.webp" alt="Корзина для кондиционера «Берёза» — Art Deco, артикул ART15" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART15-bereza/main.webp" alt="Корзина для кондиционера «Берёза» — Art Deco, артикул ART15 — на фасаде" loading="lazy"><span class="ph-label">«Берёза»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Берёза</h3><div class="mc-sub">ART15 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -379,7 +406,7 @@
       </a>
       <a class="model-card kz-card" href="ART16-ampir/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><span class="mc-badge">новинка</span><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART16-ampir/white.webp" alt="Корзина для кондиционера «Ампир» — Art Deco, артикул ART16" loading="lazy"><span class="ph-label">«Ампир»</span></div></div>
+        <div style="position:relative"><span class="mc-badge">новинка</span><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART16-ampir/white.webp" alt="Корзина для кондиционера «Ампир» — Art Deco, артикул ART16" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART16-ampir/main.webp" alt="Корзина для кондиционера «Ампир» — Art Deco, артикул ART16 — на фасаде" loading="lazy"><span class="ph-label">«Ампир»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Ампир</h3><div class="mc-sub">ART16 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -387,7 +414,7 @@
       </a>
       <a class="model-card kz-card" href="ART17-modern/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART17-modern/white.webp" alt="Корзина для кондиционера «Модерн» — Art Deco, артикул ART17" loading="lazy"><span class="ph-label">«Модерн»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART17-modern/white.webp" alt="Корзина для кондиционера «Модерн» — Art Deco, артикул ART17" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART17-modern/main.webp" alt="Корзина для кондиционера «Модерн» — Art Deco, артикул ART17 — на фасаде" loading="lazy"><span class="ph-label">«Модерн»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Модерн</h3><div class="mc-sub">ART17 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -395,7 +422,7 @@
       </a>
       <a class="model-card kz-card" href="ART18-ampir-2/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART18-ampir-2/white.webp" alt="Корзина для кондиционера «Ампир 2» — Art Deco, артикул ART18" loading="lazy"><span class="ph-label">«Ампир 2»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART18-ampir-2/white.webp" alt="Корзина для кондиционера «Ампир 2» — Art Deco, артикул ART18" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART18-ampir-2/main.webp" alt="Корзина для кондиционера «Ампир 2» — Art Deco, артикул ART18 — на фасаде" loading="lazy"><span class="ph-label">«Ампир 2»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Ампир 2</h3><div class="mc-sub">ART18 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -403,7 +430,7 @@
       </a>
       <a class="model-card kz-card" href="ART19-rokoko/index.html">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img contain"><img src="../../assets/img/korziny/art-deco/ART19-rokoko/white.webp" alt="Корзина для кондиционера «Рококо» — Art Deco, артикул ART19" loading="lazy"><span class="ph-label">«Рококо»</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/korziny/art-deco/ART19-rokoko/white.webp" alt="Корзина для кондиционера «Рококо» — Art Deco, артикул ART19" loading="lazy"><img class="kz-img-b" src="../../assets/img/korziny/art-deco/ART19-rokoko/main.webp" alt="Корзина для кондиционера «Рококо» — Art Deco, артикул ART19 — на фасаде" loading="lazy"><span class="ph-label">«Рококо»</span><span class="kz-hint">на фасаде →</span></div></div>
         <div class="mc-b"><h3>Рококо</h3><div class="mc-sub">ART19 · лазерный узор</div>
           <ul class="mc-spec"><li><span>Углы</span><b>закруглённые</b></li><li><span>Экран</span><b>цельногнутый</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>от 10 790 ₽</b><small>по размеру</small></div><span class="mc-go">Открыть →</span></div></div>
@@ -591,47 +618,33 @@
   var rises=document.querySelectorAll('.kz-rise');
   if(reduced||!('IntersectionObserver'in window)){rises.forEach(function(e){e.classList.add('kz-in')});}
   else{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('kz-in');io.unobserve(e.target);}})},{threshold:.1});rises.forEach(function(e){io.observe(e)});}
-  /* advantage plates slide-in */
   var adv=document.querySelector('.kzc-adv');
   if(adv){if(reduced||!('IntersectionObserver'in window)){adv.classList.add('in');}else{var io2=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io2.unobserve(e.target);}})},{threshold:.2});io2.observe(adv);}}
-  /* showcase swap + parallax */
-  var stage=document.getElementById('kzStage');
-  if(stage){var simg=stage.querySelector('.kz-stage-img');
-    document.querySelectorAll('.kz-pick[data-img]').forEach(function(p){p.addEventListener('click',function(){
+  var stage=document.getElementById('kzStage');var simg=stage&&stage.querySelector('.kz-stage-img');
+  if(stage){document.querySelectorAll('.kz-pick[data-img]').forEach(function(p){p.addEventListener('click',function(){
       if(p.classList.contains('on'))return;simg.style.opacity=0;
       setTimeout(function(){simg.src=p.dataset.img;simg.alt=p.dataset.alt||'';stage.querySelector('.kz-stage-art').textContent=p.dataset.art;stage.querySelector('.kz-stage-cap b').textContent=p.dataset.name;stage.querySelector('.kz-stage-sub').textContent=p.dataset.sub;simg.style.opacity=1;},230);
-      document.querySelectorAll('.kz-pick').forEach(function(x){x.classList.remove('on')});p.classList.add('on');});});
-    if(!reduced){var raf=false;addEventListener('scroll',function(){if(raf)return;raf=true;requestAnimationFrame(function(){raf=false;var r=stage.getBoundingClientRect();var vh=innerHeight||800;var prog=(r.top+r.height/2-vh/2)/vh;simg.style.transform='translateY('+(prog*-20).toFixed(1)+'px) scale(1.07)';});},{passive:true});}
-  }
-  /* 3D cursor-tilt on cards (hover devices only) */
-  if(canHover&&!reduced){
-    document.querySelectorAll('.kz-card').forEach(function(card){
+      document.querySelectorAll('.kz-pick').forEach(function(x){x.classList.remove('on')});p.classList.add('on');});});}
+  /* 3D cursor-tilt */
+  if(canHover&&!reduced){document.querySelectorAll('.kz-card').forEach(function(card){
       var inn=card.querySelector('.kz-card-in');if(!inn)return;
-      card.addEventListener('pointermove',function(e){
-        var r=card.getBoundingClientRect();var px=(e.clientX-r.left)/r.width;var py=(e.clientY-r.top)/r.height;
+      card.addEventListener('pointermove',function(e){var r=card.getBoundingClientRect();var px=(e.clientX-r.left)/r.width;var py=(e.clientY-r.top)/r.height;
         inn.style.transform='rotateY('+((px-.5)*9).toFixed(2)+'deg) rotateX('+(-(py-.5)*9).toFixed(2)+'deg) translateZ(12px)';
-        inn.style.setProperty('--gx',(px*100).toFixed(1)+'%');inn.style.setProperty('--gy',(py*100).toFixed(1)+'%');
-        card.classList.add('tilt');
-      });
-      card.addEventListener('pointerleave',function(){inn.style.transform='';card.classList.remove('tilt');});
-    });
+        inn.style.setProperty('--gx',(px*100).toFixed(1)+'%');inn.style.setProperty('--gy',(py*100).toFixed(1)+'%');card.classList.add('tilt');});
+      card.addEventListener('pointerleave',function(){inn.style.transform='';card.classList.remove('tilt');});});}
+  /* scroll loop: parallax bg (multi-speed) + stage parallax + title fill */
+  var word=document.querySelector('#kz-artdeco .kzc-word');var intro=document.querySelector('#kz-artdeco .kzc-intro');var title=document.querySelector('#kz-artdeco .kzc-title');
+  var bgs=[].slice.call(document.querySelectorAll('.kzc-bg'));
+  var raf=false;
+  function loop(){raf=false;var vh=innerHeight||800;
+    bgs.forEach(function(bg){var r=bg.getBoundingClientRect();
+      var prog=(vh-r.top)/(vh+r.height);prog=Math.max(0,Math.min(1,prog));var c=(prog-0.5)*2; // -1..1
+      bg.querySelectorAll('[data-spd]').forEach(function(o){o.style.transform='translate3d(0,'+(c*parseFloat(o.dataset.spd)).toFixed(1)+'px,0)';});});
+    if(simg){var rs=simg.getBoundingClientRect();var prog=(rs.top+rs.height/2-vh/2)/vh;simg.style.transform='translateY('+(prog*-20).toFixed(1)+'px) scale(1.07)';}
+    if(word&&intro){var ri=intro.getBoundingClientRect();var p=Math.min(1,Math.max(0,(vh*0.82 - ri.top)/(vh*0.62)));word.style.setProperty('--p',p.toFixed(3));if(title)title.style.transform='scale('+(0.93+p*0.07).toFixed(3)+')';}
   }
-  /* cinematic Art-Deco: scroll-driven title fill + page darken */
-  var sec=document.getElementById('kz-artdeco');var dark=document.querySelector('.kzc-dark');var intro=sec&&sec.querySelector('.kzc-intro');var title=sec&&sec.querySelector('.kzc-title');var word=sec&&sec.querySelector('.kzc-word');
-  if(sec&&dark&&intro&&word&&!reduced){
-    var raf2=false;
-    function tick(){raf2=false;
-      var ri=intro.getBoundingClientRect();var rs=sec.getBoundingClientRect();var vh=innerHeight||800;
-      var p=Math.min(1,Math.max(0,(vh*0.82 - ri.top)/(vh*0.62)));
-      word.style.setProperty('--p',p.toFixed(3));
-      if(title)title.style.transform='scale('+(0.93+p*0.07).toFixed(3)+')';
-      var center=rs.top+rs.height/2;var dist=Math.abs(center-vh/2)/(vh*0.95);
-      var d=(rs.bottom<40||rs.top>vh-40)?0:Math.max(0,0.8*(1-dist));
-      dark.style.opacity=d.toFixed(3);
-    }
-    addEventListener('scroll',function(){if(!raf2){raf2=true;requestAnimationFrame(tick);}},{passive:true});
-    addEventListener('resize',tick);tick();
-  } else if(word){word.style.setProperty('--p','1');}
+  if(!reduced){addEventListener('scroll',function(){if(!raf){raf=true;requestAnimationFrame(loop);}},{passive:true});addEventListener('resize',loop);loop();}
+  else if(word){word.style.setProperty('--p','1');}
 })();
 </script>
 <script src="../../assets/js/site.js"></script>
