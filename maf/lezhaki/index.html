@@ -23,17 +23,61 @@
 .classic-grid .model-card:nth-child(n+9){display:none}
 .classic-grid.expanded .model-card{display:flex}
 .classic-more{text-align:center;margin-top:30px}
-/* Art Deco лежаки (черновик) */
-.kzad{background:radial-gradient(900px 480px at 82% 0%,rgba(242,111,29,.08),transparent 55%),var(--bg2)}
-.kzad-swap{position:relative;overflow:hidden}
-.kzad-swap img{position:absolute;inset:0;width:100%;height:100%;transition:opacity .5s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
-.kzad-swap .kzad-a{object-fit:contain;background:#fff}
-.kzad-swap .kzad-b{object-fit:cover;opacity:0}
-.kzad-card:hover .kzad-swap .kzad-a{opacity:0}
-.kzad-card:hover .kzad-swap .kzad-b{opacity:1;transform:scale(1.04)}
-.kzad-card .ph-label{background:rgba(242,111,29,.92);color:#fff;left:12px;bottom:12px;width:auto;padding:3px 9px;border-radius:20px;font-size:11px;opacity:0;transform:translateY(6px);transition:.3s}
-.kzad-card:hover .ph-label{opacity:1;transform:none}
-.kzad-note{color:var(--steel);font-size:12.5px;margin-top:20px;max-width:640px}
+/* card hover: white -> facade */
+.kz-swap{position:relative;overflow:hidden}
+.kz-swap img{position:absolute;inset:0;width:100%;height:100%;transition:opacity .5s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.kz-swap .kz-img-a{object-fit:contain;background:#fff}
+.kz-swap .kz-img-b{object-fit:cover;opacity:0}
+.kz-card:hover .kz-swap .kz-img-a{opacity:0}
+.kz-card:hover .kz-swap .kz-img-b{opacity:1;transform:scale(1.04)}
+.kz-card .ph-label{position:absolute;left:12px;bottom:12px;z-index:3;background:rgba(242,111,29,.92);color:#fff;width:auto;padding:3px 9px;border-radius:20px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;opacity:0;transform:translateY(6px);transition:.3s}
+.kz-card:hover .ph-label{opacity:1;transform:none}
+/* 3D tilt + glare + hover-wall */
+.kz-card{perspective:1000px;background:transparent;border:none;box-shadow:none;overflow:visible}
+.kz-card .kz-card-in{position:relative;display:flex;flex-direction:column;height:100%;background:#12161b;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,border-color .35s;transform-style:preserve-3d;will-change:transform}
+.kz-card .kz-card-in::before{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(420px circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.22),transparent 42%)}
+.kz-card.tilt .kz-card-in::before{opacity:1}
+.kz-card.tilt .kz-card-in{box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(242,111,29,.35);border-color:rgba(242,111,29,.4)}
+.kz-card .mc-b{padding:20px 22px 22px;display:flex;flex-direction:column;flex:1}
+.kz-card .mc-sub{color:var(--steel);font-size:12.5px;margin:-2px 0 14px;font-family:'Oswald',sans-serif;letter-spacing:.03em}
+.kz-card .ph.r-43{aspect-ratio:4/3}
+.kz-wall:hover .kz-card:not(:hover){opacity:.45;filter:saturate(.7) brightness(.82)}
+.kz-wall .kz-card{transition:opacity .35s,filter .35s}
+/* reveal */
+.kz-rise>*{opacity:0;transform:translateY(34px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.kz-rise.kz-in>*{opacity:1;transform:none}
+.kz-rise.kz-in>*:nth-child(1){transition-delay:.0s}.kz-rise.kz-in>*:nth-child(2){transition-delay:.06s}.kz-rise.kz-in>*:nth-child(3){transition-delay:.12s}.kz-rise.kz-in>*:nth-child(4){transition-delay:.18s}
+/* parallax bg */
+.kzc-bg{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.kzc-orb{position:absolute;border-radius:50%;will-change:transform}
+.kzc-orb.o1{width:640px;height:640px;left:-14%;top:2%;background:radial-gradient(circle,rgba(242,111,29,.26),transparent 66%);filter:blur(40px)}
+.kzc-orb.o2{width:520px;height:520px;right:-12%;top:40%;background:radial-gradient(circle,rgba(72,116,196,.18),transparent 66%);filter:blur(50px)}
+.kzc-orb.o3{width:420px;height:420px;left:52%;top:74%;background:radial-gradient(circle,rgba(242,111,29,.18),transparent 66%);filter:blur(46px)}
+.kzc-lines{position:absolute;inset:-18%;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:56px 56px;will-change:transform}
+/* cinematic */
+.kzc{position:relative;z-index:1;overflow:visible}
+.kzc .container,.kzc-intro{position:relative;z-index:2}
+.kzc-intro{text-align:center;padding:100px 16px 30px;overflow:visible}
+.kzc-title{position:relative;display:inline-block;will-change:transform}
+.kzc-word{display:inline-block;font-family:'Oswald',sans-serif;font-weight:700;font-size:clamp(60px,16vw,200px);letter-spacing:.04em;line-height:.9;
+  background:linear-gradient(95deg,#ffffff 0%,#ffcf9a calc(var(--p,0)*100% - 3%),#ffffff calc(var(--p,0)*100%),rgba(255,255,255,.07) calc(var(--p,0)*100%));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;-webkit-text-stroke:1.4px rgba(255,255,255,.22);
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,.55)) drop-shadow(0 10px 26px rgba(0,0,0,.55)) drop-shadow(0 0 46px rgba(242,111,29,calc(.15 + var(--p,0)*.4)))}
+.kzc-title::after{content:"";position:absolute;inset:-22% -8%;z-index:-1;background:radial-gradient(58% 78% at 50% 50%,rgba(242,111,29,calc(.08 + var(--p,0)*.22)),transparent 70%);filter:blur(26px);pointer-events:none}
+.kzc-sub{color:var(--tx2);margin-top:18px;font-size:14.5px;letter-spacing:.05em;opacity:calc(.3 + var(--p,0)*.7)}
+.kzc-adv{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0 48px;perspective:1000px}
+.adv-plate{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px 20px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transform:translateY(46px) translateX(var(--sx,0)) rotateY(var(--ry,0));transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1),border-color .3s,box-shadow .3s;transition-delay:var(--d,0s)}
+.adv-plate[data-side="l"]{--sx:-44px;--ry:9deg}.adv-plate[data-side="r"]{--sx:44px;--ry:-9deg}
+.kzc-adv.in .adv-plate{opacity:1;transform:none}
+.adv-plate:hover{border-color:rgba(242,111,29,.5);transform:translateY(-7px) scale(1.03);box-shadow:0 26px 56px rgba(0,0,0,.5)}
+.adv-ic{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(242,111,29,.14);color:var(--amber-h);margin-bottom:14px}
+.adv-ic svg{width:22px;height:22px}
+.adv-plate h4{font-family:'Oswald',sans-serif;font-size:16px;color:#fff;margin:0 0 4px}
+.adv-plate p{margin:0;font-size:12.5px;color:var(--steel)}
+.kzc-note{color:var(--steel);font-size:12.5px;margin-top:24px;max-width:640px}
+@media(prefers-reduced-motion:reduce){.kz-rise>*{opacity:1!important;transform:none!important}.kzc-word{--p:1}.adv-plate{opacity:1!important;transform:none!important}.kzc-orb,.kzc-lines{display:none}}
+@media(hover:none){.kz-wall:hover .kz-card:not(:hover){opacity:1;filter:none}.kz-card:hover .kz-swap .kz-img-a{opacity:1}.kz-card:hover .kz-swap .kz-img-b{opacity:0}}
+@media(max-width:900px){.kzc-intro{padding-top:64px}.kzc-orb{filter:blur(60px);opacity:.7}}
 </style>
 </head>
 <body>
@@ -253,38 +297,53 @@
   </div>
 </section>
 
-<!-- ART DECO lezhaki (пилот, черновик) -->
-<section class="tint kzad" id="kz-artdeco">
+
+<!-- ART DECO lezhaki (кинематографичный блок) -->
+<section class="artdeco kzc" id="kz-artdeco">
+  <div class="kzc-bg" aria-hidden="true"><span class="kzc-orb o1" data-spd="-60"></span><span class="kzc-orb o2" data-spd="95"></span><span class="kzc-orb o3" data-spd="-140"></span><span class="kzc-lines" data-spd="-34"></span></div>
+  <div class="kzc-intro">
+    <div class="kzc-title"><span class="kzc-word">ART DECO</span></div>
+    <p class="kzc-sub">Новаторская линейка лежаков · минимализм · архитектурная форма · таких почти нет на рынке</p>
+  </div>
   <div class="container">
-    <div class="reveal"><div class="dim"><span class="tick"></span>Новая линейка · Art Deco</div></div>
-    <div class="sec-head reveal" style="margin-top:22px"><div><h2>Art Deco — новаторские лежаки</h2></div><p class="lead-wide">Дизайнерская линейка в стиле европейского бренда Egoé: минимализм, тонкие ламели, архитектурная форма. Таких решений почти нет на рынке — это про статус объекта.</p></div>
-    <div class="model-grid reveal">
-      <a class="model-card kzad-card reveal" href="#" onclick="openModal();return false">
-        <div style="position:relative"><span class="mc-badge">новинка</span><div class="ph r-43 has-img kzad-swap"><img class="kzad-a" src="../../assets/img/artdeco/lezhaki/a1-2651/hero.webp" alt="Лежак Egoé A1 · сталь — новаторский лежак Art Deco, дизайн Egoé, A1-2651" loading="lazy"><img class="kzad-b" src="../../assets/img/artdeco/lezhaki/a1-2651/facade1.webp" alt="Лежак Egoé A1 · сталь на объекте" loading="lazy"><span class="ph-label">на объекте →</span></div></div>
+    <div class="kzc-adv">
+      <div class="adv-plate" data-side="l" style="--d:0.00s"><div class="adv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div><h4>Тонкие ламели</h4><p>чистая архитектурная линия</p></div><div class="adv-plate" data-side="r" style="--d:0.07s"><div class="adv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 21l-4.9 2.6.9-5.5-4-3.9 5.5-.8z"/></svg></div><h4>Минимализм</h4><p>лежак как арт-объект</p></div><div class="adv-plate" data-side="l" style="--d:0.14s"><div class="adv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16v12H4zM8 6v12M16 6v12"/></svg></div><h4>Металл или дерево</h4><p>алюминий / термодерево</p></div><div class="adv-plate" data-side="r" style="--d:0.21s"><div class="adv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1018 0 9 9 0 10-18 0M12 3v18"/></svg></div><h4>Любой RAL</h4><p>под цвет проекта</p></div><div class="adv-plate" data-side="l" style="--d:0.28s"><div class="adv-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg></div><h4>Всепогодность</h4><p>набережные, дворы ЖК</p></div>
+    </div>
+    <div class="model-grid kz-wall kz-rise">
+      <a class="model-card kz-card" href="#" onclick="openModal();return false">
+        <div class="kz-card-in">
+        <div style="position:relative"><span class="mc-badge">новинка</span><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-2651/hero.webp" alt="Лежак Egoé A1 · сталь — новаторский лежак Art Deco, дизайн Egoé, A1-2651" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-2651/facade1.webp" alt="Лежак Egoé A1 · сталь на объекте" loading="lazy"><span class="ph-label">на объекте →</span></div></div>
         <div class="mc-b"><h3>Лежак Egoé A1 · сталь</h3><div class="mc-sub">Дизайн Egoé · A1-2651 · минимализм</div>
           <ul class="mc-spec"><li><span>Материал</span><b>алюминий/сталь</b></li><li><span>Вес</span><b>72 кг</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить →</span></div></div>
+        </div>
       </a>
-      <a class="model-card kzad-card reveal" href="#" onclick="openModal();return false">
-        <div style="position:relative"><span class="mc-badge">новинка</span><div class="ph r-43 has-img kzad-swap"><img class="kzad-a" src="../../assets/img/artdeco/lezhaki/a1-2661/hero.webp" alt="Лежак Egoé A1 · сталь (2) — новаторский лежак Art Deco, дизайн Egoé, A1-2661" loading="lazy"><img class="kzad-b" src="../../assets/img/artdeco/lezhaki/a1-2661/facade1.webp" alt="Лежак Egoé A1 · сталь (2) на объекте" loading="lazy"><span class="ph-label">на объекте →</span></div></div>
+      <a class="model-card kz-card" href="#" onclick="openModal();return false">
+        <div class="kz-card-in">
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-2661/hero.webp" alt="Лежак Egoé A1 · сталь (2) — новаторский лежак Art Deco, дизайн Egoé, A1-2661" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-2661/facade1.webp" alt="Лежак Egoé A1 · сталь (2) на объекте" loading="lazy"><span class="ph-label">на объекте →</span></div></div>
         <div class="mc-b"><h3>Лежак Egoé A1 · сталь (2)</h3><div class="mc-sub">Дизайн Egoé · A1-2661 · минимализм</div>
           <ul class="mc-spec"><li><span>Материал</span><b>алюминий/сталь</b></li><li><span>Вес</span><b>72 кг</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить →</span></div></div>
+        </div>
       </a>
-      <a class="model-card kzad-card reveal" href="#" onclick="openModal();return false">
-        <div style="position:relative"><span class="mc-badge">новинка</span><div class="ph r-43 has-img kzad-swap"><img class="kzad-a" src="../../assets/img/artdeco/lezhaki/a1-4651/hero.webp" alt="Лежак Egoé A1 · дерево — новаторский лежак Art Deco, дизайн Egoé, A1-4651" loading="lazy"><img class="kzad-b" src="../../assets/img/artdeco/lezhaki/a1-4651/facade1.webp" alt="Лежак Egoé A1 · дерево на объекте" loading="lazy"><span class="ph-label">на объекте →</span></div></div>
+      <a class="model-card kz-card" href="#" onclick="openModal();return false">
+        <div class="kz-card-in">
+        <div style="position:relative"><span class="mc-badge">хит</span><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-4651/hero.webp" alt="Лежак Egoé A1 · дерево — новаторский лежак Art Deco, дизайн Egoé, A1-4651" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-4651/facade1.webp" alt="Лежак Egoé A1 · дерево на объекте" loading="lazy"><span class="ph-label">на объекте →</span></div></div>
         <div class="mc-b"><h3>Лежак Egoé A1 · дерево</h3><div class="mc-sub">Дизайн Egoé · A1-4651 · минимализм</div>
           <ul class="mc-spec"><li><span>Материал</span><b>сталь + дерево</b></li><li><span>Вес</span><b>56–76 кг</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить →</span></div></div>
+        </div>
       </a>
-      <a class="model-card kzad-card reveal" href="#" onclick="openModal();return false">
-        <div style="position:relative"><span class="mc-badge">новинка</span><div class="ph r-43 has-img kzad-swap"><img class="kzad-a" src="../../assets/img/artdeco/lezhaki/a1-4661/hero.webp" alt="Лежак Egoé A1 · дерево (2) — новаторский лежак Art Deco, дизайн Egoé, A1-4661" loading="lazy"><img class="kzad-b" src="../../assets/img/artdeco/lezhaki/a1-4661/facade1.webp" alt="Лежак Egoé A1 · дерево (2) на объекте" loading="lazy"><span class="ph-label">на объекте →</span></div></div>
+      <a class="model-card kz-card" href="#" onclick="openModal();return false">
+        <div class="kz-card-in">
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-4661/hero.webp" alt="Лежак Egoé A1 · дерево (2) — новаторский лежак Art Deco, дизайн Egoé, A1-4661" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-4661/facade1.webp" alt="Лежак Egoé A1 · дерево (2) на объекте" loading="lazy"><span class="ph-label">на объекте →</span></div></div>
         <div class="mc-b"><h3>Лежак Egoé A1 · дерево (2)</h3><div class="mc-sub">Дизайн Egoé · A1-4661 · минимализм</div>
           <ul class="mc-spec"><li><span>Материал</span><b>сталь + дерево</b></li><li><span>Вес</span><b>56–76 кг</b></li></ul>
           <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить →</span></div></div>
+        </div>
       </a>
     </div>
-    <p class="kzad-note reveal">Черновик линейки. Фото и характеристики — предварительные (референс Egoé), заменим на собственные рендеры/съёмку. Наведите на карточку — покажется кадр на объекте.</p>
+    <p class="kzc-note">Черновик линейки. Фото и характеристики предварительные (референс Egoé) — заменим на собственные рендеры. Наведите на карточку — кадр на объекте.</p>
   </div>
 </section>
 
@@ -319,6 +378,27 @@
 </div></div>
 <script id="kzad-js">
 window.toggleClassic=function(btn){var g=document.getElementById('classicGrid');var on=g.classList.toggle('expanded');btn.textContent=on?'Свернуть ↑':'Показать все 19 моделей ↓';if(!on)g.scrollIntoView({behavior:'smooth',block:'start'});};
+(function(){
+  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;var canHover=matchMedia('(hover: hover)').matches;
+  var rises=document.querySelectorAll('.kz-rise');
+  if(reduced||!('IntersectionObserver'in window)){rises.forEach(function(e){e.classList.add('kz-in')});}
+  else{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('kz-in');io.unobserve(e.target);}})},{threshold:.1});rises.forEach(function(e){io.observe(e)});}
+  var advc=document.querySelector('.kzc-adv');
+  if(advc){if(reduced||!('IntersectionObserver'in window)){advc.classList.add('in');}else{var io2=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io2.unobserve(e.target);}})},{threshold:.2});io2.observe(advc);}}
+  if(canHover&&!reduced){document.querySelectorAll('.kz-card').forEach(function(c){var inn=c.querySelector('.kz-card-in');if(!inn)return;
+    c.addEventListener('pointermove',function(e){var r=c.getBoundingClientRect();var px=(e.clientX-r.left)/r.width;var py=(e.clientY-r.top)/r.height;
+      inn.style.transform='rotateY('+((px-.5)*9).toFixed(2)+'deg) rotateX('+(-(py-.5)*9).toFixed(2)+'deg) translateZ(12px)';inn.style.setProperty('--gx',(px*100).toFixed(1)+'%');inn.style.setProperty('--gy',(py*100).toFixed(1)+'%');c.classList.add('tilt');});
+    c.addEventListener('pointerleave',function(){inn.style.transform='';c.classList.remove('tilt');});});}
+  var word=document.querySelector('#kz-artdeco .kzc-word');var intro=document.querySelector('#kz-artdeco .kzc-intro');var title=document.querySelector('#kz-artdeco .kzc-title');
+  var bgs=[].slice.call(document.querySelectorAll('.kzc-bg'));var raf=false;
+  function loop(){raf=false;var vh=innerHeight||800;
+    bgs.forEach(function(bg){var r=bg.getBoundingClientRect();var prog=(vh-r.top)/(vh+r.height);prog=Math.max(0,Math.min(1,prog));var c=(prog-0.5)*2;
+      bg.querySelectorAll('[data-spd]').forEach(function(o){o.style.transform='translate3d(0,'+(c*parseFloat(o.dataset.spd)).toFixed(1)+'px,0)';});});
+    if(word&&intro){var ri=intro.getBoundingClientRect();var p=Math.min(1,Math.max(0,(vh*0.82 - ri.top)/(vh*0.62)));word.style.setProperty('--p',p.toFixed(3));if(title)title.style.transform='scale('+(0.93+p*0.07).toFixed(3)+')';}
+  }
+  if(!reduced){addEventListener('scroll',function(){if(!raf){raf=true;requestAnimationFrame(loop);}},{passive:true});addEventListener('resize',loop);loop();}
+  else if(word){word.style.setProperty('--p','1');}
+})();
 </script>
 <script src="../../assets/js/site.js?v=gallery-2"></script>
 </body>
