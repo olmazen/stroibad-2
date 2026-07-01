@@ -226,6 +226,20 @@
 @media(max-width:860px){.ad-feat-row{display:block}.ad-feat-media,.ad-feat-row.alt .ad-feat-media{grid-column:auto}.ad-feat-copy,.ad-feat-row.alt .ad-feat-copy{grid-column:auto;text-align:left;margin:-38px 12px 0;padding-top:52px}.ad-feat-row.alt .ad-feat-eyebrow{flex-direction:row}.ad-feat-row.alt .ad-feat-line{margin-left:0;background:linear-gradient(90deg,var(--amber),transparent)}.ad-feat-n,.ad-feat-row.alt .ad-feat-n{left:18px;right:auto;font-size:clamp(52px,15vw,82px)}.ad-feat{gap:54px}}
 @media(max-width:900px){.kz-stage-wrap{grid-template-columns:1fr}.kz-picks{flex-direction:row;overflow-x:auto}.kz-pick{flex-direction:column;min-width:120px;gap:7px;text-align:center;font-size:11px}.kz-pick img{width:100%;height:60px}.kz-pick::before{display:none}.ad-intro{padding-top:48px}.kz-air{padding-top:60px;padding-bottom:54px}.ad-seal{top:0;right:1%;width:62px}}
 @media(max-width:560px){.artdeco .model-grid{grid-template-columns:1fr}.ad-seal{display:none}}
+
+/* — доработанные анимации: staggered появление интро + reveal каталога — */
+.ad-intro.reveal .ad-crown,.ad-intro.reveal .ad-kicker,.ad-intro.reveal .ad-rule,.ad-intro.reveal .ad-title,.ad-intro.reveal .ad-lead{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.ad-intro.reveal.in .ad-crown{opacity:1;transform:none;transition-delay:.05s}
+.ad-intro.reveal.in .ad-kicker{opacity:1;transform:none;transition-delay:.16s}
+.ad-intro.reveal.in .ad-rule{opacity:1;transform:none;transition-delay:.27s}
+.ad-intro.reveal.in .ad-title{opacity:1;transform:none;transition-delay:.4s}
+.ad-intro.reveal.in .ad-lead{opacity:1;transform:none;transition-delay:.56s}
+.ad-cathead.reveal h3,.ad-cathead.reveal .sub{opacity:0;transform:translateY(22px);transition:opacity .75s cubic-bezier(.2,.7,.2,1),transform .75s cubic-bezier(.2,.7,.2,1)}
+.ad-cathead.reveal.in h3{opacity:1;transform:none}
+.ad-cathead.reveal.in .sub{opacity:1;transform:none;transition-delay:.12s}
+#kz-artdeco.is-depth .ad-corner-fan{opacity:.26}
+.ad-corner-fan{transition:opacity .6s ease}
+@media(prefers-reduced-motion:reduce){.ad-intro.reveal .ad-crown,.ad-intro.reveal .ad-kicker,.ad-intro.reveal .ad-rule,.ad-intro.reveal .ad-title,.ad-intro.reveal .ad-lead,.ad-cathead.reveal h3,.ad-cathead.reveal .sub{opacity:1!important;transform:none!important}}
 </style>
 </head>
 <body>
@@ -459,56 +473,6 @@
     </div>
 
     
-
-    <div class="ad-divider reveal" aria-hidden="true"><svg viewBox="0 0 600 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M30 20H248M570 20H352"></path><path d="M30 20l8-6 8 6-8 6z" fill="currentColor" stroke="none"></path><path d="M570 20l-8-6-8 6 8 6z" fill="currentColor" stroke="none"></path><path d="M248 20l16-9M248 20l16 9M352 20l-16-9M352 20l-16 9" stroke-width="1.1"></path><path d="M300 2l26 18-26 18-26-18z"></path><path d="M300 11l14 9-14 9-14-9z"></path><circle cx="300" cy="20" r="2.6" fill="currentColor" stroke="none"></circle></svg></div>
-
-    <div class="ad-feat">
-      <article class="ad-feat-row reveal">
-        <div class="ad-feat-media">
-          <div class="ad-feat-frame">
-            <img src="../../assets/img/korziny/art-deco/ART14-volnenie/main.webp" alt="Корзина Art Déco «Волнение» на фасаде ЖК — оригинальный ажурный дизайн" loading="lazy" data-par="0.18">
-            <span class="ad-feat-badge">ART14 · Волнение</span>
-          </div>
-        </div>
-        <div class="ad-feat-copy">
-          <span class="ad-feat-n">01</span>
-          <span class="ad-feat-eyebrow">Эстетика фасада</span>
-          <h3>Оригинальный дизайн</h3>
-          <div class="ad-feat-line"></div>
-          <p>Ажурный узор перетекает по всем плоскостям экрана — не «коробка на фасаде», а деталь архитектуры. 14 рисунков на выбор.</p>
-        </div>
-      </article>
-      <article class="ad-feat-row alt reveal">
-        <div class="ad-feat-media">
-          <div class="ad-feat-frame">
-            <img src="../../assets/img/korziny/art-deco/ART14-volnenie/closeup.webp" alt="Радиусный угол корзины Art Déco — цельногнутый лазерный экран без шва" loading="lazy" data-par="0.18">
-            <span class="ad-feat-badge">Цельногнутый экран</span>
-          </div>
-        </div>
-        <div class="ad-feat-copy">
-          <span class="ad-feat-n">02</span>
-          <span class="ad-feat-eyebrow">Конструкция</span>
-          <h3>Радиусные углы</h3>
-          <div class="ad-feat-line"></div>
-          <p>Цельногнутый экран увеличивает жёсткость и надёжность, а узор плавно перетекает по граням — без единого видимого шва.</p>
-        </div>
-      </article>
-      <article class="ad-feat-row reveal">
-        <div class="ad-feat-media">
-          <div class="ad-feat-frame">
-            <img src="../../assets/img/korziny/art-deco/ART14-volnenie/white.webp" alt="Корзина Art Déco — студийный рендер конструкции и усиленного кронштейна" loading="lazy" data-par="0.18">
-            <span class="ad-feat-badge">Скрытый монтаж</span>
-          </div>
-        </div>
-        <div class="ad-feat-copy">
-          <span class="ad-feat-n">03</span>
-          <span class="ad-feat-eyebrow">Крепление</span>
-          <h3>Улучшенный кронштейн</h3>
-          <div class="ad-feat-line"></div>
-          <p>Усиленные модели крепления со скрытым монтажом — держат блок надёжно и выдерживают ветровую нагрузку.</p>
-        </div>
-      </article>
-    </div>
 
     <div class="ad-cathead reveal">
       <div class="ad-divider reveal" aria-hidden="true"><svg viewBox="0 0 600 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M30 20H248M570 20H352"></path><path d="M30 20l8-6 8 6-8 6z" fill="currentColor" stroke="none"></path><path d="M570 20l-8-6-8 6 8 6z" fill="currentColor" stroke="none"></path><path d="M248 20l16-9M248 20l16 9M352 20l-16-9M352 20l-16 9" stroke-width="1.1"></path><path d="M300 2l26 18-26 18-26-18z"></path><path d="M300 11l14 9-14 9-14-9z"></path><circle cx="300" cy="20" r="2.6" fill="currentColor" stroke="none"></circle></svg></div>
@@ -842,6 +806,7 @@
   if(stnMore&&stnGrid){stnMore.addEventListener('click',function(){stnGrid.classList.remove('kz-collapsed');var w=stnMore.parentNode;if(w)w.style.display='none';});}
 })();
 </script>
+<script id="kz-depth">(function(){var s=document.getElementById('kz-artdeco');if(!s)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var t=false;function a(){t=false;var r=s.getBoundingClientRect();var vh=innerHeight||800;var c=r.top+r.height/2;var on=r.top<vh*0.4&&r.bottom>vh*0.6;s.classList.toggle('is-depth',on);}addEventListener('scroll',function(){if(!t){t=true;requestAnimationFrame(a);}},{passive:true});addEventListener('resize',a);a();})();</script>
 <script src="../../assets/js/site.js"></script>
 </body>
 </html>

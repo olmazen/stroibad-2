@@ -215,6 +215,20 @@
 .classic-grid .model-card:nth-child(n+9){display:none}
 .classic-grid.expanded .model-card{display:flex}
 .classic-more{text-align:center;margin-top:30px}
+
+/* — доработанные анимации: staggered появление интро + reveal каталога — */
+.ad-intro.reveal .ad-crown,.ad-intro.reveal .ad-kicker,.ad-intro.reveal .ad-rule,.ad-intro.reveal .ad-title,.ad-intro.reveal .ad-lead{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.ad-intro.reveal.in .ad-crown{opacity:1;transform:none;transition-delay:.05s}
+.ad-intro.reveal.in .ad-kicker{opacity:1;transform:none;transition-delay:.16s}
+.ad-intro.reveal.in .ad-rule{opacity:1;transform:none;transition-delay:.27s}
+.ad-intro.reveal.in .ad-title{opacity:1;transform:none;transition-delay:.4s}
+.ad-intro.reveal.in .ad-lead{opacity:1;transform:none;transition-delay:.56s}
+.ad-cathead.reveal h3,.ad-cathead.reveal .sub{opacity:0;transform:translateY(22px);transition:opacity .75s cubic-bezier(.2,.7,.2,1),transform .75s cubic-bezier(.2,.7,.2,1)}
+.ad-cathead.reveal.in h3{opacity:1;transform:none}
+.ad-cathead.reveal.in .sub{opacity:1;transform:none;transition-delay:.12s}
+#kz-artdeco.is-depth .ad-corner-fan{opacity:.26}
+.ad-corner-fan{transition:opacity .6s ease}
+@media(prefers-reduced-motion:reduce){.ad-intro.reveal .ad-crown,.ad-intro.reveal .ad-kicker,.ad-intro.reveal .ad-rule,.ad-intro.reveal .ad-title,.ad-intro.reveal .ad-lead,.ad-cathead.reveal h3,.ad-cathead.reveal .sub{opacity:1!important;transform:none!important}}
 </style>
 </head>
 <body>
@@ -479,32 +493,6 @@
 
     
 
-    <div class="ad-divider reveal" aria-hidden="true"><svg viewBox="0 0 600 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M30 20H248M570 20H352"></path><path d="M30 20l8-6 8 6-8 6z" fill="currentColor" stroke="none"></path><path d="M570 20l-8-6-8 6 8 6z" fill="currentColor" stroke="none"></path><path d="M248 20l16-9M248 20l16 9M352 20l-16-9M352 20l-16 9" stroke-width="1.1"></path><path d="M300 2l26 18-26 18-26-18z"></path><path d="M300 11l14 9-14 9-14-9z"></path><circle cx="300" cy="20" r="2.6" fill="currentColor" stroke="none"></circle></svg></div>
-
-    <div class="ad-feat">
-      <article class="ad-feat-row reveal">
-        <div class="ad-feat-media"><div class="ad-feat-frame">
-          <img src="../../assets/img/artdeco/lezhaki/a1-2651/facade1.webp" alt="Лежаки Art Déco Egoé на объекте — двор ЖК" loading="lazy" data-par="0.18">
-          <span class="ad-feat-badge">Egoé A1 · на объекте</span>
-        </div></div>
-        <div class="ad-feat-copy"><span class="ad-feat-n">01</span><span class="ad-feat-eyebrow">Эстетика пространства</span><h3>Архитектурная форма</h3><div class="ad-feat-line"></div><p>Тонкие ламели и чистая линия — лежак как арт-объект. Продуманная геометрия для набережных, парков и премиальных дворов.</p></div>
-      </article>
-      <article class="ad-feat-row alt reveal">
-        <div class="ad-feat-media"><div class="ad-feat-frame">
-          <img src="../../assets/img/artdeco/lezhaki/a1-4651/hero.webp" alt="Лежак Art Déco Egoé из термодерева — студийный рендер" loading="lazy" data-par="0.18">
-          <span class="ad-feat-badge">Термодерево</span>
-        </div></div>
-        <div class="ad-feat-copy"><span class="ad-feat-n">02</span><span class="ad-feat-eyebrow">Материал</span><h3>Металл или дерево</h3><div class="ad-feat-line"></div><p>Алюминиевый каркас или тёплое термодерево на выбор. Всепогодные материалы — не боятся солнца, дождя и перепадов.</p></div>
-      </article>
-      <article class="ad-feat-row reveal">
-        <div class="ad-feat-media"><div class="ad-feat-frame">
-          <img src="../../assets/img/artdeco/lezhaki/a1-2651/hero.webp" alt="Лежак Art Déco Egoé — алюминий, окраска в любой RAL" loading="lazy" data-par="0.18">
-          <span class="ad-feat-badge">Любой RAL</span>
-        </div></div>
-        <div class="ad-feat-copy"><span class="ad-feat-n">03</span><span class="ad-feat-eyebrow">Отделка</span><h3>Цвет под проект</h3><div class="ad-feat-line"></div><p>Порошковая окраска в любой RAL — вписываем в дизайн-код территории. Партия в едином оттенке под весь объект.</p></div>
-      </article>
-    </div>
-
     <div class="ad-cathead reveal">
       <div class="ad-divider reveal" aria-hidden="true"><svg viewBox="0 0 600 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M30 20H248M570 20H352"></path><path d="M30 20l8-6 8 6-8 6z" fill="currentColor" stroke="none"></path><path d="M570 20l-8-6-8 6 8 6z" fill="currentColor" stroke="none"></path><path d="M248 20l16-9M248 20l16 9M352 20l-16-9M352 20l-16 9" stroke-width="1.1"></path><path d="M300 2l26 18-26 18-26-18z"></path><path d="M300 11l14 9-14 9-14-9z"></path><circle cx="300" cy="20" r="2.6" fill="currentColor" stroke="none"></circle></svg></div>
       <h3>Каталог серии</h3>
@@ -617,6 +605,7 @@
   if(stnMore&&stnGrid){stnMore.addEventListener('click',function(){stnGrid.classList.remove('kz-collapsed');var w=stnMore.parentNode;if(w)w.style.display='none';});}
 })();
 </script>
+<script id="kz-depth">(function(){var s=document.getElementById('kz-artdeco');if(!s)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var t=false;function a(){t=false;var r=s.getBoundingClientRect();var vh=innerHeight||800;var c=r.top+r.height/2;var on=r.top<vh*0.4&&r.bottom>vh*0.6;s.classList.toggle('is-depth',on);}addEventListener('scroll',function(){if(!t){t=true;requestAnimationFrame(a);}},{passive:true});addEventListener('resize',a);a();})();</script>
 <script src="../../assets/js/site.js?v=gallery-2"></script>
 </body>
 </html>
