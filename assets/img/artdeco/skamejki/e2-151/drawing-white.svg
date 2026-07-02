@@ -18,13 +18,13 @@
 
       .cls-2 {
         fill: none;
-        stroke: #1d1d1b;
+        stroke: #ffffff;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
 
       .cls-4 {
-        fill: #2d4a72;
+        fill: #24466f;
         stroke-width: 0px;
       }
     </style>

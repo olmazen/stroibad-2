@@ -19,7 +19,7 @@
       }
 
       .cls-8 {
-        fill: #2d4a72;
+        fill: #24466f;
       }
 
       .cls-8, .cls-9, .cls-10 {
@@ -33,24 +33,24 @@
       }
 
       .cls-2, .cls-7 {
-        stroke: #030304;
+        stroke: #ffffff;
       }
 
       .cls-4 {
-        fill: #030404;
-        stroke: #030404;
+        fill: #ffffff;
+        stroke: #ffffff;
       }
 
       .cls-9 {
-        fill: #1f1f1d;
+        fill: #24466f;
       }
 
       .cls-5 {
-        stroke: #010202;
+        stroke: #ffffff;
       }
 
       .cls-10 {
-        fill: #1d1d1b;
+        fill: #24466f;
       }
 
       .cls-6 {
@@ -58,7 +58,7 @@
       }
 
       .cls-7 {
-        fill: #030304;
+        fill: #ffffff;
       }
     </style>
   </defs>
