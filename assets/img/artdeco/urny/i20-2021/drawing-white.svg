@@ -1,9 +1,9 @@
-<svg vector-effect="non-scaling-stroke" id="Vrstva_1" data-name="Vrstva 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 226.77 226.77">
+<svg id="Vrstva_1" data-name="Vrstva 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 226.77 226.77">
   <defs>
     <style>
       .cls-1 {
         fill: none;
-        stroke: #cfe0fa;
+        stroke: #ffffff;
         stroke-linecap: round;
         stroke-linejoin: round;
       }

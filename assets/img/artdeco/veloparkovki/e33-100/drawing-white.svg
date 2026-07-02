@@ -1,4 +1,4 @@
-<svg vector-effect="non-scaling-stroke" id="Vrstva_1" data-name="Vrstva 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 226.77 226.77">
+<svg id="Vrstva_1" data-name="Vrstva 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 226.77 226.77">
   <defs>
     <style>
       .cls-1, .cls-4, .cls-5 {
@@ -6,7 +6,7 @@
       }
 
       .cls-1 {
-        stroke: #cfe0fa;
+        stroke: #ffffff;
       }
 
       .cls-1, .cls-4 {
