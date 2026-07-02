@@ -3,18 +3,18 @@
     <style>
       .cls-1 {
         fill: none;
-        stroke: #ffffff;
+        stroke: #010101;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
 
       .cls-1, .cls-2 {
-        stroke-width: .7px;
+        stroke-width:.7px;
       }
 
       .cls-2 {
-        fill: #ffffff;
-        stroke: #ffffff;
+        fill: #010202;
+        stroke: #010202;
         stroke-miterlimit: 10;
       }
 
@@ -23,9 +23,13 @@
       }
 
       .cls-4 {
-        fill: #24466f;
+        fill: #1d1d1b;
       }
-    </style>
+    
+.cls-1{stroke:#ffffff}
+.cls-2{stroke:#ffffff;fill:#ffffff}
+.cls-4{fill:#ffffff}
+</style>
   </defs>
   <g>
     <path class="cls-1" d="M137,169.47a5.44,5.44,0,0,1-1.81-.51"/>

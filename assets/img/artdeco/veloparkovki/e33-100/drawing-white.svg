@@ -6,7 +6,7 @@
       }
 
       .cls-1 {
-        stroke: #ffffff;
+        stroke: #010101;
       }
 
       .cls-1, .cls-4 {
@@ -15,12 +15,12 @@
       }
 
       .cls-1, .cls-2, .cls-4, .cls-5 {
-        stroke-width: .7px;
+        stroke-width:.7px;
       }
 
       .cls-2 {
-        fill: #ffffff;
-        stroke: #ffffff;
+        fill: #020303;
+        stroke: #020303;
       }
 
       .cls-2, .cls-5 {
@@ -28,13 +28,19 @@
       }
 
       .cls-3 {
-        fill: #24466f;
+        fill: #1d1d1b;
       }
 
       .cls-4, .cls-5 {
-        stroke: #ffffff;
+        stroke: #010202;
       }
-    </style>
+    
+.cls-1{stroke:#ffffff}
+.cls-4{stroke:#ffffff}
+.cls-5{stroke:#ffffff}
+.cls-2{stroke:#ffffff;fill:#ffffff}
+.cls-3{fill:#24466f}
+</style>
   </defs>
   <path class="cls-1" d="M175,138.36l-11.87-6.77"/>
   <line class="cls-1" x1="175.11" y1="223.03" x2="114.98" y2="196.99"/>

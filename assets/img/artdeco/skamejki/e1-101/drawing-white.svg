@@ -7,7 +7,7 @@
       }
 
       .cls-1 {
-        stroke: #ffffff;
+        stroke: #1d1d1b;
       }
 
       .cls-1, .cls-2, .cls-6 {
@@ -15,16 +15,16 @@
       }
 
       .cls-1, .cls-2, .cls-3, .cls-6, .cls-7 {
-        stroke-width: .7px;
+        stroke-width:.7px;
       }
 
       .cls-2, .cls-6, .cls-7 {
-        stroke: #ffffff;
+        stroke: #010101;
       }
 
       .cls-3 {
-        fill: #ffffff;
-        stroke: #ffffff;
+        fill: #010202;
+        stroke: #010202;
       }
 
       .cls-3, .cls-6, .cls-7 {
@@ -36,9 +36,16 @@
       }
 
       .cls-5, .cls-6, .cls-7 {
-        fill: #24466f;
+        fill: #1d1d1b;
       }
-    </style>
+    
+.cls-1{stroke:#ffffff}
+.cls-2{stroke:#ffffff}
+.cls-6{stroke:#ffffff;fill:#ffffff}
+.cls-3{stroke:#ffffff;fill:#ffffff}
+.cls-7{stroke:#ffffff;fill:#ffffff}
+.cls-5{fill:#ffffff}
+</style>
   </defs>
   <g>
     <g>

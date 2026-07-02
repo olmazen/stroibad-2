@@ -7,26 +7,30 @@
       }
 
       .cls-2 {
-        fill: #ffffff;
-        stroke: #ffffff;
+        fill: #010202;
+        stroke: #010202;
         stroke-miterlimit: 10;
       }
 
       .cls-2, .cls-3 {
-        stroke-width: .7px;
+        stroke-width:.7px;
       }
 
       .cls-3 {
         fill: none;
-        stroke: #ffffff;
+        stroke: #010101;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
 
       .cls-4 {
-        fill: #24466f;
+        fill: #1d1d1b;
       }
-    </style>
+    
+.cls-2{stroke:#ffffff;fill:#ffffff}
+.cls-3{stroke:#ffffff}
+.cls-4{fill:#ffffff}
+</style>
   </defs>
   <line class="cls-3" x1="143.83" y1="20.58" x2="143.83" y2="21.48"/>
   <path class="cls-3" d="m98.31,20.9c0,.09.02.18.06.26.04.09.1.18.16.26.08.1.17.18.26.26.12.09.24.18.37.26.18.11.37.21.57.29.23.1.47.2.7.28.85.31,1.82.55,2.7.74,1.77.38,3.74.64,5.53.83"/>

@@ -3,7 +3,7 @@
   <defs>
     <style>
       .cls-1 {
-        stroke: #ffffff;
+        stroke: #010202;
       }
 
       .cls-1, .cls-2 {
@@ -18,31 +18,39 @@
       }
 
       .cls-1, .cls-2, .cls-3, .cls-4 {
-        stroke-width: .7px;
+        stroke-width:.7px;
       }
 
       .cls-5 {
-        fill: #24466f;
+        fill: #1f1f1d;
       }
 
       .cls-2, .cls-3 {
-        stroke: #ffffff;
+        stroke: #020303;
       }
 
       .cls-6 {
-        fill: #24466f;
+        fill: #1d1d1b;
       }
 
       .cls-4 {
-        fill: #ffffff;
-        stroke: #ffffff;
+        fill: #030304;
+        stroke: #030304;
         stroke-miterlimit: 10;
       }
 
       .cls-7 {
-        fill: #ffffff;
+        fill: #010101;
       }
-    </style>
+    
+.cls-1{stroke:#ffffff}
+.cls-2{stroke:#ffffff}
+.cls-3{stroke:#ffffff}
+.cls-4{stroke:#ffffff;fill:#ffffff}
+.cls-5{fill:#24466f}
+.cls-6{fill:#24466f}
+.cls-7{fill:#24466f}
+</style>
   </defs>
   <line class="cls-3" x1="17.58" y1="105.16" x2="14.69" y2="46.16"/>
   <line class="cls-3" x1="169.42" y1="163.24" x2="344.44" y2="96.97"/>

@@ -3,15 +3,15 @@
   <defs>
     <style>
       .cls-1 {
-        fill: #ffffff;
+        fill: #020303;
       }
 
       .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7, .cls-8 {
-        stroke-width: .7px;
+        stroke-width:.7px;
       }
 
       .cls-1, .cls-4 {
-        stroke: #ffffff;
+        stroke: #020303;
       }
 
       .cls-1, .cls-5, .cls-8 {
@@ -29,23 +29,23 @@
       }
 
       .cls-2, .cls-12 {
-        stroke: #ffffff;
+        stroke: #1d1d1b;
       }
 
       .cls-3 {
-        stroke: #ffffff;
+        stroke: #231f20;
       }
 
       .cls-10 {
-        fill: #24466f;
+        fill: #1e1e1c;
       }
 
       .cls-5 {
-        fill: #ffffff;
+        fill: #010202;
       }
 
       .cls-5, .cls-6 {
-        stroke: #ffffff;
+        stroke: #010202;
       }
 
       .cls-12 {
@@ -53,18 +53,30 @@
       }
 
       .cls-11 {
-        fill: #24466f;
+        fill: #1d1d1b;
       }
 
       .cls-7 {
-        stroke: #ffffff;
+        stroke: #010101;
       }
 
       .cls-8 {
-        fill: #ffffff;
-        stroke: #ffffff;
+        fill: #030304;
+        stroke: #030304;
       }
-    </style>
+    
+.cls-1{stroke:#ffffff;fill:#ffffff}
+.cls-2{stroke:#ffffff}
+.cls-3{stroke:#ffffff}
+.cls-4{stroke:#ffffff}
+.cls-5{stroke:#ffffff;fill:#ffffff}
+.cls-6{stroke:#ffffff}
+.cls-7{stroke:#ffffff}
+.cls-8{stroke:#ffffff;fill:#ffffff}
+.cls-10{fill:#24466f}
+.cls-11{fill:#24466f}
+.cls-12{stroke:#ffffff}
+</style>
   </defs>
   <g>
     <line class="cls-7" x1="290.75" y1="77.99" x2="257.21" y2="85.06"/>

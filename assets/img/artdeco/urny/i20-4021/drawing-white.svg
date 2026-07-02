@@ -3,28 +3,32 @@
     <style>
       .cls-1 {
         fill: none;
-        stroke: #ffffff;
+        stroke: #010101;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
 
       .cls-1, .cls-2 {
-        stroke-width: .7px;
+        stroke-width:.7px;
       }
 
       .cls-2, .cls-4 {
-        fill: #ffffff;
+        fill: #010202;
       }
 
       .cls-2 {
-        stroke: #ffffff;
+        stroke: #010202;
         stroke-miterlimit: 10;
       }
 
       .cls-3 {
         isolation: isolate;
       }
-    </style>
+    
+.cls-1{stroke:#ffffff}
+.cls-2{stroke:#ffffff;fill:#ffffff}
+.cls-4{fill:#ffffff}
+</style>
   </defs>
   <g>
     <path class="cls-1" d="M150.27,42.65h0"/>

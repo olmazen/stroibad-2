@@ -3,13 +3,13 @@
     <style>
       .cls-1 {
         fill: none;
-        stroke: #ffffff;
+        stroke: #010101;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
 
       .cls-1, .cls-4 {
-        stroke-width: .7px;
+        stroke-width:.7px;
       }
 
       .cls-2 {
@@ -17,15 +17,19 @@
       }
 
       .cls-3 {
-        fill: #24466f;
+        fill: #1d1d1b;
       }
 
       .cls-4 {
-        fill: #ffffff;
-        stroke: #ffffff;
+        fill: #010202;
+        stroke: #010202;
         stroke-miterlimit: 10;
       }
-    </style>
+    
+.cls-1{stroke:#ffffff}
+.cls-4{stroke:#ffffff;fill:#ffffff}
+.cls-3{fill:#ffffff}
+</style>
   </defs>
   <line class="cls-1" x1="216.82" y1="104.97" x2="235.13" y2="109.09"/>
   <line class="cls-1" x1="90.53" y1="131.8" x2="108" y2="137.71"/>

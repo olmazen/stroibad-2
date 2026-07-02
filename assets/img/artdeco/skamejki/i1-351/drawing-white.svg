@@ -3,7 +3,7 @@
   <defs>
     <style>
       .cls-1 {
-        stroke: #ffffff;
+        stroke: #e72b6b;
         stroke-miterlimit: 10;
       }
 
@@ -12,15 +12,17 @@
       }
 
       .cls-1, .cls-3 {
-        stroke-width: .7px;
+        stroke-width:.7px;
       }
 
       .cls-3 {
-        stroke: #ffffff;
+        stroke: #010101;
         stroke-dasharray: .4 .4;
         stroke-linejoin: round;
       }
-    </style>
+    
+.cls-3{stroke:#ffffff}
+</style>
   </defs>
   <g>
     <g>
