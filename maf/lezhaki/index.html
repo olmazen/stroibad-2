@@ -211,11 +211,6 @@
 @media(max-width:900px){.kz-stage-wrap{grid-template-columns:1fr}.kz-picks{flex-direction:row;overflow-x:auto}.kz-pick{flex-direction:column;min-width:120px;gap:7px;text-align:center;font-size:11px}.kz-pick img{width:100%;height:60px}.kz-pick::before{display:none}.ad-intro{padding-top:48px}.kz-air{padding-top:60px;padding-bottom:54px}.ad-seal{top:0;right:1%;width:62px}}
 @media(max-width:560px){.artdeco .model-grid{grid-template-columns:1fr}.ad-seal{display:none}}
 
-/* классика: показать больше */
-.classic-grid .model-card:nth-child(n+9){display:none}
-.classic-grid.expanded .model-card{display:flex}
-.classic-more{text-align:center;margin-top:30px}
-
 /* — доработанные анимации: staggered появление интро + reveal каталога — */
 .ad-intro.reveal .ad-crown,.ad-intro.reveal .ad-kicker,.ad-intro.reveal .ad-rule,.ad-intro.reveal .ad-title,.ad-intro.reveal .ad-lead{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
 .ad-intro.reveal.in .ad-crown{opacity:1;transform:none;transition-delay:.05s}
@@ -229,6 +224,10 @@
 #kz-artdeco.is-depth .ad-corner-fan{opacity:.26}
 .ad-corner-fan{transition:opacity .6s ease}
 @media(prefers-reduced-motion:reduce){.ad-intro.reveal .ad-crown,.ad-intro.reveal .ad-kicker,.ad-intro.reveal .ad-rule,.ad-intro.reveal .ad-title,.ad-intro.reveal .ad-lead,.ad-cathead.reveal h3,.ad-cathead.reveal .sub{opacity:1!important;transform:none!important}}
+
+.classic-grid .model-card:nth-child(n+9){display:none}
+.classic-grid.expanded .model-card{display:flex}
+.classic-more{text-align:center;margin-top:6px}
 </style>
 </head>
 <body>
@@ -449,6 +448,7 @@
 </section>
 
 
+<!-- ART DECO lezhaki -->
 <section class="artdeco kzc" id="kz-artdeco">
   <div class="kzc-deco" aria-hidden="true">
     <div class="ad-bg-solid"></div>
@@ -488,7 +488,7 @@
         </svg>
       </div>
       <h2 class="ad-title"><span class="ad-title-tx">Art Deco</span></h2>
-      <p class="ad-lead"><b>Минимализм и архитектурная форма.</b> Тонкие ламели, чистая линия — лежак как арт-объект, а не «пляжная мебель». Металл или тёплое термодерево, любой RAL. Дизайн-линейка для набережных, дворов ЖК и премиальных пространств.</p>
+      <p class="ad-lead"><b>Минимализм и архитектурная форма.</b> Тонкие ламели, чистая линия — лежак как арт-объект. Металл или термодерево, любой RAL. Дизайн-линейка для набережных, дворов ЖК и премиальных пространств.</p>
     </div>
 
     
@@ -496,43 +496,75 @@
     <div class="ad-cathead reveal">
       <div class="ad-divider reveal" aria-hidden="true"><svg viewBox="0 0 600 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M30 20H248M570 20H352"></path><path d="M30 20l8-6 8 6-8 6z" fill="currentColor" stroke="none"></path><path d="M570 20l-8-6-8 6 8 6z" fill="currentColor" stroke="none"></path><path d="M248 20l16-9M248 20l16 9M352 20l-16-9M352 20l-16 9" stroke-width="1.1"></path><path d="M300 2l26 18-26 18-26-18z"></path><path d="M300 11l14 9-14 9-14-9z"></path><circle cx="300" cy="20" r="2.6" fill="currentColor" stroke="none"></circle></svg></div>
       <h3>Каталог серии</h3>
-      <span class="sub">4 модели · сталь и дерево</span>
+      <span class="sub">8 моделей серии</span>
     </div>
     <div class="model-grid kz-wall kz-rise">
       <a class="model-card kz-card" href="#" onclick="openModal();return false">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-2651/hero.webp" alt="Egoé A1 · сталь I — лежак Art Déco, дизайн Egoé, A1-2651" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-2651/facade1.webp" alt="Egoé A1 · сталь I на объекте" loading="lazy"><span class="ph-label">«сталь I»</span><span class="kz-hint">на объекте →</span></div></div>
-        <div class="mc-b"><h3>Egoé A1 · сталь I</h3><div class="mc-sub">Дизайн Egoé · A1-2651</div>
-          <ul class="mc-spec"><li><span>Материал</span><b>алюминий/сталь</b></li><li><span>Вес</span><b>72 кг</b></li></ul>
-          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Открыть</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-2651/hero.webp" alt="Лежак A1-2651 — дизайнерская серия EGOE Art Deco, коллекция A" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-2651/facade1.webp" alt="Лежак A1-2651 на объекте" loading="lazy"><span class="ph-label">«A1-2651»</span><span class="kz-hint">на объекте →</span></div></div>
+        <div class="mc-b"><h3>Лежак A1-2651</h3><div class="mc-sub">Серия A · дизайн EGOE</div>
+          <ul class="mc-spec"><li><span>Коллекция</span><b>A</b></li><li><span>Артикул</span><b>A1-2651</b></li></ul>
+          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить</span></div></div>
         </div>
       </a>
       <a class="model-card kz-card" href="#" onclick="openModal();return false">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-2661/hero.webp" alt="Egoé A1 · сталь II — лежак Art Déco, дизайн Egoé, A1-2661" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-2661/facade1.webp" alt="Egoé A1 · сталь II на объекте" loading="lazy"><span class="ph-label">«сталь II»</span><span class="kz-hint">на объекте →</span></div></div>
-        <div class="mc-b"><h3>Egoé A1 · сталь II</h3><div class="mc-sub">Дизайн Egoé · A1-2661</div>
-          <ul class="mc-spec"><li><span>Материал</span><b>алюминий/сталь</b></li><li><span>Вес</span><b>72 кг</b></li></ul>
-          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Открыть</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-2661/hero.webp" alt="Лежак A1-2661 — дизайнерская серия EGOE Art Deco, коллекция A" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-2661/facade1.webp" alt="Лежак A1-2661 на объекте" loading="lazy"><span class="ph-label">«A1-2661»</span><span class="kz-hint">на объекте →</span></div></div>
+        <div class="mc-b"><h3>Лежак A1-2661</h3><div class="mc-sub">Серия A · дизайн EGOE</div>
+          <ul class="mc-spec"><li><span>Коллекция</span><b>A</b></li><li><span>Артикул</span><b>A1-2661</b></li></ul>
+          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить</span></div></div>
         </div>
       </a>
       <a class="model-card kz-card" href="#" onclick="openModal();return false">
         <div class="kz-card-in">
-        <div style="position:relative"><span class="mc-badge">хит</span><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-4651/hero.webp" alt="Egoé A1 · дерево I — лежак Art Déco, дизайн Egoé, A1-4651" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-4651/facade1.webp" alt="Egoé A1 · дерево I на объекте" loading="lazy"><span class="ph-label">«дерево I»</span><span class="kz-hint">на объекте →</span></div></div>
-        <div class="mc-b"><h3>Egoé A1 · дерево I</h3><div class="mc-sub">Дизайн Egoé · A1-4651</div>
-          <ul class="mc-spec"><li><span>Материал</span><b>сталь + дерево</b></li><li><span>Вес</span><b>56–76 кг</b></li></ul>
-          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Открыть</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-4651/hero.webp" alt="Лежак A1-4651 — дизайнерская серия EGOE Art Deco, коллекция A" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-4651/facade1.webp" alt="Лежак A1-4651 на объекте" loading="lazy"><span class="ph-label">«A1-4651»</span><span class="kz-hint">на объекте →</span></div></div>
+        <div class="mc-b"><h3>Лежак A1-4651</h3><div class="mc-sub">Серия A · дизайн EGOE</div>
+          <ul class="mc-spec"><li><span>Коллекция</span><b>A</b></li><li><span>Артикул</span><b>A1-4651</b></li></ul>
+          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить</span></div></div>
         </div>
       </a>
       <a class="model-card kz-card" href="#" onclick="openModal();return false">
         <div class="kz-card-in">
-        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-4661/hero.webp" alt="Egoé A1 · дерево II — лежак Art Déco, дизайн Egoé, A1-4661" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-4661/facade1.webp" alt="Egoé A1 · дерево II на объекте" loading="lazy"><span class="ph-label">«дерево II»</span><span class="kz-hint">на объекте →</span></div></div>
-        <div class="mc-b"><h3>Egoé A1 · дерево II</h3><div class="mc-sub">Дизайн Egoé · A1-4661</div>
-          <ul class="mc-spec"><li><span>Материал</span><b>сталь + дерево</b></li><li><span>Вес</span><b>56–76 кг</b></li></ul>
-          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Открыть</span></div></div>
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/a1-4661/hero.webp" alt="Лежак A1-4661 — дизайнерская серия EGOE Art Deco, коллекция A" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/a1-4661/facade1.webp" alt="Лежак A1-4661 на объекте" loading="lazy"><span class="ph-label">«A1-4661»</span><span class="kz-hint">на объекте →</span></div></div>
+        <div class="mc-b"><h3>Лежак A1-4661</h3><div class="mc-sub">Серия A · дизайн EGOE</div>
+          <ul class="mc-spec"><li><span>Коллекция</span><b>A</b></li><li><span>Артикул</span><b>A1-4661</b></li></ul>
+          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить</span></div></div>
+        </div>
+      </a>
+      <a class="model-card kz-card" href="#" onclick="openModal();return false">
+        <div class="kz-card-in">
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/i1-3451/hero.webp" alt="Лежак I1-3451 — дизайнерская серия EGOE Art Deco, коллекция I" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/i1-3451/facade1.webp" alt="Лежак I1-3451 на объекте" loading="lazy"><span class="ph-label">«I1-3451»</span><span class="kz-hint">на объекте →</span></div></div>
+        <div class="mc-b"><h3>Лежак I1-3451</h3><div class="mc-sub">Серия I · дизайн EGOE</div>
+          <ul class="mc-spec"><li><span>Коллекция</span><b>I</b></li><li><span>Артикул</span><b>I1-3451</b></li></ul>
+          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить</span></div></div>
+        </div>
+      </a>
+      <a class="model-card kz-card" href="#" onclick="openModal();return false">
+        <div class="kz-card-in">
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/i1-3481-10/hero.webp" alt="Лежак I1-3481-10 — дизайнерская серия EGOE Art Deco, коллекция I" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/i1-3481-10/facade1.webp" alt="Лежак I1-3481-10 на объекте" loading="lazy"><span class="ph-label">«I1-3481-10»</span><span class="kz-hint">на объекте →</span></div></div>
+        <div class="mc-b"><h3>Лежак I1-3481-10</h3><div class="mc-sub">Серия I · дизайн EGOE</div>
+          <ul class="mc-spec"><li><span>Коллекция</span><b>I</b></li><li><span>Артикул</span><b>I1-3481-10</b></li></ul>
+          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить</span></div></div>
+        </div>
+      </a>
+      <a class="model-card kz-card" href="#" onclick="openModal();return false">
+        <div class="kz-card-in">
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/i1-3561/hero.webp" alt="Лежак I1-3561 — дизайнерская серия EGOE Art Deco, коллекция I" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/i1-3561/facade1.webp" alt="Лежак I1-3561 на объекте" loading="lazy"><span class="ph-label">«I1-3561»</span><span class="kz-hint">на объекте →</span></div></div>
+        <div class="mc-b"><h3>Лежак I1-3561</h3><div class="mc-sub">Серия I · дизайн EGOE</div>
+          <ul class="mc-spec"><li><span>Коллекция</span><b>I</b></li><li><span>Артикул</span><b>I1-3561</b></li></ul>
+          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить</span></div></div>
+        </div>
+      </a>
+      <a class="model-card kz-card" href="#" onclick="openModal();return false">
+        <div class="kz-card-in">
+        <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/lezhaki/i1-3651/hero.webp" alt="Лежак I1-3651 — дизайнерская серия EGOE Art Deco, коллекция I" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/lezhaki/i1-3651/facade1.webp" alt="Лежак I1-3651 на объекте" loading="lazy"><span class="ph-label">«I1-3651»</span><span class="kz-hint">на объекте →</span></div></div>
+        <div class="mc-b"><h3>Лежак I1-3651</h3><div class="mc-sub">Серия I · дизайн EGOE</div>
+          <ul class="mc-spec"><li><span>Коллекция</span><b>I</b></li><li><span>Артикул</span><b>I1-3651</b></li></ul>
+          <div class="mc-foot"><div class="mc-price"><b>под заказ</b><small>дизайн-линейка</small></div><span class="mc-go">Запросить</span></div></div>
         </div>
       </a>
     </div>
-    <p class="kzc-note" style="color:var(--steel);font-size:12.5px;margin-top:26px;max-width:640px">Черновик линейки: фото и характеристики предварительные (референс Egoé) — заменим на собственные рендеры. Наведите на карточку — кадр на объекте.</p>
+    <p class="kzc-note" style="color:var(--steel);font-size:12.5px;margin-top:26px;max-width:660px">Черновик линейки: фото — предварительные (референс Egoé), заменим на собственные рендеры (Polza). Наведите на карточку — кадр на объекте.</p>
   </div>
 </section>
 
@@ -565,7 +597,7 @@
     <div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div>
   </div>
 </div></div>
-<script id="kz-js">window.toggleClassic=function(btn){var g=document.getElementById('classicGrid');var on=g.classList.toggle('expanded');btn.textContent=on?'Свернуть \u2191':'Показать все 19 моделей \u2193';if(!on)g.scrollIntoView({behavior:'smooth',block:'start'});};
+<script id="kz-js">window.toggleClassic=function(btn){var g=document.getElementById('classicGrid');var on=g.classList.toggle('expanded');btn.textContent=on?'\u0421\u0432\u0435\u0440\u043d\u0443\u0442\u044c \u2191':'\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c \u0432\u0441\u0435 19 \u043c\u043e\u0434\u0435\u043b\u0435\u0439 \u2193';if(!on)g.scrollIntoView({behavior:'smooth',block:'start'});};
 
 (function(){
   var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
