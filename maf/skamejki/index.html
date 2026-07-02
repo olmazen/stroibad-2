@@ -840,7 +840,7 @@
       <span class="sub">48 моделей серии</span>
     </div>
     <div class="model-grid kz-wall kz-rise">
-      <a class="model-card kz-card" href="#" onclick="openModal();return false">
+      <a class="model-card kz-card" href="artdeco-a1-101/index.html">
         <div class="kz-card-in">
         <div style="position:relative"><div class="ph r-43 has-img kz-swap"><img class="kz-img-a" src="../../assets/img/artdeco/skamejki/a1-101/hero.webp" alt="Скамейка A1-101 — дизайнерская серия EGOE Art Deco, коллекция A" loading="lazy"><img class="kz-img-b" src="../../assets/img/artdeco/skamejki/a1-101/facade1.webp" alt="Скамейка A1-101 на объекте" loading="lazy"><span class="ph-label">«A1-101»</span><span class="kz-hint">на объекте →</span></div></div>
         <div class="mc-b"><h3>Скамейка A1-101</h3><div class="mc-sub">Серия A · дизайн EGOE</div>
@@ -1266,7 +1266,7 @@
   /* staggered rise-in (карточки каталога) */
   var rises=document.querySelectorAll('.kz-rise');
   if(reduced||!('IntersectionObserver'in window)){rises.forEach(function(e){e.classList.add('kz-in');});}
-  else{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('kz-in');io.unobserve(e.target);}});},{threshold:.1});rises.forEach(function(e){io.observe(e);});}
+  else{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('kz-in');io.unobserve(e.target);}});},{threshold:0,rootMargin:'0px 0px -8% 0px'});rises.forEach(function(e){io.observe(e);});}
   /* — Art Deco: параллакс обоев от скролла — */
   (function(){
     var section=document.getElementById('kz-artdeco');if(!section)return;

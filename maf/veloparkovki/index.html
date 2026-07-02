@@ -500,7 +500,7 @@
   /* staggered rise-in (карточки каталога) */
   var rises=document.querySelectorAll('.kz-rise');
   if(reduced||!('IntersectionObserver'in window)){rises.forEach(function(e){e.classList.add('kz-in');});}
-  else{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('kz-in');io.unobserve(e.target);}});},{threshold:.1});rises.forEach(function(e){io.observe(e);});}
+  else{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('kz-in');io.unobserve(e.target);}});},{threshold:0,rootMargin:'0px 0px -8% 0px'});rises.forEach(function(e){io.observe(e);});}
   /* — Art Deco: параллакс обоев от скролла — */
   (function(){
     var section=document.getElementById('kz-artdeco');if(!section)return;
