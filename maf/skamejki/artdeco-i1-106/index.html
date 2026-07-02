@@ -31,25 +31,28 @@
 .pp-art .gold{color:var(--gold-h);font-weight:700}
 .ad-tint .ph-label{background:linear-gradient(180deg,rgba(201,154,63,.9),rgba(168,127,47,.9));color:#1c1305}
 .ad-key{color:var(--gold-h)!important;font-weight:700}
-.ad-draw{display:grid;grid-template-columns:1.35fr .65fr;gap:30px;align-items:stretch}
-.ad-draw-card{position:relative;background:linear-gradient(160deg,#12294a,#0a1626 70%);border:1px solid rgba(201,154,63,.32);border-radius:2px;padding:24px;display:flex;align-items:center;justify-content:center;min-height:320px;overflow:hidden}
-.ad-draw-card::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.06) 0 1px,transparent 1px 32px),repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,transparent 1px 32px)}
-.ad-draw-card img{position:relative;max-width:100%;max-height:390px;height:auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.4))}
-.ad-draw-card .stamp{position:absolute;right:16px;top:14px;font-family:'Oswald',sans-serif;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#9db8dd;text-align:right;line-height:1.5;z-index:2}
-.ad-draw-card .corner{position:absolute;width:22px;height:22px;border:1px solid var(--gold);opacity:.75}
-.ad-draw-card .c1{left:10px;top:10px;border-right:0;border-bottom:0}
-.ad-draw-card .c2{right:10px;top:10px;border-left:0;border-bottom:0}
-.ad-draw-card .c3{left:10px;bottom:10px;border-right:0;border-top:0}
-.ad-draw-card .c4{right:10px;bottom:10px;border-left:0;border-top:0}
-.ad-dims{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:2px;overflow:hidden}
-.ad-dims li{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:15px 18px;border-bottom:1px solid var(--line);background:var(--srf)}
-.ad-dims li:last-child{border-bottom:0}
-.ad-dims li:nth-child(odd){background:var(--srf2)}
-.ad-dims .k{font-family:'Oswald',sans-serif;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--steel)}
-.ad-dims .v{font-family:'Oswald',sans-serif;font-size:19px;font-weight:600;color:var(--gold-h)}
-.ad-dims .v small{font-size:12px;color:var(--steel);font-weight:400;margin-left:3px}
+.ad-plate-hint{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--steel);align-self:flex-end;padding-bottom:8px}
+.ad-plate{position:relative;background:radial-gradient(130% 100% at 50% 32%,#1b3a63 0%,#0e2340 45%,#081422 100%);border:1px solid rgba(201,154,63,.28);border-radius:3px;padding:40px 34px;min-height:440px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 0 90px rgba(0,0,0,.45),0 24px 60px -30px rgba(0,0,0,.8)}
+.ad-plate::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(150,185,230,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(150,185,230,.09) 1px,transparent 1px);background-size:40px 40px;-webkit-mask-image:radial-gradient(130% 105% at 50% 45%,#000 52%,transparent 92%);mask-image:radial-gradient(130% 105% at 50% 45%,#000 52%,transparent 92%)}
+.ad-plate-glow{position:absolute;left:50%;top:46%;width:64%;height:40%;transform:translate(-50%,-50%);background:radial-gradient(closest-side,rgba(120,170,235,.28),transparent 78%);filter:blur(8px);z-index:0}
+.ad-plate img{position:relative;z-index:1;width:min(720px,90%);max-height:460px;height:auto;filter:drop-shadow(0 22px 46px rgba(0,0,0,.55))}
+.ad-plate .stamp{position:absolute;right:22px;top:18px;font-family:'Oswald',sans-serif;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#8fb0dc;text-align:right;line-height:1.7;z-index:2}
+.ad-plate .stamp b{color:var(--gold-h);font-weight:600;letter-spacing:.14em}
+.ad-plate .corner{position:absolute;width:30px;height:30px;border:0;z-index:2}
+.ad-plate .corner::before,.ad-plate .corner::after{content:"";position:absolute;background:var(--gold);opacity:.8}
+.ad-plate .corner::before{width:100%;height:1.5px}
+.ad-plate .corner::after{height:100%;width:1.5px}
+.ad-plate .c1{left:16px;top:16px}.ad-plate .c1::before{top:0;left:0}.ad-plate .c1::after{top:0;left:0}
+.ad-plate .c2{right:16px;top:16px}.ad-plate .c2::before{top:0;right:0}.ad-plate .c2::after{top:0;right:0}
+.ad-plate .c3{left:16px;bottom:16px}.ad-plate .c3::before{bottom:0;left:0}.ad-plate .c3::after{bottom:0;left:0}
+.ad-plate .c4{right:16px;bottom:16px}.ad-plate .c4::before{bottom:0;right:0}.ad-plate .c4::after{bottom:0;right:0}
+.ad-dimrow{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.ad-dimrow li{background:var(--srf);padding:16px 20px;display:flex;flex-direction:column;gap:7px}
+.ad-dimrow .k{font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--steel)}
+.ad-dimrow .v{font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;color:#fff;line-height:1}
+.ad-dimrow li:first-child .v{color:var(--gold-h)}
 .ad-draft{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:rgba(201,154,63,.08);border:1px dashed rgba(201,154,63,.4);border-radius:2px;padding:7px 13px;margin-top:16px}
-@media(max-width:760px){.ad-draw{grid-template-columns:1fr;gap:18px}.ad-draw-card{min-height:230px;padding:16px}.ad-dims li{padding:13px 15px}.ad-dims .v{font-size:17px}}
+@media(max-width:760px){.ad-plate{min-height:300px;padding:24px 16px}.ad-plate img{width:96%}.ad-plate-hint{display:none}.ad-dimrow{grid-template-columns:repeat(2,1fr)}.ad-dimrow .v{font-size:16px}}
 </style>
 </head>
 <body>
@@ -103,15 +106,14 @@
 <!-- Чертёж и размеры -->
 <section style="padding-top:0"><div class="container">
   <div class="ad-eyebrow"><span class="pf">Art&nbsp;Déco</span> · технический чертёж</div>
-  <div class="sec-head"><div><h2>Чертёж и размеры</h2></div></div>
-  <div class="ad-draw">
-    <div class="ad-draw-card">
-      <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
-      <span class="stamp">Серия Art Déco<br>I1-106 · ISO</span>
-      <img src="../../../assets/img/artdeco/skamejki/i1-106/drawing-white.svg" alt="Скамейка I1-106 — изометрический чертёж с размерами">
-    </div>
-    <div><ul class="ad-dims"><li><span class="k">Масса</span><span class="v">26<small>кг</small></span></li><li><span class="k">Коллекция</span><span class="v" style=font-size:14px>I</span></li><li><span class="k">Артикул</span><span class="v" style=font-size:14px>I1-106</span></li></ul><p style="color:var(--steel);font-size:12px;margin:12px 0 0">Точные размеры указаны на чертеже.</p></div>
+  <div class="sec-head"><div><h2>Чертёж и размеры</h2></div><span class="ad-plate-hint">Изометрия · размеры в мм</span></div>
+  <div class="ad-plate">
+    <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
+    <span class="stamp"><b>Серия Art Déco</b><br>I1-106 · ISO · масштаб инф.</span>
+    <div class="ad-plate-glow"></div>
+    <img src="../../../assets/img/artdeco/skamejki/i1-106/drawing-white.svg" alt="Скамейка I1-106 — изометрический чертёж с размерами">
   </div>
+  <ul class="ad-dimrow"><li><span class="k">Масса</span><span class="v">26 кг</span></li><li><span class="k">Материал</span><span class="v">Сталь</span></li><li><span class="k">Покрытие</span><span class="v">Любой RAL</span></li><li><span class="k">Коллекция</span><span class="v">I</span></li><li><span class="k">Артикул</span><span class="v">I1-106</span></li></ul>
 </div></section>
 <section style="padding-top:0"><div class="container"><div class="split">
   <div><div class="sec-head"><div><h2>Характеристики</h2></div></div><table class="specs"><tr><td>Тип товара</td><td>Скамейки</td></tr><tr><td>Серия</td><td><span class="ad-key">Art Déco · коллекция I</span></td></tr><tr><td>Материал</td><td>сталь</td></tr><tr><td>Вес</td><td>26 кг</td></tr><tr><td>Покрытие</td><td>цинк + порошковая окраска, любой RAL</td></tr><tr><td>Артикул</td><td>I1-106</td></tr></table></div>

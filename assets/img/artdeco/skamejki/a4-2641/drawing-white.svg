@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Vrstva_1" data-name="Vrstva 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 354.33 226.77">
+<svg vector-effect="non-scaling-stroke" id="Vrstva_1" data-name="Vrstva 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 354.33 226.77">
   <defs>
     <style>
       .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7, .cls-8, .cls-9, .cls-10 {
-        stroke-width: .25px;
+        stroke-width: .5px;
       }
 
       .cls-1, .cls-2, .cls-3, .cls-4, .cls-6, .cls-7, .cls-10 {
@@ -23,7 +23,7 @@
       }
 
       .cls-2 {
-        fill: #d7e6fb;
+        fill: #ffffff;
       }
 
       .cls-2, .cls-5 {
@@ -55,7 +55,7 @@
       }
 
       .cls-9 {
-        stroke: #eaf2ff;
+        stroke: #cfe0fa;
       }
 
       .cls-12 {

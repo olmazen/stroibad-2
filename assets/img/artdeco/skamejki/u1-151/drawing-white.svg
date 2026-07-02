@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Vrstva_1" data-name="Vrstva 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 297.64 226.77">
+<svg vector-effect="non-scaling-stroke" id="Vrstva_1" data-name="Vrstva 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 297.64 226.77">
   <defs>
     <style>
       .cls-1 {
-        fill: #d7e6fb;
+        fill: #ffffff;
         stroke: #ffffff;
         stroke-miterlimit: 10;
       }
 
       .cls-1, .cls-2 {
-        stroke-width: .25px;
+        stroke-width: .5px;
       }
 
       .cls-3 {
@@ -17,7 +17,7 @@
       }
 
       .cls-4 {
-        fill: #33507d;
+        fill: #2d4a72;
       }
 
       .cls-4, .cls-5 {
@@ -30,7 +30,7 @@
 
       .cls-2 {
         fill: none;
-        stroke: #eaf2ff;
+        stroke: #cfe0fa;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
