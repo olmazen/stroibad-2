@@ -378,6 +378,217 @@ window.__whenVisible = (function () {
   });
 })();
 
+/* ── мобильное меню: анимация бургера + закрытие ── */
+(function () {
+  window.toggleNav = function () {
+    var n = document.getElementById('nav');
+    var b = document.querySelector('.burger');
+    if (!n) return;
+    var open = n.classList.toggle('open');
+    if (b) b.classList.toggle('open', open);
+  };
+  function closeNav() {
+    var n = document.getElementById('nav'); var b = document.querySelector('.burger');
+    if (n) n.classList.remove('open'); if (b) b.classList.remove('open');
+  }
+  // закрытие по клику вне меню и по ссылке
+  document.addEventListener('click', function (e) {
+    var n = document.getElementById('nav');
+    if (!n || !n.classList.contains('open')) return;
+    if (e.target.closest('.burger')) return;
+    if (!e.target.closest('#nav')) closeNav();
+    else if (e.target.closest('#nav a') && !e.target.closest('.navitem>a')) closeNav();
+  });
+  window.addEventListener('resize', function () { if (innerWidth > 1180) closeNav(); });
+})();
+
+/* ── шапка: поиск + корзина (лист для КП) ── */
+(function () {
+  var header = document.getElementById('siteHeader');
+  if (!header) return;
+  var logo = header.querySelector('.logo');
+  // база сайта (для корректных путей на любой глубине и на GitHub Pages)
+  var base = logo ? new URL(logo.getAttribute('href'), location.href) : new URL('./', location.href);
+  var siteBase = new URL('./', base); // папка index.html = корень сайта
+
+  /* ---- вставляем иконки в шапку ---- */
+  var actions = header.querySelector('.hdr-actions');
+  var burger = header.querySelector('.burger');
+  var tools = document.createElement('div');
+  tools.className = 'hdr-tools';
+  tools.innerHTML =
+    '<button class="hicon" id="hSearch" type="button" aria-label="Поиск"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>' +
+    '<button class="hicon" id="hCart" type="button" aria-label="Корзина"><svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg><span class="hicon-badge" id="cartCount">0</span></button>';
+  if (actions) actions.insertBefore(tools, actions.firstChild);
+  else if (burger) burger.parentNode.insertBefore(tools, burger);
+
+  /* ---- разметка оверлеев ---- */
+  var wrap = document.createElement('div');
+  wrap.innerHTML =
+    '<div class="search-ov" id="searchOv"><div class="search-box">' +
+      '<div class="search-field"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>' +
+      '<input type="search" id="searchInput" placeholder="Поиск по товарам: скамейка, урна, A1-101…" autocomplete="off">' +
+      '<button class="search-x" id="searchX" aria-label="Закрыть">×</button></div>' +
+      '<div class="search-results" id="searchResults"></div>' +
+      '<div class="search-hint">Введите название или артикул · Esc — закрыть</div>' +
+    '</div></div>' +
+    '<div class="cart-ov" id="cartOv"></div>' +
+    '<aside class="cart-drawer" id="cartDrawer" aria-label="Корзина">' +
+      '<div class="cart-head"><h3>Ваш список для КП</h3><button class="cart-x" id="cartX" aria-label="Закрыть">×</button></div>' +
+      '<div class="cart-body" id="cartBody"></div>' +
+      '<div class="cart-foot" id="cartFoot"></div>' +
+    '</aside>' +
+    '<div class="add-cart-ok" id="addCartOk">Добавлено в список ✓</div>';
+  document.body.appendChild(wrap);
+
+  /* ================= КОРЗИНА ================= */
+  var KEY = 'sp_cart_v1';
+  function read() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } }
+  function write(c) { try { localStorage.setItem(KEY, JSON.stringify(c)); } catch (e) {} render(); }
+  function count() { return read().reduce(function (s, i) { return s + i.qty; }, 0); }
+
+  window.addToCart = function (item) {
+    if (!item || !item.id) return;
+    var c = read(); var f = c.filter(function (x) { return x.id === item.id; })[0];
+    if (f) f.qty += (item.qty || 1);
+    else c.push({ id: item.id, name: item.name || item.id, url: item.url || '', img: item.img || '', qty: item.qty || 1 });
+    write(c); toast();
+  };
+  window.addToCartFromPage = function (btn) {
+    var pp = document.querySelector('.pp-info') || document;
+    var h = pp.querySelector('h1') || document.querySelector('h1');
+    var art = (pp.querySelector('.pp-art') || {}).textContent || '';
+    var m = art.match(/Артикул\s*([A-Za-zА-Яа-я0-9\-]+)/);
+    var mainImg = document.querySelector('.gallery .ph.main img');
+    var id = (m ? m[1] : (h ? h.textContent.trim() : location.pathname)).trim();
+    addToCart({
+      id: id,
+      name: h ? h.textContent.trim() : id,
+      url: location.pathname,
+      img: mainImg ? mainImg.getAttribute('src') : ''
+    });
+  };
+  function setQty(id, d) {
+    var c = read();
+    c.forEach(function (x) { if (x.id === id) x.qty = Math.max(1, x.qty + d); });
+    write(c);
+  }
+  function del(id) { write(read().filter(function (x) { return x.id !== id; })); }
+
+  var badge = tools.querySelector('#cartCount');
+  var body = wrap.querySelector('#cartBody');
+  var foot = wrap.querySelector('#cartFoot');
+  var okToast = wrap.querySelector('#addCartOk');
+  var toastT;
+  function toast() {
+    if (!okToast) return; okToast.classList.add('on');
+    clearTimeout(toastT); toastT = setTimeout(function () { okToast.classList.remove('on'); }, 1600);
+  }
+  function abs(u) { try { return u ? new URL(u, location.href).href : ''; } catch (e) { return u; } }
+  function render() {
+    var c = read(); var n = count();
+    if (badge) { badge.textContent = n; badge.classList.toggle('on', n > 0); }
+    if (!c.length) {
+      body.innerHTML = '<div class="cart-empty"><svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg><p>Список пуст.<br>Добавляйте товары кнопкой «В корзину» — соберём их в одну заявку на расчёт.</p></div>';
+      foot.innerHTML = '';
+      return;
+    }
+    body.innerHTML = c.map(function (i) {
+      return '<div class="cart-item"><img src="' + abs(i.img) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+        '<div class="ci-b"><b>' + esc(i.name) + '</b>' +
+        '<div class="ci-row"><span class="cart-qty"><button data-q="-1" data-id="' + esc(i.id) + '">−</button><span>' + i.qty + '</span><button data-q="1" data-id="' + esc(i.id) + '">+</button></span>' +
+        '<button class="ci-del" data-del="' + esc(i.id) + '">убрать</button></div></div></div>';
+    }).join('');
+    foot.innerHTML = '<div class="cart-count-line"><span>Позиций</span><b>' + c.length + ' · ' + n + ' шт</b></div>' +
+      '<p class="cart-note">Цены — под заказ. Отправьте список — рассчитаем КП по вашему объёму, цвету RAL и логистике за 1 рабочий день.</p>' +
+      '<button class="btn btn-primary btn-block" id="cartSubmit">Оформить заявку на расчёт</button>';
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  var drawer = wrap.querySelector('#cartDrawer'), cartOv = wrap.querySelector('#cartOv');
+  function openCart() { render(); cartOv.classList.add('on'); drawer.classList.add('on'); }
+  function closeCart() { cartOv.classList.remove('on'); drawer.classList.remove('on'); }
+  tools.querySelector('#hCart').addEventListener('click', openCart);
+  wrap.querySelector('#cartX').addEventListener('click', closeCart);
+  cartOv.addEventListener('click', closeCart);
+  body.addEventListener('click', function (e) {
+    var q = e.target.closest('[data-q]'); var d = e.target.closest('[data-del]');
+    if (q) setQty(q.dataset.id, parseInt(q.dataset.q, 10));
+    if (d) del(d.dataset.del);
+  });
+  foot.addEventListener('click', function (e) {
+    if (e.target.closest('#cartSubmit')) {
+      var c = read();
+      closeCart();
+      if (window.openModal) {
+        window.openModal();
+        var ta = document.querySelector('#modal textarea');
+        if (!ta) {
+          var f = document.querySelector('#modal form');
+          if (f) { ta = document.createElement('textarea'); ta.rows = 3; ta.name = 'items'; f.insertBefore(ta, f.querySelector('button')); }
+        }
+        if (ta) ta.value = 'Список для расчёта:\n' + c.map(function (i) { return '• ' + i.name + ' — ' + i.qty + ' шт'; }).join('\n');
+      }
+    }
+  });
+
+  /* инъекция кнопки «В корзину» на страницах товара */
+  var ppActions = document.querySelector('.pp-actions');
+  if (ppActions && !ppActions.querySelector('.btn-cart')) {
+    var b = document.createElement('button');
+    b.className = 'btn btn-cart'; b.type = 'button';
+    b.innerHTML = 'В корзину';
+    b.addEventListener('click', function () { addToCartFromPage(b); openCart(); });
+    ppActions.insertBefore(b, ppActions.firstChild);
+  }
+
+  /* ================= ПОИСК ================= */
+  var searchOv = wrap.querySelector('#searchOv'), input = wrap.querySelector('#searchInput'),
+      results = wrap.querySelector('#searchResults'), INDEX = null, sel = -1;
+  function openSearch() {
+    searchOv.classList.add('on'); setTimeout(function () { input.focus(); }, 60);
+    if (!INDEX) fetch(new URL('assets/products.json', siteBase)).then(function (r) { return r.json(); })
+      .then(function (d) { INDEX = d; if (input.value) run(); }).catch(function () { INDEX = []; });
+  }
+  function closeSearch() { searchOv.classList.remove('on'); }
+  tools.querySelector('#hSearch').addEventListener('click', openSearch);
+  wrap.querySelector('#searchX').addEventListener('click', closeSearch);
+  searchOv.addEventListener('click', function (e) { if (e.target === searchOv) closeSearch(); });
+  function norm(s) { return (s || '').toLowerCase().replace(/ё/g, 'е'); }
+  function run() {
+    var q = norm(input.value.trim()); sel = -1;
+    if (!q) { results.innerHTML = ''; return; }
+    if (!INDEX) { results.innerHTML = '<div class="sr-empty">Загрузка…</div>'; return; }
+    var terms = q.split(/\s+/);
+    var hits = INDEX.filter(function (p) {
+      var hay = norm(p.n + ' ' + (p.c || '') + ' ' + (p.k || ''));
+      return terms.every(function (t) { return hay.indexOf(t) >= 0; });
+    }).slice(0, 12);
+    if (!hits.length) { results.innerHTML = '<div class="sr-empty">Ничего не найдено. Попробуйте «скамейка», «урна», артикул.</div>'; return; }
+    results.innerHTML = hits.map(function (p) {
+      return '<a class="sr-item" href="' + new URL(p.u, siteBase).href + '">' +
+        (p.i ? '<img class="sr-thumb" src="' + new URL(p.i, siteBase).href + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '<span class="sr-thumb"></span>') +
+        '<span class="sr-tx"><b>' + esc(p.n) + '</b><span>' + esc(p.c || '') + '</span></span></a>';
+    }).join('');
+  }
+  input.addEventListener('input', run);
+  input.addEventListener('keydown', function (e) {
+    var items = results.querySelectorAll('.sr-item');
+    if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(sel + 1, items.length - 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(sel - 1, 0); }
+    else if (e.key === 'Enter') { if (items[sel]) items[sel].click(); return; }
+    else return;
+    items.forEach(function (it, i) { it.classList.toggle('sel', i === sel); });
+    if (items[sel]) items[sel].scrollIntoView({ block: 'nearest' });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { closeSearch(); closeCart(); }
+    if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); openSearch(); }
+  });
+
+  render();
+})();
+
 /* ── переключатель «Завод vs Посредник» ── */
 (function () {
   document.querySelectorAll('.versus').forEach(function (box) {
