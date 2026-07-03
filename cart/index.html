@@ -3,25 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Наши работы — металлоизделия на объектах застройщиков | СТАЛЬПРОМ</title>
-<meta name="description" content="Реализованные проекты СТАЛЬПРОМ: благоустройство ЖК, фасадные корзины, МАФ, ограждения школ и дворов. Фото объектов по всей России.">
-<link rel="canonical" href="https://stalprom.ru/projects/">
-<meta name="robots" content="index, follow">
-<meta property="og:type" content="website">
-<meta property="og:locale" content="ru_RU">
-<meta property="og:site_name" content="СТАЛЬПРОМ">
-<meta property="og:title" content="Наши работы — металлоизделия на объектах застройщиков">
-<meta property="og:description" content="Реализованные проекты СТАЛЬПРОМ: благоустройство ЖК, фасадные корзины, МАФ, ограждения школ и дворов. Фото объектов по всей России.">
-<meta property="og:url" content="https://stalprom.ru/projects/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>Корзина — список для расчёта КП | СТАЛЬПРОМ</title>
+<meta name="description" content="Ваш список изделий для расчёта коммерческого предложения: количество, цвет RAL, доставка. КП за 1 рабочий день.">
+<link rel="canonical" href="https://stalprom.ru/cart/">
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css?v=h3">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
-{"@type":"ListItem","position":1,"name":"Главная","item":"https://stalprom.ru/"},
-{"@type":"ListItem","position":2,"name":"Проекты","item":"https://stalprom.ru/projects/"}]}
-</script>
 </head>
 <body>
 <div class="topbar"><div class="container">
@@ -58,96 +46,36 @@
   <div class="hdr-actions"><button class="btn btn-primary btn-sm" onclick="openModal()">Расчёт по ТЗ</button></div>
   <div class="burger" onclick="toggleNav()"><span></span><span></span><span></span></div>
 </div></header>
-<main>
 
-<div class="shero">
-  <div class="shero-bg"><div class="ph"></div></div>
-  <span class="shero-corner">Проекты · фон: коллаж объектов</span>
-  <div class="container"><div class="shero-inner">
-    <nav class="crumbs"><a href="../index.html">Главная</a> / <span>Проекты</span></nav>
-    <div class="eyebrow">Портфолио завода</div>
-    <h1>Реализованные проекты <em>и объекты</em></h1>
-    <p class="lead">800+ объектов за 14 лет: дворы ЖК, школы, набережные и муниципальное благоустройство по всей России. Ниже — свежие и показательные.</p>
-    <div class="shero-meta"><span><b>800+</b> объектов</span><span><b>40+</b> регионов</span><span>фото <b>добавляются</b></span></div>
-  </div></div>
-</div>
-
-<section>
+<section class="cartp">
   <div class="container">
-    <div class="reveal"><div class="dim"><span class="tick"></span>01 — Флагманский кейс</div></div>
-    <div class="sec-head reveal" style="margin-top:24px"><div><h2>ЖК в Волгограде — комплектация целиком</h2></div></div>
-    <div class="dir-hero reveal" style="cursor:default">
-      <div class="ph"><span class="ph-tag">фото объекта — скоро</span><span class="ph-label">Фото: двор ЖК, Волгоград — общий план</span></div>
-      <div class="dir-hero-b">
-        <span class="dir-num">2026</span>
-        <div class="dir-hero-l">
-          <div class="eyebrow">Волгоград · жилой комплекс</div>
-          <h3>Фасад, двор и стальной «Колизей»</h3>
+    <div class="crumbs"><a href="../index.html">Главная</a> → <span>Корзина</span></div>
+    <h1 class="cartp-title">Список для расчёта <span id="cartTitleCount"></span></h1>
+    <p class="cartp-sub">Цены на изделия считаем под объём заказа, цвет RAL и логистику. Отправьте список — пришлём коммерческое предложение в течение 1 рабочего дня.</p>
+    <div class="cartp-grid" id="cartPage">
+      <div class="cartp-items" id="cartItems"></div>
+      <aside class="cartp-side" id="cartSide">
+        <div class="cartp-panel">
+          <h3>Итого</h3>
+          <div class="cartp-line"><span>Позиций</span><b id="sumPos">0</b></div>
+          <div class="cartp-line"><span>Всего единиц</span><b id="sumQty">0</b></div>
+          <hr>
+          <form onsubmit="return submitLead(this)">
+            <div class="field"><label>Имя</label><input type="text" required></div>
+            <div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div>
+            <div class="field"><label>Комментарий</label><textarea rows="2" placeholder="Цвет RAL, город доставки, сроки"></textarea></div>
+            <textarea name="items" id="cartFormItems" hidden></textarea>
+            <button class="btn btn-primary btn-block" type="submit">Отправить на расчёт</button>
+            <p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p>
+          </form>
+          <div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Пришлём КП в течение 1 рабочего дня.</div>
         </div>
-        <div class="dir-hero-r">
-          <p>350 корзин для кондиционеров в едином RAL, 60+ единиц МАФ в парковых зонах и арт-объект — массив стальных колец в форме колизея по эскизу архитектора. От ТЗ до сдачи — 5 месяцев.</p>
-          <div class="dir-tags"><span>корзины</span><span>МАФ</span><span>арт-объект</span><span>единый RAL</span></div>
-          <a class="dir-link" style="margin-top:18px" href="../proizvodstvo/index.html">Как это делалось →</a>
-        </div>
-      </div>
+        <p class="cartp-note">Завод-производитель · окраска RAL · отгрузка по всей России</p>
+      </aside>
     </div>
   </div>
 </section>
 
-<section class="tint">
-  <div class="container">
-    <div class="reveal"><div class="dim"><span class="tick"></span>02 — Объекты</div></div>
-    <div class="sec-head reveal" style="margin-top:24px">
-      <div><h2>География работ</h2></div>
-      <p class="lead-wide">Подборка типовых проектов. Фото с объектов добавим по мере согласования с заказчиками.</p>
-    </div>
-    <div class="model-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div class="model-card reveal"><div style="position:relative"><span class="mc-badge">благоустройство</span><div class="ph r-43"><span class="ph-label">Фото: двор ЖК, Саратов</span></div></div>
-        <div class="mc-b"><h3>Двор ЖК, Саратов</h3><div class="mc-sub">Скамьи, урны, велопарковки, газонные ограждения</div>
-        <ul class="mc-spec"><li><span>Состав</span><b>48 ед. МАФ</b></li><li><span>Срок</span><b>6 недель</b></li></ul></div></div>
-      <div class="model-card reveal" style="--d:.06s"><div style="position:relative"><span class="mc-badge alt">фасад</span><div class="ph r-43"><span class="ph-label">Фото: фасад ЖК, Москва</span></div></div>
-        <div class="mc-b"><h3>Фасад ЖК, Москва</h3><div class="mc-sub">Корзины Art Deco с лазерным узором</div>
-        <ul class="mc-spec"><li><span>Состав</span><b>220 корзин</b></li><li><span>Срок</span><b>8 недель</b></li></ul></div></div>
-      <div class="model-card reveal" style="--d:.12s"><div style="position:relative"><span class="mc-badge alt">44-ФЗ</span><div class="ph r-43"><span class="ph-label">Фото: школа, Балаково</span></div></div>
-        <div class="mc-b"><h3>Школа, Балаково</h3><div class="mc-sub">Ограждение территории и велопарковки</div>
-        <ul class="mc-spec"><li><span>Состав</span><b>380 м секций</b></li><li><span>Срок</span><b>5 недель</b></li></ul></div></div>
-      <div class="model-card reveal"><div style="position:relative"><span class="mc-badge">благоустройство</span><div class="ph r-43"><span class="ph-label">Фото: набережная, Самара</span></div></div>
-        <div class="mc-b"><h3>Набережная, Самара</h3><div class="mc-sub">Скамьи из массива и урны, антивандальная серия</div>
-        <ul class="mc-spec"><li><span>Состав</span><b>72 ед. МАФ</b></li><li><span>Срок</span><b>7 недель</b></li></ul></div></div>
-      <div class="model-card reveal" style="--d:.06s"><div style="position:relative"><span class="mc-badge alt">МКД</span><div class="ph r-43"><span class="ph-label">Фото: подъезды, Энгельс</span></div></div>
-        <div class="mc-b"><h3>Кап. ремонт МКД, Энгельс</h3><div class="mc-sub">Почтовые ящики и перила входных групп</div>
-        <ul class="mc-spec"><li><span>Состав</span><b>16 подъездов</b></li><li><span>Срок</span><b>4 недели</b></li></ul></div></div>
-      <div class="model-card reveal" style="--d:.12s"><div style="position:relative"><div class="ph r-43"><span class="ph-label">Фото: двор ТКО, Казань</span></div></div>
-        <div class="mc-b"><h3>Площадки ТКО, Казань</h3><div class="mc-sub">Серия закрытых площадок с воротами</div>
-        <ul class="mc-spec"><li><span>Состав</span><b>14 площадок</b></li><li><span>Срок</span><b>6 недель</b></li></ul></div></div>
-    </div>
-  </div>
-</section>
-
-<section style="padding:0">
-  <div class="metrics">
-    <div class="metric reveal"><b data-count="800">0<i>+</i></b><span>объектов за 14 лет</span></div>
-    <div class="metric reveal" style="--d:.07s"><b data-count="40">0<i>+</i></b><span>регионов поставки</span></div>
-    <div class="metric reveal" style="--d:.14s"><b data-count="4500">0</b><span>изделий МАФ в год</span></div>
-    <div class="metric reveal" style="--d:.21s"><b data-count="98">0<i>%</i></b><span>отгрузок точно в срок</span></div>
-  </div>
-</section>
-
-<section style="padding-top:0">
-  <div class="container"><div class="formpanel reveal">
-    <h3>Хотите такой же объект?</h3>
-    <p>Пришлите ТЗ или проект благоустройства — покажем релевантные кейсы и посчитаем смету.</p>
-    <form onsubmit="return submitLead(this)">
-      <div class="row2"><div class="field"><label>Имя</label><input type="text" required></div><div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div></div>
-      <div class="field"><label>Ваш объект</label><textarea rows="2" placeholder="Например: двор ЖК, нужны МАФ и ограждения"></textarea></div>
-      <button class="btn btn-primary btn-block" type="submit">Отправить заявку</button>
-      <p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p>
-    </form>
-    <div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div>
-  </div></div>
-</section>
-
-</main>
 <footer>
   <div class="foot-cta"><div class="container">
     <div>

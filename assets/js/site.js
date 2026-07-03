@@ -1,11 +1,5 @@
-/* СТАЛЬПРОМ — общий скрипт сайта v2: навигация, формы, микроанимации */
+/* СТАЛЬПРОМ — общий скрипт сайта v3: навигация, формы, корзина-страница, микроанимации */
 (function () {
-  // мобильное меню
-  window.toggleNav = function () {
-    var n = document.getElementById('nav');
-    if (n) n.classList.toggle('open');
-  };
-
   // модальное окно «Расчёт по ТЗ»
   window.openModal = function () {
     var m = document.getElementById('modal');
@@ -378,28 +372,90 @@ window.__whenVisible = (function () {
   });
 })();
 
-/* ── мобильное меню: анимация бургера + закрытие ── */
+/* ── мобильное меню v3: панель справа, аккордеоны разделов, CTA снизу ──
+   Разметка строится ИЗ существующего desktop-меню (#nav) — один источник правды,
+   ничего не дублируем в HTML страниц. */
 (function () {
-  window.toggleNav = function () {
-    var n = document.getElementById('nav');
-    var b = document.querySelector('.burger');
-    if (!n) return;
-    var open = n.classList.toggle('open');
-    if (b) b.classList.toggle('open', open);
-  };
-  function closeNav() {
-    var n = document.getElementById('nav'); var b = document.querySelector('.burger');
-    if (n) n.classList.remove('open'); if (b) b.classList.remove('open');
-  }
-  // закрытие по клику вне меню и по ссылке
-  document.addEventListener('click', function (e) {
-    var n = document.getElementById('nav');
-    if (!n || !n.classList.contains('open')) return;
-    if (e.target.closest('.burger')) return;
-    if (!e.target.closest('#nav')) closeNav();
-    else if (e.target.closest('#nav a') && !e.target.closest('.navitem>a')) closeNav();
+  var nav = document.getElementById('nav');
+  var header = document.getElementById('siteHeader');
+  if (!nav || !header) return;
+
+  var esc = function (s) { return String(s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var topbar = document.querySelector('.topbar');
+  var phoneA = topbar ? topbar.querySelector('a[href^="tel:"]') : null;
+  var messA = topbar ? Array.prototype.slice.call(topbar.querySelectorAll('.tb-r a:not([href^="tel:"])')) : [];
+
+  // --- собираем панель из пунктов desktop-меню ---
+  var body = '';
+  Array.prototype.forEach.call(nav.children, function (child) {
+    if (child.classList && child.classList.contains('navitem')) {
+      var top = child.querySelector(':scope > a') || child.querySelector('a');
+      var dd = child.querySelector('.dropdown');
+      var items = dd ? Array.prototype.map.call(dd.querySelectorAll('.dd-item'), function (a) { return a.outerHTML; }).join('') : '';
+      body += '<div class="mnav-group">'
+        + '<button class="mnav-acc" type="button" aria-expanded="false"><span>' + esc(top.textContent.trim()) + '</span><i></i></button>'
+        + '<div class="mnav-sub"><div class="mnav-sub-in">'
+        + '<a class="mnav-all" href="' + esc(top.getAttribute('href')) + '">Весь раздел →</a>'
+        + items
+        + '</div></div></div>';
+    } else if (child.tagName === 'A') {
+      body += '<a class="mnav-link" href="' + esc(child.getAttribute('href')) + '">' + esc(child.textContent.trim()) + '</a>';
+    }
   });
-  window.addEventListener('resize', function () { if (innerWidth > 1180) closeNav(); });
+
+  var cta = '<div class="mnav-cta">'
+    + '<button class="btn btn-primary btn-block" type="button" onclick="closeMnav();openModal()">Расчёт по ТЗ</button>'
+    + (phoneA ? '<a class="mnav-phone" href="' + esc(phoneA.getAttribute('href')) + '">' + esc(phoneA.textContent.trim()) + '<small>звонок и расчёт бесплатно</small></a>' : '')
+    + (messA.length ? '<div class="mnav-mess">' + messA.map(function (a) { return '<a href="' + esc(a.getAttribute('href')) + '">' + esc(a.textContent.trim()) + '</a>'; }).join('') + '</div>' : '')
+    + '</div>';
+
+  var mnav = document.createElement('div');
+  mnav.className = 'mnav';
+  mnav.id = 'mnav';
+  mnav.setAttribute('aria-hidden', 'true');
+  mnav.innerHTML = '<div class="mnav-ov"></div>'
+    + '<aside class="mnav-panel" role="dialog" aria-label="Меню">'
+    + '<div class="mnav-head"><b>СТАЛЬПРОМ</b><button class="mnav-x" type="button" aria-label="Закрыть меню">×</button></div>'
+    + '<div class="mnav-scroll">' + body + '</div>'
+    + cta
+    + '</aside>';
+  document.body.appendChild(mnav);
+
+  var burger = document.querySelector('.burger');
+  function openMnav() {
+    mnav.classList.add('on');
+    mnav.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('mnav-lock');
+    if (burger) burger.classList.add('open');
+  }
+  window.closeMnav = function () {
+    mnav.classList.remove('on');
+    mnav.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('mnav-lock');
+    if (burger) burger.classList.remove('open');
+  };
+  window.toggleNav = function () {
+    if (mnav.classList.contains('on')) window.closeMnav(); else openMnav();
+  };
+
+  mnav.querySelector('.mnav-ov').addEventListener('click', window.closeMnav);
+  mnav.querySelector('.mnav-x').addEventListener('click', window.closeMnav);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') window.closeMnav(); });
+  // переход по любой ссылке закрывает меню
+  mnav.addEventListener('click', function (e) { if (e.target.closest('a')) window.closeMnav(); });
+  // аккордеоны разделов
+  mnav.querySelectorAll('.mnav-acc').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.parentNode;
+      var open = g.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      // одновременно открыт только один раздел — аккуратнее на маленьком экране
+      if (open) mnav.querySelectorAll('.mnav-group.open').forEach(function (o) {
+        if (o !== g) { o.classList.remove('open'); o.querySelector('.mnav-acc').setAttribute('aria-expanded', 'false'); }
+      });
+    });
+  });
+  window.addEventListener('resize', function () { if (innerWidth > 1180) window.closeMnav(); });
 })();
 
 /* ── шапка: поиск + корзина (лист для КП) ── */
@@ -414,15 +470,16 @@ window.__whenVisible = (function () {
   /* ---- вставляем иконки в шапку ---- */
   var actions = header.querySelector('.hdr-actions');
   var burger = header.querySelector('.burger');
+  var cartURL = new URL('cart/', siteBase).href;
   var tools = document.createElement('div');
   tools.className = 'hdr-tools';
   tools.innerHTML =
     '<button class="hicon" id="hSearch" type="button" aria-label="Поиск"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>' +
-    '<button class="hicon" id="hCart" type="button" aria-label="Корзина"><svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg><span class="hicon-badge" id="cartCount">0</span></button>';
+    '<a class="hicon" id="hCart" href="' + cartURL + '" aria-label="Корзина — список для расчёта"><svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg><span class="hicon-badge" id="cartCount">0</span></a>';
   if (actions) actions.insertBefore(tools, actions.firstChild);
   else if (burger) burger.parentNode.insertBefore(tools, burger);
 
-  /* ---- разметка оверлеев ---- */
+  /* ---- разметка оверлеев (поиск + тост корзины) ---- */
   var wrap = document.createElement('div');
   wrap.innerHTML =
     '<div class="search-ov" id="searchOv"><div class="search-box">' +
@@ -432,20 +489,23 @@ window.__whenVisible = (function () {
       '<div class="search-results" id="searchResults"></div>' +
       '<div class="search-hint">Введите название или артикул · Esc — закрыть</div>' +
     '</div></div>' +
-    '<div class="cart-ov" id="cartOv"></div>' +
-    '<aside class="cart-drawer" id="cartDrawer" aria-label="Корзина">' +
-      '<div class="cart-head"><h3>Ваш список для КП</h3><button class="cart-x" id="cartX" aria-label="Закрыть">×</button></div>' +
-      '<div class="cart-body" id="cartBody"></div>' +
-      '<div class="cart-foot" id="cartFoot"></div>' +
-    '</aside>' +
-    '<div class="add-cart-ok" id="addCartOk">Добавлено в список ✓</div>';
+    '<div class="add-cart-ok" id="addCartOk"><span>Добавлено в список ✓</span><a href="' + cartURL + '">Открыть корзину →</a></div>';
   document.body.appendChild(wrap);
 
-  /* ================= КОРЗИНА ================= */
+  /* ================= КОРЗИНА (данные; страница — /cart/) ================= */
   var KEY = 'sp_cart_v1';
   function read() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } }
-  function write(c) { try { localStorage.setItem(KEY, JSON.stringify(c)); } catch (e) {} render(); }
+  function write(c) { try { localStorage.setItem(KEY, JSON.stringify(c)); } catch (e) {} renderBadge(); }
   function count() { return read().reduce(function (s, i) { return s + i.qty; }, 0); }
+  function setQty(id, d) {
+    var c = read();
+    c.forEach(function (x) { if (x.id === id) x.qty = Math.max(1, x.qty + d); });
+    write(c);
+  }
+  function del(id) { write(read().filter(function (x) { return x.id !== id; })); }
+  function clearAll() { write([]); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function abs(u) { try { return u ? new URL(u, location.href).href : ''; } catch (e) { return u; } }
 
   window.addToCart = function (item) {
     if (!item || !item.id) return;
@@ -460,77 +520,30 @@ window.__whenVisible = (function () {
     var art = (pp.querySelector('.pp-art') || {}).textContent || '';
     var m = art.match(/Артикул\s*([A-Za-zА-Яа-я0-9\-]+)/);
     var mainImg = document.querySelector('.gallery .ph.main img');
+    var qtyInp = document.querySelector('.pp-info .qty input') || document.querySelector('.qty input');
     var id = (m ? m[1] : (h ? h.textContent.trim() : location.pathname)).trim();
     addToCart({
       id: id,
       name: h ? h.textContent.trim() : id,
-      url: location.pathname,
-      img: mainImg ? mainImg.getAttribute('src') : ''
+      url: location.href,                                        // абсолютный — работает со страницы корзины
+      img: mainImg ? abs(mainImg.getAttribute('src')) : '',      // абсолютный — картинка не ломается на /cart/
+      qty: qtyInp ? Math.max(1, parseInt(qtyInp.value, 10) || 1) : 1
     });
   };
-  function setQty(id, d) {
-    var c = read();
-    c.forEach(function (x) { if (x.id === id) x.qty = Math.max(1, x.qty + d); });
-    write(c);
-  }
-  function del(id) { write(read().filter(function (x) { return x.id !== id; })); }
+  // общий API для страницы корзины
+  window.__spCart = { read: read, write: write, count: count, setQty: setQty, del: del, clear: clearAll, esc: esc, cartURL: cartURL, siteBase: siteBase.href };
 
   var badge = tools.querySelector('#cartCount');
-  var body = wrap.querySelector('#cartBody');
-  var foot = wrap.querySelector('#cartFoot');
+  function renderBadge() {
+    var n = count();
+    if (badge) { badge.textContent = n; badge.classList.toggle('on', n > 0); }
+  }
   var okToast = wrap.querySelector('#addCartOk');
   var toastT;
   function toast() {
     if (!okToast) return; okToast.classList.add('on');
-    clearTimeout(toastT); toastT = setTimeout(function () { okToast.classList.remove('on'); }, 1600);
+    clearTimeout(toastT); toastT = setTimeout(function () { okToast.classList.remove('on'); }, 2600);
   }
-  function abs(u) { try { return u ? new URL(u, location.href).href : ''; } catch (e) { return u; } }
-  function render() {
-    var c = read(); var n = count();
-    if (badge) { badge.textContent = n; badge.classList.toggle('on', n > 0); }
-    if (!c.length) {
-      body.innerHTML = '<div class="cart-empty"><svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg><p>Список пуст.<br>Добавляйте товары кнопкой «В корзину» — соберём их в одну заявку на расчёт.</p></div>';
-      foot.innerHTML = '';
-      return;
-    }
-    body.innerHTML = c.map(function (i) {
-      return '<div class="cart-item"><img src="' + abs(i.img) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
-        '<div class="ci-b"><b>' + esc(i.name) + '</b>' +
-        '<div class="ci-row"><span class="cart-qty"><button data-q="-1" data-id="' + esc(i.id) + '">−</button><span>' + i.qty + '</span><button data-q="1" data-id="' + esc(i.id) + '">+</button></span>' +
-        '<button class="ci-del" data-del="' + esc(i.id) + '">убрать</button></div></div></div>';
-    }).join('');
-    foot.innerHTML = '<div class="cart-count-line"><span>Позиций</span><b>' + c.length + ' · ' + n + ' шт</b></div>' +
-      '<p class="cart-note">Цены — под заказ. Отправьте список — рассчитаем КП по вашему объёму, цвету RAL и логистике за 1 рабочий день.</p>' +
-      '<button class="btn btn-primary btn-block" id="cartSubmit">Оформить заявку на расчёт</button>';
-  }
-  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-
-  var drawer = wrap.querySelector('#cartDrawer'), cartOv = wrap.querySelector('#cartOv');
-  function openCart() { render(); cartOv.classList.add('on'); drawer.classList.add('on'); }
-  function closeCart() { cartOv.classList.remove('on'); drawer.classList.remove('on'); }
-  tools.querySelector('#hCart').addEventListener('click', openCart);
-  wrap.querySelector('#cartX').addEventListener('click', closeCart);
-  cartOv.addEventListener('click', closeCart);
-  body.addEventListener('click', function (e) {
-    var q = e.target.closest('[data-q]'); var d = e.target.closest('[data-del]');
-    if (q) setQty(q.dataset.id, parseInt(q.dataset.q, 10));
-    if (d) del(d.dataset.del);
-  });
-  foot.addEventListener('click', function (e) {
-    if (e.target.closest('#cartSubmit')) {
-      var c = read();
-      closeCart();
-      if (window.openModal) {
-        window.openModal();
-        var ta = document.querySelector('#modal textarea');
-        if (!ta) {
-          var f = document.querySelector('#modal form');
-          if (f) { ta = document.createElement('textarea'); ta.rows = 3; ta.name = 'items'; f.insertBefore(ta, f.querySelector('button')); }
-        }
-        if (ta) ta.value = 'Список для расчёта:\n' + c.map(function (i) { return '• ' + i.name + ' — ' + i.qty + ' шт'; }).join('\n');
-      }
-    }
-  });
 
   /* инъекция кнопки «В корзину» на страницах товара */
   var ppActions = document.querySelector('.pp-actions');
@@ -538,7 +551,7 @@ window.__whenVisible = (function () {
     var b = document.createElement('button');
     b.className = 'btn btn-cart'; b.type = 'button';
     b.innerHTML = 'В корзину';
-    b.addEventListener('click', function () { addToCartFromPage(b); openCart(); });
+    b.addEventListener('click', function () { addToCartFromPage(b); });
     ppActions.insertBefore(b, ppActions.firstChild);
   }
 
@@ -582,8 +595,74 @@ window.__whenVisible = (function () {
     if (items[sel]) items[sel].scrollIntoView({ block: 'nearest' });
   });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { closeSearch(); closeCart(); }
+    if (e.key === 'Escape') closeSearch();
     if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) { e.preventDefault(); openSearch(); }
+  });
+
+  renderBadge();
+})();
+
+/* ── страница корзины /cart/: список, количество, заявка ── */
+(function () {
+  var itemsBox = document.getElementById('cartItems');
+  if (!itemsBox || !window.__spCart) return;
+  var C = window.__spCart;
+  var side = document.getElementById('cartSide');
+  var titleCount = document.getElementById('cartTitleCount');
+  var sumPos = document.getElementById('sumPos');
+  var sumQty = document.getElementById('sumQty');
+  var itemsTa = document.getElementById('cartFormItems');
+
+  function lineList(c) {
+    return 'Список для расчёта:\n' + c.map(function (i) { return '• ' + i.name + ' — ' + i.qty + ' шт'; }).join('\n');
+  }
+  function render() {
+    var c = C.read();
+    var n = C.count();
+    if (titleCount) titleCount.textContent = c.length ? c.length + ' поз. · ' + n + ' шт' : '';
+    if (sumPos) sumPos.textContent = c.length;
+    if (sumQty) sumQty.textContent = n + ' шт';
+    if (itemsTa) itemsTa.value = lineList(c);
+    if (side) side.classList.toggle('is-empty', !c.length);
+
+    if (!c.length) {
+      itemsBox.innerHTML =
+        '<div class="cartp-empty reveal in">' +
+        '<svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>' +
+        '<h2>Список пока пуст</h2>' +
+        '<p>Добавляйте изделия кнопкой «В корзину» — соберём их в одну заявку<br>и рассчитаем КП по объёму, цвету RAL и доставке.</p>' +
+        '<div class="cartp-empty-act"><a class="btn btn-primary" href="' + new URL('maf/index.html', C.siteBase).href + '">Каталог МАФ</a>' +
+        '<a class="btn" href="' + new URL('ograzhdeniya/index.html', C.siteBase).href + '">Ограждения</a></div></div>';
+      return;
+    }
+    itemsBox.innerHTML = c.map(function (i, idx) {
+      var img = i.img ? '<img src="' + C.esc(i.img) + '" alt="" loading="lazy" onerror="this.parentNode.classList.add(\'noimg\')">' : '';
+      var open = i.url ? ' href="' + C.esc(i.url) + '"' : '';
+      return '<div class="cartp-item" data-id="' + C.esc(i.id) + '" style="--i:' + idx + '">' +
+        '<a class="ci-ph' + (i.img ? '' : ' noimg') + '"' + open + '>' + img + '</a>' +
+        '<div class="ci-main">' +
+          '<a class="ci-name"' + open + '>' + C.esc(i.name) + '</a>' +
+          '<small>Артикул ' + C.esc(i.id) + ' · цена по запросу</small>' +
+          '<div class="ci-ctrl">' +
+            '<span class="cart-qty"><button type="button" data-q="-1" aria-label="Меньше">−</button><span>' + i.qty + '</span><button type="button" data-q="1" aria-label="Больше">+</button></span>' +
+            '<button class="ci-del" type="button" data-del>Убрать</button>' +
+          '</div>' +
+        '</div></div>';
+    }).join('') +
+    '<div class="cartp-tools"><button class="ci-del" type="button" id="cartClear">Очистить весь список</button></div>';
+  }
+
+  itemsBox.addEventListener('click', function (e) {
+    var row = e.target.closest('.cartp-item');
+    var q = e.target.closest('[data-q]');
+    var d = e.target.closest('[data-del]');
+    if (q && row) { C.setQty(row.dataset.id, parseInt(q.dataset.q, 10)); render(); }
+    else if (d && row) {
+      row.classList.add('out');
+      setTimeout(function () { C.del(row.dataset.id); render(); }, 240);
+    } else if (e.target.closest('#cartClear')) {
+      if (confirm('Очистить весь список?')) { C.clear(); render(); }
+    }
   });
 
   render();
