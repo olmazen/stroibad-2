@@ -27,8 +27,9 @@
   var P = new URLSearchParams(location.search);
   var mode = P.get('mode') === 'tender' ? 'tender' : 'beauty';
   var ledgerOnly = P.get('ledger') === '1' || mode === 'tender';
-  var ndsPerRow = P.get('nds') === 'row';
+  var ndsPerRow = mode === 'tender' && P.get('nds') === 'row';
   var auto = P.get('auto') === '1';
+  var firmOnly = mode === 'tender';   // тендер: только ТВЁРДАЯ цена (row.price), справочная «от» не подходит для НМЦК
 
   document.body.className = 'mode-' + mode + (ledgerOnly ? ' ledger-only' : '');
   var modeLabel = document.getElementById('kpModeLabel');
@@ -44,7 +45,12 @@
   }
   function moneyInt(n) { return Math.round(n).toLocaleString('ru-RU').replace(/\s/g, NBSP) + NBSP + '₽'; }
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
-  function parseDate(s) { if (!s) return new Date(); var d = new Date(s); return isNaN(d) ? new Date() : d; }
+  function parseDate(s) {
+    if (!s) return new Date();
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
+    if (m) return new Date(+m[1], +m[2] - 1, +m[3]);   // локальная дата — без UTC-сдвига на день
+    var d = new Date(s); return isNaN(d) ? new Date() : d;
+  }
   function fmtRu(d) { return pad2(d.getDate()) + '.' + pad2(d.getMonth() + 1) + '.' + d.getFullYear(); }
   function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
 
@@ -91,7 +97,11 @@
   }
 
   /* ---------------- бизнес-логика позиции ---------------- */
-  function unit(row) { return row.price > 0 ? row.price : (row.priceFrom > 0 ? row.priceFrom : 0); }
+  function round2(n) { return Math.round(n * 100) / 100; }
+  function unit(row) {
+    if (row.price > 0) return row.price;
+    return firmOnly ? 0 : (row.priceFrom > 0 ? row.priceFrom : 0);  // тендер: без fallback на «от»
+  }
   function priced(row) { return unit(row) > 0; }
   function ralHex(row) {
     if (!row.ral) return null;
@@ -117,7 +127,7 @@
   var cart = readJSON(CART_KEY, []);
   var head = readJSON(HEAD_KEY, {});
 
-  fetch('../assets/catalog.json?v=kp1').then(function (r) { return r.json(); }).then(function (catalog) {
+  fetch('../assets/catalog.json?v=kp2').then(function (r) { return r.json(); }).then(function (catalog) {
     var bySku = {}; catalog.forEach(function (x) { bySku[x.sku] = x; });
     var rows = cart.map(function (it) { return Object.assign({}, it, { cat: bySku[it.id] || null }); });
     build(rows);
@@ -139,9 +149,8 @@
     if (mode === 'tender') doc.innerHTML = buildTender(rows, num, d);
     else doc.innerHTML = buildBeauty(rows, num, d);
     fillStamp(num);
-    injectDrawings(rows);
     if (mode === 'tender') runValidator(rows);
-    finish();
+    injectDrawings(rows).then(finish);   // дождаться вставки чертежей ДО __kpReady/печати (иначе пустые рамки в PDF)
   }
   function autoNumber() {
     var d = parseDate(head.date);
@@ -162,7 +171,7 @@
   function buildBeauty(rows, num, d) {
     var html = '';
     /* ОБЛОЖКА */
-    var firstImg = (rows[0] && rows[0].img) || '';
+    var firstImg = (rows.filter(function (r) { return r.img; })[0] || rows[0] || {}).img || '';
     html += '<section class="sheet kp-cover beauty-only">' +
       '<span class="bp-corner tl"></span><span class="bp-corner br"></span>' +
       '<div class="cover-top">' + logo() +
@@ -323,7 +332,7 @@
       '<span class="nds">Цены указаны в рублях РФ, в т.ч. НДС 20% (поставщик на общей системе налогообложения).</span></p>' +
       tenderTable(rows) +
       tenderTotals(t) +
-      '<div class="kp-words">Всего наименований ' + rows.length + ', на сумму: <b>' + esc(amountInWords(t.withVat)) + '</b>.</div>' +
+      (t.hasOnReq ? '' : '<div class="kp-words">Всего наименований ' + rows.length + ', на сумму: <b>' + esc(amountInWords(t.withVat)) + '</b>.</div>') +
       tenderConditions(validDate, d) +
       '<div class="kp-offer">Настоящее коммерческое предложение является официальной офертой (ст. 435 ГК РФ).</div>' +
       '<div class="kp-assure">Товар новый, соответствует требованиям технического задания. Поставщик не включён в реестр недобросовестных поставщиков.</div>' +
@@ -340,11 +349,11 @@
       '<th class="num">Цена без НДС</th><th class="num">Сумма без НДС</th><th class="num">НДС 20%</th><th class="num">Сумма с НДС</th></tr>';
     var body = rows.map(function (r, i) {
       var withVat = unit(r) * r.qty;
-      var noVat = withVat / (1 + VAT), vat = withVat - noVat;
+      var noVat = round2(withVat / (1 + VAT)), vat = withVat - noVat;
       var name = '<div class="t-name"><b>' + esc(tenderName(r)) + '</b><small>' + esc(tenderChar(r)) + '</small></div>';
       if (ndsPerRow) {
         return '<tr><td class="num">' + (i + 1) + '</td><td>' + name + '</td><td>шт.</td><td class="num">' + r.qty + '</td>' +
-          '<td class="num">' + money(unit(r) / (1 + VAT)) + '</td><td class="num">' + money(noVat) + '</td>' +
+          '<td class="num">' + money(round2(unit(r) / (1 + VAT))) + '</td><td class="num">' + money(noVat) + '</td>' +
           '<td class="num">' + money(vat) + '</td><td class="num">' + money(withVat) + '</td></tr>';
       }
       return '<tr><td class="num">' + (i + 1) + '</td><td>' + name + '</td><td>шт.</td><td class="num">' + r.qty + '</td>' +
@@ -355,17 +364,20 @@
   function tenderName(r) {
     /* наименование под ТЗ: имя изделия (уже содержит тип: Скамейка/Лежак/Урна…) + марка + артикул */
     var name = r.name.replace(/\s*\(Art\s*Déco\)/i, '').trim();
-    return name + ', марка EGOE, арт. ' + r.id;
+    return name + ', марка EGOE™, арт. ' + r.id;
   }
   function tenderChar(r) {
-    var cat = r.cat, parts = [];
+    var cat = r.cat;
+    if (!cat) return 'характеристики уточняются (позиция вне текущего каталога)';
+    var parts = [];
     parts.push('материал: ' + material(cat));
     var dm = dims(cat);
     var g = []; if (dm.L) g.push('Д ' + dm.L); if (dm.W) g.push('Ш ' + dm.W); if (dm.H) g.push('В ' + dm.H);
     if (g.length) parts.push('габариты: ' + g.join(', '));
     if (dm.Wt) parts.push('вес: ' + dm.Wt);
-    parts.push('покрытие: порошковая окраска' + (r.ral ? ' ' + r.ral : ' RAL'));
+    parts.push('покрытие: порошковая окраска' + (r.ral ? ' ' + r.ral : ', цвет RAL по согласованию'));
     parts.push('гарантия: ' + warranty(cat));
+    parts.push('страна происхождения: Россия');
     return parts.join('; ') + '.';
   }
   function tenderTotals(t) {
@@ -396,6 +408,7 @@
       '<dt>Банк</dt><dd>' + SUP.bank + '</dd>' +
       '<dt>Корр. счёт</dt><dd>' + SUP.ks + '</dd>' +
       '<dt>БИК</dt><dd>' + SUP.bik + '</dd>' +
+      '<dt>Руководитель</dt><dd>Директор ' + SUP.dir + '</dd>' +
       '<dt>Контакты</dt><dd>' + SUP.tel + ' · ' + SUP.email + '</dd>' +
       '</dl></div>';
   }
@@ -407,10 +420,13 @@
 
   /* =============== итоги =============== */
   function totals(rows) {
-    var withVat = 0, hasOnReq = false;
-    rows.forEach(function (r) { if (priced(r)) withVat += unit(r) * r.qty; else hasOnReq = true; });
-    var noVat = withVat / (1 + VAT), vat = withVat - noVat;
-    return { withVat: withVat, noVat: noVat, vat: vat, hasOnReq: hasOnReq };
+    var withVat = 0, noVat = 0, vat = 0, hasOnReq = false;
+    rows.forEach(function (r) {
+      if (!priced(r)) { hasOnReq = true; return; }
+      var wv = unit(r) * r.qty, nv = round2(wv / (1 + VAT));
+      withVat += wv; noVat += nv; vat += (wv - nv);   // суммируем ПОСТРОЧНО округлённое — итог сходится с таблицей
+    });
+    return { withVat: round2(withVat), noVat: round2(noVat), vat: round2(vat), hasOnReq: hasOnReq };
   }
   function totalsBlock(t, tender) {
     return '<div class="kp-totals">' +
@@ -422,9 +438,9 @@
   /* =============== чертежи (inline + перекрас) =============== */
   function injectDrawings(rows) {
     var holders = doc.querySelectorAll('.kp-drawing[data-draw]');
-    [].forEach.call(holders, function (h) {
+    return Promise.all([].map.call(holders, function (h) {
       var path = h.getAttribute('data-draw');
-      fetch('../' + path + '?v=kp1').then(function (r) { return r.text(); }).then(function (txt) {
+      return fetch('../' + path + '?v=kp2').then(function (r) { return r.text(); }).then(function (txt) {
         txt = txt.replace(/<\?xml[^>]*\?>/i, '');
         /* Чертежи имеют хвостовой белый override .cls-N{...#ffffff...} (для тёмного сайта).
            Заменяем ЛЮБОЙ белый → графит прямо в тексте SVG: не удаляем правила и не трогаем
@@ -432,7 +448,7 @@
         txt = txt.replace(/#ffffff/gi, '#14181e').replace(/#fff\b/gi, '#14181e');
         h.insertAdjacentHTML('beforeend', txt);
       }).catch(function () { /* нет чертежа — пропускаем */ });
-    });
+    }));
   }
 
   /* =============== штамп-подвал =============== */
@@ -452,8 +468,10 @@
     if (!head.addressee) errs.push('Не указан адресат (полное наименование заказчика).');
     if (!head.number) errs.push('Не указан исходящий № КП.');
     if (!head.date) errs.push('Не указана дата КП.');
+    var noCat = rows.filter(function (r) { return !r.cat; });
+    if (noCat.length) errs.push('Позиции вне текущего каталога (характеристики недоступны): ' + noCat.map(function (r) { return r.name; }).join(', ') + '.');
     var onreq = rows.filter(function (r) { return !priced(r); });
-    if (onreq.length) errs.push('Не проставлена цена по позициям: ' + onreq.map(function (r) { return r.name; }).join(', ') + '. Для НМЦК цена обязательна.');
+    if (onreq.length) errs.push('Не указана твёрдая цена по позициям: ' + onreq.map(function (r) { return r.name; }).join(', ') + '. В тендерном КП цена за единицу обязательна (справочная «от» не подходит).');
     if (!errs.length) { window.__kpValid = true; return; }
     window.__kpValid = false;
     var ov = document.getElementById('kpOverlay');

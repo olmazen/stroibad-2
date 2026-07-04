@@ -869,6 +869,7 @@ body.mnav-lock{overflow:hidden}
 .kp-check input{width:16px;height:16px;accent-color:var(--amber);flex-shrink:0}
 .kp-tender-field{display:none}
 .kp-gen.is-tender .kp-tender-field{display:block}
+.kp-gen.is-tender .kp-row2.kp-tender-field{display:grid}
 .kp-gen.is-tender .kp-check.kp-tender-field{display:flex}
 .kp-gen-note{font-size:11px;color:var(--steel);margin:8px 0 0;line-height:1.4}
 #kpOpen{margin-top:10px}

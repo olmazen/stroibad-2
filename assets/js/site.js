@@ -519,13 +519,12 @@ window.__whenVisible = (function () {
       f.qty += (item.qty || 1);
       if (item.ral) f.ral = item.ral;                            // обновляем выбор, если пришёл новый
     } else {
-      var pf = item.priceFrom || 0;
       c.push({
         id: item.id, name: item.name || item.id, url: item.url || '', img: item.img || '',
         qty: item.qty || 1,
         ral: item.ral || '',                                     // выбранный цвет RAL
-        priceFrom: pf,                                           // цена «от» с сайта (справочно)
-        price: pf,                                               // редактируемая цена за единицу (префилл)
+        priceFrom: item.priceFrom || 0,                          // цена «от» с сайта (справочно, показывается как placeholder)
+        price: 0,                                                // ТВЁРДАЯ цена/ед — только когда менеджер ввёл вручную (обязательна для тендера)
         comment: ''                                              // комментарий по позиции
       });
     }
@@ -637,21 +636,24 @@ window.__whenVisible = (function () {
   var sumMoney = document.getElementById('sumMoney');
 
   function money(n) { return (n || 0).toLocaleString('ru-RU') + ' ₽'; }
+  function est(i) { return i.price > 0 ? i.price : (i.priceFrom || 0); }   // цена или справочная «от» (ориентировочно)
   function lineList(c) {
     return 'Список для расчёта:\n' + c.map(function (i) {
       var head = '• ' + i.name + (i.ral ? ' (' + i.ral + ')' : '') + ' — ' + i.qty + ' шт';
-      return head + (i.price > 0 ? ' × ' + money(i.price) + ' = ' + money(i.price * i.qty) : ' — цена по запросу');
+      if (i.price > 0) return head + ' × ' + money(i.price) + ' = ' + money(i.price * i.qty);
+      if (i.priceFrom > 0) return head + ' — ориентировочно от ' + money(i.priceFrom) + '/шт';
+      return head + ' — цена по запросу';
     }).join('\n');
   }
   function updateSums() {
     var c = C.read(); var grand = 0, anyReq = false;
     var rows = itemsBox.querySelectorAll('.cartp-item');
     c.forEach(function (i) {
-      var s = (i.price || 0) * i.qty; grand += s; if (!(i.price > 0)) anyReq = true;
+      var u = est(i); var s = u * i.qty; grand += s; if (!(u > 0)) anyReq = true;
       for (var r = 0; r < rows.length; r++) {
         if (rows[r].dataset.id === i.id) {
           var sn = rows[r].querySelector('.ci-sum');
-          if (sn) sn.textContent = i.price > 0 ? money(s) : 'по запросу';
+          if (sn) sn.textContent = u > 0 ? (i.price > 0 ? money(s) : '≈ ' + money(s)) : 'по запросу';
         }
       }
     });
@@ -681,7 +683,9 @@ window.__whenVisible = (function () {
       var img = i.img ? '<img src="' + C.esc(i.img) + '" alt="" loading="lazy" onerror="this.parentNode.classList.add(\'noimg\')">' : '';
       var open = i.url ? ' href="' + C.esc(i.url) + '"' : '';
       var meta = 'Артикул ' + C.esc(i.id) + (i.ral ? ' · ' + C.esc(i.ral) : '');
-      var fromNote = i.priceFrom > 0 ? ' title="на сайте: от ' + money(i.priceFrom) + '"' : '';
+      var ph = i.priceFrom > 0 ? 'от ' + i.priceFrom.toLocaleString('ru-RU') : 'цена';
+      var u = est(i);
+      var sumTxt = u > 0 ? (i.price > 0 ? money(u * i.qty) : '≈ ' + money(u * i.qty)) : 'по запросу';
       return '<div class="cartp-item" data-id="' + C.esc(i.id) + '" style="--i:' + idx + '">' +
         '<a class="ci-ph' + (i.img ? '' : ' noimg') + '"' + open + '>' + img + '</a>' +
         '<div class="ci-main">' +
@@ -689,8 +693,8 @@ window.__whenVisible = (function () {
           '<small>' + meta + '</small>' +
           '<div class="ci-ctrl">' +
             '<span class="cart-qty"><button type="button" data-q="-1" aria-label="Меньше">−</button><span>' + i.qty + '</span><button type="button" data-q="1" aria-label="Больше">+</button></span>' +
-            '<label class="ci-price"' + fromNote + '>Цена/ед <input type="text" inputmode="numeric" data-price value="' + (i.price || '') + '" placeholder="—"><span>₽</span></label>' +
-            '<span class="ci-sum">' + (i.price > 0 ? money(i.price * i.qty) : 'по запросу') + '</span>' +
+            '<label class="ci-price">Цена/ед <input type="text" inputmode="numeric" data-price value="' + (i.price || '') + '" placeholder="' + ph + '"><span>₽</span></label>' +
+            '<span class="ci-sum">' + sumTxt + '</span>' +
             '<button class="ci-del" type="button" data-del>Убрать</button>' +
           '</div>' +
         '</div></div>';
@@ -754,6 +758,7 @@ window.__whenVisible = (function () {
       return h;
     }
     for (var k in F) F[k].addEventListener('input', saveHead);
+    saveHead(); // сразу зафиксировать дефолты (№/дата), иначе валидатор на /kp/ ругается на «пустые» при показанных автозначениях
 
     seg.addEventListener('click', function (e) {
       var b = e.target.closest('[data-kpmode]'); if (!b) return;
@@ -768,14 +773,18 @@ window.__whenVisible = (function () {
 
     openBtn.addEventListener('click', function () {
       var h = saveHead();
-      // мягкая проверка для тендера — подсветить пустые обязательные (жёсткий валидатор на /kp/)
+      // для тендера обязательные поля — не открываем /kp/ с пустыми (подсветка + подсказка)
       if (kpMode === 'tender') {
         var miss = [];
         if (!h.addressee) miss.push(F.addressee);
         if (!h.number) miss.push(F.number);
         if (!h.date) miss.push(F.date);
-        miss.forEach(function (el) { el.classList.add('kp-invalid'); });
-        setTimeout(function () { miss.forEach(function (el) { el.classList.remove('kp-invalid'); }); }, 2500);
+        if (miss.length) {
+          miss.forEach(function (el) { el.classList.add('kp-invalid'); el.focus(); });
+          setTimeout(function () { miss.forEach(function (el) { el.classList.remove('kp-invalid'); }); }, 3000);
+          hint.textContent = 'Заполните обязательные поля со звёздочкой (заказчик, № и дата КП) — они нужны для тендерного КП.';
+          return;
+        }
       }
       var q = 'mode=' + kpMode;
       if (ledgerOnly.checked) q += '&ledger=1';
