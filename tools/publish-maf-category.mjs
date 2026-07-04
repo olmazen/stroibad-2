@@ -25,7 +25,7 @@ const CATEGORY_CONFIG = {
     relatedTitle: 'Другие модели скамеек',
     relatedLink: 'Все скамейки',
     indexHeadline: 'Выберите модель скамейки',
-    title: 'Скамейки уличные от производителя — каталог и цены | СТАЛЬПРОМ',
+    title: 'Скамейки уличные от производителя — каталог и цены | EGOE',
     h1: 'Скамейки уличные',
     lead: 'Парковые, дворовые и модульные скамейки из металла и дерева для благоустройства ЖК, парков, скверов и общественных пространств.',
     metaDescription: 'Скамейки уличные от производителя: 57 моделей, металл и дерево, окраска RAL, поставка по России. Выберите модель и запросите расчёт партии.',
@@ -44,7 +44,7 @@ const CATEGORY_CONFIG = {
     relatedTitle: 'Другие модели лежаков',
     relatedLink: 'Все лежаки',
     indexHeadline: 'Выберите модель лежака',
-    title: 'Лежаки парковые от производителя — каталог и цены | СТАЛЬПРОМ',
+    title: 'Лежаки парковые от производителя — каталог и цены | EGOE',
     h1: 'Лежаки парковые',
     lead: 'Парковые, пляжные и городские лежаки для благоустройства зон отдыха, набережных, ЖК, парков и общественных пространств.',
     metaDescription: 'Лежаки парковые от производителя: модели из стали и дерева, окраска RAL, поставка по России. Выберите модель и запросите расчёт партии.',
@@ -63,7 +63,7 @@ const CATEGORY_CONFIG = {
     relatedTitle: 'Другие павильоны и навесы',
     relatedLink: 'Все павильоны и навесы',
     indexHeadline: 'Выберите модель павильона или навеса',
-    title: 'Павильоны, навесы и беседки от производителя | СТАЛЬПРОМ',
+    title: 'Павильоны, навесы и беседки от производителя | EGOE',
     h1: 'Павильоны и навесы',
     lead: 'Павильоны, навесы и беседки из металла и дерева для дворов ЖК, парков, зон отдыха и общественных пространств.',
     metaDescription: 'Павильоны, навесы и беседки от производителя: металл, дерево, окраска RAL, изготовление под объект и поставка по России.',
@@ -82,7 +82,7 @@ const CATEGORY_CONFIG = {
     relatedTitle: 'Другие модели урн',
     relatedLink: 'Все урны',
     indexHeadline: 'Выберите модель урны',
-    title: 'Урны уличные от производителя — каталог и цены | СТАЛЬПРОМ',
+    title: 'Урны уличные от производителя — каталог и цены | EGOE',
     h1: 'Урны уличные',
     lead: 'Металлические уличные урны для парков, дворов ЖК, общественных пространств, набережных и коммерческих территорий.',
     metaDescription: 'Урны уличные от производителя: металлические модели, окраска RAL, комплектация под объект, поставка по России.',
@@ -105,7 +105,7 @@ const CATEGORY_CONFIG = {
     relatedTitle: 'Другие контейнерные площадки',
     relatedLink: 'Все контейнерные площадки',
     indexHeadline: 'Выберите контейнерную площадку',
-    title: 'Контейнерные площадки для ТКО от производителя | СТАЛЬПРОМ',
+    title: 'Контейнерные площадки для ТКО от производителя | EGOE',
     h1: 'Контейнерные площадки для ТКО',
     lead: 'Закрытые контейнерные шкафы, ограждения и площадки для сбора ТКО и КГМ: изготовление под объект, окраска RAL и поставка по России.',
     metaDescription: 'Контейнерные площадки для ТКО от производителя: закрытые шкафы, ограждения и модульные решения. Цены, характеристики, окраска RAL и поставка по России.',
@@ -126,7 +126,7 @@ const CATEGORY_CONFIG = {
     relatedTitle: 'Другие модели велопарковок',
     relatedLink: 'Все велопарковки',
     indexHeadline: 'Выберите модель велопарковки',
-    title: 'Велопарковки уличные от производителя — каталог и цены | СТАЛЬПРОМ',
+    title: 'Велопарковки уличные от производителя — каталог и цены | EGOE',
     h1: 'Велопарковки уличные',
     lead: 'Уличные велопарковки и парковки для самокатов для дворов ЖК, школ, парков, офисов и общественных пространств.',
     metaDescription: 'Велопарковки уличные от производителя: модели из стали и нержавейки, парковки для самокатов, навесы, окраска RAL и поставка по России.',
@@ -302,7 +302,7 @@ function nav(prefix) {
   <div class="tb-r"><a href="tel:+70000000000"><b>+7 (000) 000-00-00</b></a><a href="#">WhatsApp</a><a href="#">Telegram</a></div>
 </div></div>
 <header id="siteHeader"><div class="container hdr">
-  <a class="logo" href="${prefix}index.html"><span class="logo-mark"></span><span class="logo-txt"><b>СТАЛЬПРОМ</b><span>Завод металлоконструкций</span></span></a>
+  <a class="logo" href="${prefix}index.html"><span class="logo-mark"></span><span class="logo-txt"><b>EGOE</b><span>Завод металлоконструкций</span></span></a>
   <nav class="main" id="nav">
     <div class="navitem"><a href="${prefix}maf/index.html">Каталог</a>
       <div class="dropdown">
@@ -332,12 +332,12 @@ function footer(prefix) {
   </div></div>
   <div class="container">
     <div class="foot-grid">
-      <div class="foot-about"><a class="logo" href="${prefix}index.html"><span class="logo-mark"></span><span class="logo-txt"><b style="color:#fff">СТАЛЬПРОМ</b><span>Завод металлоконструкций</span></span></a><p>Производство полного цикла в Балаково: лазерная резка, гибка на ЧПУ, сварка, порошковая окраска RAL и собственный цех деревообработки.</p><div class="foot-badges"><span>14 лет</span><span>800+ объектов</span><span>44-ФЗ · НДС</span></div></div>
+      <div class="foot-about"><a class="logo" href="${prefix}index.html"><span class="logo-mark"></span><span class="logo-txt"><b style="color:#fff">EGOE</b><span>Завод металлоконструкций</span></span></a><p>Производство полного цикла в Балаково: лазерная резка, гибка на ЧПУ, сварка, порошковая окраска RAL и собственный цех деревообработки.</p><div class="foot-badges"><span>14 лет</span><span>800+ объектов</span><span>44-ФЗ · НДС</span></div></div>
       <div><div class="foot-col-h">Продукция</div><a href="${prefix}maf/skamejki/index.html">Скамейки</a><a href="${prefix}maf/kacheli/index.html">Качели</a><a href="${prefix}maf/urny/index.html">Урны</a><a href="${prefix}maf/lezhaki/index.html">Лежаки</a><a href="${prefix}maf/pavilony-i-navesy/index.html">Павильоны и навесы</a><a href="${prefix}maf/veloparkovki/index.html">Велопарковки</a><a href="${prefix}ograzhdeniya/index.html">Ограждения</a></div>
       <div><div class="foot-col-h">Клиентам</div><a href="${prefix}proizvodstvo/index.html">Производство полного цикла</a><a href="${prefix}zastrojshchikam/index.html">Застройщикам</a><a href="${prefix}44-fz/index.html">Работа по 44-ФЗ</a><a href="${prefix}projects/index.html">Проекты и кейсы</a><a href="${prefix}dostavka/index.html">Доставка и оплата</a></div>
-      <div><div class="foot-col-h">Контакты</div><div class="foot-ic"><span>+7 (000) 000-00-00</span></div><div class="foot-ic"><span>info@stalprom.ru</span></div><div class="foot-ic"><span>Производство: г. Балаково</span></div><div class="foot-ic"><span>Пн–Пт 9:00–18:00</span></div></div>
+      <div><div class="foot-col-h">Контакты</div><div class="foot-ic"><span>+7 (000) 000-00-00</span></div><div class="foot-ic"><span>info@egoe-life.ru</span></div><div class="foot-ic"><span>Производство: г. Балаково</span></div><div class="foot-ic"><span>Пн–Пт 9:00–18:00</span></div></div>
     </div>
-    <div class="foot-bot"><span>© 2026 СТАЛЬПРОМ. Завод металлоконструкций.</span><span>Информация на сайте не является публичной офертой</span></div>
+    <div class="foot-bot"><span>© 2026 EGOE. Завод металлоконструкций.</span><span>Информация на сайте не является публичной офертой</span></div>
   </div>
 </footer>
 <div class="modal-wrap" id="modal"><div class="modal" style="position:relative">
@@ -361,7 +361,7 @@ function doc({ title, description, canonical, ogImage, cssPrefix, body, scriptPr
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ru_RU">
-<meta property="og:site_name" content="СТАЛЬПРОМ">
+<meta property="og:site_name" content="EGOE">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${esc(canonical)}">
@@ -403,7 +403,7 @@ function card(cfg, product, prefix = '../../') {
 
 function renderIndex(cfg, products) {
   const prefix = '../../';
-  const items = products.map((p, i) => `{"@type":"ListItem","position":${i + 1},"name":"${esc(p.name)}","url":"https://stalprom.ru${categoryUrl(cfg)}${p.pageSlug}/"}`).join(',');
+  const items = products.map((p, i) => `{"@type":"ListItem","position":${i + 1},"name":"${esc(p.name)}","url":"https://www.egoe-life.ru${categoryUrl(cfg)}${p.pageSlug}/"}`).join(',');
   const hero = imageBlock(cfg, products[0], 'main', products[0].name, '', 'eager').replaceAll('{{prefix}}', prefix);
   const body = `${nav(prefix)}
 <main>
@@ -435,9 +435,9 @@ ${footer(prefix)}`;
   return doc({
     title: cfg.title,
     description: cfg.metaDescription,
-    canonical: `https://stalprom.ru${categoryUrl(cfg)}`,
+    canonical: `https://www.egoe-life.ru${categoryUrl(cfg)}`,
     ogImage: products.some((p) => p.hasImages)
-      ? `https://stalprom.ru/assets/img/${assetSection(cfg)}/${cfg.imgTarget}/${products.find((p) => p.hasImages).sku}/main.webp`
+      ? `https://www.egoe-life.ru/assets/img/${assetSection(cfg)}/${cfg.imgTarget}/${products.find((p) => p.hasImages).sku}/main.webp`
       : '',
     cssPrefix: prefix,
     scriptPrefix: prefix,
@@ -452,7 +452,7 @@ function renderProduct(cfg, product, allProducts) {
   const specRows = product.specs.length ? product.specs : cfg.defaultSpecs;
   const description = cleanDescription(product.raw, cfg.productType);
   const schemaPrice = lowPrice(product.raw.price);
-  const schemaOffer = schemaPrice ? `"offers":{"@type":"AggregateOffer","priceCurrency":"RUB","lowPrice":"${schemaPrice}","availability":"https://schema.org/InStock","seller":{"@type":"Organization","name":"СТАЛЬПРОМ"}}` : `"offers":{"@type":"Offer","priceCurrency":"RUB","availability":"https://schema.org/InStock","seller":{"@type":"Organization","name":"СТАЛЬПРОМ"}}`;
+  const schemaOffer = schemaPrice ? `"offers":{"@type":"AggregateOffer","priceCurrency":"RUB","lowPrice":"${schemaPrice}","availability":"https://schema.org/InStock","seller":{"@type":"Organization","name":"EGOE"}}` : `"offers":{"@type":"Offer","priceCurrency":"RUB","availability":"https://schema.org/InStock","seller":{"@type":"Organization","name":"EGOE"}}`;
   const mainVisual = imageBlock(cfg, product, 'main', product.name, 'main', 'eager').replaceAll('{{prefix}}', prefix);
   const detailVisual = imageBlock(cfg, product, 'closeup', `${product.name} — деталь`).replaceAll('{{prefix}}', prefix);
   const whiteVisual = imageBlock(cfg, product, 'white', `${product.name} — белый фон`).replaceAll('{{prefix}}', prefix);
@@ -489,14 +489,14 @@ function renderProduct(cfg, product, allProducts) {
 </div></div></section>
 <section style="padding-top:0"><div class="container"><div class="sec-head"><div><h2>${esc(cfg.relatedTitle)}</h2></div><a class="btn btn-sm" href="${prefix}${categoryRelativeUrl(cfg)}/index.html">${esc(cfg.relatedLink)}</a></div><div class="tiles3">${others.map((p) => `<a class="tile" href="${prefix}${categoryRelativeUrl(cfg)}/${p.pageSlug}/index.html">${imageBlock(cfg, p, 'main', p.shortName).replaceAll('{{prefix}}', prefix)}<h3>${esc(p.name)}</h3><p>${esc(p.priceText)}</p></a>`).join('')}</div></div></section>
 <section style="padding-top:0"><div class="container"><div class="formpanel"><h3>Получить расчёт: ${esc(product.name)}</h3><p>Укажите количество, город поставки и требования — пришлём смету за 1 рабочий день.</p><form onsubmit="return submitLead(this)"><div class="row2"><div class="field"><label>Имя</label><input type="text" required></div><div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div></div><div class="field"><label>Количество и требования</label><textarea rows="2" placeholder="Например: ${esc(product.name)}, 10 шт, RAL 7016"></textarea></div><button class="btn btn-primary btn-block" type="submit">Отправить заявку</button><p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p></form><div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div></div></div></section>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"${esc(product.name)}","description":"${esc(product.cardText)}","category":"${esc(sectionLabel(cfg))} / ${esc(cfg.label)}","brand":{"@type":"Brand","name":"СТАЛЬПРОМ"},"manufacturer":{"@type":"Organization","name":"СТАЛЬПРОМ"},${schemaOffer}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"${esc(product.name)}","description":"${esc(product.cardText)}","category":"${esc(sectionLabel(cfg))} / ${esc(cfg.label)}","brand":{"@type":"Brand","name":"EGOE"},"manufacturer":{"@type":"Organization","name":"EGOE"},${schemaOffer}}</script>
 </main>
 ${footer(prefix)}`;
   return doc({
-    title: `${product.name} — производство и поставка | СТАЛЬПРОМ`,
+    title: `${product.name} — производство и поставка | EGOE`,
     description: `${product.name} от производителя для благоустройства. ${product.priceText}, окраска RAL, поставка по России.`,
-    canonical: `https://stalprom.ru${categoryUrl(cfg)}${product.pageSlug}/`,
-    ogImage: product.hasImages ? `https://stalprom.ru/${rel}/main.webp` : '',
+    canonical: `https://www.egoe-life.ru${categoryUrl(cfg)}${product.pageSlug}/`,
+    ogImage: product.hasImages ? `https://www.egoe-life.ru/${rel}/main.webp` : '',
     cssPrefix: prefix,
     scriptPrefix: prefix,
     body,
@@ -562,7 +562,7 @@ function updateSitemap(siteRoot, cfg, products) {
   for (const p of products) existing.set(`${baseUrl}${p.pageSlug}/`, '0.6');
 
   const urls = [...existing.entries()];
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(([u, pr]) => `  <url><loc>https://stalprom.ru${u}</loc><priority>${pr}</priority></url>`).join('\n')}\n</urlset>\n`;
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(([u, pr]) => `  <url><loc>https://www.egoe-life.ru${u}</loc><priority>${pr}</priority></url>`).join('\n')}\n</urlset>\n`;
   writeFileSync(sitemapPath, xml);
 }
 

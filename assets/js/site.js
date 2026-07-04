@@ -1,4 +1,4 @@
-/* СТАЛЬПРОМ — общий скрипт сайта v3: навигация, формы, корзина-страница, микроанимации */
+/* EGOE — общий скрипт сайта v3: навигация, формы, корзина-страница, микроанимации */
 (function () {
   // модальное окно «Расчёт по ТЗ»
   window.openModal = function () {
@@ -415,7 +415,7 @@ window.__whenVisible = (function () {
   mnav.setAttribute('aria-hidden', 'true');
   mnav.innerHTML = '<div class="mnav-ov"></div>'
     + '<aside class="mnav-panel" role="dialog" aria-label="Меню">'
-    + '<div class="mnav-head"><b>СТАЛЬПРОМ</b><button class="mnav-x" type="button" aria-label="Закрыть меню">×</button></div>'
+    + '<div class="mnav-head"><b>EGOE</b><button class="mnav-x" type="button" aria-label="Закрыть меню">×</button></div>'
     + '<div class="mnav-scroll">' + body + '</div>'
     + cta
     + '</aside>';

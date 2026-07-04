@@ -13,4 +13,4 @@ Allow: /
 User-agent: YandexBot
 Allow: /
 
-Sitemap: https://stalprom.ru/sitemap.xml
+Sitemap: https://www.egoe-life.ru/sitemap.xml
