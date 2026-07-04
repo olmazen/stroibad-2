@@ -864,50 +864,61 @@ body.mnav-lock{overflow:hidden}
 @keyframes tapeMove{to{transform:translateX(-50%)}}
 @media(prefers-reduced-motion:reduce){.tape-track{animation:none}}
 
-/* ============ циферблат «7 шагов» (шкала-манометр) ============ */
-.fdial{position:relative;max-width:1020px;margin:26px auto 0}
-.fdial.built .fdial-list{display:none}
-.fdial-list{list-style:none;display:grid;gap:10px;color:var(--tx2)}
-.fdial-stage{position:relative}
-.fdial-svg{width:100%;height:auto;display:block;touch-action:none;cursor:grab;user-select:none}
-.fdial-svg:active{cursor:grabbing}
-.fdial-tick{stroke:rgba(255,255,255,.14);stroke-width:1.4}
-.fdial-tick.mj{stroke:rgba(255,255,255,.34);stroke-width:2.2}
-.fdial-track{fill:none;stroke:rgba(255,255,255,.12);stroke-width:2.4}
-.fdial-prog{fill:none;stroke:var(--amber);stroke-width:3.4;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:99;filter:drop-shadow(0 0 9px var(--glow));transition:stroke-dashoffset .7s cubic-bezier(.3,.8,.3,1)}
-.fdial-needle{transform-box:view-box;transform-origin:50% 83.93%;transition:transform .7s cubic-bezier(.34,1.25,.35,1)}
-.fdial-needle polygon{fill:var(--amber);filter:drop-shadow(0 0 12px var(--glow))}
-.fdial-hub{fill:#161B21;stroke:var(--line-2);stroke-width:2}
-.fdial-pin{fill:var(--amber)}
-.fdial-node{cursor:pointer}
-.fdial-node circle{fill:#12161A;stroke:rgba(255,255,255,.3);stroke-width:2;transition:fill .25s,stroke .25s,r .25s}
-.fdial-node text{font-family:'Oswald',sans-serif;font-size:15px;fill:var(--tx2);pointer-events:none;transition:fill .25s}
-.fdial-node:hover circle{stroke:var(--amber)}
-.fdial-node.on circle{fill:var(--amber);stroke:var(--amber);filter:drop-shadow(0 0 10px var(--glow))}
-.fdial-node.on text{fill:#1c1305;font-weight:600}
-.fdial-lab{font-family:'Oswald',sans-serif;font-size:20px;letter-spacing:.05em;text-transform:uppercase;fill:var(--steel);transition:fill .25s;pointer-events:none}
-.fdial-lab.on{fill:#fff}
-.fdial-info{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);width:min(52%,470px);text-align:center;pointer-events:none}
-.fdial-info>*{pointer-events:auto}
-.fdial-num{font-family:'Oswald',sans-serif;color:var(--steel);letter-spacing:.14em;font-size:13px;margin-bottom:6px}
-.fdial-num b{color:var(--amber);font-size:30px;letter-spacing:.04em;margin-right:4px}
-.fdial-info h3{font-size:25px;letter-spacing:.04em;margin-bottom:8px}
-.fdial-info p{color:var(--tx2);font-size:14.5px;line-height:1.55;min-height:3.2em}
-.fdial-info.sw h3,.fdial-info.sw p,.fdial-info.sw .fdial-num{animation:fdSwap .38s cubic-bezier(.2,.7,.2,1)}
-@keyframes fdSwap{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
-.fdial-nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px}
-.fdial-btn{width:42px;height:42px;border:1.5px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:17px;cursor:pointer;border-radius:var(--r);transition:all .2s}
-.fdial-btn:hover{border-color:var(--amber);color:var(--amber);background:rgba(242,111,29,.08)}
-.fdial-hint{display:block;width:100%;margin-top:10px;color:var(--steel-l);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-family:'Oswald',sans-serif}
+/* ============ колесо заказа сбоку (скролл-движок) ============ */
+.fwsec{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#0C0F13}
+.fwheel.built>.fdial-list{display:none}
+.fwheel .fdial-list{list-style:none;display:grid;gap:10px;color:var(--tx2);padding:64px var(--gut)}
+.fwheel:not(.built) .fw-head-src{padding:64px var(--gut) 0}
+.fw-track{position:relative}
+.fw-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.fw-arc{position:absolute;inset:0;pointer-events:none}
+.fw-ring{fill:none;stroke:rgba(255,255,255,.14);stroke-width:1.6}
+.fw-ring2{fill:none;stroke:rgba(255,255,255,.05);stroke-width:1;stroke-dasharray:3 9}
+.fw-ticks line{stroke:rgba(255,255,255,.16);stroke-width:1.4}
+.fw-ticks line.mj{stroke:rgba(242,111,29,.6);stroke-width:2.2}
+.fw-marker{position:absolute;width:0;height:0;border:8px solid transparent;border-left:11px solid var(--amber);transform:translateY(-50%);filter:drop-shadow(0 0 8px var(--glow));pointer-events:none;z-index:3}
+.fw-labels{position:absolute;inset:0;z-index:2}
+.fw-lab{position:absolute;left:0;top:0;display:flex;align-items:center;gap:12px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--steel);font-size:19px;white-space:nowrap;cursor:pointer;pointer-events:auto;transition:color .3s;will-change:transform,opacity,filter}
+.fw-lab b{font-size:12.5px;color:var(--steel-l);letter-spacing:.14em;font-weight:500;transition:color .3s}
+.fw-lab:hover{color:var(--tx)}
+.fw-lab.on{color:#fff;font-size:23px}
+.fw-lab.on b{color:var(--amber)}
+.fw-head{position:absolute;top:max(84px,9vh);left:var(--fwleft,300px);right:var(--gut);z-index:4}
+.fw-head h2{margin-top:18px;font-size:clamp(24px,2.4vw,34px)}
+.fw-body{position:absolute;top:0;bottom:0;left:var(--fwleft,300px);right:max(var(--gut),calc((100vw - var(--wrap))/2 + var(--gut)));z-index:4;display:flex;align-items:center}
+.fw-step{position:absolute;left:0;right:0;opacity:0;transform:translateY(-18px);pointer-events:none;transition:opacity .22s ease,transform .3s ease}
+.fw-step.on{opacity:1;transform:none;pointer-events:auto;transition:opacity .5s .14s cubic-bezier(.2,.7,.2,1),transform .55s .14s cubic-bezier(.2,.7,.2,1)}
+.fw-step:not(.on){transform:translateY(-18px)}
+.fw-step.on~.fw-step:not(.on),.fw-step:not(.on):has(~.fw-step.on){transform:translateY(22px)}
+.fw-step{display:grid;grid-template-columns:minmax(300px,.9fr) minmax(320px,1.1fr);gap:clamp(24px,3.4vw,64px);align-items:center}
+.fw-num{font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:.16em;color:var(--amber)}
+.fw-num span{color:var(--steel-l)}
+.fw-step h3{font-size:clamp(30px,3.2vw,46px);letter-spacing:.02em;margin:12px 0 14px}
+.fw-step p{color:var(--tx2);font-size:16.5px;line-height:1.65;max-width:460px}
+.fw-media:empty{display:none}
+.fw-chips{display:flex;flex-wrap:wrap;gap:10px}
+.fw-chips span{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--tx);border:1px solid var(--line-2);padding:11px 16px;border-radius:var(--r);background:rgba(255,255,255,.03)}
+.fw-form{background:var(--srf);border:1px solid var(--line);padding:22px;border-radius:var(--r)}
+.fw-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fw-form .consent{margin-top:10px}
+.fw-bp{position:relative;background:#0E1526;background-image:linear-gradient(rgba(88,120,190,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(88,120,190,.12) 1px,transparent 1px);background-size:26px 26px;border:1px solid rgba(120,150,210,.28);border-radius:var(--r);padding:20px;display:flex;align-items:center;justify-content:center;min-height:260px}
+.fw-bp img{max-height:300px;width:auto;max-width:100%}
+.fw-bp-tag{position:absolute;top:10px;right:12px;font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:.16em;color:rgba(170,195,240,.75);text-transform:uppercase}
+.fw-ph{position:relative;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.fw-ph img{width:100%;height:100%;max-height:320px;object-fit:cover;display:block}
+.fw-ph span{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 11px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.72));font-family:'Oswald',sans-serif;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#fff}
+.fw-bar{position:absolute;left:var(--gut);right:var(--gut);bottom:26px;display:none;align-items:center;gap:12px;z-index:5}
+.fw-bar i{flex:1;height:2px;background:rgba(255,255,255,.14);position:relative;display:block}
+.fw-bar i::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--p,0%);background:var(--amber);box-shadow:0 0 8px var(--glow);transition:width .2s linear}
+.fw-bar b{font-family:'Oswald',sans-serif;font-size:12.5px;letter-spacing:.14em;color:var(--steel)}
+@media(max-width:1180px){.fw-step{grid-template-columns:1fr;gap:22px;align-content:center}.fw-step p{max-width:560px}}
 @media(max-width:900px){
-  .fdial-lab{font-size:26px}
-  .fdial-info{position:static;transform:none;width:100%;max-width:480px;margin:-8px auto 0}
+  .fw-arc,.fw-labels,.fw-marker{display:none}
+  .fw-head{left:var(--gut)}
+  .fw-body{left:var(--gut);right:var(--gut)}
+  .fw-bar{display:flex}
+  .fw-step h3{font-size:30px}
 }
-@media(max-width:600px){
-  .fdial-lab{display:none}
-  .fdial-node circle{r:26}
-  .fdial-node text{font-size:24px}
-  .fdial-prog{stroke-width:5}
-  .fdial-tick{stroke-width:2}
-}
-@media(prefers-reduced-motion:reduce){.fdial-needle,.fdial-prog{transition:none}.fdial-info.sw h3,.fdial-info.sw p,.fdial-info.sw .fdial-num{animation:none}}
+@media(max-width:600px){.fw-form-row{grid-template-columns:1fr}}
+@media(max-height:700px){.fw-head{display:none}}
+@media(prefers-reduced-motion:reduce){.fw-step{transition:none}.fw-lab{transition:none}}

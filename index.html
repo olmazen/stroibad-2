@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=egoe3">
+<link rel="stylesheet" href="assets/css/style.css?v=egoe4">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -242,22 +242,18 @@
   </div>
 </section>
 
-<!-- PROCESS -->
-<section>
-  <div class="container">
-    <div class="reveal"><div class="dim"><span class="tick"></span>03 — Как проходит заказ</div></div>
-    <div class="sec-head reveal" style="margin-top:24px"><div><h2>От заявки до отгрузки — 7 шагов</h2></div><p class="lead-wide">Крутите шкалу — как стрелку манометра в цехе: от первого письма до машины на вашем объекте.</p></div>
-    <div class="fdial reveal" id="flowDial">
-      <ol class="fdial-list">
-        <li data-t="Заявка" data-d="Пришлите ТЗ, чертёж или просто фото-референс — для старта достаточно эскиза.">Заявка — ТЗ или чертёж</li>
-        <li data-t="Расчёт" data-d="Смета с ценами, сроками и логистикой — за 1 рабочий день.">Расчёт — смета за 1 день</li>
-        <li data-t="Договор" data-d="Работаем с НДС, под 44-ФЗ и 223-ФЗ — подходит для тендеров.">Договор — с НДС</li>
-        <li data-t="Чертежи" data-d="Готовим КМД-документацию и согласовываем каждую деталь.">Чертежи — КМД</li>
-        <li data-t="Производство" data-d="Лазерная резка, гибка и сварка в собственном цехе.">Производство — резка, сварка</li>
-        <li data-t="Окраска" data-d="Порошковая окраска в любой цвет RAL, цинкование против коррозии.">Окраска — по RAL</li>
-        <li data-t="Отгрузка" data-d="Доставляем на объект по всей России. Монтаж — по запросу.">Отгрузка — на объект</li>
-      </ol>
-    </div>
+<!-- PROCESS: колесо заказа (скролл-движок) -->
+<section class="fwsec" style="padding:0">
+  <div class="fwheel" id="flowWheel">
+    <div class="fw-head-src"><div class="dim"><span class="tick"></span>03 — Как проходит заказ</div><h2>От заявки до отгрузки</h2></div>
+    <ol class="fdial-list">
+      <li data-t="Заявка" data-k="form" data-d="Пришлите ТЗ, чертёж или просто фото-референс — для старта достаточно эскиза. Ответим в течение рабочего дня.">Заявка — ТЗ или чертёж</li>
+      <li data-t="Расчёт" data-k="calc" data-d="Считаем смету под ваш объём: цены, сроки, логистика. Прозрачно и по делу.">Расчёт — смета за 1 день</li>
+      <li data-t="Договор" data-k="contract" data-d="Договор с НДС, работа по 44-ФЗ и 223-ФЗ — полный пакет документов для тендера.">Договор — с НДС</li>
+      <li data-t="Чертежи" data-k="draw" data-d="Готовим КМД-документацию и согласовываем каждую деталь до запуска в цех.">Чертежи — КМД</li>
+      <li data-t="Производство" data-k="prod" data-d="Лазерная резка, гибка, сварка и порошковая окраска RAL — всё в собственном цехе.">Производство — резка, сварка, окраска</li>
+      <li data-t="Отгрузка" data-k="ship" data-d="Доставляем на объект по всей России, партиями под этапы стройки. Монтаж — по запросу.">Отгрузка — на объект</li>
+    </ol>
   </div>
 </section>
 
@@ -458,6 +454,6 @@
   </div>
 </div>
 
-<script src="assets/js/site.js?v=egoe3"></script>
+<script src="assets/js/site.js?v=egoe4"></script>
 </body>
 </html>

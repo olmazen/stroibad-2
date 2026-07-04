@@ -697,121 +697,163 @@ window.__whenVisible = (function () {
   });
 })();
 
-/* ── главная: циферблат «7 шагов» — полукруглая шкала-манометр ── */
+/* ── главная: колесо заказа сбоку — крутится скроллом страницы ──
+   Слева большая дуга-колесо с шагами; активный шаг в центре экрана
+   (у «Заявки» — форма, у «Чертежей» — КМД, у «Производства» — фото).
+   Дальние подписи уходят вверх/вниз и растворяются с блюром. */
 (function () {
-  var host = document.getElementById('flowDial');
+  var host = document.getElementById('flowWheel');
   if (!host) return;
   var items = Array.prototype.map.call(host.querySelectorAll('.fdial-list li'), function (li, i) {
-    return { n: i + 1, t: li.dataset.t || li.textContent, d: li.dataset.d || '' };
+    return { n: i + 1, t: li.dataset.t || li.textContent, d: li.dataset.d || '', k: li.dataset.k || '' };
   });
-  if (items.length < 2) return;
-  var N = items.length, cur = 0, userTouched = false, hovered = false, timer = null;
-  var CX = 500, CY = 470, R = 340, VB = '0 0 1000 560';
-  var rad = function (a) { return a * Math.PI / 180; };
-  var ang = function (i) { return 180 - i * (180 / (N - 1)); };
-  var px = function (a, r) { return CX + r * Math.cos(rad(a)); };
-  var py = function (a, r) { return CY - r * Math.sin(rad(a)); };
+  var N = items.length;
+  if (N < 2) return;
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var SP = 24; // угловой шаг между пунктами, °
 
-  // --- SVG шкалы ---
-  var S = '<svg class="fdial-svg" viewBox="' + VB + '" role="img" aria-label="Шаги заказа">';
-  // минорные риски каждые 6°, мажорные на шагах
-  for (var a = 180; a >= 0; a -= 6) {
-    var major = Math.abs((180 - a) % (180 / (N - 1))) < 0.01;
-    var r1 = R - (major ? 24 : 13), r2 = R - 2;
-    S += '<line class="fdial-tick' + (major ? ' mj' : '') + '" x1="' + px(a, r1).toFixed(1) + '" y1="' + py(a, r1).toFixed(1) + '" x2="' + px(a, r2).toFixed(1) + '" y2="' + py(a, r2).toFixed(1) + '"/>';
+  function chips(a) { return '<div class="fw-chips">' + a.map(function (c) { return '<span>' + c + '</span>'; }).join('') + '</div>'; }
+  function mediaFor(k) {
+    if (k === 'form') return '<form class="fw-form" onsubmit="return submitLead(this)">' +
+      '<div class="fw-form-row"><div class="field"><label>Имя</label><input type="text" required placeholder="Как к вам обращаться"></div>' +
+      '<div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div></div>' +
+      '<button class="btn btn-primary" type="submit">Отправить заявку</button>' +
+      '<p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p></form>' +
+      '<div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Перезвоним в течение рабочего дня.</div>';
+    if (k === 'calc') return chips(['Смета за 1 рабочий день', 'Фиксация цены', 'Логистика в смете']);
+    if (k === 'contract') return chips(['44-ФЗ', '223-ФЗ', 'С НДС', 'Полный пакет для тендера']);
+    if (k === 'draw') return '<div class="fw-bp"><span class="fw-bp-tag">EGOE · КМД</span><img src="assets/img/artdeco/lezhaki/a1-2661/drawing-white.svg" alt="Чертёж изделия — КМД-документация"></div>';
+    if (k === 'prod') return '<div class="fw-ph"><img src="assets/img/artdeco/lezhaki/i1-3651/facade2.webp" alt="Сталь изделия крупным планом — производство EGOE"><span>сталь · порошковая окраска RAL · свой цех</span></div>';
+    if (k === 'ship') return chips(['Доставка по всей России', 'Партиями под этапы стройки', 'Монтаж по запросу']);
+    return '';
   }
-  var arcD = 'M ' + (CX - R) + ' ' + CY + ' A ' + R + ' ' + R + ' 0 0 1 ' + (CX + R) + ' ' + CY;
-  S += '<path class="fdial-track" d="' + arcD + '"/>';
-  S += '<path class="fdial-prog" d="' + arcD + '" pathLength="100"/>';
-  // стрелка
-  S += '<g class="fdial-needle"><polygon points="500,158 489,470 511,470"/><circle class="fdial-hub" cx="500" cy="470" r="30"/><circle class="fdial-pin" cx="500" cy="470" r="7"/></g>';
-  // узлы и подписи
-  for (var i = 0; i < N; i++) {
-    var A = ang(i), nx = px(A, R), ny = py(A, R), lx = px(A, R + 48), ly = py(A, R + 48);
-    var anchor = lx < CX - 40 ? 'end' : (lx > CX + 40 ? 'start' : 'middle');
-    S += '<g class="fdial-node" data-i="' + i + '"><circle cx="' + nx.toFixed(1) + '" cy="' + ny.toFixed(1) + '" r="17"/><text x="' + nx.toFixed(1) + '" y="' + (ny + 5.5).toFixed(1) + '" text-anchor="middle">' + items[i].n + '</text></g>';
-    S += '<text class="fdial-lab" data-i="' + i + '" x="' + lx.toFixed(1) + '" y="' + (ly + 6).toFixed(1) + '" text-anchor="' + anchor + '">' + items[i].t + '</text>';
-  }
-  S += '</svg>';
 
-  var stage = document.createElement('div');
-  stage.className = 'fdial-stage';
-  stage.innerHTML = S +
-    '<div class="fdial-info"><div class="fdial-num"><b>01</b><span>/ ' + String(N).padStart(2, '0') + '</span></div>' +
-    '<h3></h3><p></p>' +
-    '<div class="fdial-nav"><button class="fdial-btn" type="button" data-go="-1" aria-label="Предыдущий шаг">←</button>' +
-    '<button class="fdial-btn" type="button" data-go="1" aria-label="Следующий шаг">→</button>' +
-    '<span class="fdial-hint">крутите колесом · тяните стрелку · кликайте по шкале</span></div></div>';
-  host.appendChild(stage);
+  // каркас: высокий трек, внутри — прилипающий экран
+  var track = document.createElement('div');
+  track.className = 'fw-track';
+  track.style.height = (N * 88 + 16) + 'vh';
+  track.innerHTML =
+    '<div class="fw-sticky">' +
+      '<svg class="fw-arc" aria-hidden="true"><circle class="fw-ring2"/><circle class="fw-ring"/><g class="fw-ticks"></g></svg>' +
+      '<div class="fw-labels" aria-hidden="true"></div>' +
+      '<div class="fw-marker" aria-hidden="true"></div>' +
+      '<div class="fw-head"></div>' +
+      '<div class="fw-body"></div>' +
+      '<div class="fw-bar" aria-hidden="true"><i></i><b>01 / ' + String(N).padStart(2, '0') + '</b></div>' +
+    '</div>';
+  host.appendChild(track);
+
+  // заголовок секции переезжает внутрь прилипающего экрана (SEO-разметка остаётся)
+  var headSrc = host.querySelector('.fw-head-src');
+  if (headSrc) track.querySelector('.fw-head').appendChild(headSrc);
+
+  var body = track.querySelector('.fw-body');
+  body.innerHTML = items.map(function (s, i) {
+    return '<article class="fw-step' + (i === 0 ? ' on' : '') + '" data-i="' + i + '">' +
+      '<div class="fw-tx"><div class="fw-num">' + String(s.n).padStart(2, '0') + '<span> / ' + String(N).padStart(2, '0') + '</span></div>' +
+      '<h3>' + s.t + '</h3><p>' + s.d + '</p></div>' +
+      '<div class="fw-media">' + mediaFor(s.k) + '</div></article>';
+  }).join('');
   host.classList.add('built');
 
-  var svg = stage.querySelector('.fdial-svg');
-  var needle = stage.querySelector('.fdial-needle');
-  var prog = stage.querySelector('.fdial-prog');
-  var info = stage.querySelector('.fdial-info');
-  var numB = info.querySelector('.fdial-num b');
-  var h3 = info.querySelector('h3');
-  var pEl = info.querySelector('p');
+  var svg = track.querySelector('.fw-arc');
+  var ring = track.querySelector('.fw-ring');
+  var ring2 = track.querySelector('.fw-ring2');
+  var ticksG = track.querySelector('.fw-ticks');
+  var labelsBox = track.querySelector('.fw-labels');
+  var marker = track.querySelector('.fw-marker');
+  var barI = track.querySelector('.fw-bar i');
+  var barB = track.querySelector('.fw-bar b');
+  var steps = track.querySelectorAll('.fw-step');
 
-  function go(i, silent) {
-    i = Math.max(0, Math.min(N - 1, i));
-    cur = i;
-    needle.style.transform = 'rotate(' + (90 - ang(i)) + 'deg)';
-    prog.style.strokeDashoffset = 100 - Math.max((i / (N - 1)) * 100, 1.2);
-    svg.querySelectorAll('.fdial-node').forEach(function (n) { n.classList.toggle('on', +n.dataset.i === i); });
-    svg.querySelectorAll('.fdial-lab').forEach(function (l) { l.classList.toggle('on', +l.dataset.i === i); });
-    numB.textContent = String(i + 1).padStart(2, '0');
-    h3.textContent = items[i].t;
-    pEl.textContent = items[i].d;
-    if (!silent) { info.classList.remove('sw'); void info.offsetWidth; info.classList.add('sw'); }
-  }
-
-  function stopAuto() { userTouched = true; if (timer) { clearInterval(timer); timer = null; } }
-  function startAuto() {
-    if (userTouched || timer || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    timer = setInterval(function () { if (!hovered) go((cur + 1) % N); }, 3200);
-  }
-
-  svg.addEventListener('click', function (e) {
-    var n = e.target.closest('.fdial-node');
-    if (n) { stopAuto(); go(+n.dataset.i); }
+  var labels = items.map(function (s, i) {
+    var el = document.createElement('div');
+    el.className = 'fw-lab';
+    el.innerHTML = '<b>' + String(s.n).padStart(2, '0') + '</b><span>' + s.t + '</span>';
+    el.addEventListener('click', function () { scrollToStep(i); });
+    labelsBox.appendChild(el);
+    return el;
   });
-  info.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-go]');
-    if (b) { stopAuto(); go(cur + (+b.dataset.go)); }
-  });
-  // колесо — как вращение шкалы
-  var wheelT = 0;
-  stage.addEventListener('wheel', function (e) {
-    var now = Date.now();
-    if ((e.deltaY > 0 && cur < N - 1) || (e.deltaY < 0 && cur > 0)) {
-      e.preventDefault();
-      if (now - wheelT < 320) return;
-      wheelT = now; stopAuto(); go(cur + (e.deltaY > 0 ? 1 : -1));
+
+  var W = 0, H = 0, R = 0, CX = 0, CY = 0, EDGE = 0, mobile = false;
+  var theta = 0, targetTheta = 0, active = 0, raf = null;
+  var rad = function (a) { return a * Math.PI / 180; };
+
+  function tickLine(b, mj) {
+    var len = mj ? 30 : 12;
+    var r1 = R - 4 - len, r2 = R - 4;
+    return '<line class="' + (mj ? 'mj' : '') + '" x1="' + (CX + r1 * Math.cos(rad(b))).toFixed(1) + '" y1="' + (CY + r1 * Math.sin(rad(b))).toFixed(1) +
+      '" x2="' + (CX + r2 * Math.cos(rad(b))).toFixed(1) + '" y2="' + (CY + r2 * Math.sin(rad(b))).toFixed(1) + '"/>';
+  }
+  function layout() {
+    W = innerWidth; H = innerHeight;
+    mobile = W < 900;
+    EDGE = mobile ? 0 : Math.round(Math.max(150, Math.min(0.15 * W, 225)));
+    R = Math.round(Math.max(H * 0.78, 540));
+    CX = EDGE - R; CY = Math.round(H / 2);
+    svg.setAttribute('width', W); svg.setAttribute('height', H);
+    ring.setAttribute('cx', CX); ring.setAttribute('cy', CY); ring.setAttribute('r', R);
+    ring2.setAttribute('cx', CX); ring2.setAttribute('cy', CY); ring2.setAttribute('r', Math.max(R - 54, 100));
+    var t = '';
+    for (var b = -30; b <= (N - 1) * SP + 30; b += 3) {
+      var mj = Math.abs(((b % SP) + SP) % SP) < 0.01;
+      t += tickLine(b, mj);
     }
-  }, { passive: false });
-  // перетаскивание стрелки
-  var dragging = false;
-  function dragTo(e) {
-    var r = svg.getBoundingClientRect();
-    var cx = r.left + r.width / 2, cy = r.top + r.height * (CY / 560);
-    var dx = e.clientX - cx, dy = cy - e.clientY;
-    var a = Math.atan2(dy, dx) * 180 / Math.PI;
-    if (a < -40 || dy < -r.height * 0.12) return;
-    a = Math.max(0, Math.min(180, a));
-    var i = Math.round((180 - a) / (180 / (N - 1)));
-    if (i !== cur) go(i);
+    ticksG.innerHTML = t;
+    marker.style.left = (EDGE + 6) + 'px';
+    marker.style.top = CY + 'px';
+    track.querySelector('.fw-sticky').style.setProperty('--fwleft', (mobile ? 0 : EDGE + 250) + 'px');
+    apply();
   }
-  svg.addEventListener('pointerdown', function (e) {
-    dragging = true; stopAuto(); svg.setPointerCapture(e.pointerId); dragTo(e);
-  });
-  svg.addEventListener('pointermove', function (e) { if (dragging) { e.preventDefault(); dragTo(e); } });
-  svg.addEventListener('pointerup', function () { dragging = false; });
-  svg.addEventListener('pointercancel', function () { dragging = false; });
-  stage.addEventListener('mouseenter', function () { hovered = true; });
-  stage.addEventListener('mouseleave', function () { hovered = false; });
+  function apply() {
+    for (var i = 0; i < N; i++) {
+      var a = i * SP + theta;
+      var x = CX + R * Math.cos(rad(a));
+      var y = CY + R * Math.sin(rad(a));
+      var t = Math.abs(a);
+      var el = labels[i];
+      el.style.transform = 'translate(' + (x + 20).toFixed(1) + 'px,' + y.toFixed(1) + 'px) translateY(-50%)';
+      el.style.opacity = Math.max(0, 1 - Math.max(0, t - 4) / 46).toFixed(3);
+      el.style.filter = (!reduced && t > 7) ? 'blur(' + Math.min((t - 7) / 8, 5).toFixed(2) + 'px)' : 'none';
+      el.classList.toggle('on', t < SP / 2);
+    }
+    ticksG.setAttribute('transform', 'rotate(' + theta + ' ' + CX + ' ' + CY + ')');
+  }
+  function frame() {
+    raf = null;
+    var d = targetTheta - theta;
+    theta = reduced ? targetTheta : theta + d * 0.16;
+    if (Math.abs(targetTheta - theta) < 0.02) theta = targetTheta;
+    apply();
+    if (theta !== targetTheta) raf = requestAnimationFrame(frame);
+  }
+  function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+  function setActive(i) {
+    if (i === active) return;
+    active = i;
+    steps.forEach(function (s) { s.classList.toggle('on', +s.dataset.i === i); });
+    if (barB) barB.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
+  }
+  function onScroll() {
+    var r = track.getBoundingClientRect();
+    var total = track.offsetHeight - H;
+    var p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
+    targetTheta = -p * (N - 1) * SP;
+    setActive(Math.max(0, Math.min(N - 1, Math.round(p * (N - 1)))));
+    if (barI) barI.style.setProperty('--p', (p * 100).toFixed(1) + '%');
+    kick();
+  }
+  function scrollToStep(i) {
+    var top = track.getBoundingClientRect().top + (window.scrollY || document.documentElement.scrollTop);
+    var total = track.offsetHeight - H;
+    window.scrollTo({ top: Math.round(top + (i / (N - 1)) * total) + 2, behavior: reduced ? 'auto' : 'smooth' });
+  }
+  window.__fwSet = function (p) { // отладочный хук: 0..1
+    targetTheta = -p * (N - 1) * SP; theta = targetTheta;
+    setActive(Math.round(p * (N - 1))); apply();
+  };
 
-  go(0, true);
-  if (window.__whenVisible) window.__whenVisible(host, startAuto, 0.2);
-  else startAuto();
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', layout);
+  layout(); onScroll();
 })();
