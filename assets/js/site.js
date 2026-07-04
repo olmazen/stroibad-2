@@ -804,13 +804,15 @@ window.__whenVisible = (function () {
     W = innerWidth; H = innerHeight;
     mobile = W < 900;
     if (mobile) {
-      var crest = H - 200;                       // верхняя точка нижнего колеса
+      var crestGap = Math.min(210, Math.max(150, Math.round(H * 0.22)));
+      var crest = H - crestGap;                  // верхняя точка нижнего колеса
       R = Math.max(Math.round(W * 0.8), 360);
       CX = Math.round(W / 2); CY = crest + R;
       BASE = -90; CARD_R = R + 46;
       marker.className = 'fw-marker down';
       marker.style.left = CX + 'px'; marker.style.top = (crest - 24) + 'px';
-      sticky.style.setProperty('--fwbot', (H - crest + 34) + 'px');
+      // карточка стоит на 46px выше crest и сама ~60px высотой → низ контента держим выше её верха
+      sticky.style.setProperty('--fwbot', (H - crest + 122) + 'px');
     } else {
       EDGE = Math.round(Math.max(150, Math.min(0.15 * W, 225)));
       R = Math.round(Math.max(H * 0.78, 540));
