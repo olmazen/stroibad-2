@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=egoe2">
+<link rel="stylesheet" href="assets/css/style.css?v=egoe3">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -164,6 +164,14 @@
   </div>
 </section>
 
+<!-- ЛЕНТА ВОЗМОЖНОСТЕЙ -->
+<div class="tape" aria-hidden="true">
+  <div class="tape-track">
+    <span>Лазерная резка</span><i>◆</i><span>Гибка</span><i>◆</i><span>Сварка</span><i>◆</i><span>Порошковая окраска RAL</span><i>◆</i><span>Цинкование</span><i>◆</i><span>Свой цех дерева</span><i>◆</i><span>КМД-документация</span><i>◆</i><span>44-ФЗ и НДС</span><i>◆</i><span>Доставка по всей России</span><i>◆</i>
+    <span>Лазерная резка</span><i>◆</i><span>Гибка</span><i>◆</i><span>Сварка</span><i>◆</i><span>Порошковая окраска RAL</span><i>◆</i><span>Цинкование</span><i>◆</i><span>Свой цех дерева</span><i>◆</i><span>КМД-документация</span><i>◆</i><span>44-ФЗ и НДС</span><i>◆</i><span>Доставка по всей России</span><i>◆</i>
+  </div>
+</div>
+
 <!-- DIRECTIONS -->
 <section>
   <div class="container">
@@ -174,7 +182,7 @@
     </div>
     <div class="dirs">
       <a class="dir-hero reveal" href="maf/index.html">
-        <div class="ph"><span class="ph-label">Фото: МАФ во дворе ЖК</span></div>
+        <div class="ph has-img"><img src="assets/img/artdeco/lezhaki/a1-2661/hero.webp" alt="Лежак Art Déco во дворе ЖК — малые архитектурные формы EGOE" loading="lazy"><span class="ph-label">Лежак Art Déco · двор ЖК</span></div>
         <div class="dir-hero-b">
           <span class="dir-num">01</span>
           <div class="dir-hero-l">
@@ -190,7 +198,7 @@
       </a>
       <div class="dir-row">
         <a class="dir-tile reveal" style="--d:.08s" href="metallokonstrukcii/index.html">
-          <div class="ph"><span class="ph-label">Фото: металлоконструкции</span></div>
+          <div class="ph has-img"><img src="assets/img/korziny/standart/STN08-lepestok/main.webp" alt="Ажурная корзина для кондиционера на фасаде ЖК — металлоконструкции EGOE" loading="lazy"><span class="ph-label">Корзина для кондиционера · фасад</span></div>
           <div class="dir-tile-b">
             <span class="dir-num">02</span>
             <h3>Металлоконструкции</h3>
@@ -238,15 +246,17 @@
 <section>
   <div class="container">
     <div class="reveal"><div class="dim"><span class="tick"></span>03 — Как проходит заказ</div></div>
-    <div class="sec-head reveal" style="margin-top:24px"><div><h2>От заявки до отгрузки — 7 шагов</h2></div></div>
-    <div class="flow reveal">
-      <div class="flow-step"><div class="flow-dot">1</div><div class="ft">Заявка</div><div class="fd">ТЗ или чертёж</div></div>
-      <div class="flow-step"><div class="flow-dot">2</div><div class="ft">Расчёт</div><div class="fd">смета за 1 день</div></div>
-      <div class="flow-step"><div class="flow-dot">3</div><div class="ft">Договор</div><div class="fd">с НДС</div></div>
-      <div class="flow-step"><div class="flow-dot">4</div><div class="ft">Чертежи</div><div class="fd">КМД</div></div>
-      <div class="flow-step"><div class="flow-dot">5</div><div class="ft">Производство</div><div class="fd">резка, сварка</div></div>
-      <div class="flow-step"><div class="flow-dot">6</div><div class="ft">Окраска</div><div class="fd">по RAL</div></div>
-      <div class="flow-step"><div class="flow-dot">7</div><div class="ft">Отгрузка</div><div class="fd">на объект</div></div>
+    <div class="sec-head reveal" style="margin-top:24px"><div><h2>От заявки до отгрузки — 7 шагов</h2></div><p class="lead-wide">Крутите шкалу — как стрелку манометра в цехе: от первого письма до машины на вашем объекте.</p></div>
+    <div class="fdial reveal" id="flowDial">
+      <ol class="fdial-list">
+        <li data-t="Заявка" data-d="Пришлите ТЗ, чертёж или просто фото-референс — для старта достаточно эскиза.">Заявка — ТЗ или чертёж</li>
+        <li data-t="Расчёт" data-d="Смета с ценами, сроками и логистикой — за 1 рабочий день.">Расчёт — смета за 1 день</li>
+        <li data-t="Договор" data-d="Работаем с НДС, под 44-ФЗ и 223-ФЗ — подходит для тендеров.">Договор — с НДС</li>
+        <li data-t="Чертежи" data-d="Готовим КМД-документацию и согласовываем каждую деталь.">Чертежи — КМД</li>
+        <li data-t="Производство" data-d="Лазерная резка, гибка и сварка в собственном цехе.">Производство — резка, сварка</li>
+        <li data-t="Окраска" data-d="Порошковая окраска в любой цвет RAL, цинкование против коррозии.">Окраска — по RAL</li>
+        <li data-t="Отгрузка" data-d="Доставляем на объект по всей России. Монтаж — по запросу.">Отгрузка — на объект</li>
+      </ol>
     </div>
   </div>
 </section>
@@ -315,8 +325,8 @@
       <a class="btn btn-sm reveal" href="metallokonstrukcii/index.html">Весь каталог</a>
     </div>
     <div class="spot-grid">
-      <a class="spot reveal" href="metallokonstrukcii/korziny-dlya-konditsionerov/index.html"><div class="ph r-43"><span class="ph-label">Корзины</span></div><div class="spot-b"><h3>Корзины для кондиционеров</h3><div class="from">от <b>1 900 ₽</b></div></div></a>
-      <a class="spot reveal" style="--d:.06s" href="maf/skamejki/index.html"><div class="ph r-43"><span class="ph-label">Скамейки</span></div><div class="spot-b"><h3>Скамейки уличные</h3><div class="from">от <b>4 500 ₽</b></div></div></a>
+      <a class="spot reveal" href="metallokonstrukcii/korziny-dlya-konditsionerov/index.html"><div class="ph has-img r-43"><img src="assets/img/korziny/standart/STN03-treugolnik/main.webp" alt="Корзина для кондиционера на фасаде" loading="lazy"><span class="ph-label">Корзины</span></div><div class="spot-b"><h3>Корзины для кондиционеров</h3><div class="from">от <b>1 900 ₽</b></div></div></a>
+      <a class="spot reveal" style="--d:.06s" href="maf/skamejki/index.html"><div class="ph has-img r-43"><img src="assets/img/maf/skamejki/9467/main.webp" alt="Уличная скамейка сталь и дерево" loading="lazy"><span class="ph-label">Скамейки</span></div><div class="spot-b"><h3>Скамейки уличные</h3><div class="from">от <b>4 500 ₽</b></div></div></a>
       <a class="spot reveal" style="--d:.12s" href="metallokonstrukcii/pochtovye-yashchiki/index.html"><div class="ph r-43"><span class="ph-label">Ящики</span></div><div class="spot-b"><h3>Почтовые ящики</h3><div class="from">от <b>620 ₽</b>/секция</div></div></a>
       <a class="spot reveal" style="--d:.18s" href="metallokonstrukcii/konteynernye-ploshchadki/index.html"><div class="ph has-img r-43"><img src="assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/main.webp" alt="Контейнерные площадки для ТКО" loading="lazy"><span class="ph-label">Площадки</span></div><div class="spot-b"><h3>Контейнерные площадки</h3><div class="from">от <b>86 800 ₽</b></div></div></a>
     </div>
@@ -448,6 +458,6 @@
   </div>
 </div>
 
-<script src="assets/js/site.js?v=egoe2"></script>
+<script src="assets/js/site.js?v=egoe3"></script>
 </body>
 </html>

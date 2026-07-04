@@ -696,3 +696,122 @@ window.__whenVisible = (function () {
     });
   });
 })();
+
+/* ── главная: циферблат «7 шагов» — полукруглая шкала-манометр ── */
+(function () {
+  var host = document.getElementById('flowDial');
+  if (!host) return;
+  var items = Array.prototype.map.call(host.querySelectorAll('.fdial-list li'), function (li, i) {
+    return { n: i + 1, t: li.dataset.t || li.textContent, d: li.dataset.d || '' };
+  });
+  if (items.length < 2) return;
+  var N = items.length, cur = 0, userTouched = false, hovered = false, timer = null;
+  var CX = 500, CY = 470, R = 340, VB = '0 0 1000 560';
+  var rad = function (a) { return a * Math.PI / 180; };
+  var ang = function (i) { return 180 - i * (180 / (N - 1)); };
+  var px = function (a, r) { return CX + r * Math.cos(rad(a)); };
+  var py = function (a, r) { return CY - r * Math.sin(rad(a)); };
+
+  // --- SVG шкалы ---
+  var S = '<svg class="fdial-svg" viewBox="' + VB + '" role="img" aria-label="Шаги заказа">';
+  // минорные риски каждые 6°, мажорные на шагах
+  for (var a = 180; a >= 0; a -= 6) {
+    var major = Math.abs((180 - a) % (180 / (N - 1))) < 0.01;
+    var r1 = R - (major ? 24 : 13), r2 = R - 2;
+    S += '<line class="fdial-tick' + (major ? ' mj' : '') + '" x1="' + px(a, r1).toFixed(1) + '" y1="' + py(a, r1).toFixed(1) + '" x2="' + px(a, r2).toFixed(1) + '" y2="' + py(a, r2).toFixed(1) + '"/>';
+  }
+  var arcD = 'M ' + (CX - R) + ' ' + CY + ' A ' + R + ' ' + R + ' 0 0 1 ' + (CX + R) + ' ' + CY;
+  S += '<path class="fdial-track" d="' + arcD + '"/>';
+  S += '<path class="fdial-prog" d="' + arcD + '" pathLength="100"/>';
+  // стрелка
+  S += '<g class="fdial-needle"><polygon points="500,158 489,470 511,470"/><circle class="fdial-hub" cx="500" cy="470" r="30"/><circle class="fdial-pin" cx="500" cy="470" r="7"/></g>';
+  // узлы и подписи
+  for (var i = 0; i < N; i++) {
+    var A = ang(i), nx = px(A, R), ny = py(A, R), lx = px(A, R + 48), ly = py(A, R + 48);
+    var anchor = lx < CX - 40 ? 'end' : (lx > CX + 40 ? 'start' : 'middle');
+    S += '<g class="fdial-node" data-i="' + i + '"><circle cx="' + nx.toFixed(1) + '" cy="' + ny.toFixed(1) + '" r="17"/><text x="' + nx.toFixed(1) + '" y="' + (ny + 5.5).toFixed(1) + '" text-anchor="middle">' + items[i].n + '</text></g>';
+    S += '<text class="fdial-lab" data-i="' + i + '" x="' + lx.toFixed(1) + '" y="' + (ly + 6).toFixed(1) + '" text-anchor="' + anchor + '">' + items[i].t + '</text>';
+  }
+  S += '</svg>';
+
+  var stage = document.createElement('div');
+  stage.className = 'fdial-stage';
+  stage.innerHTML = S +
+    '<div class="fdial-info"><div class="fdial-num"><b>01</b><span>/ ' + String(N).padStart(2, '0') + '</span></div>' +
+    '<h3></h3><p></p>' +
+    '<div class="fdial-nav"><button class="fdial-btn" type="button" data-go="-1" aria-label="Предыдущий шаг">←</button>' +
+    '<button class="fdial-btn" type="button" data-go="1" aria-label="Следующий шаг">→</button>' +
+    '<span class="fdial-hint">крутите колесом · тяните стрелку · кликайте по шкале</span></div></div>';
+  host.appendChild(stage);
+  host.classList.add('built');
+
+  var svg = stage.querySelector('.fdial-svg');
+  var needle = stage.querySelector('.fdial-needle');
+  var prog = stage.querySelector('.fdial-prog');
+  var info = stage.querySelector('.fdial-info');
+  var numB = info.querySelector('.fdial-num b');
+  var h3 = info.querySelector('h3');
+  var pEl = info.querySelector('p');
+
+  function go(i, silent) {
+    i = Math.max(0, Math.min(N - 1, i));
+    cur = i;
+    needle.style.transform = 'rotate(' + (90 - ang(i)) + 'deg)';
+    prog.style.strokeDashoffset = 100 - Math.max((i / (N - 1)) * 100, 1.2);
+    svg.querySelectorAll('.fdial-node').forEach(function (n) { n.classList.toggle('on', +n.dataset.i === i); });
+    svg.querySelectorAll('.fdial-lab').forEach(function (l) { l.classList.toggle('on', +l.dataset.i === i); });
+    numB.textContent = String(i + 1).padStart(2, '0');
+    h3.textContent = items[i].t;
+    pEl.textContent = items[i].d;
+    if (!silent) { info.classList.remove('sw'); void info.offsetWidth; info.classList.add('sw'); }
+  }
+
+  function stopAuto() { userTouched = true; if (timer) { clearInterval(timer); timer = null; } }
+  function startAuto() {
+    if (userTouched || timer || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    timer = setInterval(function () { if (!hovered) go((cur + 1) % N); }, 3200);
+  }
+
+  svg.addEventListener('click', function (e) {
+    var n = e.target.closest('.fdial-node');
+    if (n) { stopAuto(); go(+n.dataset.i); }
+  });
+  info.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-go]');
+    if (b) { stopAuto(); go(cur + (+b.dataset.go)); }
+  });
+  // колесо — как вращение шкалы
+  var wheelT = 0;
+  stage.addEventListener('wheel', function (e) {
+    var now = Date.now();
+    if ((e.deltaY > 0 && cur < N - 1) || (e.deltaY < 0 && cur > 0)) {
+      e.preventDefault();
+      if (now - wheelT < 320) return;
+      wheelT = now; stopAuto(); go(cur + (e.deltaY > 0 ? 1 : -1));
+    }
+  }, { passive: false });
+  // перетаскивание стрелки
+  var dragging = false;
+  function dragTo(e) {
+    var r = svg.getBoundingClientRect();
+    var cx = r.left + r.width / 2, cy = r.top + r.height * (CY / 560);
+    var dx = e.clientX - cx, dy = cy - e.clientY;
+    var a = Math.atan2(dy, dx) * 180 / Math.PI;
+    if (a < -40 || dy < -r.height * 0.12) return;
+    a = Math.max(0, Math.min(180, a));
+    var i = Math.round((180 - a) / (180 / (N - 1)));
+    if (i !== cur) go(i);
+  }
+  svg.addEventListener('pointerdown', function (e) {
+    dragging = true; stopAuto(); svg.setPointerCapture(e.pointerId); dragTo(e);
+  });
+  svg.addEventListener('pointermove', function (e) { if (dragging) { e.preventDefault(); dragTo(e); } });
+  svg.addEventListener('pointerup', function () { dragging = false; });
+  svg.addEventListener('pointercancel', function () { dragging = false; });
+  stage.addEventListener('mouseenter', function () { hovered = true; });
+  stage.addEventListener('mouseleave', function () { hovered = false; });
+
+  go(0, true);
+  if (window.__whenVisible) window.__whenVisible(host, startAuto, 0.2);
+  else startAuto();
+})();
