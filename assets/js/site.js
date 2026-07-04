@@ -697,10 +697,11 @@ window.__whenVisible = (function () {
   });
 })();
 
-/* ── главная: колесо заказа сбоку — крутится скроллом страницы ──
-   Слева большая дуга-колесо с шагами; активный шаг в центре экрана
-   (у «Заявки» — форма, у «Чертежей» — КМД, у «Производства» — фото).
-   Дальние подписи уходят вверх/вниз и растворяются с блюром. */
+/* ── главная: колесо заказа v3 ──
+   ОСНОВНАЯ информация шага (номер + заголовок) закреплена НА колесе и уезжает
+   вместе с его вращением; следующая подъезжает по дуге. Когда шаг встал в паз —
+   проявляется ДОП (описание + смета/форма/чертёж/фото).
+   Десктоп: колесо слева. Мобилка: колесо ВНИЗУ, блоки едут по дуге горизонтально. */
 (function () {
   var host = document.getElementById('flowWheel');
   if (!host) return;
@@ -710,7 +711,8 @@ window.__whenVisible = (function () {
   var N = items.length;
   if (N < 2) return;
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var SP = 24; // угловой шаг между пунктами, °
+  var SP = 24;
+  var pad2 = function (n) { return String(n).padStart(2, '0'); };
 
   function chips(a) { return '<div class="fw-chips">' + a.map(function (c) { return '<span>' + c + '</span>'; }).join('') + '</div>'; }
   function mediaFor(k) {
@@ -744,7 +746,6 @@ window.__whenVisible = (function () {
     return '';
   }
 
-  // каркас: высокий трек, внутри — прилипающий экран
   var track = document.createElement('div');
   track.className = 'fw-track';
   track.style.height = (N * 88 + 16) + 'vh';
@@ -757,24 +758,21 @@ window.__whenVisible = (function () {
       '</div>' +
       '<div class="fw-ghost" aria-hidden="true">01</div>' +
       '<svg class="fw-arc" aria-hidden="true"><circle class="fw-ring2"/><circle class="fw-ring"/><g class="fw-ticks"></g></svg>' +
-      '<div class="fw-labels" aria-hidden="true"></div>' +
       '<div class="fw-marker" aria-hidden="true"></div>' +
+      '<div class="fw-cards"></div>' +
       '<div class="fw-head"></div>' +
       '<div class="fw-body"></div>' +
-      '<div class="fw-bar" aria-hidden="true"><i></i><b>01 / ' + String(N).padStart(2, '0') + '</b></div>' +
     '</div>';
   host.appendChild(track);
 
-  // заголовок секции переезжает внутрь прилипающего экрана (SEO-разметка остаётся)
   var headSrc = host.querySelector('.fw-head-src');
   if (headSrc) track.querySelector('.fw-head').appendChild(headSrc);
 
+  // панель шага = ОПИСАНИЕ + доп-медиа (заголовок едет на колесе)
   var body = track.querySelector('.fw-body');
   body.innerHTML = items.map(function (s, i) {
     return '<article class="fw-step' + (i === 0 ? ' on' : '') + '" data-i="' + i + '">' +
-      '<div class="fw-tx"><div class="fw-num">' + String(s.n).padStart(2, '0') + '<span> / ' + String(N).padStart(2, '0') + '</span></div>' +
-      '<h3>' + s.t + '</h3><p>' + s.d + '</p></div>' +
-      '<div class="fw-media">' + mediaFor(s.k) + '</div></article>';
+      '<p>' + s.d + '</p><div class="fw-media">' + mediaFor(s.k) + '</div></article>';
   }).join('');
   host.classList.add('built');
 
@@ -783,61 +781,73 @@ window.__whenVisible = (function () {
   var ring = track.querySelector('.fw-ring');
   var ring2 = track.querySelector('.fw-ring2');
   var ticksG = track.querySelector('.fw-ticks');
-  var labelsBox = track.querySelector('.fw-labels');
+  var cardsBox = track.querySelector('.fw-cards');
   var marker = track.querySelector('.fw-marker');
-  var barI = track.querySelector('.fw-bar i');
-  var barB = track.querySelector('.fw-bar b');
+  var ghost = track.querySelector('.fw-ghost');
   var steps = track.querySelectorAll('.fw-step');
 
-  var labels = items.map(function (s, i) {
+  // карточки на колесе: номер + заголовок шага
+  var cards = items.map(function (s, i) {
     var el = document.createElement('div');
-    el.className = 'fw-lab';
-    el.innerHTML = '<b>' + String(s.n).padStart(2, '0') + '</b><span>' + s.t + '</span>';
+    el.className = 'fw-card';
+    el.innerHTML = '<b>' + pad2(s.n) + ' / ' + pad2(N) + '</b><span>' + s.t + '</span>';
     el.addEventListener('click', function () { scrollToStep(i); });
-    labelsBox.appendChild(el);
+    cardsBox.appendChild(el);
     return el;
   });
 
-  var W = 0, H = 0, R = 0, CX = 0, CY = 0, EDGE = 0, mobile = false;
+  var W = 0, H = 0, R = 0, CX = 0, CY = 0, BASE = 0, CARD_R = 0, EDGE = 0, mobile = false;
   var theta = 0, targetTheta = 0, active = 0, raf = null;
   var rad = function (a) { return a * Math.PI / 180; };
 
-  function tickLine(b, mj) {
-    var len = mj ? 30 : 12;
-    var r1 = R - 4 - len, r2 = R - 4;
-    return '<line class="' + (mj ? 'mj' : '') + '" x1="' + (CX + r1 * Math.cos(rad(b))).toFixed(1) + '" y1="' + (CY + r1 * Math.sin(rad(b))).toFixed(1) +
-      '" x2="' + (CX + r2 * Math.cos(rad(b))).toFixed(1) + '" y2="' + (CY + r2 * Math.sin(rad(b))).toFixed(1) + '"/>';
-  }
   function layout() {
     W = innerWidth; H = innerHeight;
     mobile = W < 900;
-    EDGE = mobile ? 46 : Math.round(Math.max(150, Math.min(0.15 * W, 225)));
-    R = Math.round(mobile ? Math.max(H * 0.6, 420) : Math.max(H * 0.78, 540));
-    CX = EDGE - R; CY = Math.round(H / 2);
+    if (mobile) {
+      var crest = H - 200;                       // верхняя точка нижнего колеса
+      R = Math.max(Math.round(W * 0.8), 360);
+      CX = Math.round(W / 2); CY = crest + R;
+      BASE = -90; CARD_R = R + 46;
+      marker.className = 'fw-marker down';
+      marker.style.left = CX + 'px'; marker.style.top = (crest - 24) + 'px';
+      sticky.style.setProperty('--fwbot', (H - crest + 34) + 'px');
+    } else {
+      EDGE = Math.round(Math.max(150, Math.min(0.15 * W, 225)));
+      R = Math.round(Math.max(H * 0.78, 540));
+      CX = EDGE - R; CY = Math.round(H / 2);
+      BASE = 0; CARD_R = R + 28;
+      marker.className = 'fw-marker';
+      marker.style.left = (EDGE + 6) + 'px'; marker.style.top = CY + 'px';
+      sticky.style.setProperty('--fwleft', (EDGE + 330) + 'px');
+      sticky.style.setProperty('--fwbot', '90px');
+    }
     svg.setAttribute('width', W); svg.setAttribute('height', H);
     ring.setAttribute('cx', CX); ring.setAttribute('cy', CY); ring.setAttribute('r', R);
-    ring2.setAttribute('cx', CX); ring2.setAttribute('cy', CY); ring2.setAttribute('r', Math.max(R - 54, 100));
+    ring2.setAttribute('cx', CX); ring2.setAttribute('cy', CY); ring2.setAttribute('r', Math.max(R - 54, 80));
     var t = '';
-    for (var b = -30; b <= (N - 1) * SP + 30; b += 3) {
-      var mj = Math.abs(((b % SP) + SP) % SP) < 0.01;
-      t += tickLine(b, mj);
+    for (var b = -34; b <= (N - 1) * SP + 34; b += 3) {
+      var mj = b >= -0.01 && b <= (N - 1) * SP + 0.01 && Math.abs(((b % SP) + SP) % SP) < 0.01;
+      var A = BASE + b, len = mj ? 30 : 12, r1 = R - 4 - len, r2 = R - 4;
+      t += '<line class="' + (mj ? 'mj' : '') + '" x1="' + (CX + r1 * Math.cos(rad(A))).toFixed(1) + '" y1="' + (CY + r1 * Math.sin(rad(A))).toFixed(1) +
+        '" x2="' + (CX + r2 * Math.cos(rad(A))).toFixed(1) + '" y2="' + (CY + r2 * Math.sin(rad(A))).toFixed(1) + '"/>';
     }
     ticksG.innerHTML = t;
-    marker.style.left = (EDGE + 6) + 'px';
-    marker.style.top = CY + 'px';
-    sticky.style.setProperty('--fwleft', (mobile ? EDGE + 26 : EDGE + 250) + 'px');
     apply();
   }
+
   function apply() {
     for (var i = 0; i < N; i++) {
-      var a = i * SP + theta;
-      var x = CX + R * Math.cos(rad(a));
-      var y = CY + R * Math.sin(rad(a));
-      var t = Math.abs(a);
-      var el = labels[i];
-      el.style.transform = 'translate(' + (x + 20).toFixed(1) + 'px,' + y.toFixed(1) + 'px) translateY(-50%)';
-      el.style.opacity = Math.max(0, 1 - Math.max(0, t - 4) / 46).toFixed(3);
-      el.style.filter = (!reduced && t > 7) ? 'blur(' + Math.min((t - 7) / 8, 5).toFixed(2) + 'px)' : 'none';
+      var bi = i * SP + theta;                 // угол от паза
+      var A = BASE + bi;
+      var x = CX + CARD_R * Math.cos(rad(A));
+      var y = CY + CARD_R * Math.sin(rad(A));
+      var tilt = bi * (mobile ? 0.9 : 0.45);   // блок наклоняется, уезжая с колесом
+      var t = Math.abs(bi);
+      var el = cards[i];
+      el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) ' +
+        (mobile ? 'translate(-50%,-100%)' : 'translate(22px,-50%)') + ' rotate(' + tilt.toFixed(2) + 'deg)';
+      el.style.opacity = Math.max(0, 1 - Math.max(0, t - 5) / (mobile ? 30 : 42)).toFixed(3);
+      el.style.filter = (!reduced && t > 8) ? 'blur(' + Math.min((t - 8) / 9, 4.5).toFixed(2) + 'px)' : 'none';
       el.classList.toggle('on', t < SP / 2);
     }
     ticksG.setAttribute('transform', 'rotate(' + theta + ' ' + CX + ' ' + CY + ')');
@@ -852,21 +862,22 @@ window.__whenVisible = (function () {
     if (theta !== targetTheta) raf = requestAnimationFrame(frame);
   }
   function kick() { if (!raf) raf = requestAnimationFrame(frame); }
-  var ghost = track.querySelector('.fw-ghost');
   function setActive(i) {
     if (i === active) return;
     active = i;
     steps.forEach(function (s) { s.classList.toggle('on', +s.dataset.i === i); });
-    if (barB) barB.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
-    if (ghost) ghost.textContent = String(i + 1).padStart(2, '0');
+    if (ghost) ghost.textContent = pad2(i + 1);
   }
   function onScroll() {
     var r = track.getBoundingClientRect();
     var total = track.offsetHeight - H;
     var p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
-    targetTheta = -p * (N - 1) * SP;
-    setActive(Math.max(0, Math.min(N - 1, Math.round(p * (N - 1)))));
-    if (barI) barI.style.setProperty('--p', (p * 100).toFixed(1) + '%');
+    var pf = p * (N - 1);
+    var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
+    targetTheta = -pf * SP;
+    setActive(idx);
+    // паз: главная встала на место → показываем доп; в движении — прячем
+    sticky.classList.toggle('settle', Math.abs(pf - idx) < 0.24);
     kick();
   }
   function scrollToStep(i) {
@@ -874,9 +885,10 @@ window.__whenVisible = (function () {
     var total = track.offsetHeight - H;
     window.scrollTo({ top: Math.round(top + (i / (N - 1)) * total) + 2, behavior: reduced ? 'auto' : 'smooth' });
   }
-  window.__fwSet = function (p) { // отладочный хук: 0..1
-    targetTheta = -p * (N - 1) * SP; theta = targetTheta;
-    setActive(Math.round(p * (N - 1))); apply();
+  window.__fwSet = function (p) { // отладочный хук 0..1
+    var pf = p * (N - 1); var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
+    targetTheta = -pf * SP; theta = targetTheta;
+    setActive(idx); sticky.classList.toggle('settle', Math.abs(pf - idx) < 0.24); apply();
   };
 
   addEventListener('scroll', onScroll, { passive: true });
