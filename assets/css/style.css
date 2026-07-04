@@ -913,12 +913,43 @@ body.mnav-lock{overflow:hidden}
 .fw-bar b{font-family:'Oswald',sans-serif;font-size:12.5px;letter-spacing:.14em;color:var(--steel)}
 @media(max-width:1180px){.fw-step{grid-template-columns:1fr;gap:22px;align-content:center}.fw-step p{max-width:560px}}
 @media(max-width:900px){
-  .fw-arc,.fw-labels,.fw-marker{display:none}
-  .fw-head{left:var(--gut)}
-  .fw-body{left:var(--gut);right:var(--gut)}
-  .fw-bar{display:flex}
-  .fw-step h3{font-size:30px}
+  .fw-labels{display:none}
+  .fw-head{left:var(--fwleft,72px)}
+  .fw-body{left:var(--fwleft,72px);right:var(--gut);top:clamp(150px,19vh,240px);bottom:86px;align-items:flex-start}
+  .fw-step{position:static}
+  .fw-step:not(.on){display:none}
+  .fw-bar{display:flex;left:var(--fwleft,72px)}
+  .fw-step h3{font-size:29px}
+  .fw-sheets{display:none}
+  .fw-ghost{font-size:34vw;right:-4px}
 }
 @media(max-width:600px){.fw-form-row{grid-template-columns:1fr}}
 @media(max-height:700px){.fw-head{display:none}}
 @media(prefers-reduced-motion:reduce){.fw-step{transition:none}.fw-lab{transition:none}}
+
+
+/* ── колесо: документы, стопка чертежей, ghost-номер ── */
+.fw-doc{position:relative;margin-bottom:30px;background:linear-gradient(175deg,#171C22,#12161B);border:1px solid var(--line-2);border-radius:var(--r);padding:20px 22px 16px;max-width:480px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.fw-doc::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--amber);opacity:.85}
+.fw-doc-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid var(--line);padding-bottom:11px;margin-bottom:4px}
+.fw-doc-h b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:15.5px;color:#fff}
+.fw-doc-h span{font-size:12px;color:var(--amber);font-family:'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.fw-doc-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed rgba(255,255,255,.08);font-size:14px;color:var(--tx2)}
+.fw-doc-row b{color:#fff;font-weight:700;white-space:nowrap}
+.fw-doc-total{display:flex;justify-content:space-between;gap:14px;padding:12px 0 4px;font-size:15px;color:#fff}
+.fw-doc-total b{color:var(--amber);font-family:'Oswald',sans-serif;font-size:19px;letter-spacing:.03em}
+.fw-doc-note{display:block;margin-top:8px;font-size:11px;color:var(--steel-l);font-style:normal}
+.fw-stamp{position:absolute;right:10px;bottom:-40px;width:104px;height:104px;border:2px solid rgba(242,111,29,.75);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--amber);transform:rotate(-11deg);background:rgba(14,17,20,.55);backdrop-filter:blur(2px);box-shadow:inset 0 0 0 4px rgba(14,17,20,.9),inset 0 0 0 5px rgba(242,111,29,.45)}
+.fw-stamp b{font-family:'Oswald',sans-serif;font-size:19px;letter-spacing:.14em}
+.fw-stamp{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;line-height:1.5}
+.fw-bp-stack .fw-bp-under{position:absolute;inset:22px -26px -30px 40px;width:auto;max-width:none;height:100%;opacity:.14;transform:rotate(6deg) scale(.96);filter:blur(.4px);pointer-events:none}
+.fw-bp-stack{overflow:visible}
+.fw-bp-stack::after{content:"";position:absolute;inset:10px -14px -14px 14px;border:1px solid rgba(120,150,210,.16);border-radius:var(--r);transform:rotate(2.6deg);pointer-events:none}
+.fw-bp-main{position:relative;z-index:2}
+.fw-sheets{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.fw-sh{position:absolute;opacity:.075;width:34vw;max-width:560px;filter:grayscale(1)}
+.fw-sh.s1{right:-6%;top:4%;transform:rotate(calc(-9deg + var(--th,0deg)*.1))}
+.fw-sh.s2{right:14%;bottom:-8%;opacity:.055;transform:rotate(calc(7deg + var(--th,0deg)*.16))}
+.fw-sh.s3{left:30%;top:-12%;opacity:.05;transform:rotate(calc(14deg + var(--th,0deg)*.07))}
+.fw-ghost{position:absolute;right:1%;bottom:-6%;z-index:1;font-family:'Oswald',sans-serif;font-weight:700;font-size:min(30vh,24vw);line-height:1;color:rgba(255,255,255,.028);letter-spacing:.02em;pointer-events:none;user-select:none}
+@media(max-width:1180px){.fw-sh{width:52vw}}

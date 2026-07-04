@@ -720,11 +720,27 @@ window.__whenVisible = (function () {
       '<button class="btn btn-primary" type="submit">Отправить заявку</button>' +
       '<p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p></form>' +
       '<div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Перезвоним в течение рабочего дня.</div>';
-    if (k === 'calc') return chips(['Смета за 1 рабочий день', 'Фиксация цены', 'Логистика в смете']);
-    if (k === 'contract') return chips(['44-ФЗ', '223-ФЗ', 'С НДС', 'Полный пакет для тендера']);
-    if (k === 'draw') return '<div class="fw-bp"><span class="fw-bp-tag">EGOE · КМД</span><img src="assets/img/artdeco/lezhaki/a1-2661/drawing-white.svg" alt="Чертёж изделия — КМД-документация"></div>';
+    if (k === 'calc') return '<div class="fw-doc">' +
+      '<div class="fw-doc-h"><b>Смета № 214-МК</b><span>готова за 1 день</span></div>' +
+      '<div class="fw-doc-row"><span>Лежак Art Déco A1-2661 · 12 шт</span><b>260 400 ₽</b></div>' +
+      '<div class="fw-doc-row"><span>Порошковая окраска RAL 6021</span><b>вкл.</b></div>' +
+      '<div class="fw-doc-row"><span>Доставка до объекта · Москва</span><b>38 200 ₽</b></div>' +
+      '<div class="fw-doc-total"><span>Итого, фиксация до отгрузки</span><b>298 600 ₽</b></div>' +
+      '<i class="fw-doc-note">пример реальной сметы</i></div>';
+    if (k === 'contract') return '<div class="fw-doc fw-contract">' +
+      '<div class="fw-doc-h"><b>Договор поставки</b><span>с НДС 20%</span></div>' +
+      '<div class="fw-doc-row"><span>Работа по 44-ФЗ и 223-ФЗ</span><b>✓</b></div>' +
+      '<div class="fw-doc-row"><span>Спецификация и КМД в приложении</span><b>✓</b></div>' +
+      '<div class="fw-doc-row"><span>Паспорта изделий, сертификаты</span><b>✓</b></div>' +
+      '<div class="fw-doc-row"><span>Гарантия на конструкции</span><b>24 мес</b></div>' +
+      '<span class="fw-stamp"><b>EGOE</b>завод · Балаково</span></div>';
+    if (k === 'draw') return '<div class="fw-bp fw-bp-stack">' +
+      '<img class="fw-bp-under" src="assets/img/artdeco/lezhaki/i1-3451/drawing-white.svg" alt="" aria-hidden="true">' +
+      '<span class="fw-bp-tag">EGOE · КМД</span>' +
+      '<img class="fw-bp-main" src="assets/img/artdeco/lezhaki/a1-2661/drawing-white.svg" alt="Чертёж изделия — КМД-документация"></div>';
     if (k === 'prod') return '<div class="fw-ph"><img src="assets/img/artdeco/lezhaki/i1-3651/facade2.webp" alt="Сталь изделия крупным планом — производство EGOE"><span>сталь · порошковая окраска RAL · свой цех</span></div>';
-    if (k === 'ship') return chips(['Доставка по всей России', 'Партиями под этапы стройки', 'Монтаж по запросу']);
+    if (k === 'ship') return '<div class="fw-ph"><img src="assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/main.webp" alt="Изделие доставлено и смонтировано на объекте"><span>доставлено и смонтировано · двор ЖК</span></div>' +
+      chips(['Вся Россия', 'Партиями под этапы', 'Монтаж по запросу']);
     return '';
   }
 
@@ -734,6 +750,12 @@ window.__whenVisible = (function () {
   track.style.height = (N * 88 + 16) + 'vh';
   track.innerHTML =
     '<div class="fw-sticky">' +
+      '<div class="fw-sheets" aria-hidden="true">' +
+        '<img class="fw-sh s1" src="assets/img/artdeco/lezhaki/a1-4651/drawing-white.svg" alt="">' +
+        '<img class="fw-sh s2" src="assets/img/artdeco/lezhaki/i1-3651/drawing-white.svg" alt="">' +
+        '<img class="fw-sh s3" src="assets/img/artdeco/lezhaki/i1-3561/drawing-white.svg" alt="">' +
+      '</div>' +
+      '<div class="fw-ghost" aria-hidden="true">01</div>' +
       '<svg class="fw-arc" aria-hidden="true"><circle class="fw-ring2"/><circle class="fw-ring"/><g class="fw-ticks"></g></svg>' +
       '<div class="fw-labels" aria-hidden="true"></div>' +
       '<div class="fw-marker" aria-hidden="true"></div>' +
@@ -756,6 +778,7 @@ window.__whenVisible = (function () {
   }).join('');
   host.classList.add('built');
 
+  var sticky = track.querySelector('.fw-sticky');
   var svg = track.querySelector('.fw-arc');
   var ring = track.querySelector('.fw-ring');
   var ring2 = track.querySelector('.fw-ring2');
@@ -788,8 +811,8 @@ window.__whenVisible = (function () {
   function layout() {
     W = innerWidth; H = innerHeight;
     mobile = W < 900;
-    EDGE = mobile ? 0 : Math.round(Math.max(150, Math.min(0.15 * W, 225)));
-    R = Math.round(Math.max(H * 0.78, 540));
+    EDGE = mobile ? 46 : Math.round(Math.max(150, Math.min(0.15 * W, 225)));
+    R = Math.round(mobile ? Math.max(H * 0.6, 420) : Math.max(H * 0.78, 540));
     CX = EDGE - R; CY = Math.round(H / 2);
     svg.setAttribute('width', W); svg.setAttribute('height', H);
     ring.setAttribute('cx', CX); ring.setAttribute('cy', CY); ring.setAttribute('r', R);
@@ -802,7 +825,7 @@ window.__whenVisible = (function () {
     ticksG.innerHTML = t;
     marker.style.left = (EDGE + 6) + 'px';
     marker.style.top = CY + 'px';
-    track.querySelector('.fw-sticky').style.setProperty('--fwleft', (mobile ? 0 : EDGE + 250) + 'px');
+    sticky.style.setProperty('--fwleft', (mobile ? EDGE + 26 : EDGE + 250) + 'px');
     apply();
   }
   function apply() {
@@ -818,6 +841,7 @@ window.__whenVisible = (function () {
       el.classList.toggle('on', t < SP / 2);
     }
     ticksG.setAttribute('transform', 'rotate(' + theta + ' ' + CX + ' ' + CY + ')');
+    sticky.style.setProperty('--th', theta.toFixed(2) + 'deg');
   }
   function frame() {
     raf = null;
@@ -828,11 +852,13 @@ window.__whenVisible = (function () {
     if (theta !== targetTheta) raf = requestAnimationFrame(frame);
   }
   function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+  var ghost = track.querySelector('.fw-ghost');
   function setActive(i) {
     if (i === active) return;
     active = i;
     steps.forEach(function (s) { s.classList.toggle('on', +s.dataset.i === i); });
     if (barB) barB.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
+    if (ghost) ghost.textContent = String(i + 1).padStart(2, '0');
   }
   function onScroll() {
     var r = track.getBoundingClientRect();
