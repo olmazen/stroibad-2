@@ -507,11 +507,28 @@ window.__whenVisible = (function () {
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function abs(u) { try { return u ? new URL(u, location.href).href : ''; } catch (e) { return u; } }
 
+  function update(id, patch) {
+    var c = read();
+    c.forEach(function (x) { if (x.id === id) { for (var k in patch) x[k] = patch[k]; } });
+    write(c);
+  }
   window.addToCart = function (item) {
     if (!item || !item.id) return;
     var c = read(); var f = c.filter(function (x) { return x.id === item.id; })[0];
-    if (f) f.qty += (item.qty || 1);
-    else c.push({ id: item.id, name: item.name || item.id, url: item.url || '', img: item.img || '', qty: item.qty || 1 });
+    if (f) {
+      f.qty += (item.qty || 1);
+      if (item.ral) f.ral = item.ral;                            // обновляем выбор, если пришёл новый
+    } else {
+      var pf = item.priceFrom || 0;
+      c.push({
+        id: item.id, name: item.name || item.id, url: item.url || '', img: item.img || '',
+        qty: item.qty || 1,
+        ral: item.ral || '',                                     // выбранный цвет RAL
+        priceFrom: pf,                                           // цена «от» с сайта (справочно)
+        price: pf,                                               // редактируемая цена за единицу (префилл)
+        comment: ''                                              // комментарий по позиции
+      });
+    }
     write(c); toast();
   };
   window.addToCartFromPage = function (btn) {
@@ -521,17 +538,22 @@ window.__whenVisible = (function () {
     var m = art.match(/Артикул\s*([A-Za-zА-Яа-я0-9\-]+)/);
     var mainImg = document.querySelector('.gallery .ph.main img');
     var qtyInp = document.querySelector('.pp-info .qty input') || document.querySelector('.qty input');
+    var ralEl = document.querySelector('.ral .ralc.on');
+    var priceEl = document.querySelector('.pp-price .big');
+    var priceFrom = priceEl ? (parseInt(priceEl.textContent.replace(/[^\d]/g, ''), 10) || 0) : 0;
     var id = (m ? m[1] : (h ? h.textContent.trim() : location.pathname)).trim();
     addToCart({
       id: id,
       name: h ? h.textContent.trim() : id,
       url: location.href,                                        // абсолютный — работает со страницы корзины
       img: mainImg ? abs(mainImg.getAttribute('src')) : '',      // абсолютный — картинка не ломается на /cart/
-      qty: qtyInp ? Math.max(1, parseInt(qtyInp.value, 10) || 1) : 1
+      qty: qtyInp ? Math.max(1, parseInt(qtyInp.value, 10) || 1) : 1,
+      ral: ralEl ? (ralEl.getAttribute('title') || '') : '',     // напр. «RAL 7016»
+      priceFrom: priceFrom
     });
   };
   // общий API для страницы корзины
-  window.__spCart = { read: read, write: write, count: count, setQty: setQty, del: del, clear: clearAll, esc: esc, cartURL: cartURL, siteBase: siteBase.href };
+  window.__spCart = { read: read, write: write, count: count, setQty: setQty, del: del, clear: clearAll, update: update, esc: esc, cartURL: cartURL, siteBase: siteBase.href };
 
   var badge = tools.querySelector('#cartCount');
   function renderBadge() {
@@ -612,9 +634,29 @@ window.__whenVisible = (function () {
   var sumPos = document.getElementById('sumPos');
   var sumQty = document.getElementById('sumQty');
   var itemsTa = document.getElementById('cartFormItems');
+  var sumMoney = document.getElementById('sumMoney');
 
+  function money(n) { return (n || 0).toLocaleString('ru-RU') + ' ₽'; }
   function lineList(c) {
-    return 'Список для расчёта:\n' + c.map(function (i) { return '• ' + i.name + ' — ' + i.qty + ' шт'; }).join('\n');
+    return 'Список для расчёта:\n' + c.map(function (i) {
+      var head = '• ' + i.name + (i.ral ? ' (' + i.ral + ')' : '') + ' — ' + i.qty + ' шт';
+      return head + (i.price > 0 ? ' × ' + money(i.price) + ' = ' + money(i.price * i.qty) : ' — цена по запросу');
+    }).join('\n');
+  }
+  function updateSums() {
+    var c = C.read(); var grand = 0, anyReq = false;
+    var rows = itemsBox.querySelectorAll('.cartp-item');
+    c.forEach(function (i) {
+      var s = (i.price || 0) * i.qty; grand += s; if (!(i.price > 0)) anyReq = true;
+      for (var r = 0; r < rows.length; r++) {
+        if (rows[r].dataset.id === i.id) {
+          var sn = rows[r].querySelector('.ci-sum');
+          if (sn) sn.textContent = i.price > 0 ? money(s) : 'по запросу';
+        }
+      }
+    });
+    if (sumMoney) sumMoney.textContent = c.length ? money(grand) + (anyReq ? ' + по запросу' : '') : '—';
+    if (itemsTa) itemsTa.value = lineList(c);
   }
   function render() {
     var c = C.read();
@@ -622,7 +664,6 @@ window.__whenVisible = (function () {
     if (titleCount) titleCount.textContent = c.length ? c.length + ' поз. · ' + n + ' шт' : '';
     if (sumPos) sumPos.textContent = c.length;
     if (sumQty) sumQty.textContent = n + ' шт';
-    if (itemsTa) itemsTa.value = lineList(c);
     if (side) side.classList.toggle('is-empty', !c.length);
 
     if (!c.length) {
@@ -633,23 +674,29 @@ window.__whenVisible = (function () {
         '<p>Добавляйте изделия кнопкой «В корзину» — соберём их в одну заявку<br>и рассчитаем КП по объёму, цвету RAL и доставке.</p>' +
         '<div class="cartp-empty-act"><a class="btn btn-primary" href="' + new URL('maf/index.html', C.siteBase).href + '">Каталог МАФ</a>' +
         '<a class="btn" href="' + new URL('ograzhdeniya/index.html', C.siteBase).href + '">Ограждения</a></div></div>';
+      updateSums();
       return;
     }
     itemsBox.innerHTML = c.map(function (i, idx) {
       var img = i.img ? '<img src="' + C.esc(i.img) + '" alt="" loading="lazy" onerror="this.parentNode.classList.add(\'noimg\')">' : '';
       var open = i.url ? ' href="' + C.esc(i.url) + '"' : '';
+      var meta = 'Артикул ' + C.esc(i.id) + (i.ral ? ' · ' + C.esc(i.ral) : '');
+      var fromNote = i.priceFrom > 0 ? ' title="на сайте: от ' + money(i.priceFrom) + '"' : '';
       return '<div class="cartp-item" data-id="' + C.esc(i.id) + '" style="--i:' + idx + '">' +
         '<a class="ci-ph' + (i.img ? '' : ' noimg') + '"' + open + '>' + img + '</a>' +
         '<div class="ci-main">' +
           '<a class="ci-name"' + open + '>' + C.esc(i.name) + '</a>' +
-          '<small>Артикул ' + C.esc(i.id) + ' · цена по запросу</small>' +
+          '<small>' + meta + '</small>' +
           '<div class="ci-ctrl">' +
             '<span class="cart-qty"><button type="button" data-q="-1" aria-label="Меньше">−</button><span>' + i.qty + '</span><button type="button" data-q="1" aria-label="Больше">+</button></span>' +
+            '<label class="ci-price"' + fromNote + '>Цена/ед <input type="text" inputmode="numeric" data-price value="' + (i.price || '') + '" placeholder="—"><span>₽</span></label>' +
+            '<span class="ci-sum">' + (i.price > 0 ? money(i.price * i.qty) : 'по запросу') + '</span>' +
             '<button class="ci-del" type="button" data-del>Убрать</button>' +
           '</div>' +
         '</div></div>';
     }).join('') +
     '<div class="cartp-tools"><button class="ci-del" type="button" id="cartClear">Очистить весь список</button></div>';
+    updateSums();
   }
 
   itemsBox.addEventListener('click', function (e) {
@@ -663,6 +710,13 @@ window.__whenVisible = (function () {
     } else if (e.target.closest('#cartClear')) {
       if (confirm('Очистить весь список?')) { C.clear(); render(); }
     }
+  });
+  // редактирование цены за единицу — без ре-рендера (не теряем фокус)
+  itemsBox.addEventListener('input', function (e) {
+    var pin = e.target.closest('[data-price]'); if (!pin) return;
+    var row = e.target.closest('.cartp-item'); if (!row) return;
+    C.update(row.dataset.id, { price: parseInt(pin.value.replace(/[^\d]/g, ''), 10) || 0 });
+    updateSums();
   });
 
   render();
