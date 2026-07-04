@@ -719,6 +719,72 @@ window.__whenVisible = (function () {
     updateSums();
   });
 
+  /* ── генерация КП: шапка + режим + открытие /kp/ ── */
+  (function wireKpGen() {
+    var gen = document.getElementById('kpGen');
+    if (!gen) return;
+    var HEAD_KEY = 'sp_kp_head_v1';
+    var F = {
+      object: document.getElementById('kpObject'), addressee: document.getElementById('kpAddressee'),
+      number: document.getElementById('kpNumber'), date: document.getElementById('kpDate'),
+      reqNumber: document.getElementById('kpReqNumber'), reqDate: document.getElementById('kpReqDate'),
+    };
+    var seg = document.getElementById('kpSeg');
+    var hint = document.getElementById('kpGenHint');
+    var ledgerOnly = document.getElementById('kpLedgerOnly');
+    var ndsRow = document.getElementById('kpNdsRow');
+    var openBtn = document.getElementById('kpOpen');
+    var kpMode = 'beauty';
+
+    function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+    function autoNum() { var d = new Date(); return 'КП-' + d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
+
+    // префилл из сохранённого + дефолты
+    var saved = {}; try { saved = JSON.parse(localStorage.getItem(HEAD_KEY)) || {}; } catch (e) {}
+    F.object.value = saved.object || '';
+    F.addressee.value = saved.addressee || '';
+    F.number.value = saved.number || autoNum();
+    F.date.value = saved.date || today();
+    F.reqNumber.value = saved.reqNumber || '';
+    F.reqDate.value = saved.reqDate || '';
+
+    function saveHead() {
+      var h = {}; for (var k in F) h[k] = F[k].value.trim();
+      try { localStorage.setItem(HEAD_KEY, JSON.stringify(h)); } catch (e) {}
+      return h;
+    }
+    for (var k in F) F[k].addEventListener('input', saveHead);
+
+    seg.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-kpmode]'); if (!b) return;
+      kpMode = b.dataset.kpmode;
+      seg.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      gen.classList.toggle('is-tender', kpMode === 'tender');
+      hint.textContent = kpMode === 'tender'
+        ? 'Формальный документ под 44-ФЗ: реквизиты, НДС, подпись. Цены обязательны по всем позициям.'
+        : 'Для клиента: обложка, фото, чертежи, цены.';
+      if (kpMode === 'tender') ledgerOnly.checked = true;
+    });
+
+    openBtn.addEventListener('click', function () {
+      var h = saveHead();
+      // мягкая проверка для тендера — подсветить пустые обязательные (жёсткий валидатор на /kp/)
+      if (kpMode === 'tender') {
+        var miss = [];
+        if (!h.addressee) miss.push(F.addressee);
+        if (!h.number) miss.push(F.number);
+        if (!h.date) miss.push(F.date);
+        miss.forEach(function (el) { el.classList.add('kp-invalid'); });
+        setTimeout(function () { miss.forEach(function (el) { el.classList.remove('kp-invalid'); }); }, 2500);
+      }
+      var q = 'mode=' + kpMode;
+      if (ledgerOnly.checked) q += '&ledger=1';
+      if (kpMode === 'tender' && ndsRow.checked) q += '&nds=row';
+      var base = C.siteBase || (location.origin + '/');
+      window.open(new URL('kp/index.html?' + q, base).href, '_blank');
+    });
+  })();
+
   render();
 })();
 
@@ -770,44 +836,82 @@ window.__whenVisible = (function () {
 
   function chips(a) { return '<div class="fw-chips">' + a.map(function (c) { return '<span>' + c + '</span>'; }).join('') + '</div>'; }
   function mediaFor(k) {
+    var cur = '<div class="fw-cur" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L16 19l-3 1.6-3.4-6.4L5 18z"/></svg></div>';
     if (k === 'choose') return '<div class="fw-pick">' +
       '<div class="fw-pick-row">' +
       '<div class="fw-pk" data-pk="0"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp" alt="Лежак Art Déco"><b>Лежак A1-2661</b><span>от 21 700 ₽</span><i></i></div>' +
       '<div class="fw-pk" data-pk="1"><img src="assets/img/maf/skamejki/9467/main.webp" alt="Скамейка уличная"><b>Скамейка</b><span>от 4 500 ₽</span><i></i></div>' +
       '<div class="fw-pk" data-pk="2"><img src="assets/img/korziny/standart/STN03-treugolnik/main.webp" alt="Корзина для кондиционера"><b>Корзина</b><span>от 1 900 ₽</span><i></i></div>' +
-      '</div><div class="fw-pick-cnt">В списке для расчёта: <b data-cnt>0</b></div></div>';
+      '</div><div class="fw-pick-cnt">В списке для расчёта: <b data-cnt>0</b></div>' + cur + '</div>';
     if (k === 'form') return '<div class="fw-form fw-demo" aria-hidden="true">' +
+      '<div class="fw-push"><i>E</i><div><b>EGOE</b><span>Заявка № 214 принята — перезвоним сегодня</span></div><em>сейчас</em></div>' +
       '<div class="fw-form-row"><div class="field"><label>Имя</label><input type="text" readonly tabindex="-1" data-df="name" placeholder="Как к вам обращаться"></div>' +
       '<div class="field"><label>Телефон</label><input type="tel" readonly tabindex="-1" data-df="tel" placeholder="+7"></div></div>' +
       '<span class="btn btn-primary fw-demo-btn">Отправить заявку</span>' +
       '<div class="fw-form-ok"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M15 27l8 8 15-16"/></svg><b>Заявка принята</b><span>перезвоним в течение рабочего дня</span></div>' +
-      '<div class="fw-cur" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L16 19l-3 1.6-3.4-6.4L5 18z"/></svg></div></div>' +
+      cur + '</div>' +
       '<button class="fw-own" type="button" onclick="openModal()">Оставить свою заявку →</button>';
-    if (k === 'calc') return '<div class="fw-doc fw-calc">' +
-      '<div class="fw-doc-h"><b>Смета № 214-МК</b><span>готова за 1 день</span></div>' +
-      '<div class="fw-doc-row"><span>Лежак Art Déco A1-2661 · 12 шт</span><b>260 400 ₽</b></div>' +
-      '<div class="fw-doc-row"><span>Порошковая окраска RAL 6021</span><b>вкл.</b></div>' +
-      '<div class="fw-doc-row"><span>Доставка до объекта · Москва</span><b>38 200 ₽</b></div>' +
-      '<div class="fw-doc-total"><span>Итого, фиксация до отгрузки</span><b>298 600 ₽</b></div>' +
-      '<div class="fw-pdf"><i>PDF</i><div class="fw-pdf-tx"><b data-pdf>Формируем PDF-смету…</b><span class="fw-pdf-bar"><u></u></span></div></div></div>';
-    if (k === 'contract') return '<div class="fw-doc fw-contract">' +
-      '<div class="fw-doc-h"><b>Договор поставки</b><span>с НДС 20%</span></div>' +
-      '<div class="fw-doc-row"><span>Работа по 44-ФЗ и 223-ФЗ</span><b>✓</b></div>' +
-      '<div class="fw-doc-row"><span>Спецификация и КМД в приложении</span><b>✓</b></div>' +
-      '<div class="fw-doc-row"><span>Паспорта изделий, сертификаты</span><b>✓</b></div>' +
-      '<div class="fw-doc-row"><span>Гарантия на конструкции</span><b>24 мес</b></div>' +
-      '<span class="fw-stamp"><b>EGOE</b>завод · Балаково</span></div>';
+    if (k === 'calc') return '<div class="fw-flow2">' +
+      '<div class="fw-att-zone">' +
+      '<div class="fw-genline"><b data-pdf>Формируем PDF-смету…</b><span class="fw-pdf-bar"><u></u></span></div>' +
+      '<div class="fw-att"><i>PDF</i><div class="fw-att-tx"><b>смета-214-МК.pdf</b><span>3 страницы · 214 КБ</span></div><em></em></div>' +
+      '<div class="fw-att-hint">кликните — откроется смета</div>' +
+      cur + '</div>' +
+      '<div class="fw-win fw-pdfwin"><div class="fw-win-bar"><i></i><i></i><i></i><b>смета-214-МК.pdf</b><span data-pgind>1 / 3</span></div>' +
+      '<div class="fw-win-body"><div class="fw-pages">' +
+      '<div class="fw-pg on"><div class="pdf-logo"><s></s>EGOE</div>' +
+        '<div class="pdf-cv"><em>Спецификация № 214-МК</em><b>Благоустройство<br>ЖК «Ваш объект»</b><span>3 позиции · 26 единиц</span></div>' +
+        '<div class="pdf-foot">EGOE · завод металлоконструкций · egoe-life.ru</div></div>' +
+      '<div class="fw-pg"><b class="pdf-h">Ведомость изделий</b><div class="pdf-t">' +
+        '<div class="pdf-tr th"><span>Изделие</span><span>RAL</span><span>Кол-во</span><span>Цена, от</span></div>' +
+        '<div class="pdf-tr"><span>Лежак Art Déco A1-2661</span><span>6021</span><span>12</span><span>21 700 ₽</span></div>' +
+        '<div class="pdf-tr"><span>Скамейка A4-2641</span><span>7016</span><span>8</span><span>4 500 ₽</span></div>' +
+        '<div class="pdf-tr"><span>Урна U3-600</span><span>9005</span><span>6</span><span>12 900 ₽</span></div>' +
+        '</div><div class="pdf-sum"><span>ориентировочно, до расчёта КП</span><b>≈ 298 600 ₽</b></div></div>' +
+      '<div class="fw-pg"><div class="pdf-h3"><b>Лежак A1-2661</b><i>Art Déco</i></div>' +
+        '<div class="pdf-media"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp" alt=""><span class="pdf-draw"><img src="assets/img/artdeco/lezhaki/a1-2661/drawing-white.svg" alt=""></span></div>' +
+        '<div class="pdf-spec"><span>Длина</span><b>1842 мм</b></div><div class="pdf-spec"><span>Высота</span><b>760 мм</b></div><div class="pdf-spec"><span>Материал · окраска</span><b>сталь · любой RAL</b></div></div>' +
+      '</div><div class="fw-pgdots"><i class="on"></i><i></i><i></i></div></div></div></div>';
+    if (k === 'contract') return '<div class="fw-flow2">' +
+      '<div class="fw-att-zone"><div class="fw-checklist">' +
+      '<div class="fw-ck"><i></i>Работа по 44-ФЗ и 223-ФЗ</div>' +
+      '<div class="fw-ck"><i></i>НДС 20% включён</div>' +
+      '<div class="fw-ck"><i></i>Спецификация и КМД в приложении</div>' +
+      '<div class="fw-ck"><i></i>Гарантия 24 месяца</div>' +
+      '</div></div>' +
+      '<div class="fw-win fw-docwin"><div class="fw-win-bar"><i></i><i></i><i></i><b>договор-214.pdf</b><span>пакет для тендера</span></div>' +
+      '<div class="fw-win-body"><div class="fw-ct">' +
+      '<b class="ct-h">Договор поставки № 214</b><span class="ct-sub">ООО «EGOE» · с НДС 20%</span>' +
+      '<div class="ct-par"><u style="width:96%"></u><u style="width:88%"></u><u style="width:64%"></u></div>' +
+      '<div class="ct-par"><u style="width:92%"></u><u style="width:97%"></u><u style="width:41%"></u></div>' +
+      '<div class="ct-par"><u style="width:85%"></u><u style="width:72%"></u></div>' +
+      '<div class="ct-sign"><div class="ct-s"><em>Поставщик · EGOE</em><svg viewBox="0 0 130 36"><path d="M8 26 C 20 6, 30 32, 44 18 S 64 8, 74 22 S 102 28, 122 10"/></svg></div>' +
+      '<span class="fw-stamp"><b>EGOE</b>завод · Балаково</span></div>' +
+      '</div></div></div></div>';
     if (k === 'draw') return '<div class="fw-bp fw-bp-stack folded">' +
       '<img class="fw-bp-under" src="assets/img/artdeco/lezhaki/i1-3451/drawing-white.svg" alt="" aria-hidden="true">' +
       '<span class="fw-bp-tag">EGOE · КМД</span>' +
       '<img class="fw-bp-main" src="assets/img/artdeco/lezhaki/a1-2661/drawing-white.svg" alt="Чертёж изделия — КМД-документация"></div>';
     if (k === 'prod') return '<div class="fw-stagechips"><span>Резка</span><span>Гибка</span><span>Сварка</span><span>Окраска RAL</span></div>' +
       '<div class="fw-ph fw-kb"><img src="assets/img/artdeco/lezhaki/i1-3651/facade2.webp" alt="Сталь изделия крупным планом — производство EGOE"><span>сталь · порошковая окраска RAL · свой цех</span></div>';
-    if (k === 'ship') return '<div class="fw-route"><b>Балаково</b><i><u></u><em></em></i><b>ваш объект</b></div>' +
-      '<div class="fw-ph"><img src="assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/main.webp" alt="Изделие доставлено и смонтировано на объекте"><span>доставлено и смонтировано · двор ЖК</span></div>';
+    if (k === 'ship') return '<div class="fw-logi">' +
+      '<div class="fw-lg-status"><b data-lgst>Собираем партию…</b></div>' +
+      '<div class="fw-lg-track"><u class="lg-line"></u><u class="lg-fill"></u>' +
+      '<span class="lg-node" style="left:0%"><i></i><b>Завод</b></span>' +
+      '<span class="lg-node" style="left:33.3%"><i></i><b>Партия</b></span>' +
+      '<span class="lg-node" style="left:66.6%"><i></i><b>В пути</b></span>' +
+      '<span class="lg-node" style="left:100%"><i></i><b>Объект</b></span>' +
+      '<div class="fw-truck"><svg viewBox="0 0 48 26"><rect x="1" y="4" width="29" height="14" rx="1.5"/><path d="M30 8h9.5l6.5 6v4H30z"/><circle cx="11" cy="21" r="4"/><circle cx="38" cy="21" r="4"/></svg></div>' +
+      '</div></div>' +
+      '<div class="fw-ph fw-shipph"><img src="assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/main.webp" alt="Изделие доставлено и смонтировано на объекте"><span>доставлено и смонтировано · двор ЖК</span></div>';
     return '';
   }
 
+  function winShow(w, on) {
+    if (!w) return;
+    if (on) { w.style.opacity = '1'; w.style.transform = 'none'; }
+    else { w.style.opacity = ''; w.style.transform = ''; }
+  }
   var track = document.createElement('div');
   track.className = 'fw-track';
   track.style.height = (N * 88 + 16) + 'vh';
@@ -950,20 +1054,24 @@ window.__whenVisible = (function () {
     if (kind === 'choose') {
       var picks = root.querySelectorAll('.fw-pk');
       var cnt = root.querySelector('[data-cnt]');
+      var ccur = root.querySelector('.fw-cur');
       api.start = function () {
         running = true;
         (function loop() {
           if (!running) return;
           picks.forEach(function (p) { p.classList.remove('on'); });
           if (cnt) cnt.textContent = '0';
-          var d = 700;
+          ccur.classList.add('show');
           picks.forEach(function (p, i) {
-            t(function () { p.classList.add('on'); if (cnt) cnt.textContent = String(i + 1); }, d + i * 850);
+            t(function () { curTo(ccur, p, 550, 0.62, 0.55); }, 500 + i * 1050);
+            t(function () { ccur.classList.add('press'); p.classList.add('on'); if (cnt) cnt.textContent = String(i + 1); }, 1080 + i * 1050);
+            t(function () { ccur.classList.remove('press'); }, 1260 + i * 1050);
           });
-          t(loop, d + picks.length * 850 + 2400);
+          t(function () { ccur.classList.remove('show'); }, 500 + picks.length * 1050 + 500);
+          t(loop, 500 + picks.length * 1050 + 2600);
         })();
       };
-      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; picks.forEach(function (p) { p.classList.remove('on'); }); if (cnt) cnt.textContent = '0'; };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; picks.forEach(function (p) { p.classList.remove('on'); }); if (cnt) cnt.textContent = '0'; ccur.classList.remove('show', 'press'); };
     }
 
     if (kind === 'form') {
@@ -979,6 +1087,7 @@ window.__whenVisible = (function () {
           if (!running) return;
           nameI.value = ''; telI.value = '';
           demo.classList.remove('sent'); ok.classList.remove('show'); btn.classList.remove('press');
+          root.querySelector('.fw-push').classList.remove('show');
           cur.classList.add('show'); curTo(cur, nameI, 10, 0.2, 0.7);
           t(function () { nameI.classList.add('focus'); typeVal(nameI, 'Алексей', 85); }, 600);
           t(function () { nameI.classList.remove('focus'); telI.classList.add('focus'); curTo(cur, telI, 500, 0.25, 0.7); }, 1600);
@@ -986,7 +1095,8 @@ window.__whenVisible = (function () {
           t(function () { telI.classList.remove('focus'); curTo(cur, btn, 650, 0.5, 0.55); }, 3400);
           t(function () { btn.classList.add('press'); cur.classList.add('press'); }, 4150);
           t(function () { btn.classList.remove('press'); cur.classList.remove('press'); demo.classList.add('sent'); ok.classList.add('show'); cur.classList.remove('show'); }, 4420);
-          t(loop, 8200);
+          t(function () { root.querySelector('.fw-push').classList.add('show'); }, 5250);
+          t(loop, 9400);
         })();
       };
       api.stop = function () {
@@ -994,46 +1104,70 @@ window.__whenVisible = (function () {
         nameI.value = ''; telI.value = '';
         nameI.classList.remove('focus'); telI.classList.remove('focus');
         demo.classList.remove('sent'); ok.classList.remove('show'); btn.classList.remove('press'); cur.classList.remove('show', 'press');
+        var pu = root.querySelector('.fw-push'); if (pu) pu.classList.remove('show');
       };
     }
 
     if (kind === 'calc') {
-      var rows = root.querySelectorAll('.fw-doc-row, .fw-doc-total');
-      var pdf = root.querySelector('.fw-pdf');
-      var pdfTx = root.querySelector('[data-pdf]');
+      var flow = root.querySelector('.fw-flow2');
+      var gen = root.querySelector('.fw-genline');
+      var genTx = root.querySelector('[data-pdf]');
+      var att = root.querySelector('.fw-att');
+      var win = root.querySelector('.fw-pdfwin');
+      var pgs = root.querySelectorAll('.fw-pg');
+      var dots = root.querySelectorAll('.fw-pgdots i');
+      var pgInd = root.querySelector('[data-pgind]');
+      var pcur = root.querySelector('.fw-att-zone .fw-cur');
+      function showPg(n) {
+        pgs.forEach(function (p, i) { p.classList.toggle('on', i === n); });
+        dots.forEach(function (d, i) { d.classList.toggle('on', i === n); });
+        if (pgInd) pgInd.textContent = (n + 1) + ' / ' + pgs.length;
+      }
       api.start = function () {
         running = true;
         (function loop() {
           if (!running) return;
-          root.classList.remove('done');
-          rows.forEach(function (r) { r.classList.remove('in'); });
-          pdf.classList.remove('go', 'ok');
-          if (pdfTx) pdfTx.textContent = 'Формируем PDF-смету…';
-          rows.forEach(function (r, i) { t(function () { r.classList.add('in'); }, 400 + i * 480); });
-          t(function () { pdf.classList.add('go'); }, 400 + rows.length * 480 + 200);
-          t(function () { pdf.classList.add('ok'); if (pdfTx) pdfTx.textContent = 'смета-214-МК.pdf · отправлена на почту'; }, 400 + rows.length * 480 + 1700);
-          t(loop, 400 + rows.length * 480 + 5600);
+          flow.classList.remove('opened'); winShow(win, false);
+          gen.classList.remove('go', 'ok'); att.classList.remove('ready', 'press');
+          if (genTx) genTx.textContent = 'Формируем PDF-смету…';
+          showPg(0);
+          t(function () { gen.classList.add('go'); }, 350);
+          t(function () { gen.classList.add('ok'); if (genTx) genTx.textContent = 'Смета готова ✓'; att.classList.add('ready'); }, 1700);
+          t(function () { pcur.classList.add('show'); curTo(pcur, att, 10, 0.15, 1.25); curTo(pcur, att, 620, 0.55, 0.55); }, 2100);
+          t(function () { pcur.classList.add('press'); att.classList.add('press'); }, 2850);
+          t(function () { pcur.classList.remove('press'); att.classList.remove('press'); pcur.classList.remove('show'); flow.classList.add('opened'); winShow(win, true); }, 3100);
+          t(function () { showPg(1); }, 5300);
+          t(function () { showPg(2); }, 7500);
+          t(loop, 10400);
         })();
       };
-      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; rows.forEach(function (r) { r.classList.add('in'); }); pdf.classList.remove('go'); pdf.classList.add('ok'); };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; gen.classList.add('ok'); att.classList.add('ready'); flow.classList.add('opened'); winShow(win, true); showPg(0); if (pcur) pcur.classList.remove('show', 'press'); };
     }
 
     if (kind === 'contract') {
-      var crows = root.querySelectorAll('.fw-doc-row');
+      var pars = root.querySelectorAll('.ct-par');
+      var cks = root.querySelectorAll('.fw-ck');
+      var sign = root.querySelector('.ct-s');
       var stamp = root.querySelector('.fw-stamp');
-      var doc = root.querySelector('.fw-doc');
+      var page = root.querySelector('.fw-ct');
+      var cflow = root.querySelector('.fw-flow2');
+      var cwin = root.querySelector('.fw-win');
       api.start = function () {
         running = true;
+        cflow.classList.add('opened'); winShow(cwin, true);
         (function loop() {
           if (!running) return;
-          crows.forEach(function (r) { r.classList.remove('in'); });
-          stamp.classList.remove('slam'); doc.classList.remove('shake');
-          crows.forEach(function (r, i) { t(function () { r.classList.add('in'); }, 380 + i * 430); });
-          t(function () { stamp.classList.add('slam'); doc.classList.add('shake'); }, 380 + crows.length * 430 + 450);
-          t(loop, 380 + crows.length * 430 + 5200);
+          pars.forEach(function (p) { p.classList.remove('in'); });
+          cks.forEach(function (c) { c.classList.remove('in'); });
+          sign.classList.remove('draw'); stamp.classList.remove('slam'); page.classList.remove('shake');
+          pars.forEach(function (p, i) { t(function () { p.classList.add('in'); }, 420 + i * 620); });
+          cks.forEach(function (c, i) { t(function () { c.classList.add('in'); }, 560 + i * 620); });
+          t(function () { sign.classList.add('draw'); }, 420 + pars.length * 620 + 300);
+          t(function () { stamp.classList.add('slam'); page.classList.add('shake'); }, 420 + pars.length * 620 + 1350);
+          t(loop, 420 + pars.length * 620 + 6300);
         })();
       };
-      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; crows.forEach(function (r) { r.classList.add('in'); }); stamp.classList.add('slam'); doc.classList.remove('shake'); };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; cflow.classList.add('opened'); winShow(cwin, true); pars.forEach(function (p) { p.classList.add('in'); }); cks.forEach(function (c) { c.classList.add('in'); }); sign.classList.add('draw'); stamp.classList.add('slam'); page.classList.remove('shake'); };
     }
 
     if (kind === 'draw') {
@@ -1067,9 +1201,31 @@ window.__whenVisible = (function () {
     }
 
     if (kind === 'ship') {
-      var route = root.querySelector('.fw-route');
-      api.start = function () { running = true; route.classList.add('play'); };
-      api.stop = function () { running = false; route.classList.remove('play'); };
+      var logi = root.querySelector('.fw-logi');
+      var truck = root.querySelector('.fw-truck');
+      var fill = root.querySelector('.lg-fill');
+      var nodes = root.querySelectorAll('.lg-node');
+      var lgst = root.querySelector('[data-lgst]');
+      var ST = ['Собираем партию…', 'Партия собрана — грузим', 'В пути по России', 'Доставлено на объект ✓'];
+      function stage(n) {
+        truck.style.left = (n * 33.333) + '%';
+        fill.style.width = (n * 33.333) + '%';
+        nodes.forEach(function (nd, i) { nd.classList.toggle('on', i <= n); });
+        if (lgst) { lgst.textContent = ST[n]; lgst.classList.toggle('ok', n === 3); }
+        truck.classList.toggle('go', n > 0 && n < 3);
+      }
+      api.start = function () {
+        running = true; logi.classList.add('play');
+        (function loop() {
+          if (!running) return;
+          stage(0);
+          t(function () { stage(1); }, 1300);
+          t(function () { stage(2); }, 2700);
+          t(function () { stage(3); }, 4100);
+          t(loop, 7600);
+        })();
+      };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; logi.classList.remove('play'); stage(3); truck.classList.remove('go'); };
     }
 
     return api;

@@ -9,7 +9,7 @@
 <meta name="robots" content="noindex, follow">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=egoe7">
+<link rel="stylesheet" href="../assets/css/style.css?v=egoe9">
 </head>
 <body>
 <div class="topbar"><div class="container">
@@ -60,6 +60,32 @@
           <div class="cartp-line"><span>Позиций</span><b id="sumPos">0</b></div>
           <div class="cartp-line"><span>Всего единиц</span><b id="sumQty">0</b></div>
           <div class="cartp-line cartp-line-total"><span>Итого ориентировочно</span><b id="sumMoney">—</b></div>
+
+          <div class="kp-gen" id="kpGen">
+            <h4>Сформировать КП (PDF)</h4>
+            <div class="kp-seg" id="kpSeg">
+              <button type="button" data-kpmode="beauty" class="on">Красивое</button>
+              <button type="button" data-kpmode="tender">Тендерное · 44-ФЗ</button>
+            </div>
+            <p class="kp-gen-hint" id="kpGenHint">Для клиента: обложка, фото, чертежи, цены.</p>
+            <div class="kp-fields">
+              <div class="field"><label>Объект / наименование закупки</label><input type="text" id="kpObject" placeholder="ЖК «Северный парк», благоустройство"></div>
+              <div class="field kp-req-field"><label>Кому (заказчик)<span class="req">*</span></label><input type="text" id="kpAddressee" placeholder="Полное наименование заказчика"></div>
+              <div class="kp-row2">
+                <div class="field"><label>Исх. № КП</label><input type="text" id="kpNumber"></div>
+                <div class="field"><label>Дата</label><input type="date" id="kpDate"></div>
+              </div>
+              <div class="kp-row2 kp-tender-field">
+                <div class="field"><label>№ запроса заказчика</label><input type="text" id="kpReqNumber" placeholder="реестровый №"></div>
+                <div class="field"><label>Дата запроса</label><input type="date" id="kpReqDate"></div>
+              </div>
+            </div>
+            <label class="kp-check"><input type="checkbox" id="kpLedgerOnly"> Только ведомость (без листов изделий)</label>
+            <label class="kp-check kp-tender-field"><input type="checkbox" id="kpNdsRow"> НДС построчно (8 колонок)</label>
+            <button class="btn btn-primary btn-block" type="button" id="kpOpen">Открыть и сохранить PDF</button>
+            <p class="kp-gen-note">Откроется страница А4 — сохраните как PDF (с фоновой графикой).</p>
+          </div>
+
           <hr>
           <form onsubmit="return submitLead(this)">
             <div class="field"><label>Имя</label><input type="text" required></div>
@@ -136,6 +162,6 @@
     <div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div></div>
 </div></div>
 
-<script src="../assets/js/site.js?v=egoe7"></script>
+<script src="../assets/js/site.js?v=egoe9"></script>
 </body>
 </html>

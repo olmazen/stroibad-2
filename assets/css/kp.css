@@ -1,0 +1,300 @@
+/* ============================================================
+   EGOE · Коммерческое предложение (печатная страница /kp/)
+   Один документ, два режима: body.mode-beauty / body.mode-tender
+   Движок PDF — Chrome window.print (позже тот же файл в Puppeteer)
+   ============================================================ */
+
+:root{
+  --ink:#14181E;          /* основной текст/графит-заголовки */
+  --ink-soft:#2A2F36;
+  --paper:#FFFFFF;
+  --plate:#F4F5F6;        /* зебра, подложка шапок таблиц */
+  --graphite:#15191E;     /* тёмные плашки/штамп, текст белым */
+  --amber:#F26F1D;        /* фирменный акцент */
+  --amber-d:#D85B0F;      /* янтарь для мелкого текста на белом */
+  --steel:#6E757C;        /* вторичный текст */
+  --steel-l:#8E959C;
+  --line:#E4E7EA;         /* тонкие разделители (инверт от тёмного сайта) */
+  --line-2:#C8CCD0;       /* рамки/уголки */
+  --f-head:'Oswald','Arial Narrow',Arial,sans-serif;
+  --f-body:'PT Sans',Arial,sans-serif;
+}
+
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--f-body);font-size:11pt;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--f-head);font-weight:600;margin:0;color:var(--ink);text-transform:uppercase;letter-spacing:.05em;line-height:1.15}
+p{margin:0 0 8px}
+table{border-collapse:collapse;width:100%}
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+
+/* ---------- Панель управления (экран) ---------- */
+.kp-toolbar{
+  position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:11px 20px;background:var(--graphite);color:#fff;font-family:var(--f-body);
+}
+.kp-tb-l{display:flex;align-items:center;gap:16px}
+.kp-tb-back{color:#cfd3d7;text-decoration:none;font-size:13.5px}
+.kp-tb-back:hover{color:#fff}
+.kp-tb-mode{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.1em;font-size:13px;color:var(--amber)}
+.kp-tb-r{display:flex;align-items:center;gap:16px}
+.kp-tb-hint{color:#9aa0a6;font-size:12px}
+.kp-tb-print{
+  background:var(--amber);color:#1c1305;border:none;border-radius:2px;cursor:pointer;
+  font-family:var(--f-head);text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-size:13px;
+  padding:9px 18px;transition:background .15s}
+.kp-tb-print:hover{background:var(--amber-h,#ff8534)}
+
+/* ---------- Каркас документа ---------- */
+.kp-doc{}
+.sheet{position:relative;background:var(--paper)}
+.sheet + .sheet{}
+
+/* ---------- Общие компоненты ---------- */
+.kp-logo{display:flex;align-items:center;gap:11px}
+.kp-logo .mark{width:38px;height:38px;background:var(--amber);border-radius:1px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center}
+.kp-logo .mark::before,.kp-logo .mark::after{content:"";position:absolute}
+.kp-logo .mark span{display:block;width:11px;height:11px;border:2px solid #1c1305;margin:0 1px}
+.kp-logo .mark i{display:flex;gap:3px}
+.kp-logo .txt b{font-family:var(--f-head);font-weight:700;font-size:21px;letter-spacing:.06em;display:block;line-height:1;color:var(--ink)}
+.kp-logo .txt small{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.18em;font-size:9.5px;color:var(--steel);display:block;margin-top:3px}
+
+.eyebrow{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.2em;font-size:11px;color:var(--amber-d)}
+.kp-h{font-family:var(--f-head);font-size:13pt;letter-spacing:.12em;padding-bottom:6px;border-bottom:2px solid var(--ink);margin:0 0 12px;break-after:avoid}
+
+/* размерная линейка/цепочка (свой класс — .dim-tick в базе нет) */
+.kp-dimline{position:relative;height:2px;background:var(--line);margin:14px 0}
+.kp-dimline::before,.kp-dimline::after{content:"";position:absolute;top:-4px;width:2px;height:10px;background:var(--amber)}
+.kp-dimline::before{left:0}.kp-dimline::after{right:0}
+.kp-dim{display:flex;align-items:center;gap:8px;font-family:var(--f-head);letter-spacing:.06em;font-size:11px;color:var(--steel);margin-top:8px}
+.kp-dim b{color:var(--ink);font-weight:600}
+
+/* угловые засечки */
+.bp-corner{position:absolute;width:16px;height:16px;border-color:var(--line-2);border-style:solid;border-width:0}
+.bp-corner.tl{top:0;left:0;border-top-width:1.5px;border-left-width:1.5px}
+.bp-corner.br{bottom:0;right:0;border-bottom-width:1.5px;border-right-width:1.5px}
+
+/* ---------- Плейсхолдер фото (нет фото / нет чертежа) ---------- */
+.ph{position:relative;background:var(--plate);
+  background-image:repeating-linear-gradient(0deg,transparent 0 25px,rgba(21,25,30,.05) 25px 26px),
+                   repeating-linear-gradient(90deg,transparent 0 25px,rgba(21,25,30,.05) 25px 26px);
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ph-motif{width:44px;height:44px;border:2px solid var(--amber);border-radius:1px;opacity:.7}
+.ph-label{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-family:var(--f-head);
+  text-transform:uppercase;letter-spacing:.14em;font-size:9px;color:var(--steel)}
+.ph-tag{position:absolute;top:8px;left:8px;font-family:var(--f-head);font-size:10px;letter-spacing:.08em;color:var(--steel-l)}
+
+/* фото-бокс с фиксированной геометрией */
+.photo-box{position:relative;overflow:hidden;background:var(--plate);border:1px solid var(--line)}
+.photo-box img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* ============================================================
+   РЕЖИМ BEAUTY — издательское КП
+   ============================================================ */
+/* --- обложка --- */
+.kp-cover{position:relative;overflow:hidden}
+.kp-cover .cover-top{display:flex;justify-content:space-between;align-items:flex-start}
+.kp-cover .cover-eyebrow{text-align:right}
+.kp-cover .cover-eyebrow .num{font-family:var(--f-head);letter-spacing:.06em;color:var(--steel);font-size:11pt;margin-top:6px}
+.kp-cover .cover-photo{position:relative;margin:26px 0;border:1px solid var(--line)}
+.kp-cover .cover-photo .photo-box{height:118mm}
+.kp-cover .cover-photo .ph{height:118mm}
+.kp-cover .cover-title{font-size:52pt;line-height:.98;letter-spacing:.01em;margin-top:6px}
+.kp-cover .cover-title .am{color:var(--amber)}
+.kp-cover .cover-meta{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);
+  font-size:10.5pt;color:var(--steel);display:flex;flex-wrap:wrap;gap:4px 22px}
+.kp-cover .cover-meta b{color:var(--ink);font-weight:400}
+
+/* --- сводная ведомость --- */
+.kp-ledger table{font-size:9.5pt}
+.kp-ledger thead th{background:var(--graphite);color:#fff;font-family:var(--f-head);text-transform:uppercase;
+  letter-spacing:.05em;font-weight:600;font-size:8.5pt;padding:8px 8px;text-align:left;border-bottom:2px solid var(--amber)}
+.kp-ledger thead th.num{text-align:right}
+.kp-ledger tbody td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.kp-ledger tbody tr:nth-child(even) td{background:var(--plate)}
+.kp-ledger .lg-ph{width:64px;height:46px}
+.kp-ledger .lg-name b{font-family:var(--f-head);font-weight:600;font-size:10pt;letter-spacing:.02em;display:block}
+.kp-ledger .lg-name small{color:var(--steel-l);font-size:8pt}
+.kp-ledger .lg-onreq{color:var(--steel);font-style:italic}
+.kp-ledger tbody tr.onreq td{background:#fdf3ea}
+.ral-chip{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.ral-chip i{width:13px;height:13px;border-radius:50%;border:1px solid rgba(0,0,0,.2);display:inline-block;flex-shrink:0}
+.ral-chip.na i{background:var(--line-2)}
+.kp-totals{margin-top:14px;margin-left:auto;width:78mm;break-inside:avoid}
+.kp-totals .row{display:flex;justify-content:space-between;padding:5px 0;font-size:10.5pt;color:var(--steel)}
+.kp-totals .row b{color:var(--ink);font-weight:400}
+.kp-totals .grand{border-top:2px solid var(--amber);margin-top:4px;padding-top:8px}
+.kp-totals .grand span{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.06em;font-size:11pt;color:var(--ink)}
+.kp-totals .grand b{font-family:var(--f-head);font-weight:600;font-size:15pt;color:var(--ink)}
+.kp-note{font-size:9pt;color:var(--steel);margin-top:12px;line-height:1.45}
+.kp-note .am{color:var(--amber-d)}
+
+/* --- лист изделия --- */
+.kp-product .prod-top{display:flex;justify-content:space-between;font-family:var(--f-head);
+  font-size:9.5pt;letter-spacing:.06em;color:var(--steel-l);text-transform:uppercase;
+  padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.kp-product .prod-head .eyebrow{margin-bottom:6px}
+.kp-product .prod-head h2{font-size:26pt;letter-spacing:.01em;line-height:1.02}
+.kp-product .prod-head .ptype{color:var(--steel);font-family:var(--f-body);text-transform:none;letter-spacing:0;font-size:11pt;margin-top:4px}
+.kp-product .prod-grid{display:grid;grid-template-columns:55fr 45fr;gap:16px;margin-top:16px}
+.kp-product .prod-visual{}
+.kp-product .prod-visual .photo-box,.kp-product .prod-visual .ph{height:70mm}
+.kp-product.no-draw .prod-visual .photo-box,.kp-product.no-draw .prod-visual .ph{height:92mm}
+.kp-thumbs{display:flex;gap:6px;margin-top:6px}
+.kp-thumbs .photo-box{flex:1;height:26mm}
+.kp-drawing{position:relative;margin-top:10px;border:1px solid var(--line);background:#fff;padding:8px}
+.kp-drawing .dl-tag{position:absolute;top:6px;left:8px;font-family:var(--f-head);text-transform:uppercase;
+  letter-spacing:.12em;font-size:8pt;color:var(--amber-d)}
+.kp-drawing .dl-sku{position:absolute;top:6px;right:8px;font-family:var(--f-head);font-size:8pt;color:var(--steel-l)}
+.kp-drawing svg{width:100%;height:auto;max-height:62mm;display:block;margin-top:12px}
+/* перекрас чертежа в графит делает kp.js (замена белого→графит в тексте SVG,
+   чтобы не заливать fill:none контуры). Здесь только тонкие линии при масштабе: */
+.kp-drawing svg [class*="cls-"]{vector-effect:non-scaling-stroke}
+.kp-product .prod-desc{font-size:10pt;line-height:1.55;color:var(--ink-soft);margin-bottom:12px}
+.spec-list{display:grid;grid-template-columns:auto 1fr;gap:0 12px;font-size:9.5pt;break-inside:avoid}
+.spec-list dt{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.04em;font-size:8.5pt;
+  color:var(--steel);padding:4px 0;border-bottom:1px solid var(--line)}
+.spec-list dd{margin:0;padding:4px 0;border-bottom:1px solid var(--line);color:var(--ink);font-weight:700;text-align:right}
+.ral-row{margin-top:12px;break-inside:avoid}
+.ral-row .rr-h{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.1em;font-size:8.5pt;color:var(--steel);margin-bottom:6px}
+.ral-swatches{display:flex;flex-wrap:wrap;gap:8px}
+.ral-swatches .sw{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:7.5pt;color:var(--steel)}
+.ral-swatches .sw i{width:22px;height:22px;border-radius:2px;border:1px solid rgba(0,0,0,.2)}
+.ral-swatches .sw.on i{outline:2px solid var(--amber);outline-offset:1px}
+.ral-swatches .sw.on{color:var(--amber-d);font-weight:700}
+.price-plate{margin-top:14px;border:1.5px solid var(--amber);border-radius:2px;padding:10px 14px;
+  display:flex;align-items:baseline;gap:10px;break-inside:avoid}
+.price-plate .pl-l{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.08em;font-size:9pt;color:var(--steel)}
+.price-plate .pl-v{font-family:var(--f-head);font-weight:600;font-size:15pt;color:var(--ink)}
+.price-plate .pl-s{font-size:8.5pt;color:var(--steel);margin-left:auto;max-width:46%;text-align:right}
+
+/* --- условия / контакты --- */
+.kp-terms .term-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+.kp-terms .term{border-top:2px solid var(--amber);background:var(--plate);padding:12px 14px}
+.kp-terms .term h4{font-size:10pt;letter-spacing:.06em;margin-bottom:5px}
+.kp-terms .term p{font-size:9.5pt;color:var(--ink-soft);margin:0}
+.kp-trust{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 18px}
+.kp-trust span{border:1px solid var(--line-2);border-radius:2px;padding:6px 12px;font-family:var(--f-head);
+  text-transform:uppercase;letter-spacing:.06em;font-size:9pt;color:var(--ink)}
+.kp-contacts{display:flex;flex-wrap:wrap;gap:6px 26px;font-size:10pt;color:var(--ink-soft);padding-top:12px;border-top:1px solid var(--line)}
+.kp-disclaimer{font-size:8.5pt;color:var(--steel);margin-top:14px;line-height:1.5}
+
+/* ============================================================
+   РЕЖИМ TENDER — 44-ФЗ (строгий, ч/б-дружественный)
+   ============================================================ */
+.kp-thead{}
+.kp-thead .th-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+.kp-thead .th-supplier{max-width:60%}
+.kp-thead .th-supplier .name{font-family:var(--f-head);font-weight:700;font-size:14pt;letter-spacing:.03em;color:var(--ink)}
+.kp-thead .th-supplier .brand{font-size:8.5pt;color:var(--steel);margin:3px 0 6px}
+.kp-thead .th-supplier .reqs{font-size:8.5pt;color:var(--ink-soft);line-height:1.45}
+.kp-thead .th-out{text-align:right;font-size:10pt;color:var(--ink);white-space:nowrap}
+.kp-thead .th-rule{height:2px;background:var(--amber);margin:12px 0}
+.kp-thead .th-addr{font-size:10.5pt;line-height:1.5}
+.kp-thead .th-addr b{font-weight:700}
+.kp-thead .th-title{text-align:center;margin:16px 0 4px;font-size:18pt;letter-spacing:.08em}
+.kp-thead .th-sub{text-align:center;font-size:9.5pt;color:var(--steel);margin-bottom:14px}
+.kp-intro{font-size:10.5pt;margin-bottom:6px}
+.kp-intro .nds{display:block;font-size:9pt;color:var(--steel);margin-top:4px}
+
+.kp-ttable table{font-size:9.5pt;border:1px solid var(--line-2)}
+.kp-ttable th{background:var(--plate);font-family:var(--f-head);text-transform:uppercase;letter-spacing:.03em;
+  font-weight:600;font-size:8pt;padding:7px 7px;text-align:left;border:1px solid var(--line-2);vertical-align:middle}
+.kp-ttable th.num{text-align:right}
+.kp-ttable td{padding:7px 7px;border:1px solid var(--line-2);vertical-align:top}
+.kp-ttable .t-name b{font-family:var(--f-head);font-weight:600;font-size:9.5pt;display:block}
+.kp-ttable .t-name small{color:var(--steel);font-size:8pt;display:block;margin-top:2px;line-height:1.4}
+.kp-ttotals{margin-top:12px;margin-left:auto;width:88mm;break-inside:avoid}
+.kp-ttotals .row{display:flex;justify-content:space-between;padding:4px 0;font-size:10pt;border-bottom:1px solid var(--line)}
+.kp-ttotals .row.grand{border-bottom:none;border-top:2px solid var(--ink);margin-top:2px;padding-top:7px}
+.kp-ttotals .row.grand span,.kp-ttotals .row.grand b{font-family:var(--f-head);font-weight:600;font-size:12.5pt;color:var(--ink)}
+.kp-words{font-size:10pt;margin-top:10px;padding:8px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.kp-words b{font-weight:700}
+
+.kp-cond{margin-top:16px;break-inside:avoid}
+.kp-cond .kp-h{}
+.kp-cond dl{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:10pt}
+.kp-cond dt{color:var(--steel)}
+.kp-cond dd{margin:0;color:var(--ink)}
+.kp-offer{margin-top:12px;font-size:9.5pt;font-style:italic;color:var(--ink-soft)}
+.kp-assure{margin-top:8px;font-size:9pt;color:var(--steel)}
+
+.kp-req{margin-top:16px;break-inside:avoid}
+.kp-req dl{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:9.5pt}
+.kp-req dt{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.03em;font-size:8pt;color:var(--steel);padding-top:2px}
+.kp-req dd{margin:0;color:var(--ink);font-weight:700}
+.kp-sign{margin-top:22px;display:flex;justify-content:space-between;align-items:flex-end;break-inside:avoid}
+.kp-sign .sig-l{font-size:10pt;line-height:2.2}
+.kp-sign .sig-line{display:inline-block;min-width:150px;border-bottom:1px solid var(--ink);margin:0 8px}
+.kp-sign .sig-basis{font-size:8.5pt;color:var(--steel);margin-top:6px}
+.kp-sign .sig-mp{width:96px;height:96px;border:1.5px dashed var(--line-2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-family:var(--f-head);letter-spacing:.1em;
+  font-size:9pt;color:var(--steel-l);text-align:center}
+
+/* ---------- Оверлей валидатора ---------- */
+.kp-overlay{position:fixed;inset:0;z-index:60;background:rgba(20,24,30,.72);
+  display:flex;align-items:center;justify-content:center;padding:24px}
+.kp-overlay .ov-card{background:#fff;max-width:520px;width:100%;border-radius:4px;padding:28px 30px;font-family:var(--f-body)}
+.kp-overlay h3{font-size:16pt;color:var(--ink);margin-bottom:6px}
+.kp-overlay .ov-sub{color:var(--steel);font-size:11pt;margin-bottom:16px}
+.kp-overlay ul{margin:0 0 20px;padding-left:20px}
+.kp-overlay li{color:var(--ink-soft);margin-bottom:7px;font-size:11pt}
+.kp-overlay .ov-act{display:flex;gap:12px}
+.kp-overlay .ov-act a,.kp-overlay .ov-act button{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.06em;
+  font-size:12px;padding:10px 18px;border-radius:2px;cursor:pointer;text-decoration:none;border:1px solid var(--line-2);background:#fff;color:var(--ink)}
+.kp-overlay .ov-act .primary{background:var(--amber);border-color:var(--amber);color:#1c1305}
+
+/* ---------- Видимость секций по режиму ---------- */
+.mode-tender .beauty-only{display:none!important}
+.mode-beauty .tender-only{display:none!important}
+.ledger-only .kp-product{display:none!important}
+
+/* ---------- Штамп-подвал ---------- */
+.kp-stamp{display:none}
+
+/* ============================================================
+   ЭКРАН — превью «как на бумаге»
+   ============================================================ */
+@media screen{
+  body{background:#3a3f45;padding-bottom:60px}
+  .kp-doc{padding:26px 0}
+  .sheet{width:210mm;min-height:297mm;margin:0 auto 22px;padding:14mm 15mm 18mm;
+    box-shadow:0 6px 28px rgba(0,0,0,.4);display:flex;flex-direction:column}
+  .kp-cover{min-height:calc(297mm - 32mm)}
+}
+
+/* ============================================================
+   ПЕЧАТЬ
+   ============================================================ */
+@page{size:A4 portrait;margin:14mm 15mm 18mm 15mm}
+@media print{
+  .no-print{display:none!important}
+  html,body{background:#fff}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  *{box-shadow:none!important;text-shadow:none!important}
+  .sheet{width:auto;min-height:0;margin:0;padding:0;box-shadow:none;display:block}
+  .kp-cover,.kp-product,.kp-terms,.kp-thead-sheet{break-after:page;page-break-after:always}
+  .sheet:last-child{break-after:auto;page-break-after:auto}
+  .kp-product{break-inside:avoid;page-break-inside:avoid}
+  .kp-drawing,.spec-list,.ral-row,.price-plate,.photo-box,.kp-totals,.kp-ttotals,.kp-req,.kp-sign,.kp-cond{break-inside:avoid}
+  table tr{break-inside:avoid}
+  thead{display:table-header-group}
+  p{orphans:3;widows:3}
+  h2,.kp-h{break-after:avoid}
+  /* фиксированный штамп на каждой странице */
+  .kp-stamp{display:flex;position:fixed;left:15mm;right:15mm;bottom:6mm;justify-content:space-between;
+    align-items:center;font-family:var(--f-head);text-transform:uppercase;letter-spacing:.06em;
+    font-size:7.5pt;color:var(--steel);border-top:1.5px solid var(--amber);padding-top:3mm}
+  .mode-tender .kp-stamp{border-top-color:var(--line-2);color:var(--steel-l)}
+  .kp-cover{color:#fff}
+}
+
+/* мобильный просмотр превью — ужимаем лист */
+@media screen and (max-width:820px){
+  .kp-doc{padding:12px 0;transform:scale(.46);transform-origin:top center}
+}

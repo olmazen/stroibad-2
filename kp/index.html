@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Коммерческое предложение · EGOE</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/kp.css?v=kp2">
+</head>
+<body>
+
+<!-- Панель управления (не печатается) -->
+<div class="kp-toolbar no-print">
+  <div class="kp-tb-l">
+    <a class="kp-tb-back" href="../cart/index.html">← Корзина</a>
+    <span class="kp-tb-mode" id="kpModeLabel">Красивое КП</span>
+  </div>
+  <div class="kp-tb-r">
+    <span class="kp-tb-hint">Формат A4 · сохраняйте как PDF с фоновой графикой</span>
+    <button class="kp-tb-print" type="button" id="kpPrintBtn">Печать / Сохранить PDF</button>
+  </div>
+</div>
+
+<!-- Документ (рендерит kp.js) -->
+<main class="kp-doc" id="kp" aria-live="polite"></main>
+
+<!-- Штамп-подвал: position:fixed, повторяется на каждой печатной странице -->
+<div class="kp-stamp" id="kpStamp" aria-hidden="true"></div>
+
+<!-- Оверлей валидатора тендерного КП (не печатается) -->
+<div class="kp-overlay no-print" id="kpOverlay" hidden></div>
+
+<!-- Сигнал готовности для Puppeteer / автопечати -->
+<span id="kp-ready" hidden></span>
+
+<script src="../assets/js/kp.js?v=kp2"></script>
+</body>
+</html>
