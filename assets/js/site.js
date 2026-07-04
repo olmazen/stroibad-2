@@ -659,6 +659,7 @@ window.__whenVisible = (function () {
     });
     if (sumMoney) sumMoney.textContent = c.length ? money(grand) + (anyReq ? ' + по запросу' : '') : '—';
     if (itemsTa) itemsTa.value = lineList(c);
+    if (window.__kpRefresh) window.__kpRefresh();     // обновить мини-превью КП
   }
   function render() {
     var c = C.read();
@@ -723,41 +724,69 @@ window.__whenVisible = (function () {
     updateSums();
   });
 
-  /* ── генерация КП: шапка + открытие /kp/ ── */
+  /* ── КП: живой предпросмотр + выдача только после ввода контактов (лид) ── */
   (function wireKpGen() {
     var gen = document.getElementById('kpGen');
     if (!gen) return;
-    var HEAD_KEY = 'sp_kp_head_v1';
-    var F = {
-      object: document.getElementById('kpObject'), addressee: document.getElementById('kpAddressee'),
-      number: document.getElementById('kpNumber'), date: document.getElementById('kpDate'),
-    };
-    var ledgerOnly = document.getElementById('kpLedgerOnly');
-    var openBtn = document.getElementById('kpOpen');
+    var HEAD_KEY = 'sp_kp_head_v1', LEADS_KEY = 'sp_leads_v1';
+    var frame = document.getElementById('kpPreviewFrame');
+    var form = document.getElementById('kpForm');
+    var nameEl = document.getElementById('kpName');
+    var phoneEl = document.getElementById('kpPhone');
+    var addrEl = document.getElementById('kpAddressee');   // компания → «Кому» в КП
+    var okBox = document.getElementById('kpOk');
+    var base = C.siteBase || (location.origin + '/');
 
     function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
     function autoNum() { var d = new Date(); return 'КП-' + d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
 
-    // префилл из сохранённого + дефолты (№/дата)
+    // префилл контактов (если уже оставляли)
     var saved = {}; try { saved = JSON.parse(localStorage.getItem(HEAD_KEY)) || {}; } catch (e) {}
-    F.object.value = saved.object || '';
-    F.addressee.value = saved.addressee || '';
-    F.number.value = saved.number || autoNum();
-    F.date.value = saved.date || today();
+    if (nameEl) nameEl.value = saved.name || '';
+    if (phoneEl) phoneEl.value = saved.phone || '';
+    if (addrEl) addrEl.value = saved.addressee || '';
 
-    function saveHead() {
-      var h = {}; for (var k in F) h[k] = F[k].value.trim();
-      try { localStorage.setItem(HEAD_KEY, JSON.stringify(h)); } catch (e) {}
-      return h;
+    // живой предпросмотр (миниатюра реального КП с товарами из корзины) — с дебаунсом
+    var refreshT, lastKey = '';
+    function refreshPreview() {
+      if (!frame) return;
+      clearTimeout(refreshT);
+      refreshT = setTimeout(function () {
+        var c = C.read(); if (!c.length) return;
+        var key = JSON.stringify(c.map(function (i) { return [i.id, i.qty, i.price]; }));
+        if (key === lastKey) return;                 // без изменений — не перезагружаем
+        lastKey = key;
+        frame.src = new URL('kp/index.html?preview=1&_=' + Date.now(), base).href;
+      }, 450);
     }
-    for (var k in F) F[k].addEventListener('input', saveHead);
-    saveHead(); // зафиксировать дефолты сразу
+    window.__kpRefresh = refreshPreview;
+    refreshPreview();
 
-    openBtn.addEventListener('click', function () {
-      saveHead();
-      var q = ledgerOnly.checked ? '?ledger=1' : '';
-      var base = C.siteBase || (location.origin + '/');
-      window.open(new URL('kp/index.html' + q, base).href, '_blank');
+    function digits(s) { return (s || '').replace(/\D/g, ''); }
+    function markInvalid(el) { el.classList.add('kp-invalid'); setTimeout(function () { el.classList.remove('kp-invalid'); }, 2500); }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name = (nameEl.value || '').trim(), phone = (phoneEl.value || '').trim(), company = (addrEl.value || '').trim();
+      var bad = false;
+      if (!name) { markInvalid(nameEl); bad = true; }
+      if (digits(phone).length < 10) { markInvalid(phoneEl); bad = true; }
+      if (bad) { if (!name) nameEl.focus(); else phoneEl.focus(); return; }
+
+      // шапка КП: адресат = компания или имя; №/дата — авто
+      var head = { name: name, phone: phone, addressee: company || name, object: '', number: autoNum(), date: today() };
+      try { localStorage.setItem(HEAD_KEY, JSON.stringify(head)); } catch (e2) {}
+
+      // фиксируем лид локально (сервер заберёт позже; TODO: POST на send-spec.php)
+      try {
+        var leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
+        leads.push({ ts: Date.now(), name: name, phone: phone, company: company, items: C.read() });
+        localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+      } catch (e3) {}
+
+      // открыть полное КП
+      window.open(new URL('kp/index.html', base).href, '_blank');
+      if (okBox) okBox.style.display = 'block';
     });
   })();
 

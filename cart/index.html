@@ -62,32 +62,23 @@
           <div class="cartp-line cartp-line-total"><span>Итого ориентировочно</span><b id="sumMoney">—</b></div>
 
           <div class="kp-gen" id="kpGen">
-            <h4>Сформировать КП (PDF)</h4>
-            <p class="kp-gen-hint">Красивое коммерческое предложение: обложка, фото, чертежи, цены.</p>
-            <div class="kp-fields">
-              <div class="field"><label>Объект (необязательно)</label><input type="text" id="kpObject" placeholder="ЖК «Северный парк», благоустройство"></div>
-              <div class="field"><label>Кому (необязательно)</label><input type="text" id="kpAddressee" placeholder="Название компании-клиента"></div>
-              <div class="kp-row2">
-                <div class="field"><label>№ КП</label><input type="text" id="kpNumber"></div>
-                <div class="field"><label>Дата</label><input type="date" id="kpDate"></div>
-              </div>
+            <h4>Получить коммерческое предложение</h4>
+            <div class="kp-preview" id="kpPreview" aria-hidden="true">
+              <iframe id="kpPreviewFrame" title="Предпросмотр КП" scrolling="no" tabindex="-1"></iframe>
+              <div class="kp-preview-fade"></div>
+              <div class="kp-preview-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>Предпросмотр · ваши изделия</div>
             </div>
-            <label class="kp-check"><input type="checkbox" id="kpLedgerOnly"> Только ведомость (без листов изделий)</label>
-            <button class="btn btn-primary btn-block" type="button" id="kpOpen">Открыть КП (A4)</button>
-            <p class="kp-gen-note">Откроется страница А4 — сохраните как PDF (с фоновой графикой).</p>
+            <p class="kp-gen-hint">Красивое КП в PDF: обложка, ведомость с ценами, фото и чертёж каждого изделия. Оставьте контакты — откроем полное предложение прямо сейчас.</p>
+            <form id="kpForm" novalidate>
+              <div class="field"><label>Ваше имя<span class="req">*</span></label><input type="text" id="kpName" placeholder="Как к вам обращаться"></div>
+              <div class="field"><label>Телефон<span class="req">*</span></label><input type="tel" id="kpPhone" placeholder="+7 ___ ___-__-__"></div>
+              <div class="field"><label>Компания (необязательно)</label><input type="text" id="kpAddressee" placeholder="Появится в КП как «Кому»"></div>
+              <textarea name="items" id="cartFormItems" hidden></textarea>
+              <button class="btn btn-primary btn-block" type="submit" id="kpOpen">Получить КП (PDF)</button>
+              <p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p>
+            </form>
+            <div class="form-result form-ok" id="kpOk" style="display:none"><b>Готово!</b>КП открылось в новой вкладке — сохраните как PDF. Мы свяжемся с вами по указанному телефону.</div>
           </div>
-
-          <hr>
-          <form onsubmit="return submitLead(this)">
-            <div class="field"><label>Имя</label><input type="text" required></div>
-            <div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div>
-            <div class="field"><label>Комментарий</label><textarea rows="2" placeholder="Цвет RAL, город доставки, сроки"></textarea></div>
-            <textarea name="items" id="cartFormItems" hidden></textarea>
-            <button class="btn btn-primary btn-block" type="submit">Отправить на расчёт</button>
-            <p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p>
-          </form>
-          <div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Пришлём КП в течение 1 рабочего дня.</div>
-        </div>
         <p class="cartp-note">Завод-производитель · окраска RAL · отгрузка по всей России</p>
       </aside>
     </div>

@@ -850,29 +850,20 @@ body.mnav-lock{overflow:hidden}
 .cartp-empty h2{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:24px;color:#fff;letter-spacing:.04em}
 .cartp-empty p{color:var(--steel);margin:12px 0 26px;line-height:1.6}
 .cartp-empty-act{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-/* генерация КП в панели корзины */
-.kp-gen{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
-.kp-gen h4{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:14px;color:#fff;margin:0 0 10px}
-.kp-seg{display:flex;border:1px solid var(--line-2);border-radius:2px;overflow:hidden;margin-bottom:8px}
-.kp-seg button{flex:1;background:transparent;border:none;color:var(--tx2);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;font-size:11.5px;padding:9px 6px;cursor:pointer;transition:background .15s,color .15s}
-.kp-seg button + button{border-left:1px solid var(--line-2)}
-.kp-seg button.on{background:var(--amber);color:#1c1305}
-.kp-gen-hint{font-size:12px;color:var(--steel);margin:0 0 12px;line-height:1.45}
-.kp-fields .field{margin-bottom:8px}
-.kp-fields label{display:block;font-size:11.5px;color:var(--tx2);margin-bottom:3px}
-.kp-fields .req{color:var(--amber);margin-left:2px}
-.kp-fields input{width:100%;height:34px;background:#12161b;border:1px solid var(--line-2);border-radius:2px;color:#fff;font-size:13px;padding:0 9px;font-family:inherit}
-.kp-fields input:focus{outline:none;border-color:var(--amber)}
-.kp-fields input.kp-invalid{border-color:var(--bad);background:#2a1315}
-.kp-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.kp-check{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--tx2);margin:9px 0 0;cursor:pointer}
-.kp-check input{width:16px;height:16px;accent-color:var(--amber);flex-shrink:0}
-.kp-tender-field{display:none}
-.kp-gen.is-tender .kp-tender-field{display:block}
-.kp-gen.is-tender .kp-row2.kp-tender-field{display:grid}
-.kp-gen.is-tender .kp-check.kp-tender-field{display:flex}
-.kp-gen-note{font-size:11px;color:var(--steel);margin:8px 0 0;line-height:1.4}
-#kpOpen{margin-top:10px}
+/* КП в панели корзины: живой предпросмотр + гейт-форма */
+.kp-gen{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.kp-gen h4{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:15px;color:#fff;margin:0 0 12px}
+.kp-preview{position:relative;width:300px;max-width:100%;height:330px;margin:0 auto 14px;overflow:hidden;border:1px solid var(--line-2);border-radius:4px;background:#fff}
+.kp-preview iframe{position:absolute;top:0;left:0;width:780px;height:1500px;border:0;transform:scale(.3846);transform-origin:top left;pointer-events:none;background:#fff}
+.kp-preview-fade{position:absolute;left:0;right:0;bottom:0;height:88px;background:linear-gradient(rgba(20,24,29,0),rgba(20,24,29,.9));pointer-events:none}
+.kp-preview-badge{position:absolute;top:9px;left:9px;display:flex;align-items:center;gap:5px;background:rgba(20,24,29,.82);color:#fff;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:10px;padding:4px 9px;border-radius:2px}
+.kp-preview-badge svg{stroke:var(--amber);flex-shrink:0}
+.kp-gen-hint{font-size:12.5px;color:var(--steel);margin:0 0 14px;line-height:1.5}
+.kp-gen .field{margin-bottom:9px}
+.kp-gen .req{color:var(--amber);margin-left:2px}
+.kp-gen input.kp-invalid{border-color:var(--bad)!important;background:#2a1315}
+#kpOpen{margin-top:4px}
+.kp-gen .form-ok{margin-top:12px}
 @media(max-width:1024px){.cartp-grid{grid-template-columns:1fr}.cartp-side .cartp-panel{position:static}}
 @media(max-width:600px){
   .cartp{padding:30px 0 60px}
