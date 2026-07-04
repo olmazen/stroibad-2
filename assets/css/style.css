@@ -962,3 +962,91 @@ body.mnav-lock{overflow:hidden}
 @media(max-width:380px){.fw-form-row{grid-template-columns:1fr}}
 @media(max-height:700px){.fw-head{display:none}.fw-body{top:12vh}}
 @media(prefers-reduced-motion:reduce){.fw-step{transition:none}.fw-card{transition:none}}
+
+/* ── демо-сцены колеса: курсор, печать, PDF, штамп, выбор, маршрут ── */
+/* выбор изделий */
+.fw-pick-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:560px}
+.fw-pk{position:relative;background:var(--srf);border:1px solid var(--line);border-radius:var(--r);padding:8px 8px 10px;transition:border-color .25s,transform .25s,box-shadow .25s}
+.fw-pk img{width:100%;height:74px;object-fit:cover;border-radius:2px;margin-bottom:8px}
+.fw-pk b{display:block;font-size:12.5px;color:var(--tx);line-height:1.25}
+.fw-pk span{font-size:11px;color:var(--steel)}
+.fw-pk i{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:var(--amber);opacity:0;transform:scale(.4);transition:opacity .25s,transform .3s cubic-bezier(.2,1.5,.4,1)}
+.fw-pk i::after{content:"";position:absolute;left:6px;top:5px;width:6px;height:9px;border:solid #1c1305;border-width:0 2px 2px 0;transform:rotate(42deg)}
+.fw-pk.on{border-color:var(--amber);box-shadow:0 8px 26px rgba(242,111,29,.16);transform:translateY(-3px)}
+.fw-pk.on i{opacity:1;transform:scale(1)}
+.fw-pick-cnt{margin-top:12px;font-size:13px;color:var(--steel)}
+.fw-pick-cnt b{color:var(--amber);font-family:'Oswald',sans-serif;font-size:16px}
+/* демо-форма заявки */
+.fw-demo{position:relative;pointer-events:none;user-select:none}
+.fw-demo input{transition:border-color .25s,box-shadow .25s}
+.fw-demo input.focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(242,111,29,.15);caret-color:var(--amber)}
+.fw-demo-btn{transition:transform .12s,filter .12s}
+.fw-demo-btn.press{transform:scale(.94);filter:brightness(1.15)}
+.fw-demo.sent .fw-form-row,.fw-demo.sent .fw-demo-btn{opacity:.12;filter:blur(1.5px)}
+.fw-form-ok{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;opacity:0;transform:scale(.92);transition:opacity .35s,transform .4s cubic-bezier(.2,1.3,.4,1);pointer-events:none}
+.fw-form-ok.show{opacity:1;transform:none}
+.fw-form-ok svg{width:52px;height:52px;margin-bottom:6px}
+.fw-form-ok circle{fill:none;stroke:var(--ok);stroke-width:2.4;stroke-dasharray:151;stroke-dashoffset:151}
+.fw-form-ok path{fill:none;stroke:var(--ok);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:34;stroke-dashoffset:34}
+.fw-form-ok.show circle{animation:fwOkC .5s .05s forwards}
+.fw-form-ok.show path{animation:fwOkP .34s .4s forwards}
+@keyframes fwOkC{to{stroke-dashoffset:0}}
+@keyframes fwOkP{to{stroke-dashoffset:0}}
+.fw-form-ok b{font-family:'Oswald',sans-serif;font-size:17px;letter-spacing:.05em;text-transform:uppercase;color:#fff}
+.fw-form-ok span{font-size:12px;color:var(--steel)}
+/* демо-курсор */
+.fw-cur{position:absolute;left:8%;top:110%;z-index:5;opacity:0;transition:left .6s cubic-bezier(.3,.7,.3,1),top .6s cubic-bezier(.3,.7,.3,1),opacity .3s,transform .12s;pointer-events:none;transform-origin:4px 3px}
+.fw-cur.show{opacity:1}
+.fw-cur.press{transform:scale(.78)}
+.fw-cur svg{width:22px;height:22px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
+.fw-cur path{fill:#fff;stroke:#0C0F13;stroke-width:1.2}
+.fw-own{margin-top:12px;background:none;border:none;color:var(--amber);font:700 13px 'PT Sans',sans-serif;cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:4px}
+.fw-own:hover{color:var(--amber-h)}
+/* PDF-генерация в смете */
+.fw-calc .fw-doc-row,.fw-calc .fw-doc-total{opacity:0;transform:translateX(-10px);transition:opacity .4s,transform .45s cubic-bezier(.2,.7,.2,1)}
+.fw-calc .fw-doc-row.in,.fw-calc .fw-doc-total.in{opacity:1;transform:none}
+.fw-pdf{display:flex;align-items:center;gap:11px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line);opacity:.45;transition:opacity .3s}
+.fw-pdf.go{opacity:1}
+.fw-pdf i{width:38px;height:44px;flex:none;background:#20262E;border:1px solid var(--line-2);border-radius:3px;display:flex;align-items:center;justify-content:center;font:700 10px 'Oswald',sans-serif;color:var(--amber);position:relative}
+.fw-pdf i::before{content:"";position:absolute;top:-1px;right:-1px;border:6px solid transparent;border-bottom-color:#0C0F13;border-left-color:#0C0F13}
+.fw-pdf.ok i{background:rgba(67,195,131,.12);border-color:rgba(67,195,131,.5);color:var(--ok)}
+.fw-pdf-tx{flex:1;min-width:0}
+.fw-pdf-tx b{display:block;font-size:12.5px;color:var(--tx2);font-weight:400;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fw-pdf.ok .fw-pdf-tx b{color:var(--ok)}
+.fw-pdf-bar{display:block;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.fw-pdf-bar u{display:block;height:100%;width:0;background:var(--amber);border-radius:2px}
+.fw-pdf.go .fw-pdf-bar u{width:100%;transition:width 1.25s cubic-bezier(.3,.6,.3,1)}
+.fw-pdf.ok .fw-pdf-bar u{background:var(--ok);transition:background .3s}
+/* договор: строки прописываются + штамп шлёпается */
+.fw-contract .fw-doc-row{opacity:0;transform:translateX(-10px);transition:opacity .4s,transform .45s}
+.fw-contract .fw-doc-row.in{opacity:1;transform:none}
+.fw-stamp{opacity:0;transform:rotate(-32deg) scale(2.1)}
+.fw-stamp.slam{opacity:1;transform:rotate(-11deg) scale(1);transition:opacity .16s,transform .34s cubic-bezier(.2,1.35,.35,1)}
+.fw-doc.shake{animation:fwShake .32s .3s}
+@keyframes fwShake{20%{transform:translate(1px,-2px) rotate(.3deg)}50%{transform:translate(-2px,1px)}80%{transform:translate(1px,1px)}}
+/* чертежи: стопка складывается/раскладывается */
+.fw-bp-stack .fw-bp-under,.fw-bp-stack::after,.fw-bp-main{transition:transform .8s cubic-bezier(.25,.9,.3,1),opacity .6s}
+.fw-bp-stack.folded .fw-bp-under{transform:rotate(0deg) scale(.985);opacity:.05}
+.fw-bp-stack.folded::after{transform:rotate(0deg)}
+.fw-bp-stack.folded .fw-bp-main{transform:translateY(4px) scale(.985)}
+/* производство: этапы + кен-бёрнс */
+.fw-stagechips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.fw-stagechips span{position:relative;font:600 11.5px 'Oswald',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);border:1px solid var(--line);border-radius:2px;padding:8px 12px 8px 24px;transition:color .3s,border-color .3s,background .3s}
+.fw-stagechips span::before{content:"";position:absolute;left:10px;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:var(--steel-l);transition:background .3s,box-shadow .3s}
+.fw-stagechips span.on{color:#fff;border-color:var(--amber);background:rgba(242,111,29,.09)}
+.fw-stagechips span.on::before{background:var(--amber);box-shadow:0 0 8px var(--glow);animation:fwPulse 1.1s infinite}
+.fw-stagechips span.done{color:var(--tx2)}
+.fw-stagechips span.done::before{background:var(--ok)}
+@keyframes fwPulse{50%{opacity:.4}}
+.fw-kb img{transition:transform 6s linear}
+.fw-kb.play img{transform:scale(1.07)}
+/* отгрузка: маршрут */
+.fw-route{display:flex;align-items:center;gap:12px;margin-bottom:12px;max-width:560px}
+.fw-route b{font:600 11.5px 'Oswald',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);white-space:nowrap}
+.fw-route i{position:relative;flex:1;height:14px}
+.fw-route u{position:absolute;left:0;right:0;top:50%;height:0;border-top:2px dashed rgba(255,255,255,.22)}
+.fw-route em{position:absolute;left:0;top:50%;width:10px;height:10px;border-radius:50%;background:var(--amber);transform:translate(-2px,-50%);box-shadow:0 0 10px var(--glow)}
+.fw-route.play em{animation:fwRide 2.6s cubic-bezier(.45,.1,.45,.9) infinite}
+@keyframes fwRide{0%{left:0}55%,70%{left:calc(100% - 8px)}100%{left:calc(100% - 8px);opacity:0}}
+@media(max-width:600px){.fw-pk img{height:56px}.fw-pk b{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.fw-cur,.fw-form-ok,.fw-pdf-bar u,.fw-stamp{transition:none;animation:none}.fw-kb.play img{transform:none}.fw-route.play em{animation:none}}

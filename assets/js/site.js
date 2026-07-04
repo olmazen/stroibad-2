@@ -716,19 +716,26 @@ window.__whenVisible = (function () {
 
   function chips(a) { return '<div class="fw-chips">' + a.map(function (c) { return '<span>' + c + '</span>'; }).join('') + '</div>'; }
   function mediaFor(k) {
-    if (k === 'form') return '<form class="fw-form" onsubmit="return submitLead(this)">' +
-      '<div class="fw-form-row"><div class="field"><label>Имя</label><input type="text" required placeholder="Как к вам обращаться"></div>' +
-      '<div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div></div>' +
-      '<button class="btn btn-primary" type="submit">Отправить заявку</button>' +
-      '<p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p></form>' +
-      '<div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Перезвоним в течение рабочего дня.</div>';
-    if (k === 'calc') return '<div class="fw-doc">' +
+    if (k === 'choose') return '<div class="fw-pick">' +
+      '<div class="fw-pick-row">' +
+      '<div class="fw-pk" data-pk="0"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp" alt="Лежак Art Déco"><b>Лежак A1-2661</b><span>от 21 700 ₽</span><i></i></div>' +
+      '<div class="fw-pk" data-pk="1"><img src="assets/img/maf/skamejki/9467/main.webp" alt="Скамейка уличная"><b>Скамейка</b><span>от 4 500 ₽</span><i></i></div>' +
+      '<div class="fw-pk" data-pk="2"><img src="assets/img/korziny/standart/STN03-treugolnik/main.webp" alt="Корзина для кондиционера"><b>Корзина</b><span>от 1 900 ₽</span><i></i></div>' +
+      '</div><div class="fw-pick-cnt">В списке для расчёта: <b data-cnt>0</b></div></div>';
+    if (k === 'form') return '<div class="fw-form fw-demo" aria-hidden="true">' +
+      '<div class="fw-form-row"><div class="field"><label>Имя</label><input type="text" readonly tabindex="-1" data-df="name" placeholder="Как к вам обращаться"></div>' +
+      '<div class="field"><label>Телефон</label><input type="tel" readonly tabindex="-1" data-df="tel" placeholder="+7"></div></div>' +
+      '<span class="btn btn-primary fw-demo-btn">Отправить заявку</span>' +
+      '<div class="fw-form-ok"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M15 27l8 8 15-16"/></svg><b>Заявка принята</b><span>перезвоним в течение рабочего дня</span></div>' +
+      '<div class="fw-cur" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L16 19l-3 1.6-3.4-6.4L5 18z"/></svg></div></div>' +
+      '<button class="fw-own" type="button" onclick="openModal()">Оставить свою заявку →</button>';
+    if (k === 'calc') return '<div class="fw-doc fw-calc">' +
       '<div class="fw-doc-h"><b>Смета № 214-МК</b><span>готова за 1 день</span></div>' +
       '<div class="fw-doc-row"><span>Лежак Art Déco A1-2661 · 12 шт</span><b>260 400 ₽</b></div>' +
       '<div class="fw-doc-row"><span>Порошковая окраска RAL 6021</span><b>вкл.</b></div>' +
       '<div class="fw-doc-row"><span>Доставка до объекта · Москва</span><b>38 200 ₽</b></div>' +
       '<div class="fw-doc-total"><span>Итого, фиксация до отгрузки</span><b>298 600 ₽</b></div>' +
-      '<i class="fw-doc-note">пример реальной сметы</i></div>';
+      '<div class="fw-pdf"><i>PDF</i><div class="fw-pdf-tx"><b data-pdf>Формируем PDF-смету…</b><span class="fw-pdf-bar"><u></u></span></div></div></div>';
     if (k === 'contract') return '<div class="fw-doc fw-contract">' +
       '<div class="fw-doc-h"><b>Договор поставки</b><span>с НДС 20%</span></div>' +
       '<div class="fw-doc-row"><span>Работа по 44-ФЗ и 223-ФЗ</span><b>✓</b></div>' +
@@ -736,13 +743,14 @@ window.__whenVisible = (function () {
       '<div class="fw-doc-row"><span>Паспорта изделий, сертификаты</span><b>✓</b></div>' +
       '<div class="fw-doc-row"><span>Гарантия на конструкции</span><b>24 мес</b></div>' +
       '<span class="fw-stamp"><b>EGOE</b>завод · Балаково</span></div>';
-    if (k === 'draw') return '<div class="fw-bp fw-bp-stack">' +
+    if (k === 'draw') return '<div class="fw-bp fw-bp-stack folded">' +
       '<img class="fw-bp-under" src="assets/img/artdeco/lezhaki/i1-3451/drawing-white.svg" alt="" aria-hidden="true">' +
       '<span class="fw-bp-tag">EGOE · КМД</span>' +
       '<img class="fw-bp-main" src="assets/img/artdeco/lezhaki/a1-2661/drawing-white.svg" alt="Чертёж изделия — КМД-документация"></div>';
-    if (k === 'prod') return '<div class="fw-ph"><img src="assets/img/artdeco/lezhaki/i1-3651/facade2.webp" alt="Сталь изделия крупным планом — производство EGOE"><span>сталь · порошковая окраска RAL · свой цех</span></div>';
-    if (k === 'ship') return '<div class="fw-ph"><img src="assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/main.webp" alt="Изделие доставлено и смонтировано на объекте"><span>доставлено и смонтировано · двор ЖК</span></div>' +
-      chips(['Вся Россия', 'Партиями под этапы', 'Монтаж по запросу']);
+    if (k === 'prod') return '<div class="fw-stagechips"><span>Резка</span><span>Гибка</span><span>Сварка</span><span>Окраска RAL</span></div>' +
+      '<div class="fw-ph fw-kb"><img src="assets/img/artdeco/lezhaki/i1-3651/facade2.webp" alt="Сталь изделия крупным планом — производство EGOE"><span>сталь · порошковая окраска RAL · свой цех</span></div>';
+    if (k === 'ship') return '<div class="fw-route"><b>Балаково</b><i><u></u><em></em></i><b>ваш объект</b></div>' +
+      '<div class="fw-ph"><img src="assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/main.webp" alt="Изделие доставлено и смонтировано на объекте"><span>доставлено и смонтировано · двор ЖК</span></div>';
     return '';
   }
 
@@ -864,6 +872,165 @@ window.__whenVisible = (function () {
     if (theta !== targetTheta) raf = requestAnimationFrame(frame);
   }
   function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+  /* ── демо-сцены шагов: печать, курсор, PDF, штамп ── */
+  function makeScene(root, kind) {
+    var timers = [], running = false;
+    function t(fn, ms) { timers.push(setTimeout(fn, ms)); }
+    function every(fn, ms) { timers.push(setInterval(fn, ms)); }
+    function typeVal(inp, str, cps, done) {
+      var i = 0;
+      var iv = setInterval(function () {
+        inp.value = str.slice(0, ++i);
+        if (i >= str.length) { clearInterval(iv); if (done) done(); }
+      }, cps);
+      timers.push(iv);
+    }
+    function curTo(cur, el, ms, dx, dy) {
+      var r = el.getBoundingClientRect(), p = cur.offsetParent.getBoundingClientRect();
+      cur.style.transitionDuration = ms + 'ms';
+      cur.style.left = (r.left - p.left + r.width * (dx == null ? 0.5 : dx)) + 'px';
+      cur.style.top = (r.top - p.top + r.height * (dy == null ? 0.6 : dy)) + 'px';
+    }
+    var api = { start: function () {}, stop: function () {} };
+
+    if (kind === 'choose') {
+      var picks = root.querySelectorAll('.fw-pk');
+      var cnt = root.querySelector('[data-cnt]');
+      api.start = function () {
+        running = true;
+        (function loop() {
+          if (!running) return;
+          picks.forEach(function (p) { p.classList.remove('on'); });
+          if (cnt) cnt.textContent = '0';
+          var d = 700;
+          picks.forEach(function (p, i) {
+            t(function () { p.classList.add('on'); if (cnt) cnt.textContent = String(i + 1); }, d + i * 850);
+          });
+          t(loop, d + picks.length * 850 + 2400);
+        })();
+      };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; picks.forEach(function (p) { p.classList.remove('on'); }); if (cnt) cnt.textContent = '0'; };
+    }
+
+    if (kind === 'form') {
+      var nameI = root.querySelector('[data-df="name"]');
+      var telI = root.querySelector('[data-df="tel"]');
+      var btn = root.querySelector('.fw-demo-btn');
+      var ok = root.querySelector('.fw-form-ok');
+      var cur = root.querySelector('.fw-cur');
+      var demo = root.querySelector('.fw-demo');
+      api.start = function () {
+        running = true;
+        (function loop() {
+          if (!running) return;
+          nameI.value = ''; telI.value = '';
+          demo.classList.remove('sent'); ok.classList.remove('show'); btn.classList.remove('press');
+          cur.classList.add('show'); curTo(cur, nameI, 10, 0.2, 0.7);
+          t(function () { nameI.classList.add('focus'); typeVal(nameI, 'Алексей', 85); }, 600);
+          t(function () { nameI.classList.remove('focus'); telI.classList.add('focus'); curTo(cur, telI, 500, 0.25, 0.7); }, 1600);
+          t(function () { typeVal(telI, '+7 912 000-00-00', 55); }, 2200);
+          t(function () { telI.classList.remove('focus'); curTo(cur, btn, 650, 0.5, 0.55); }, 3400);
+          t(function () { btn.classList.add('press'); cur.classList.add('press'); }, 4150);
+          t(function () { btn.classList.remove('press'); cur.classList.remove('press'); demo.classList.add('sent'); ok.classList.add('show'); cur.classList.remove('show'); }, 4420);
+          t(loop, 8200);
+        })();
+      };
+      api.stop = function () {
+        running = false; timers.forEach(clearTimeout); timers = [];
+        nameI.value = ''; telI.value = '';
+        nameI.classList.remove('focus'); telI.classList.remove('focus');
+        demo.classList.remove('sent'); ok.classList.remove('show'); btn.classList.remove('press'); cur.classList.remove('show', 'press');
+      };
+    }
+
+    if (kind === 'calc') {
+      var rows = root.querySelectorAll('.fw-doc-row, .fw-doc-total');
+      var pdf = root.querySelector('.fw-pdf');
+      var pdfTx = root.querySelector('[data-pdf]');
+      api.start = function () {
+        running = true;
+        (function loop() {
+          if (!running) return;
+          root.classList.remove('done');
+          rows.forEach(function (r) { r.classList.remove('in'); });
+          pdf.classList.remove('go', 'ok');
+          if (pdfTx) pdfTx.textContent = 'Формируем PDF-смету…';
+          rows.forEach(function (r, i) { t(function () { r.classList.add('in'); }, 400 + i * 480); });
+          t(function () { pdf.classList.add('go'); }, 400 + rows.length * 480 + 200);
+          t(function () { pdf.classList.add('ok'); if (pdfTx) pdfTx.textContent = 'смета-214-МК.pdf · отправлена на почту'; }, 400 + rows.length * 480 + 1700);
+          t(loop, 400 + rows.length * 480 + 5600);
+        })();
+      };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; rows.forEach(function (r) { r.classList.add('in'); }); pdf.classList.remove('go'); pdf.classList.add('ok'); };
+    }
+
+    if (kind === 'contract') {
+      var crows = root.querySelectorAll('.fw-doc-row');
+      var stamp = root.querySelector('.fw-stamp');
+      var doc = root.querySelector('.fw-doc');
+      api.start = function () {
+        running = true;
+        (function loop() {
+          if (!running) return;
+          crows.forEach(function (r) { r.classList.remove('in'); });
+          stamp.classList.remove('slam'); doc.classList.remove('shake');
+          crows.forEach(function (r, i) { t(function () { r.classList.add('in'); }, 380 + i * 430); });
+          t(function () { stamp.classList.add('slam'); doc.classList.add('shake'); }, 380 + crows.length * 430 + 450);
+          t(loop, 380 + crows.length * 430 + 5200);
+        })();
+      };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; crows.forEach(function (r) { r.classList.add('in'); }); stamp.classList.add('slam'); doc.classList.remove('shake'); };
+    }
+
+    if (kind === 'draw') {
+      var bp = root.querySelector('.fw-bp-stack');
+      api.start = function () {
+        running = true;
+        (function loop() {
+          if (!running) return;
+          bp.classList.add('folded');
+          t(function () { bp.classList.remove('folded'); }, 500);
+          t(loop, 5200);
+        })();
+      };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; bp.classList.remove('folded'); };
+    }
+
+    if (kind === 'prod') {
+      var pchips = root.querySelectorAll('.fw-stagechips span');
+      var ph = root.querySelector('.fw-ph');
+      api.start = function () {
+        running = true;
+        ph.classList.add('play');
+        var i = -1;
+        every(function () {
+          i = (i + 1) % pchips.length;
+          pchips.forEach(function (c, j) { c.classList.toggle('on', j === i); c.classList.toggle('done', j < i); });
+        }, 1100);
+        pchips.forEach(function (c, j) { c.classList.toggle('on', j === 0); });
+      };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; ph.classList.remove('play'); pchips.forEach(function (c) { c.classList.remove('on', 'done'); }); };
+    }
+
+    if (kind === 'ship') {
+      var route = root.querySelector('.fw-route');
+      api.start = function () { running = true; route.classList.add('play'); };
+      api.stop = function () { running = false; route.classList.remove('play'); };
+    }
+
+    return api;
+  }
+  var sceneOf = {};
+  steps.forEach(function (s, i) { var k = items[i].k; if (k) sceneOf[i] = makeScene(s, k); });
+  var playingScene = -1;
+  function updateScene() {
+    var want = sticky.classList.contains('settle') ? active : -1;
+    if (want === playingScene) return;
+    if (playingScene >= 0 && sceneOf[playingScene]) sceneOf[playingScene].stop();
+    playingScene = want;
+    if (want >= 0 && sceneOf[want] && !reduced) sceneOf[want].start();
+  }
+
   function setActive(i) {
     if (i === active) return;
     active = i;
@@ -880,6 +1047,7 @@ window.__whenVisible = (function () {
     setActive(idx);
     // паз: главная встала на место → показываем доп; в движении — прячем
     sticky.classList.toggle('settle', Math.abs(pf - idx) < 0.24);
+    updateScene();
     kick();
   }
   function scrollToStep(i) {
@@ -890,7 +1058,7 @@ window.__whenVisible = (function () {
   window.__fwSet = function (p) { // отладочный хук 0..1
     var pf = p * (N - 1); var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
     targetTheta = -pf * SP; theta = targetTheta;
-    setActive(idx); sticky.classList.toggle('settle', Math.abs(pf - idx) < 0.24); apply();
+    setActive(idx); sticky.classList.toggle('settle', Math.abs(pf - idx) < 0.24); updateScene(); apply();
   };
 
   addEventListener('scroll', onScroll, { passive: true });
