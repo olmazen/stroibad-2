@@ -548,7 +548,7 @@ function updateSitemap(siteRoot, cfg, products) {
   const existing = new Map();
   if (existsSync(sitemapPath)) {
     const current = readFileSync(sitemapPath, 'utf8');
-    const re = /<url><loc>https:\/\/stalprom\.ru([^<]+)<\/loc><priority>([^<]+)<\/priority><\/url>/g;
+    const re = /<url><loc>https:\/\/www\.egoe-life\.ru([^<]+)<\/loc><priority>([^<]+)<\/priority><\/url>/g;
     let m;
     while ((m = re.exec(current))) existing.set(m[1], m[2]);
   }
