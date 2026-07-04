@@ -191,6 +191,10 @@ table{border-collapse:collapse;width:100%}
 /* ---------- Штамп-подвал ---------- */
 .kp-stamp{display:none}
 
+/* ---------- Режим мини-превью (iframe в корзине) ---------- */
+.kp-preview-mode{pointer-events:none}
+.kp-preview-mode .kp-toolbar{display:none}
+
 /* ============================================================
    ЭКРАН — превью «как на бумаге»
    ============================================================ */
@@ -200,6 +204,9 @@ table{border-collapse:collapse;width:100%}
   .sheet{width:210mm;min-height:297mm;margin:0 auto 22px;padding:14mm 15mm 18mm;
     box-shadow:0 6px 28px rgba(0,0,0,.4);display:flex;flex-direction:column}
   .kp-cover{min-height:calc(297mm - 32mm)}
+  .kp-preview-mode{background:#fff}
+  .kp-preview-mode .kp-doc{padding:0}
+  .kp-preview-mode .sheet{margin:0 auto 10px;box-shadow:none}
 }
 
 /* ============================================================

@@ -815,7 +815,7 @@ window.__whenVisible = (function () {
     var cur = '<div class="fw-cur" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L16 19l-3 1.6-3.4-6.4L5 18z"/></svg></div>';
     if (k === 'choose') return '<div class="fw-pick">' +
       '<div class="fw-pick-row">' +
-      '<div class="fw-pk" data-pk="0"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp" alt="Лежак Art Déco"><b>Лежак A1-2661</b><span>от 21 700 ₽</span><i></i></div>' +
+      '<div class="fw-pk" data-pk="0"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp?i10" alt="Лежак Art Déco"><b>Лежак A1-2661</b><span>от 21 700 ₽</span><i></i></div>' +
       '<div class="fw-pk" data-pk="1"><img src="assets/img/maf/skamejki/9467/main.webp" alt="Скамейка уличная"><b>Скамейка</b><span>от 4 500 ₽</span><i></i></div>' +
       '<div class="fw-pk" data-pk="2"><img src="assets/img/korziny/standart/STN03-treugolnik/main.webp" alt="Корзина для кондиционера"><b>Корзина</b><span>от 1 900 ₽</span><i></i></div>' +
       '</div><div class="fw-pick-cnt">В списке для расчёта: <b data-cnt>0</b></div>' + cur + '</div>';
@@ -845,7 +845,7 @@ window.__whenVisible = (function () {
         '<div class="pdf-tr"><span>Урна U3-600</span><span>9005</span><span>6</span><span>12 900 ₽</span></div>' +
         '</div><div class="pdf-sum"><span>ориентировочно, до расчёта КП</span><b>≈ 298 600 ₽</b></div></div>' +
       '<div class="fw-pg"><div class="pdf-h3"><b>Лежак A1-2661</b><i>Art Déco</i></div>' +
-        '<div class="pdf-media"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp" alt=""><span class="pdf-draw"><img src="assets/img/artdeco/lezhaki/a1-2661/drawing-white.svg" alt=""></span></div>' +
+        '<div class="pdf-media"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp?i10" alt=""><span class="pdf-draw"><img src="assets/img/artdeco/lezhaki/a1-2661/drawing-white.svg" alt=""></span></div>' +
         '<div class="pdf-spec"><span>Длина</span><b>1842 мм</b></div><div class="pdf-spec"><span>Высота</span><b>760 мм</b></div><div class="pdf-spec"><span>Материал · окраска</span><b>сталь · любой RAL</b></div></div>' +
       '</div><div class="fw-pgdots"><i class="on"></i><i></i><i></i></div></div></div></div>';
     if (k === 'contract') return '<div class="fw-flow2">' +
@@ -869,7 +869,7 @@ window.__whenVisible = (function () {
       '<span class="fw-bp-tag">EGOE · КМД</span>' +
       '<img class="fw-bp-main" src="assets/img/artdeco/lezhaki/a1-2661/drawing-white.svg" alt="Чертёж изделия — КМД-документация"></div>';
     if (k === 'prod') return '<div class="fw-stagechips"><span>Резка</span><span>Гибка</span><span>Сварка</span><span>Окраска RAL</span></div>' +
-      '<div class="fw-ph fw-kb"><img src="assets/img/artdeco/lezhaki/i1-3651/facade2.webp" alt="Сталь изделия крупным планом — производство EGOE"><span>сталь · порошковая окраска RAL · свой цех</span></div>';
+      '<div class="fw-ph fw-kb"><img src="assets/img/artdeco/lezhaki/i1-3651/facade2.webp?i10" alt="Сталь изделия крупным планом — производство EGOE"><span>сталь · порошковая окраска RAL · свой цех</span></div>';
     if (k === 'ship') return '<div class="fw-logi">' +
       '<div class="fw-lg-status"><b data-lgst>Собираем партию…</b></div>' +
       '<div class="fw-lg-track"><u class="lg-line"></u><u class="lg-fill"></u>' +

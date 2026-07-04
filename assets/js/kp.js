@@ -21,6 +21,8 @@
   var P = new URLSearchParams(location.search);
   var ledgerOnly = P.get('ledger') === '1';
   var auto = P.get('auto') === '1';
+  var preview = P.get('preview') === '1';   // мини-превью в корзине (обложка+ведомость, без панели, некликабельно)
+  if (preview) { ledgerOnly = true; auto = false; if (document.body) document.body.classList.add('kp-preview-mode'); }
 
   /* ---------------- утилиты ---------------- */
   function readJSON(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }
