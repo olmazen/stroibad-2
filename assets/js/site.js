@@ -723,7 +723,7 @@ window.__whenVisible = (function () {
     updateSums();
   });
 
-  /* ── генерация КП: шапка + режим + открытие /kp/ ── */
+  /* ── генерация КП: шапка + открытие /kp/ ── */
   (function wireKpGen() {
     var gen = document.getElementById('kpGen');
     if (!gen) return;
@@ -731,26 +731,19 @@ window.__whenVisible = (function () {
     var F = {
       object: document.getElementById('kpObject'), addressee: document.getElementById('kpAddressee'),
       number: document.getElementById('kpNumber'), date: document.getElementById('kpDate'),
-      reqNumber: document.getElementById('kpReqNumber'), reqDate: document.getElementById('kpReqDate'),
     };
-    var seg = document.getElementById('kpSeg');
-    var hint = document.getElementById('kpGenHint');
     var ledgerOnly = document.getElementById('kpLedgerOnly');
-    var ndsRow = document.getElementById('kpNdsRow');
     var openBtn = document.getElementById('kpOpen');
-    var kpMode = 'beauty';
 
     function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
     function autoNum() { var d = new Date(); return 'КП-' + d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
 
-    // префилл из сохранённого + дефолты
+    // префилл из сохранённого + дефолты (№/дата)
     var saved = {}; try { saved = JSON.parse(localStorage.getItem(HEAD_KEY)) || {}; } catch (e) {}
     F.object.value = saved.object || '';
     F.addressee.value = saved.addressee || '';
     F.number.value = saved.number || autoNum();
     F.date.value = saved.date || today();
-    F.reqNumber.value = saved.reqNumber || '';
-    F.reqDate.value = saved.reqDate || '';
 
     function saveHead() {
       var h = {}; for (var k in F) h[k] = F[k].value.trim();
@@ -758,39 +751,13 @@ window.__whenVisible = (function () {
       return h;
     }
     for (var k in F) F[k].addEventListener('input', saveHead);
-    saveHead(); // сразу зафиксировать дефолты (№/дата), иначе валидатор на /kp/ ругается на «пустые» при показанных автозначениях
-
-    seg.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-kpmode]'); if (!b) return;
-      kpMode = b.dataset.kpmode;
-      seg.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
-      gen.classList.toggle('is-tender', kpMode === 'tender');
-      hint.textContent = kpMode === 'tender'
-        ? 'Формальный документ под 44-ФЗ: реквизиты, НДС, подпись. Цены обязательны по всем позициям.'
-        : 'Для клиента: обложка, фото, чертежи, цены.';
-      if (kpMode === 'tender') ledgerOnly.checked = true;
-    });
+    saveHead(); // зафиксировать дефолты сразу
 
     openBtn.addEventListener('click', function () {
-      var h = saveHead();
-      // для тендера обязательные поля — не открываем /kp/ с пустыми (подсветка + подсказка)
-      if (kpMode === 'tender') {
-        var miss = [];
-        if (!h.addressee) miss.push(F.addressee);
-        if (!h.number) miss.push(F.number);
-        if (!h.date) miss.push(F.date);
-        if (miss.length) {
-          miss.forEach(function (el) { el.classList.add('kp-invalid'); el.focus(); });
-          setTimeout(function () { miss.forEach(function (el) { el.classList.remove('kp-invalid'); }); }, 3000);
-          hint.textContent = 'Заполните обязательные поля со звёздочкой (заказчик, № и дата КП) — они нужны для тендерного КП.';
-          return;
-        }
-      }
-      var q = 'mode=' + kpMode;
-      if (ledgerOnly.checked) q += '&ledger=1';
-      if (kpMode === 'tender' && ndsRow.checked) q += '&nds=row';
+      saveHead();
+      var q = ledgerOnly.checked ? '?ledger=1' : '';
       var base = C.siteBase || (location.origin + '/');
-      window.open(new URL('kp/index.html?' + q, base).href, '_blank');
+      window.open(new URL('kp/index.html' + q, base).href, '_blank');
     });
   })();
 

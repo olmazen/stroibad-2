@@ -63,25 +63,16 @@
 
           <div class="kp-gen" id="kpGen">
             <h4>Сформировать КП (PDF)</h4>
-            <div class="kp-seg" id="kpSeg">
-              <button type="button" data-kpmode="beauty" class="on">Красивое</button>
-              <button type="button" data-kpmode="tender">Тендерное · 44-ФЗ</button>
-            </div>
-            <p class="kp-gen-hint" id="kpGenHint">Для клиента: обложка, фото, чертежи, цены.</p>
+            <p class="kp-gen-hint">Красивое коммерческое предложение: обложка, фото, чертежи, цены.</p>
             <div class="kp-fields">
-              <div class="field"><label>Объект / наименование закупки</label><input type="text" id="kpObject" placeholder="ЖК «Северный парк», благоустройство"></div>
-              <div class="field kp-req-field"><label>Кому (заказчик)<span class="req">*</span></label><input type="text" id="kpAddressee" placeholder="Полное наименование заказчика"></div>
+              <div class="field"><label>Объект (необязательно)</label><input type="text" id="kpObject" placeholder="ЖК «Северный парк», благоустройство"></div>
+              <div class="field"><label>Кому (необязательно)</label><input type="text" id="kpAddressee" placeholder="Название компании-клиента"></div>
               <div class="kp-row2">
-                <div class="field"><label>Исх. № КП</label><input type="text" id="kpNumber"></div>
+                <div class="field"><label>№ КП</label><input type="text" id="kpNumber"></div>
                 <div class="field"><label>Дата</label><input type="date" id="kpDate"></div>
-              </div>
-              <div class="kp-row2 kp-tender-field">
-                <div class="field"><label>№ запроса заказчика</label><input type="text" id="kpReqNumber" placeholder="реестровый №"></div>
-                <div class="field"><label>Дата запроса</label><input type="date" id="kpReqDate"></div>
               </div>
             </div>
             <label class="kp-check"><input type="checkbox" id="kpLedgerOnly"> Только ведомость (без листов изделий)</label>
-            <label class="kp-check kp-tender-field"><input type="checkbox" id="kpNdsRow"> НДС построчно (8 колонок)</label>
             <button class="btn btn-primary btn-block" type="button" id="kpOpen">Открыть КП (A4)</button>
             <p class="kp-gen-note">Откроется страница А4 — сохраните как PDF (с фоновой графикой).</p>
           </div>

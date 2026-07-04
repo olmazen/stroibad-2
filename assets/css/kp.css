@@ -1,6 +1,6 @@
 /* ============================================================
    EGOE · Коммерческое предложение (печатная страница /kp/)
-   Один документ, два режима: body.mode-beauty / body.mode-tender
+   Один красивый КП (без госзакупочной ориентации)
    Движок PDF — Chrome window.print (позже тот же файл в Puppeteer)
    ============================================================ */
 
@@ -184,75 +184,9 @@ table{border-collapse:collapse;width:100%}
 .kp-contacts{display:flex;flex-wrap:wrap;gap:6px 26px;font-size:10pt;color:var(--ink-soft);padding-top:12px;border-top:1px solid var(--line)}
 .kp-disclaimer{font-size:8.5pt;color:var(--steel);margin-top:14px;line-height:1.5}
 
-/* ============================================================
-   РЕЖИМ TENDER — 44-ФЗ (строгий, ч/б-дружественный)
-   ============================================================ */
-.kp-thead{}
-.kp-thead .th-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
-.kp-thead .th-supplier{max-width:60%}
-.kp-thead .th-supplier .name{font-family:var(--f-head);font-weight:700;font-size:14pt;letter-spacing:.03em;color:var(--ink)}
-.kp-thead .th-supplier .brand{font-size:8.5pt;color:var(--steel);margin:3px 0 6px}
-.kp-thead .th-supplier .reqs{font-size:8.5pt;color:var(--ink-soft);line-height:1.45}
-.kp-thead .th-out{text-align:right;font-size:10pt;color:var(--ink);white-space:nowrap}
-.kp-thead .th-rule{height:2px;background:var(--amber);margin:12px 0}
-.kp-thead .th-addr{font-size:10.5pt;line-height:1.5}
-.kp-thead .th-addr b{font-weight:700}
-.kp-thead .th-title{text-align:center;margin:16px 0 4px;font-size:18pt;letter-spacing:.08em}
-.kp-thead .th-sub{text-align:center;font-size:9.5pt;color:var(--steel);margin-bottom:14px}
-.kp-intro{font-size:10.5pt;margin-bottom:6px}
-.kp-intro .nds{display:block;font-size:9pt;color:var(--steel);margin-top:4px}
-
-.kp-ttable table{font-size:9.5pt;border:1px solid var(--line-2)}
-.kp-ttable th{background:var(--plate);font-family:var(--f-head);text-transform:uppercase;letter-spacing:.03em;
-  font-weight:600;font-size:8pt;padding:7px 7px;text-align:left;border:1px solid var(--line-2);vertical-align:middle}
-.kp-ttable th.num{text-align:right}
-.kp-ttable td{padding:7px 7px;border:1px solid var(--line-2);vertical-align:top}
-.kp-ttable .t-name b{font-family:var(--f-head);font-weight:600;font-size:9.5pt;display:block}
-.kp-ttable .t-name small{color:var(--steel);font-size:8pt;display:block;margin-top:2px;line-height:1.4}
-.kp-ttotals{margin-top:12px;margin-left:auto;width:88mm;break-inside:avoid}
-.kp-ttotals .row{display:flex;justify-content:space-between;padding:4px 0;font-size:10pt;border-bottom:1px solid var(--line)}
-.kp-ttotals .row.grand{border-bottom:none;border-top:2px solid var(--ink);margin-top:2px;padding-top:7px}
-.kp-ttotals .row.grand span,.kp-ttotals .row.grand b{font-family:var(--f-head);font-weight:600;font-size:12.5pt;color:var(--ink)}
-.kp-words{font-size:10pt;margin-top:10px;padding:8px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.kp-words b{font-weight:700}
-
-.kp-cond{margin-top:16px;break-inside:avoid}
-.kp-cond .kp-h{}
-.kp-cond dl{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:10pt}
-.kp-cond dt{color:var(--steel)}
-.kp-cond dd{margin:0;color:var(--ink)}
-.kp-offer{margin-top:12px;font-size:9.5pt;font-style:italic;color:var(--ink-soft)}
-.kp-assure{margin-top:8px;font-size:9pt;color:var(--steel)}
-
-.kp-req{margin-top:16px;break-inside:avoid}
-.kp-req dl{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:9.5pt}
-.kp-req dt{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.03em;font-size:8pt;color:var(--steel);padding-top:2px}
-.kp-req dd{margin:0;color:var(--ink);font-weight:700}
-.kp-sign{margin-top:22px;display:flex;justify-content:space-between;align-items:flex-end;break-inside:avoid}
-.kp-sign .sig-l{font-size:10pt;line-height:2.2}
-.kp-sign .sig-line{display:inline-block;min-width:150px;border-bottom:1px solid var(--ink);margin:0 8px}
-.kp-sign .sig-basis{font-size:8.5pt;color:var(--steel);margin-top:6px}
-.kp-sign .sig-mp{width:96px;height:96px;border:1.5px dashed var(--line-2);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;font-family:var(--f-head);letter-spacing:.1em;
-  font-size:9pt;color:var(--steel-l);text-align:center}
-
-/* ---------- Оверлей валидатора ---------- */
-.kp-overlay{position:fixed;inset:0;z-index:60;background:rgba(20,24,30,.72);
-  display:flex;align-items:center;justify-content:center;padding:24px}
-.kp-overlay .ov-card{background:#fff;max-width:520px;width:100%;border-radius:4px;padding:28px 30px;font-family:var(--f-body)}
-.kp-overlay h3{font-size:16pt;color:var(--ink);margin-bottom:6px}
-.kp-overlay .ov-sub{color:var(--steel);font-size:11pt;margin-bottom:16px}
-.kp-overlay ul{margin:0 0 20px;padding-left:20px}
-.kp-overlay li{color:var(--ink-soft);margin-bottom:7px;font-size:11pt}
-.kp-overlay .ov-act{display:flex;gap:12px}
-.kp-overlay .ov-act a,.kp-overlay .ov-act button{font-family:var(--f-head);text-transform:uppercase;letter-spacing:.06em;
-  font-size:12px;padding:10px 18px;border-radius:2px;cursor:pointer;text-decoration:none;border:1px solid var(--line-2);background:#fff;color:var(--ink)}
-.kp-overlay .ov-act .primary{background:var(--amber);border-color:var(--amber);color:#1c1305}
-
-/* ---------- Видимость секций по режиму ---------- */
-.mode-tender .beauty-only{display:none!important}
-.mode-beauty .tender-only{display:none!important}
-.ledger-only .kp-product{display:none!important}
+/* срок действия предложения (в блоке условий) */
+.kp-valid{margin-top:14px;font-size:10.5pt;color:var(--ink)}
+.kp-valid b{font-weight:700}
 
 /* ---------- Штамп-подвал ---------- */
 .kp-stamp{display:none}
@@ -278,10 +212,10 @@ table{border-collapse:collapse;width:100%}
   body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   *{box-shadow:none!important;text-shadow:none!important}
   .sheet{width:auto;min-height:0;margin:0;padding:0;box-shadow:none;display:block}
-  .kp-cover,.kp-product,.kp-terms,.kp-thead-sheet{break-after:page;page-break-after:always}
+  .kp-cover,.kp-product,.kp-terms{break-after:page;page-break-after:always}
   .sheet:last-child{break-after:auto;page-break-after:auto}
   .kp-product{break-inside:avoid;page-break-inside:avoid}
-  .kp-drawing,.spec-list,.ral-row,.price-plate,.photo-box,.kp-totals,.kp-ttotals,.kp-req,.kp-sign,.kp-cond{break-inside:avoid}
+  .kp-drawing,.spec-list,.ral-row,.price-plate,.photo-box,.kp-totals{break-inside:avoid}
   table tr{break-inside:avoid}
   thead{display:table-header-group}
   p{orphans:3;widows:3}
@@ -290,7 +224,6 @@ table{border-collapse:collapse;width:100%}
   .kp-stamp{display:flex;position:fixed;left:15mm;right:15mm;bottom:6mm;justify-content:space-between;
     align-items:center;font-family:var(--f-head);text-transform:uppercase;letter-spacing:.06em;
     font-size:7.5pt;color:var(--steel);border-top:1.5px solid var(--amber);padding-top:3mm}
-  .mode-tender .kp-stamp{border-top-color:var(--line-2);color:var(--steel-l)}
 }
 
 /* мобильный просмотр превью — ужимаем лист */
