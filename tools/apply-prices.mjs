@@ -142,6 +142,9 @@ if (!DRY) {
   for (const [f, s] of touched) fs.writeFileSync(f, s);
   reg.updated = data.exportedAt || null;
   fs.writeFileSync(path.join(ROOT, 'assets/data/prices.json'), JSON.stringify(reg, null, 1));
+  // каталог КП (assets/catalog.json) собирается из страниц — пересобрать, чтобы КП не показывало старые цены
+  const { execFileSync } = await import('node:child_process');
+  execFileSync('node', [path.join(ROOT, 'tools/build-catalog.mjs')], { stdio: 'inherit' });
 }
 console.log((DRY ? '[DRY RUN] ' : '') + 'страниц изменено:', new Set([...touched.keys()]).size, '| замен:', stats.repl, '| csv-строк:', stats.csvRows, '| пропущено (не заполнено):', stats.skipped);
 if (stats.warn.length) console.log('ПРЕДУПРЕЖДЕНИЯ:\n - ' + stats.warn.join('\n - '));
