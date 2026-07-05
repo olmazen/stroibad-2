@@ -1,5 +1,5 @@
 {
- "version": 1,
+ "version": 2,
  "exported": "2026-07-05",
  "items": [
   {
@@ -12,6 +12,12 @@
    "price": 44500,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a1-101/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/a1-101/hero.webp",
+    "assets/img/artdeco/skamejki/a1-101/life1.webp",
+    "assets/img/artdeco/skamejki/a1-101/facade1.webp",
+    "assets/img/artdeco/skamejki/a1-101/life2.webp"
+   ],
    "url": "maf/skamejki/artdeco-a1-101/"
   },
   {
@@ -24,6 +30,9 @@
    "price": 34700,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a1-106/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/a1-106/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-a1-106/"
   },
   {
@@ -36,6 +45,9 @@
    "price": 27600,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a1-126/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/a1-126/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-a1-126/"
   },
   {
@@ -48,6 +60,9 @@
    "price": 98600,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a1-251/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/a1-251/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-a1-251/"
   },
   {
@@ -60,6 +75,11 @@
    "price": 78400,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a1-306/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/a1-306/hero.webp",
+    "assets/img/artdeco/skamejki/a1-306/facade1.webp",
+    "assets/img/artdeco/skamejki/a1-306/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-a1-306/"
   },
   {
@@ -72,6 +92,9 @@
    "price": 98450,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a4-1601/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/a4-1601/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-a4-1601/"
   },
   {
@@ -84,6 +107,9 @@
    "price": 116000,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a4-2641/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/a4-2641/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-a4-2641/"
   },
   {
@@ -96,6 +122,9 @@
    "price": 135700,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a4-2651/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/a4-2651/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-a4-2651/"
   },
   {
@@ -108,6 +137,11 @@
    "price": 42600,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a5-101/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/a5-101/hero.webp",
+    "assets/img/artdeco/skamejki/a5-101/facade1.webp",
+    "assets/img/artdeco/skamejki/a5-101/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-a5-101/"
   },
   {
@@ -120,6 +154,11 @@
    "price": 29300,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e1-101/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/e1-101/hero.webp",
+    "assets/img/artdeco/skamejki/e1-101/facade1.webp",
+    "assets/img/artdeco/skamejki/e1-101/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-e1-101/"
   },
   {
@@ -132,6 +171,11 @@
    "price": 34300,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e1-321/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/e1-321/hero.webp",
+    "assets/img/artdeco/skamejki/e1-321/facade1.webp",
+    "assets/img/artdeco/skamejki/e1-321/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-e1-321/"
   },
   {
@@ -144,6 +188,11 @@
    "price": 39600,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e2-151/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/e2-151/hero.webp",
+    "assets/img/artdeco/skamejki/e2-151/facade1.webp",
+    "assets/img/artdeco/skamejki/e2-151/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-e2-151/"
   },
   {
@@ -156,6 +205,9 @@
    "price": 40100,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e2-210/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/e2-210/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-e2-210/"
   },
   {
@@ -168,6 +220,11 @@
    "price": 132000,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e2-351/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/e2-351/hero.webp",
+    "assets/img/artdeco/skamejki/e2-351/facade1.webp",
+    "assets/img/artdeco/skamejki/e2-351/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-e2-351/"
   },
   {
@@ -180,6 +237,10 @@
    "price": 43600,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e3-311/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/e3-311/hero.webp",
+    "assets/img/artdeco/skamejki/e3-311/facade1.webp"
+   ],
    "url": "maf/skamejki/artdeco-e3-311/"
   },
   {
@@ -192,6 +253,9 @@
    "price": 41060,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-101/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/i1-101/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-i1-101/"
   },
   {
@@ -204,6 +268,11 @@
    "price": 33290,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-106/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/i1-106/hero.webp",
+    "assets/img/artdeco/skamejki/i1-106/facade1.webp",
+    "assets/img/artdeco/skamejki/i1-106/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-i1-106/"
   },
   {
@@ -216,6 +285,9 @@
    "price": 20400,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-126/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/i1-126/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-i1-126/"
   },
   {
@@ -228,6 +300,11 @@
    "price": 38900,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-306/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/i1-306/hero.webp",
+    "assets/img/artdeco/skamejki/i1-306/facade1.webp",
+    "assets/img/artdeco/skamejki/i1-306/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-i1-306/"
   },
   {
@@ -240,6 +317,11 @@
    "price": 75600,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-351/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/i1-351/hero.webp",
+    "assets/img/artdeco/skamejki/i1-351/facade1.webp",
+    "assets/img/artdeco/skamejki/i1-351/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-i1-351/"
   },
   {
@@ -252,6 +334,11 @@
    "price": 53800,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-356/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/i1-356/hero.webp",
+    "assets/img/artdeco/skamejki/i1-356/facade1.webp",
+    "assets/img/artdeco/skamejki/i1-356/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-i1-356/"
   },
   {
@@ -264,6 +351,11 @@
    "price": 45600,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-3850/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/i1-3850/hero.webp",
+    "assets/img/artdeco/skamejki/i1-3850/facade1.webp",
+    "assets/img/artdeco/skamejki/i1-3850/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-i1-3850/"
   },
   {
@@ -276,6 +368,9 @@
    "price": 157800,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-601/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/i1-601/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-i1-601/"
   },
   {
@@ -288,6 +383,11 @@
    "price": 68400,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i2-301/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/i2-301/hero.webp",
+    "assets/img/artdeco/skamejki/i2-301/facade1.webp",
+    "assets/img/artdeco/skamejki/i2-301/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-i2-301/"
   },
   {
@@ -300,6 +400,11 @@
    "price": 99400,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-1601/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/o1-1601/hero.webp",
+    "assets/img/artdeco/skamejki/o1-1601/facade1.webp",
+    "assets/img/artdeco/skamejki/o1-1601/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-o1-1601/"
   },
   {
@@ -312,6 +417,11 @@
    "price": 102430,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-1611/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/o1-1611/hero.webp",
+    "assets/img/artdeco/skamejki/o1-1611/facade1.webp",
+    "assets/img/artdeco/skamejki/o1-1611/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-o1-1611/"
   },
   {
@@ -324,6 +434,11 @@
    "price": 77400,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-1621/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/o1-1621/hero.webp",
+    "assets/img/artdeco/skamejki/o1-1621/facade1.webp",
+    "assets/img/artdeco/skamejki/o1-1621/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-o1-1621/"
   },
   {
@@ -336,6 +451,11 @@
    "price": 97600,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-2601/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/o1-2601/hero.webp",
+    "assets/img/artdeco/skamejki/o1-2601/facade1.webp",
+    "assets/img/artdeco/skamejki/o1-2601/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-o1-2601/"
   },
   {
@@ -348,6 +468,11 @@
    "price": 86500,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-2621/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/o1-2621/hero.webp",
+    "assets/img/artdeco/skamejki/o1-2621/facade1.webp",
+    "assets/img/artdeco/skamejki/o1-2621/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-o1-2621/"
   },
   {
@@ -360,6 +485,11 @@
    "price": 32900,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-3221/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/o1-3221/hero.webp",
+    "assets/img/artdeco/skamejki/o1-3221/facade1.webp",
+    "assets/img/artdeco/skamejki/o1-3221/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-o1-3221/"
   },
   {
@@ -372,6 +502,9 @@
    "price": 43700,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-3621/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/o1-3621/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-o1-3621/"
   },
   {
@@ -384,6 +517,11 @@
    "price": 76500,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-3631/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/o1-3631/hero.webp",
+    "assets/img/artdeco/skamejki/o1-3631/facade1.webp",
+    "assets/img/artdeco/skamejki/o1-3631/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-o1-3631/"
   },
   {
@@ -396,6 +534,11 @@
    "price": 45300,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-150/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u1-150/hero.webp",
+    "assets/img/artdeco/skamejki/u1-150/facade1.webp",
+    "assets/img/artdeco/skamejki/u1-150/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-u1-150/"
   },
   {
@@ -408,6 +551,11 @@
    "price": 47500,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-151/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u1-151/hero.webp",
+    "assets/img/artdeco/skamejki/u1-151/facade1.webp",
+    "assets/img/artdeco/skamejki/u1-151/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-u1-151/"
   },
   {
@@ -420,6 +568,9 @@
    "price": 43480,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-153/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u1-153/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-u1-153/"
   },
   {
@@ -432,6 +583,11 @@
    "price": 64700,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-190/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u1-190/hero.webp",
+    "assets/img/artdeco/skamejki/u1-190/facade1.webp",
+    "assets/img/artdeco/skamejki/u1-190/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-u1-190/"
   },
   {
@@ -444,6 +600,11 @@
    "price": 67400,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-191/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u1-191/hero.webp",
+    "assets/img/artdeco/skamejki/u1-191/facade1.webp",
+    "assets/img/artdeco/skamejki/u1-191/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-u1-191/"
   },
   {
@@ -456,6 +617,9 @@
    "price": 45700,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-193/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u1-193/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-u1-193/"
   },
   {
@@ -468,6 +632,11 @@
    "price": 120300,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-350/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u1-350/hero.webp",
+    "assets/img/artdeco/skamejki/u1-350/facade1.webp",
+    "assets/img/artdeco/skamejki/u1-350/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-u1-350/"
   },
   {
@@ -480,6 +649,11 @@
    "price": 132600,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-351/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u1-351/hero.webp",
+    "assets/img/artdeco/skamejki/u1-351/facade1.webp",
+    "assets/img/artdeco/skamejki/u1-351/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-u1-351/"
   },
   {
@@ -492,6 +666,11 @@
    "price": 143000,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-390/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u1-390/hero.webp",
+    "assets/img/artdeco/skamejki/u1-390/facade1.webp",
+    "assets/img/artdeco/skamejki/u1-390/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-u1-390/"
   },
   {
@@ -504,6 +683,11 @@
    "price": 54300,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-510/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u1-510/hero.webp",
+    "assets/img/artdeco/skamejki/u1-510/facade1.webp",
+    "assets/img/artdeco/skamejki/u1-510/facade2.webp"
+   ],
    "url": "maf/skamejki/artdeco-u1-510/"
   },
   {
@@ -516,6 +700,9 @@
    "price": 43600,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u3-100/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u3-100/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-u3-100/"
   },
   {
@@ -528,6 +715,9 @@
    "price": 75800,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u3-300/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u3-300/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-u3-300/"
   },
   {
@@ -540,6 +730,10 @@
    "price": 45300,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u3-520/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u3-520/hero.webp",
+    "assets/img/artdeco/skamejki/u3-520/facade1.webp"
+   ],
    "url": "maf/skamejki/artdeco-u3-520/"
   },
   {
@@ -552,6 +746,9 @@
    "price": 65400,
    "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u3-600/hero.webp",
+   "photos": [
+    "assets/img/artdeco/skamejki/u3-600/hero.webp"
+   ],
    "url": "maf/skamejki/artdeco-u3-600/"
   },
   {
@@ -564,6 +761,12 @@
    "price": 44500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/13422/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/13422/main.webp",
+    "assets/img/maf/skamejki/13422/closeup.webp",
+    "assets/img/maf/skamejki/13422/white.webp",
+    "assets/img/maf/skamejki/13422/angle.webp"
+   ],
    "url": "maf/skamejki/banketka-chugunnaya-varshava/"
   },
   {
@@ -576,6 +779,12 @@
    "price": 43650,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/20723/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/20723/main.webp",
+    "assets/img/maf/skamejki/20723/closeup.webp",
+    "assets/img/maf/skamejki/20723/white.webp",
+    "assets/img/maf/skamejki/20723/angle.webp"
+   ],
    "url": "maf/skamejki/banketka-paradise/"
   },
   {
@@ -588,6 +797,12 @@
    "price": 35600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/11129/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/11129/main.webp",
+    "assets/img/maf/skamejki/11129/closeup.webp",
+    "assets/img/maf/skamejki/11129/white.webp",
+    "assets/img/maf/skamejki/11129/angle.webp"
+   ],
    "url": "maf/skamejki/banketka-pifagor/"
   },
   {
@@ -600,6 +815,12 @@
    "price": 32560,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/19677/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/19677/main.webp",
+    "assets/img/maf/skamejki/19677/closeup.webp",
+    "assets/img/maf/skamejki/19677/white.webp",
+    "assets/img/maf/skamejki/19677/angle.webp"
+   ],
    "url": "maf/skamejki/banketka-stalnaya-mons-filigran/"
   },
   {
@@ -612,6 +833,12 @@
    "price": 19600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/15078/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/15078/main.webp",
+    "assets/img/maf/skamejki/15078/closeup.webp",
+    "assets/img/maf/skamejki/15078/white.webp",
+    "assets/img/maf/skamejki/15078/angle.webp"
+   ],
    "url": "maf/skamejki/banketka-vizhen/"
   },
   {
@@ -624,6 +851,12 @@
    "price": 98670,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/11354/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/11354/main.webp",
+    "assets/img/maf/skamejki/11354/closeup.webp",
+    "assets/img/maf/skamejki/11354/white.webp",
+    "assets/img/maf/skamejki/11354/angle.webp"
+   ],
    "url": "maf/skamejki/divan-stalnoy-kruglyy/"
   },
   {
@@ -636,6 +869,12 @@
    "price": 78320,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12987/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/12987/main.webp",
+    "assets/img/maf/skamejki/12987/closeup.webp",
+    "assets/img/maf/skamejki/12987/white.webp",
+    "assets/img/maf/skamejki/12987/angle.webp"
+   ],
    "url": "maf/skamejki/divan-stalnoy-sol/"
   },
   {
@@ -648,6 +887,12 @@
    "price": 29800,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/22378/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/22378/main.webp",
+    "assets/img/maf/skamejki/22378/closeup.webp",
+    "assets/img/maf/skamejki/22378/white.webp",
+    "assets/img/maf/skamejki/22378/angle.webp"
+   ],
    "url": "maf/skamejki/kreslo-bez-spinki-simpozium/"
   },
   {
@@ -660,6 +905,12 @@
    "price": 88760,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12154/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/12154/main.webp",
+    "assets/img/maf/skamejki/12154/closeup.webp",
+    "assets/img/maf/skamejki/12154/white.webp",
+    "assets/img/maf/skamejki/12154/angle.webp"
+   ],
    "url": "maf/skamejki/modulnaya-skameyka-ekopolis-kombi3/"
   },
   {
@@ -672,6 +923,12 @@
    "price": 56700,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12149/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/12149/main.webp",
+    "assets/img/maf/skamejki/12149/closeup.webp",
+    "assets/img/maf/skamejki/12149/white.webp",
+    "assets/img/maf/skamejki/12149/angle.webp"
+   ],
    "url": "maf/skamejki/modulnaya-skameyka-ekopolis2/"
   },
   {
@@ -684,6 +941,12 @@
    "price": 22270,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/10721/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/10721/main.webp",
+    "assets/img/maf/skamejki/10721/closeup.webp",
+    "assets/img/maf/skamejki/10721/white.webp",
+    "assets/img/maf/skamejki/10721/angle.webp"
+   ],
    "url": "maf/skamejki/sadovoparkovaya-skameyka-duga/"
   },
   {
@@ -696,6 +959,12 @@
    "price": 33400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/9705/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/9705/main.webp",
+    "assets/img/maf/skamejki/9705/closeup.webp",
+    "assets/img/maf/skamejki/9705/white.webp",
+    "assets/img/maf/skamejki/9705/angle.webp"
+   ],
    "url": "maf/skamejki/sadovoparkovaya-skameyka-radius/"
   },
   {
@@ -708,6 +977,12 @@
    "price": 465400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/22157/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/22157/main.webp",
+    "assets/img/maf/skamejki/22157/closeup.webp",
+    "assets/img/maf/skamejki/22157/white.webp",
+    "assets/img/maf/skamejki/22157/angle.webp"
+   ],
    "url": "maf/skamejki/sadovoparkovaya-skameyka-radius-raund-kruglaya/"
   },
   {
@@ -720,6 +995,12 @@
    "price": 19800,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/21237/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/21237/main.webp",
+    "assets/img/maf/skamejki/21237/closeup.webp",
+    "assets/img/maf/skamejki/21237/white.webp",
+    "assets/img/maf/skamejki/21237/angle.webp"
+   ],
    "url": "maf/skamejki/sidene-enigma/"
   },
   {
@@ -732,6 +1013,12 @@
    "price": 14600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/7106/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/7106/main.webp",
+    "assets/img/maf/skamejki/7106/closeup.webp",
+    "assets/img/maf/skamejki/7106/white.webp",
+    "assets/img/maf/skamejki/7106/angle.webp"
+   ],
    "url": "maf/skamejki/skameika-modern/"
   },
   {
@@ -744,6 +1031,12 @@
    "price": 12500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/7112/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/7112/main.webp",
+    "assets/img/maf/skamejki/7112/closeup.webp",
+    "assets/img/maf/skamejki/7112/white.webp",
+    "assets/img/maf/skamejki/7112/angle.webp"
+   ],
    "url": "maf/skamejki/skameika-modern-bez-podlokotnikov/"
   },
   {
@@ -756,6 +1049,12 @@
    "price": 64600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14146/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14146/main.webp",
+    "assets/img/maf/skamejki/14146/closeup.webp",
+    "assets/img/maf/skamejki/14146/white.webp",
+    "assets/img/maf/skamejki/14146/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-adonis/"
   },
   {
@@ -768,6 +1067,12 @@
    "price": 41780,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/11478/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/11478/main.webp",
+    "assets/img/maf/skamejki/11478/closeup.webp",
+    "assets/img/maf/skamejki/11478/white.webp",
+    "assets/img/maf/skamejki/11478/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-arkhimed/"
   },
   {
@@ -780,6 +1085,12 @@
    "price": 46850,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/15495/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/15495/main.webp",
+    "assets/img/maf/skamejki/15495/closeup.webp",
+    "assets/img/maf/skamejki/15495/white.webp",
+    "assets/img/maf/skamejki/15495/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-bez-spinki-avinon/"
   },
   {
@@ -792,6 +1103,12 @@
    "price": 23440,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/15621/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/15621/main.webp",
+    "assets/img/maf/skamejki/15621/closeup.webp",
+    "assets/img/maf/skamejki/15621/white.webp",
+    "assets/img/maf/skamejki/15621/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-bez-spinki-gloriya/"
   },
   {
@@ -804,6 +1121,12 @@
    "price": 42000,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14037/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14037/main.webp",
+    "assets/img/maf/skamejki/14037/closeup.webp",
+    "assets/img/maf/skamejki/14037/white.webp",
+    "assets/img/maf/skamejki/14037/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-bez-spinki-khold/"
   },
   {
@@ -816,6 +1139,12 @@
    "price": 51050,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/18177/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/18177/main.webp",
+    "assets/img/maf/skamejki/18177/closeup.webp",
+    "assets/img/maf/skamejki/18177/white.webp",
+    "assets/img/maf/skamejki/18177/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-bez-spinki-tauer/"
   },
   {
@@ -828,6 +1157,12 @@
    "price": 20500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/13998/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/13998/main.webp",
+    "assets/img/maf/skamejki/13998/closeup.webp",
+    "assets/img/maf/skamejki/13998/white.webp",
+    "assets/img/maf/skamejki/13998/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-bez-spinki-ulichnaya-kolledzh/"
   },
   {
@@ -840,6 +1175,12 @@
    "price": 41660,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12233/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/12233/main.webp",
+    "assets/img/maf/skamejki/12233/closeup.webp",
+    "assets/img/maf/skamejki/12233/white.webp",
+    "assets/img/maf/skamejki/12233/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-chugunnaya-goliaf/"
   },
   {
@@ -852,6 +1193,12 @@
    "price": 25600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14201/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14201/main.webp",
+    "assets/img/maf/skamejki/14201/closeup.webp",
+    "assets/img/maf/skamejki/14201/white.webp",
+    "assets/img/maf/skamejki/14201/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-galaktika/"
   },
   {
@@ -864,6 +1211,12 @@
    "price": 34200,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14137/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14137/main.webp",
+    "assets/img/maf/skamejki/14137/closeup.webp",
+    "assets/img/maf/skamejki/14137/white.webp",
+    "assets/img/maf/skamejki/14137/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-idilliya/"
   },
   {
@@ -876,6 +1229,12 @@
    "price": 30800,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14138/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14138/main.webp",
+    "assets/img/maf/skamejki/14138/closeup.webp",
+    "assets/img/maf/skamejki/14138/white.webp",
+    "assets/img/maf/skamejki/14138/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-idilliya-bez-podlokotnikov/"
   },
   {
@@ -888,6 +1247,12 @@
    "price": 45700,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14300/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14300/main.webp",
+    "assets/img/maf/skamejki/14300/closeup.webp",
+    "assets/img/maf/skamejki/14300/white.webp",
+    "assets/img/maf/skamejki/14300/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-kalipso/"
   },
   {
@@ -900,6 +1265,12 @@
    "price": 25400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12963/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/12963/main.webp",
+    "assets/img/maf/skamejki/12963/closeup.webp",
+    "assets/img/maf/skamejki/12963/white.webp",
+    "assets/img/maf/skamejki/12963/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-kubitum/"
   },
   {
@@ -912,6 +1283,12 @@
    "price": 23400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14901/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14901/main.webp",
+    "assets/img/maf/skamejki/14901/closeup.webp",
+    "assets/img/maf/skamejki/14901/white.webp",
+    "assets/img/maf/skamejki/14901/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-leman/"
   },
   {
@@ -924,6 +1301,12 @@
    "price": 45580,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14839/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14839/main.webp",
+    "assets/img/maf/skamejki/14839/closeup.webp",
+    "assets/img/maf/skamejki/14839/white.webp",
+    "assets/img/maf/skamejki/14839/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-london/"
   },
   {
@@ -936,6 +1319,12 @@
    "price": 26500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12168/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/12168/main.webp",
+    "assets/img/maf/skamejki/12168/closeup.webp",
+    "assets/img/maf/skamejki/12168/white.webp",
+    "assets/img/maf/skamejki/12168/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-madrid/"
   },
   {
@@ -948,6 +1337,12 @@
    "price": 45700,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/13979/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/13979/main.webp",
+    "assets/img/maf/skamejki/13979/closeup.webp",
+    "assets/img/maf/skamejki/13979/white.webp",
+    "assets/img/maf/skamejki/13979/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-mekhiko/"
   },
   {
@@ -960,6 +1355,12 @@
    "price": 45600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12220/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/12220/main.webp",
+    "assets/img/maf/skamejki/12220/closeup.webp",
+    "assets/img/maf/skamejki/12220/white.webp",
+    "assets/img/maf/skamejki/12220/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-parabola/"
   },
   {
@@ -972,6 +1373,12 @@
    "price": 60100,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/10895/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/10895/main.webp",
+    "assets/img/maf/skamejki/10895/closeup.webp",
+    "assets/img/maf/skamejki/10895/white.webp",
+    "assets/img/maf/skamejki/10895/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-pifagor/"
   },
   {
@@ -984,6 +1391,12 @@
    "price": 35200,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/19144/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/19144/main.webp",
+    "assets/img/maf/skamejki/19144/closeup.webp",
+    "assets/img/maf/skamejki/19144/white.webp",
+    "assets/img/maf/skamejki/19144/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-prityazhenie/"
   },
   {
@@ -996,6 +1409,12 @@
    "price": 35400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12409/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/12409/main.webp",
+    "assets/img/maf/skamejki/12409/closeup.webp",
+    "assets/img/maf/skamejki/12409/white.webp",
+    "assets/img/maf/skamejki/12409/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-radiusnaya-artek/"
   },
   {
@@ -1008,6 +1427,12 @@
    "price": 98600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14847/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14847/main.webp",
+    "assets/img/maf/skamejki/14847/closeup.webp",
+    "assets/img/maf/skamejki/14847/white.webp",
+    "assets/img/maf/skamejki/14847/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-s-navesom-filigran-volna/"
   },
   {
@@ -1020,6 +1445,12 @@
    "price": 23400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/15496/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/15496/main.webp",
+    "assets/img/maf/skamejki/15496/closeup.webp",
+    "assets/img/maf/skamejki/15496/white.webp",
+    "assets/img/maf/skamejki/15496/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-so-spinkoy-avinon/"
   },
   {
@@ -1032,6 +1463,12 @@
    "price": 33300,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/15632/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/15632/main.webp",
+    "assets/img/maf/skamejki/15632/closeup.webp",
+    "assets/img/maf/skamejki/15632/white.webp",
+    "assets/img/maf/skamejki/15632/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-so-spinkoy-gloriya/"
   },
   {
@@ -1044,6 +1481,12 @@
    "price": 49200,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14605/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14605/main.webp",
+    "assets/img/maf/skamejki/14605/closeup.webp",
+    "assets/img/maf/skamejki/14605/white.webp",
+    "assets/img/maf/skamejki/14605/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-so-spinkoy-ladya/"
   },
   {
@@ -1056,6 +1499,12 @@
    "price": 61700,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/27171/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/27171/main.webp",
+    "assets/img/maf/skamejki/27171/closeup.webp",
+    "assets/img/maf/skamejki/27171/white.webp",
+    "assets/img/maf/skamejki/27171/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-fergana/"
   },
   {
@@ -1068,6 +1517,12 @@
    "price": 41200,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/27134/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/27134/main.webp",
+    "assets/img/maf/skamejki/27134/closeup.webp",
+    "assets/img/maf/skamejki/27134/white.webp",
+    "assets/img/maf/skamejki/27134/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-fergana-bez-spinki/"
   },
   {
@@ -1080,6 +1535,12 @@
    "price": 23000,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12708/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/12708/main.webp",
+    "assets/img/maf/skamejki/12708/closeup.webp",
+    "assets/img/maf/skamejki/12708/white.webp",
+    "assets/img/maf/skamejki/12708/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-flesh/"
   },
   {
@@ -1092,6 +1553,12 @@
    "price": 29800,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/23626/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/23626/main.webp",
+    "assets/img/maf/skamejki/23626/closeup.webp",
+    "assets/img/maf/skamejki/23626/white.webp",
+    "assets/img/maf/skamejki/23626/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-globus/"
   },
   {
@@ -1104,6 +1571,12 @@
    "price": 63600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12410/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/12410/main.webp",
+    "assets/img/maf/skamejki/12410/closeup.webp",
+    "assets/img/maf/skamejki/12410/white.webp",
+    "assets/img/maf/skamejki/12410/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-kvadrant/"
   },
   {
@@ -1116,6 +1589,12 @@
    "price": 24900,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/26223/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/26223/main.webp",
+    "assets/img/maf/skamejki/26223/closeup.webp",
+    "assets/img/maf/skamejki/26223/white.webp",
+    "assets/img/maf/skamejki/26223/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-ladya-bez-spinki/"
   },
   {
@@ -1128,6 +1607,12 @@
    "price": 38800,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/24379/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/24379/main.webp",
+    "assets/img/maf/skamejki/24379/closeup.webp",
+    "assets/img/maf/skamejki/24379/white.webp",
+    "assets/img/maf/skamejki/24379/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-london-bez-spinki/"
   },
   {
@@ -1140,6 +1625,12 @@
    "price": 38000,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/13872/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/13872/main.webp",
+    "assets/img/maf/skamejki/13872/closeup.webp",
+    "assets/img/maf/skamejki/13872/white.webp",
+    "assets/img/maf/skamejki/13872/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-mons/"
   },
   {
@@ -1152,6 +1643,12 @@
    "price": 33500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/43708/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/43708/main.webp",
+    "assets/img/maf/skamejki/43708/closeup.webp",
+    "assets/img/maf/skamejki/43708/white.webp",
+    "assets/img/maf/skamejki/43708/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-mons-bez-spinki/"
   },
   {
@@ -1164,6 +1661,12 @@
    "price": 47200,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14913/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/14913/main.webp",
+    "assets/img/maf/skamejki/14913/closeup.webp",
+    "assets/img/maf/skamejki/14913/white.webp",
+    "assets/img/maf/skamejki/14913/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-mons-filigran/"
   },
   {
@@ -1176,6 +1679,12 @@
    "price": 44500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/27136/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/27136/main.webp",
+    "assets/img/maf/skamejki/27136/closeup.webp",
+    "assets/img/maf/skamejki/27136/white.webp",
+    "assets/img/maf/skamejki/27136/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-stalnaya-tashkent/"
   },
   {
@@ -1188,6 +1697,12 @@
    "price": 19600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/9467/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/9467/main.webp",
+    "assets/img/maf/skamejki/9467/closeup.webp",
+    "assets/img/maf/skamejki/9467/white.webp",
+    "assets/img/maf/skamejki/9467/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-ulichnaya-kolledzh/"
   },
   {
@@ -1200,6 +1715,12 @@
    "price": 30700,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/19805/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/19805/main.webp",
+    "assets/img/maf/skamejki/19805/closeup.webp",
+    "assets/img/maf/skamejki/19805/white.webp",
+    "assets/img/maf/skamejki/19805/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-ulichnaya-ursula/"
   },
   {
@@ -1212,6 +1733,12 @@
    "price": 24500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/15063/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/15063/main.webp",
+    "assets/img/maf/skamejki/15063/closeup.webp",
+    "assets/img/maf/skamejki/15063/white.webp",
+    "assets/img/maf/skamejki/15063/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-vizhen/"
   },
   {
@@ -1224,6 +1751,12 @@
    "price": 45700,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/10728/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/10728/main.webp",
+    "assets/img/maf/skamejki/10728/closeup.webp",
+    "assets/img/maf/skamejki/10728/white.webp",
+    "assets/img/maf/skamejki/10728/angle.webp"
+   ],
    "url": "maf/skamejki/skameyka-vokrug-dereva-ekspress/"
   },
   {
@@ -1236,6 +1769,12 @@
    "price": 59600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/20925/main.webp",
+   "photos": [
+    "assets/img/maf/skamejki/20925/main.webp",
+    "assets/img/maf/skamejki/20925/closeup.webp",
+    "assets/img/maf/skamejki/20925/white.webp",
+    "assets/img/maf/skamejki/20925/angle.webp"
+   ],
    "url": "maf/skamejki/tribuna-skameyka-valensiya/"
   },
   {
@@ -1248,6 +1787,12 @@
    "price": 78500,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/12202/main.webp",
+   "photos": [
+    "assets/img/maf/kacheli/12202/main.webp",
+    "assets/img/maf/kacheli/12202/closeup.webp",
+    "assets/img/maf/kacheli/12202/white.webp",
+    "assets/img/maf/kacheli/12202/angle.webp"
+   ],
    "url": "maf/kacheli/kacheli-bulvar/"
   },
   {
@@ -1260,6 +1805,12 @@
    "price": 785000,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/30279/main.webp",
+   "photos": [
+    "assets/img/maf/kacheli/30279/main.webp",
+    "assets/img/maf/kacheli/30279/closeup.webp",
+    "assets/img/maf/kacheli/30279/white.webp",
+    "assets/img/maf/kacheli/30279/angle.webp"
+   ],
    "url": "maf/kacheli/kacheli-miass-raund/"
   },
   {
@@ -1272,6 +1823,12 @@
    "price": 2450700,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/39606/main.webp",
+   "photos": [
+    "assets/img/maf/kacheli/39606/main.webp",
+    "assets/img/maf/kacheli/39606/closeup.webp",
+    "assets/img/maf/kacheli/39606/white.webp",
+    "assets/img/maf/kacheli/39606/angle.webp"
+   ],
    "url": "maf/kacheli/kacheli-oazis/"
   },
   {
@@ -1284,6 +1841,12 @@
    "price": 4248900,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/55644/main.webp",
+   "photos": [
+    "assets/img/maf/kacheli/55644/main.webp",
+    "assets/img/maf/kacheli/55644/closeup.webp",
+    "assets/img/maf/kacheli/55644/white.webp",
+    "assets/img/maf/kacheli/55644/angle.webp"
+   ],
    "url": "maf/kacheli/kacheli-oazis-tip-7/"
   },
   {
@@ -1296,6 +1859,12 @@
    "price": 868000,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/12189/main.webp",
+   "photos": [
+    "assets/img/maf/kacheli/12189/main.webp",
+    "assets/img/maf/kacheli/12189/closeup.webp",
+    "assets/img/maf/kacheli/12189/white.webp",
+    "assets/img/maf/kacheli/12189/angle.webp"
+   ],
    "url": "maf/kacheli/kacheli-siti/"
   },
   {
@@ -1308,6 +1877,12 @@
    "price": 296000,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/61962/main.webp",
+   "photos": [
+    "assets/img/maf/kacheli/61962/main.webp",
+    "assets/img/maf/kacheli/61962/closeup.webp",
+    "assets/img/maf/kacheli/61962/white.webp",
+    "assets/img/maf/kacheli/61962/angle.webp"
+   ],
    "url": "maf/kacheli/kacheli-tandem/"
   },
   {
@@ -1320,6 +1895,11 @@
    "price": 25400,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/a20-1101/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/a20-1101/hero.webp",
+    "assets/img/artdeco/urny/a20-1101/facade1.webp",
+    "assets/img/artdeco/urny/a20-1101/facade2.webp"
+   ],
    "url": "maf/urny/artdeco-a20-1101/"
   },
   {
@@ -1332,6 +1912,11 @@
    "price": 32500,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/a20-5101/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/a20-5101/hero.webp",
+    "assets/img/artdeco/urny/a20-5101/facade1.webp",
+    "assets/img/artdeco/urny/a20-5101/facade2.webp"
+   ],
    "url": "maf/urny/artdeco-a20-5101/"
   },
   {
@@ -1344,6 +1929,9 @@
    "price": 37870,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/a20-7101/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/a20-7101/hero.webp"
+   ],
    "url": "maf/urny/artdeco-a20-7101/"
   },
   {
@@ -1356,6 +1944,9 @@
    "price": 189400,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/a20-8201/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/a20-8201/hero.webp"
+   ],
    "url": "maf/urny/artdeco-a20-8201/"
   },
   {
@@ -1368,6 +1959,11 @@
    "price": 37800,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/e20-1100/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/e20-1100/hero.webp",
+    "assets/img/artdeco/urny/e20-1100/facade1.webp",
+    "assets/img/artdeco/urny/e20-1100/facade2.webp"
+   ],
    "url": "maf/urny/artdeco-e20-1100/"
   },
   {
@@ -1380,6 +1976,11 @@
    "price": 33460,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/e20-1101/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/e20-1101/hero.webp",
+    "assets/img/artdeco/urny/e20-1101/facade1.webp",
+    "assets/img/artdeco/urny/e20-1101/facade2.webp"
+   ],
    "url": "maf/urny/artdeco-e20-1101/"
   },
   {
@@ -1392,6 +1993,9 @@
    "price": 34600,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/e20-1413/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/e20-1413/hero.webp"
+   ],
    "url": "maf/urny/artdeco-e20-1413/"
   },
   {
@@ -1404,6 +2008,9 @@
    "price": 45370,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/e20-2411/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/e20-2411/hero.webp"
+   ],
    "url": "maf/urny/artdeco-e20-2411/"
   },
   {
@@ -1416,6 +2023,10 @@
    "price": 175300,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/e20-4411/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/e20-4411/hero.webp",
+    "assets/img/artdeco/urny/e20-4411/facade1.webp"
+   ],
    "url": "maf/urny/artdeco-e20-4411/"
   },
   {
@@ -1428,6 +2039,9 @@
    "price": 96400,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/i20-2001/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/i20-2001/hero.webp"
+   ],
    "url": "maf/urny/artdeco-i20-2001/"
   },
   {
@@ -1440,6 +2054,9 @@
    "price": 123600,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/i20-2021/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/i20-2021/hero.webp"
+   ],
    "url": "maf/urny/artdeco-i20-2021/"
   },
   {
@@ -1452,6 +2069,9 @@
    "price": 145300,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/i20-3021/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/i20-3021/hero.webp"
+   ],
    "url": "maf/urny/artdeco-i20-3021/"
   },
   {
@@ -1464,6 +2084,9 @@
    "price": 175400,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/i20-4021/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/i20-4021/hero.webp"
+   ],
    "url": "maf/urny/artdeco-i20-4021/"
   },
   {
@@ -1476,6 +2099,11 @@
    "price": 38600,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/o20-1411/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/o20-1411/hero.webp",
+    "assets/img/artdeco/urny/o20-1411/facade1.webp",
+    "assets/img/artdeco/urny/o20-1411/facade2.webp"
+   ],
    "url": "maf/urny/artdeco-o20-1411/"
   },
   {
@@ -1488,6 +2116,9 @@
    "price": 43200,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/o20-2411/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/o20-2411/hero.webp"
+   ],
    "url": "maf/urny/artdeco-o20-2411/"
   },
   {
@@ -1500,6 +2131,9 @@
    "price": 48600,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/o20-3411/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/o20-3411/hero.webp"
+   ],
    "url": "maf/urny/artdeco-o20-3411/"
   },
   {
@@ -1512,6 +2146,9 @@
    "price": 56300,
    "underOrder": false,
    "photo": "assets/img/artdeco/urny/o20-4411/hero.webp",
+   "photos": [
+    "assets/img/artdeco/urny/o20-4411/hero.webp"
+   ],
    "url": "maf/urny/artdeco-o20-4411/"
   },
   {
@@ -1524,6 +2161,12 @@
    "price": 26800,
    "underOrder": false,
    "photo": "assets/img/maf/urny/14171/main.webp",
+   "photos": [
+    "assets/img/maf/urny/14171/main.webp",
+    "assets/img/maf/urny/14171/closeup.webp",
+    "assets/img/maf/urny/14171/white.webp",
+    "assets/img/maf/urny/14171/angle.webp"
+   ],
    "url": "maf/urny/urna-chikago/"
   },
   {
@@ -1536,6 +2179,12 @@
    "price": 18500,
    "underOrder": false,
    "photo": "assets/img/maf/urny/42066/main.webp",
+   "photos": [
+    "assets/img/maf/urny/42066/main.webp",
+    "assets/img/maf/urny/42066/closeup.webp",
+    "assets/img/maf/urny/42066/white.webp",
+    "assets/img/maf/urny/42066/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-batareek-kvadratnaya-astrey/"
   },
   {
@@ -1548,6 +2197,12 @@
    "price": 14300,
    "underOrder": false,
    "photo": "assets/img/maf/urny/25579/main.webp",
+   "photos": [
+    "assets/img/maf/urny/25579/main.webp",
+    "assets/img/maf/urny/25579/closeup.webp",
+    "assets/img/maf/urny/25579/white.webp",
+    "assets/img/maf/urny/25579/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-ekskrementov-korsika/"
   },
   {
@@ -1560,6 +2215,12 @@
    "price": 19600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/10549/main.webp",
+   "photos": [
+    "assets/img/maf/urny/10549/main.webp",
+    "assets/img/maf/urny/10549/closeup.webp",
+    "assets/img/maf/urny/10549/white.webp",
+    "assets/img/maf/urny/10549/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-ekskrementov-variant1/"
   },
   {
@@ -1572,6 +2233,12 @@
    "price": 61600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/16302/main.webp",
+   "photos": [
+    "assets/img/maf/urny/16302/main.webp",
+    "assets/img/maf/urny/16302/closeup.webp",
+    "assets/img/maf/urny/16302/white.webp",
+    "assets/img/maf/urny/16302/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-fusion/"
   },
   {
@@ -1584,6 +2251,12 @@
    "price": 43600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12846/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12846/main.webp",
+    "assets/img/maf/urny/12846/closeup.webp",
+    "assets/img/maf/urny/12846/white.webp",
+    "assets/img/maf/urny/12846/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-alvarium/"
   },
   {
@@ -1596,6 +2269,12 @@
    "price": 65000,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12774/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12774/main.webp",
+    "assets/img/maf/urny/12774/closeup.webp",
+    "assets/img/maf/urny/12774/white.webp",
+    "assets/img/maf/urny/12774/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-gratiya/"
   },
   {
@@ -1608,6 +2287,12 @@
    "price": 36500,
    "underOrder": false,
    "photo": "assets/img/maf/urny/25577/main.webp",
+   "photos": [
+    "assets/img/maf/urny/25577/main.webp",
+    "assets/img/maf/urny/25577/closeup.webp",
+    "assets/img/maf/urny/25577/white.webp",
+    "assets/img/maf/urny/25577/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-korsika/"
   },
   {
@@ -1620,6 +2305,12 @@
    "price": 68600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12770/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12770/main.webp",
+    "assets/img/maf/urny/12770/closeup.webp",
+    "assets/img/maf/urny/12770/white.webp",
+    "assets/img/maf/urny/12770/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-solidum/"
   },
   {
@@ -1632,6 +2323,12 @@
    "price": 50600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/55671/main.webp",
+   "photos": [
+    "assets/img/maf/urny/55671/main.webp",
+    "assets/img/maf/urny/55671/closeup.webp",
+    "assets/img/maf/urny/55671/white.webp",
+    "assets/img/maf/urny/55671/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-stellar/"
   },
   {
@@ -1644,6 +2341,12 @@
    "price": 55000,
    "underOrder": false,
    "photo": "assets/img/maf/urny/52968/main.webp",
+   "photos": [
+    "assets/img/maf/urny/52968/main.webp",
+    "assets/img/maf/urny/52968/closeup.webp",
+    "assets/img/maf/urny/52968/white.webp",
+    "assets/img/maf/urny/52968/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-stellar-s-kryshkoy/"
   },
   {
@@ -1656,6 +2359,12 @@
    "price": 34580,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12772/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12772/main.webp",
+    "assets/img/maf/urny/12772/closeup.webp",
+    "assets/img/maf/urny/12772/white.webp",
+    "assets/img/maf/urny/12772/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-tabula/"
   },
   {
@@ -1668,6 +2377,12 @@
    "price": 47600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12775/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12775/main.webp",
+    "assets/img/maf/urny/12775/closeup.webp",
+    "assets/img/maf/urny/12775/white.webp",
+    "assets/img/maf/urny/12775/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-tenoris/"
   },
   {
@@ -1680,6 +2395,12 @@
    "price": 40800,
    "underOrder": false,
    "photo": "assets/img/maf/urny/14865/main.webp",
+   "photos": [
+    "assets/img/maf/urny/14865/main.webp",
+    "assets/img/maf/urny/14865/closeup.webp",
+    "assets/img/maf/urny/14865/white.webp",
+    "assets/img/maf/urny/14865/angle.webp"
+   ],
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-titaniya/"
   },
   {
@@ -1692,6 +2413,12 @@
    "price": 43800,
    "underOrder": false,
    "photo": "assets/img/maf/urny/47907/main.webp",
+   "photos": [
+    "assets/img/maf/urny/47907/main.webp",
+    "assets/img/maf/urny/47907/closeup.webp",
+    "assets/img/maf/urny/47907/white.webp",
+    "assets/img/maf/urny/47907/angle.webp"
+   ],
    "url": "maf/urny/urna-dvoynaya-gorod/"
   },
   {
@@ -1704,6 +2431,12 @@
    "price": 9600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/7284/main.webp",
+   "photos": [
+    "assets/img/maf/urny/7284/main.webp",
+    "assets/img/maf/urny/7284/closeup.webp",
+    "assets/img/maf/urny/7284/white.webp",
+    "assets/img/maf/urny/7284/angle.webp"
+   ],
    "url": "maf/urny/urna-elegant/"
   },
   {
@@ -1716,6 +2449,12 @@
    "price": 17000,
    "underOrder": false,
    "photo": "assets/img/maf/urny/13007/main.webp",
+   "photos": [
+    "assets/img/maf/urny/13007/main.webp",
+    "assets/img/maf/urny/13007/closeup.webp",
+    "assets/img/maf/urny/13007/white.webp",
+    "assets/img/maf/urny/13007/angle.webp"
+   ],
    "url": "maf/urny/urna-estet/"
   },
   {
@@ -1728,6 +2467,12 @@
    "price": 23800,
    "underOrder": false,
    "photo": "assets/img/maf/urny/14824/main.webp",
+   "photos": [
+    "assets/img/maf/urny/14824/main.webp",
+    "assets/img/maf/urny/14824/closeup.webp",
+    "assets/img/maf/urny/14824/white.webp",
+    "assets/img/maf/urny/14824/angle.webp"
+   ],
    "url": "maf/urny/urna-filigran/"
   },
   {
@@ -1740,6 +2485,12 @@
    "price": 22600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/14214/main.webp",
+   "photos": [
+    "assets/img/maf/urny/14214/main.webp",
+    "assets/img/maf/urny/14214/closeup.webp",
+    "assets/img/maf/urny/14214/white.webp",
+    "assets/img/maf/urny/14214/angle.webp"
+   ],
    "url": "maf/urny/urna-galaktika/"
   },
   {
@@ -1752,6 +2503,12 @@
    "price": 26100,
    "underOrder": false,
    "photo": "assets/img/maf/urny/10853/main.webp",
+   "photos": [
+    "assets/img/maf/urny/10853/main.webp",
+    "assets/img/maf/urny/10853/closeup.webp",
+    "assets/img/maf/urny/10853/white.webp",
+    "assets/img/maf/urny/10853/angle.webp"
+   ],
    "url": "maf/urny/urna-gorod/"
   },
   {
@@ -1764,6 +2521,12 @@
    "price": 27800,
    "underOrder": false,
    "photo": "assets/img/maf/urny/58619/main.webp",
+   "photos": [
+    "assets/img/maf/urny/58619/main.webp",
+    "assets/img/maf/urny/58619/closeup.webp",
+    "assets/img/maf/urny/58619/white.webp",
+    "assets/img/maf/urny/58619/angle.webp"
+   ],
    "url": "maf/urny/urna-gorod-vud/"
   },
   {
@@ -1776,6 +2539,12 @@
    "price": 12200,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12224/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12224/main.webp",
+    "assets/img/maf/urny/12224/closeup.webp",
+    "assets/img/maf/urny/12224/white.webp",
+    "assets/img/maf/urny/12224/angle.webp"
+   ],
    "url": "maf/urny/urna-kvadratnaya-fans/"
   },
   {
@@ -1788,6 +2557,12 @@
    "price": 27500,
    "underOrder": false,
    "photo": "assets/img/maf/urny/14163/main.webp",
+   "photos": [
+    "assets/img/maf/urny/14163/main.webp",
+    "assets/img/maf/urny/14163/closeup.webp",
+    "assets/img/maf/urny/14163/white.webp",
+    "assets/img/maf/urny/14163/angle.webp"
+   ],
    "url": "maf/urny/urna-long/"
   },
   {
@@ -1800,6 +2575,12 @@
    "price": 13100,
    "underOrder": false,
    "photo": "assets/img/maf/urny/10386/main.webp",
+   "photos": [
+    "assets/img/maf/urny/10386/main.webp",
+    "assets/img/maf/urny/10386/closeup.webp",
+    "assets/img/maf/urny/10386/white.webp",
+    "assets/img/maf/urny/10386/angle.webp"
+   ],
    "url": "maf/urny/urna-park-m-gorkogo/"
   },
   {
@@ -1812,6 +2593,12 @@
    "price": 15000,
    "underOrder": false,
    "photo": "assets/img/maf/urny/19807/main.webp",
+   "photos": [
+    "assets/img/maf/urny/19807/main.webp",
+    "assets/img/maf/urny/19807/closeup.webp",
+    "assets/img/maf/urny/19807/white.webp",
+    "assets/img/maf/urny/19807/angle.webp"
+   ],
    "url": "maf/urny/urna-parkovaya-estel-kruglaya/"
   },
   {
@@ -1824,6 +2611,12 @@
    "price": 25400,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12315/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12315/main.webp",
+    "assets/img/maf/urny/12315/closeup.webp",
+    "assets/img/maf/urny/12315/white.webp",
+    "assets/img/maf/urny/12315/angle.webp"
+   ],
    "url": "maf/urny/urna-parkovaya-krakov-kruglaya/"
   },
   {
@@ -1836,6 +2629,12 @@
    "price": 26300,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12316/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12316/main.webp",
+    "assets/img/maf/urny/12316/closeup.webp",
+    "assets/img/maf/urny/12316/white.webp",
+    "assets/img/maf/urny/12316/angle.webp"
+   ],
    "url": "maf/urny/urna-parkovaya-krakov-kvadratnaya/"
   },
   {
@@ -1848,6 +2647,12 @@
    "price": 10100,
    "underOrder": false,
    "photo": "assets/img/maf/urny/7299/main.webp",
+   "photos": [
+    "assets/img/maf/urny/7299/main.webp",
+    "assets/img/maf/urny/7299/closeup.webp",
+    "assets/img/maf/urny/7299/white.webp",
+    "assets/img/maf/urny/7299/angle.webp"
+   ],
    "url": "maf/urny/urna-pepelnica-pa011/"
   },
   {
@@ -1860,6 +2665,12 @@
    "price": 17400,
    "underOrder": false,
    "photo": "assets/img/maf/urny/7301/main.webp",
+   "photos": [
+    "assets/img/maf/urny/7301/main.webp",
+    "assets/img/maf/urny/7301/closeup.webp",
+    "assets/img/maf/urny/7301/white.webp",
+    "assets/img/maf/urny/7301/angle.webp"
+   ],
    "url": "maf/urny/urna-pepelnica-pa014/"
   },
   {
@@ -1872,6 +2683,12 @@
    "price": 21800,
    "underOrder": false,
    "photo": "assets/img/maf/urny/62220/main.webp",
+   "photos": [
+    "assets/img/maf/urny/62220/main.webp",
+    "assets/img/maf/urny/62220/closeup.webp",
+    "assets/img/maf/urny/62220/white.webp",
+    "assets/img/maf/urny/62220/angle.webp"
+   ],
    "url": "maf/urny/urna-piksel/"
   },
   {
@@ -1884,6 +2701,12 @@
    "price": 33100,
    "underOrder": false,
    "photo": "assets/img/maf/urny/20727/main.webp",
+   "photos": [
+    "assets/img/maf/urny/20727/main.webp",
+    "assets/img/maf/urny/20727/closeup.webp",
+    "assets/img/maf/urny/20727/white.webp",
+    "assets/img/maf/urny/20727/angle.webp"
+   ],
    "url": "maf/urny/urna-plast/"
   },
   {
@@ -1896,6 +2719,12 @@
    "price": 23200,
    "underOrder": false,
    "photo": "assets/img/maf/urny/16301/main.webp",
+   "photos": [
+    "assets/img/maf/urny/16301/main.webp",
+    "assets/img/maf/urny/16301/closeup.webp",
+    "assets/img/maf/urny/16301/white.webp",
+    "assets/img/maf/urny/16301/angle.webp"
+   ],
    "url": "maf/urny/urna-red/"
   },
   {
@@ -1908,6 +2737,12 @@
    "price": 21400,
    "underOrder": false,
    "photo": "assets/img/maf/urny/14192/main.webp",
+   "photos": [
+    "assets/img/maf/urny/14192/main.webp",
+    "assets/img/maf/urny/14192/closeup.webp",
+    "assets/img/maf/urny/14192/white.webp",
+    "assets/img/maf/urny/14192/angle.webp"
+   ],
    "url": "maf/urny/urna-ring/"
   },
   {
@@ -1920,6 +2755,12 @@
    "price": 16600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/9671/main.webp",
+   "photos": [
+    "assets/img/maf/urny/9671/main.webp",
+    "assets/img/maf/urny/9671/closeup.webp",
+    "assets/img/maf/urny/9671/white.webp",
+    "assets/img/maf/urny/9671/angle.webp"
+   ],
    "url": "maf/urny/urna-s-betonnym-osnovaniem-bulvar/"
   },
   {
@@ -1932,6 +2773,12 @@
    "price": 35400,
    "underOrder": false,
    "photo": "assets/img/maf/urny/14129/main.webp",
+   "photos": [
+    "assets/img/maf/urny/14129/main.webp",
+    "assets/img/maf/urny/14129/closeup.webp",
+    "assets/img/maf/urny/14129/white.webp",
+    "assets/img/maf/urny/14129/angle.webp"
+   ],
    "url": "maf/urny/urna-shtrikh/"
   },
   {
@@ -1944,6 +2791,12 @@
    "price": 30900,
    "underOrder": false,
    "photo": "assets/img/maf/urny/56508/main.webp",
+   "photos": [
+    "assets/img/maf/urny/56508/main.webp",
+    "assets/img/maf/urny/56508/closeup.webp",
+    "assets/img/maf/urny/56508/white.webp",
+    "assets/img/maf/urny/56508/angle.webp"
+   ],
    "url": "maf/urny/urna-soyuz/"
   },
   {
@@ -1956,6 +2809,12 @@
    "price": 34400,
    "underOrder": false,
    "photo": "assets/img/maf/urny/19648/main.webp",
+   "photos": [
+    "assets/img/maf/urny/19648/main.webp",
+    "assets/img/maf/urny/19648/closeup.webp",
+    "assets/img/maf/urny/19648/white.webp",
+    "assets/img/maf/urny/19648/angle.webp"
+   ],
    "url": "maf/urny/urna-stalnaya-argo/"
   },
   {
@@ -1968,6 +2827,12 @@
    "price": 22800,
    "underOrder": false,
    "photo": "assets/img/maf/urny/23196/main.webp",
+   "photos": [
+    "assets/img/maf/urny/23196/main.webp",
+    "assets/img/maf/urny/23196/closeup.webp",
+    "assets/img/maf/urny/23196/white.webp",
+    "assets/img/maf/urny/23196/angle.webp"
+   ],
    "url": "maf/urny/urna-stalnaya-dezhavyu/"
   },
   {
@@ -1980,6 +2845,12 @@
    "price": 12500,
    "underOrder": false,
    "photo": "assets/img/maf/urny/25578/main.webp",
+   "photos": [
+    "assets/img/maf/urny/25578/main.webp",
+    "assets/img/maf/urny/25578/closeup.webp",
+    "assets/img/maf/urny/25578/white.webp",
+    "assets/img/maf/urny/25578/angle.webp"
+   ],
    "url": "maf/urny/urna-stalnaya-korsika/"
   },
   {
@@ -1992,6 +2863,12 @@
    "price": 20200,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12735/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12735/main.webp",
+    "assets/img/maf/urny/12735/closeup.webp",
+    "assets/img/maf/urny/12735/white.webp",
+    "assets/img/maf/urny/12735/angle.webp"
+   ],
    "url": "maf/urny/urna-stalnaya-neptun/"
   },
   {
@@ -2004,6 +2881,12 @@
    "price": 25000,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12144/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12144/main.webp",
+    "assets/img/maf/urny/12144/closeup.webp",
+    "assets/img/maf/urny/12144/white.webp",
+    "assets/img/maf/urny/12144/angle.webp"
+   ],
    "url": "maf/urny/urna-stalnaya-novaya-moskva/"
   },
   {
@@ -2016,6 +2899,12 @@
    "price": 23800,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12246/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12246/main.webp",
+    "assets/img/maf/urny/12246/closeup.webp",
+    "assets/img/maf/urny/12246/white.webp",
+    "assets/img/maf/urny/12246/angle.webp"
+   ],
    "url": "maf/urny/urna-stalnaya-novichok/"
   },
   {
@@ -2028,6 +2917,12 @@
    "price": 22200,
    "underOrder": false,
    "photo": "assets/img/maf/urny/56127/main.webp",
+   "photos": [
+    "assets/img/maf/urny/56127/main.webp",
+    "assets/img/maf/urny/56127/closeup.webp",
+    "assets/img/maf/urny/56127/white.webp",
+    "assets/img/maf/urny/56127/angle.webp"
+   ],
    "url": "maf/urny/urna-stalnaya-stellar-kvadratnaya/"
   },
   {
@@ -2040,6 +2935,12 @@
    "price": 24000,
    "underOrder": false,
    "photo": "assets/img/maf/urny/56126/main.webp",
+   "photos": [
+    "assets/img/maf/urny/56126/main.webp",
+    "assets/img/maf/urny/56126/closeup.webp",
+    "assets/img/maf/urny/56126/white.webp",
+    "assets/img/maf/urny/56126/angle.webp"
+   ],
    "url": "maf/urny/urna-stalnaya-stellar-kvadratnaya-s-kryshkoy/"
   },
   {
@@ -2052,6 +2953,12 @@
    "price": 33500,
    "underOrder": false,
    "photo": "assets/img/maf/urny/14150/main.webp",
+   "photos": [
+    "assets/img/maf/urny/14150/main.webp",
+    "assets/img/maf/urny/14150/closeup.webp",
+    "assets/img/maf/urny/14150/white.webp",
+    "assets/img/maf/urny/14150/angle.webp"
+   ],
    "url": "maf/urny/urna-stefano/"
   },
   {
@@ -2064,6 +2971,12 @@
    "price": 25200,
    "underOrder": false,
    "photo": "assets/img/maf/urny/55653/main.webp",
+   "photos": [
+    "assets/img/maf/urny/55653/main.webp",
+    "assets/img/maf/urny/55653/closeup.webp",
+    "assets/img/maf/urny/55653/white.webp",
+    "assets/img/maf/urny/55653/angle.webp"
+   ],
    "url": "maf/urny/urna-stellar-kruglaya/"
   },
   {
@@ -2076,6 +2989,12 @@
    "price": 27300,
    "underOrder": false,
    "photo": "assets/img/maf/urny/52966/main.webp",
+   "photos": [
+    "assets/img/maf/urny/52966/main.webp",
+    "assets/img/maf/urny/52966/closeup.webp",
+    "assets/img/maf/urny/52966/white.webp",
+    "assets/img/maf/urny/52966/angle.webp"
+   ],
    "url": "maf/urny/urna-stellar-kruglaya-s-kryshkoy/"
   },
   {
@@ -2088,6 +3007,12 @@
    "price": 26100,
    "underOrder": false,
    "photo": "assets/img/maf/urny/55668/main.webp",
+   "photos": [
+    "assets/img/maf/urny/55668/main.webp",
+    "assets/img/maf/urny/55668/closeup.webp",
+    "assets/img/maf/urny/55668/white.webp",
+    "assets/img/maf/urny/55668/angle.webp"
+   ],
    "url": "maf/urny/urna-stellar-kvadratnaya/"
   },
   {
@@ -2100,6 +3025,12 @@
    "price": 28200,
    "underOrder": false,
    "photo": "assets/img/maf/urny/52967/main.webp",
+   "photos": [
+    "assets/img/maf/urny/52967/main.webp",
+    "assets/img/maf/urny/52967/closeup.webp",
+    "assets/img/maf/urny/52967/white.webp",
+    "assets/img/maf/urny/52967/angle.webp"
+   ],
    "url": "maf/urny/urna-stellar-kvadratnaya-s-kryshkoy/"
   },
   {
@@ -2112,6 +3043,12 @@
    "price": 30900,
    "underOrder": false,
    "photo": "assets/img/maf/urny/14043/main.webp",
+   "photos": [
+    "assets/img/maf/urny/14043/main.webp",
+    "assets/img/maf/urny/14043/closeup.webp",
+    "assets/img/maf/urny/14043/white.webp",
+    "assets/img/maf/urny/14043/angle.webp"
+   ],
    "url": "maf/urny/urna-stil/"
   },
   {
@@ -2124,6 +3061,12 @@
    "price": 9200,
    "underOrder": false,
    "photo": "assets/img/maf/urny/7280/main.webp",
+   "photos": [
+    "assets/img/maf/urny/7280/main.webp",
+    "assets/img/maf/urny/7280/closeup.webp",
+    "assets/img/maf/urny/7280/white.webp",
+    "assets/img/maf/urny/7280/angle.webp"
+   ],
    "url": "maf/urny/urna-ulichnaia-geo/"
   },
   {
@@ -2136,6 +3079,12 @@
    "price": 9000,
    "underOrder": false,
    "photo": "assets/img/maf/urny/7281/main.webp",
+   "photos": [
+    "assets/img/maf/urny/7281/main.webp",
+    "assets/img/maf/urny/7281/closeup.webp",
+    "assets/img/maf/urny/7281/white.webp",
+    "assets/img/maf/urny/7281/angle.webp"
+   ],
    "url": "maf/urny/urna-ulichnaia-radius/"
   },
   {
@@ -2148,6 +3097,12 @@
    "price": 10000,
    "underOrder": false,
    "photo": "assets/img/maf/urny/9421/main.webp",
+   "photos": [
+    "assets/img/maf/urny/9421/main.webp",
+    "assets/img/maf/urny/9421/closeup.webp",
+    "assets/img/maf/urny/9421/white.webp",
+    "assets/img/maf/urny/9421/angle.webp"
+   ],
    "url": "maf/urny/urna-ulichnaya-akatsiya/"
   },
   {
@@ -2160,6 +3115,12 @@
    "price": 35400,
    "underOrder": false,
    "photo": "assets/img/maf/urny/9676/main.webp",
+   "photos": [
+    "assets/img/maf/urny/9676/main.webp",
+    "assets/img/maf/urny/9676/closeup.webp",
+    "assets/img/maf/urny/9676/white.webp",
+    "assets/img/maf/urny/9676/angle.webp"
+   ],
    "url": "maf/urny/urna-ulichnaya-kruglaya-palermo/"
   },
   {
@@ -2172,6 +3133,12 @@
    "price": 13500,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12158/main.webp",
+   "photos": [
+    "assets/img/maf/urny/12158/main.webp",
+    "assets/img/maf/urny/12158/closeup.webp",
+    "assets/img/maf/urny/12158/white.webp",
+    "assets/img/maf/urny/12158/angle.webp"
+   ],
    "url": "maf/urny/urna-ulichnaya-radius2/"
   },
   {
@@ -2184,6 +3151,12 @@
    "price": 9700,
    "underOrder": false,
    "photo": "assets/img/maf/urny/9422/main.webp",
+   "photos": [
+    "assets/img/maf/urny/9422/main.webp",
+    "assets/img/maf/urny/9422/closeup.webp",
+    "assets/img/maf/urny/9422/white.webp",
+    "assets/img/maf/urny/9422/angle.webp"
+   ],
    "url": "maf/urny/urna-ust-002/"
   },
   {
@@ -2196,6 +3169,12 @@
    "price": 18200,
    "underOrder": false,
    "photo": "assets/img/maf/urny/15065/main.webp",
+   "photos": [
+    "assets/img/maf/urny/15065/main.webp",
+    "assets/img/maf/urny/15065/closeup.webp",
+    "assets/img/maf/urny/15065/white.webp",
+    "assets/img/maf/urny/15065/angle.webp"
+   ],
    "url": "maf/urny/urna-vizhen/"
   },
   {
@@ -2208,6 +3187,12 @@
    "price": 75400,
    "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/a1-2651/hero.webp",
+   "photos": [
+    "assets/img/artdeco/lezhaki/a1-2651/hero.webp",
+    "assets/img/artdeco/lezhaki/a1-2651/facade1.webp",
+    "assets/img/artdeco/lezhaki/a1-2651/facade2.webp",
+    "assets/img/artdeco/lezhaki/a1-2651/facade3.webp"
+   ],
    "url": "maf/lezhaki/artdeco-a1-2651/"
   },
   {
@@ -2220,6 +3205,12 @@
    "price": 72400,
    "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/a1-2661/hero.webp",
+   "photos": [
+    "assets/img/artdeco/lezhaki/a1-2661/hero.webp",
+    "assets/img/artdeco/lezhaki/a1-2661/facade1.webp",
+    "assets/img/artdeco/lezhaki/a1-2661/facade2.webp",
+    "assets/img/artdeco/lezhaki/a1-2661/facade3.webp"
+   ],
    "url": "maf/lezhaki/artdeco-a1-2661/"
   },
   {
@@ -2232,6 +3223,12 @@
    "price": 89700,
    "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/a1-4651/hero.webp",
+   "photos": [
+    "assets/img/artdeco/lezhaki/a1-4651/hero.webp",
+    "assets/img/artdeco/lezhaki/a1-4651/facade1.webp",
+    "assets/img/artdeco/lezhaki/a1-4651/facade2.webp",
+    "assets/img/artdeco/lezhaki/a1-4651/facade3.webp"
+   ],
    "url": "maf/lezhaki/artdeco-a1-4651/"
   },
   {
@@ -2244,6 +3241,12 @@
    "price": 89700,
    "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/a1-4661/hero.webp",
+   "photos": [
+    "assets/img/artdeco/lezhaki/a1-4661/hero.webp",
+    "assets/img/artdeco/lezhaki/a1-4661/facade1.webp",
+    "assets/img/artdeco/lezhaki/a1-4661/facade2.webp",
+    "assets/img/artdeco/lezhaki/a1-4661/facade3.webp"
+   ],
    "url": "maf/lezhaki/artdeco-a1-4661/"
   },
   {
@@ -2256,6 +3259,12 @@
    "price": 154000,
    "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/i1-3451/hero.webp",
+   "photos": [
+    "assets/img/artdeco/lezhaki/i1-3451/hero.webp",
+    "assets/img/artdeco/lezhaki/i1-3451/facade1.webp",
+    "assets/img/artdeco/lezhaki/i1-3451/facade2.webp",
+    "assets/img/artdeco/lezhaki/i1-3451/facade3.webp"
+   ],
    "url": "maf/lezhaki/artdeco-i1-3451/"
   },
   {
@@ -2268,6 +3277,12 @@
    "price": 167400,
    "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/i1-3481-10/hero.webp",
+   "photos": [
+    "assets/img/artdeco/lezhaki/i1-3481-10/hero.webp",
+    "assets/img/artdeco/lezhaki/i1-3481-10/facade1.webp",
+    "assets/img/artdeco/lezhaki/i1-3481-10/facade2.webp",
+    "assets/img/artdeco/lezhaki/i1-3481-10/facade3.webp"
+   ],
    "url": "maf/lezhaki/artdeco-i1-3481-10/"
   },
   {
@@ -2280,6 +3295,12 @@
    "price": 78600,
    "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/i1-3561/hero.webp",
+   "photos": [
+    "assets/img/artdeco/lezhaki/i1-3561/hero.webp",
+    "assets/img/artdeco/lezhaki/i1-3561/facade1.webp",
+    "assets/img/artdeco/lezhaki/i1-3561/facade2.webp",
+    "assets/img/artdeco/lezhaki/i1-3561/facade3.webp"
+   ],
    "url": "maf/lezhaki/artdeco-i1-3561/"
   },
   {
@@ -2292,6 +3313,12 @@
    "price": 56400,
    "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/i1-3651/hero.webp",
+   "photos": [
+    "assets/img/artdeco/lezhaki/i1-3651/hero.webp",
+    "assets/img/artdeco/lezhaki/i1-3651/facade1.webp",
+    "assets/img/artdeco/lezhaki/i1-3651/facade2.webp",
+    "assets/img/artdeco/lezhaki/i1-3651/facade3.webp"
+   ],
    "url": "maf/lezhaki/artdeco-i1-3651/"
   },
   {
@@ -2304,6 +3331,12 @@
    "price": 82300,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/11484/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/11484/main.webp",
+    "assets/img/maf/lezhaki/11484/closeup.webp",
+    "assets/img/maf/lezhaki/11484/white.webp",
+    "assets/img/maf/lezhaki/11484/angle.webp"
+   ],
    "url": "maf/lezhaki/lezhak-delta/"
   },
   {
@@ -2316,6 +3349,12 @@
    "price": 36200,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/11061/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/11061/main.webp",
+    "assets/img/maf/lezhaki/11061/closeup.webp",
+    "assets/img/maf/lezhaki/11061/white.webp",
+    "assets/img/maf/lezhaki/11061/angle.webp"
+   ],
    "url": "maf/lezhaki/lezhak-gorodskoy/"
   },
   {
@@ -2328,6 +3367,12 @@
    "price": 37900,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/40281/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/40281/main.webp",
+    "assets/img/maf/lezhaki/40281/closeup.webp",
+    "assets/img/maf/lezhaki/40281/white.webp",
+    "assets/img/maf/lezhaki/40281/angle.webp"
+   ],
    "url": "maf/lezhaki/lezhak-gorodskoy-so-stolikom/"
   },
   {
@@ -2340,6 +3385,12 @@
    "price": 21700,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/9977/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/9977/main.webp",
+    "assets/img/maf/lezhaki/9977/closeup.webp",
+    "assets/img/maf/lezhaki/9977/white.webp",
+    "assets/img/maf/lezhaki/9977/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-1/"
   },
   {
@@ -2352,6 +3403,12 @@
    "price": 53700,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/9978/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/9978/main.webp",
+    "assets/img/maf/lezhaki/9978/closeup.webp",
+    "assets/img/maf/lezhaki/9978/white.webp",
+    "assets/img/maf/lezhaki/9978/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-2/"
   },
   {
@@ -2364,6 +3421,12 @@
    "price": 24500,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/9979/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/9979/main.webp",
+    "assets/img/maf/lezhaki/9979/closeup.webp",
+    "assets/img/maf/lezhaki/9979/white.webp",
+    "assets/img/maf/lezhaki/9979/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-3/"
   },
   {
@@ -2376,6 +3439,12 @@
    "price": 23800,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/9980/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/9980/main.webp",
+    "assets/img/maf/lezhaki/9980/closeup.webp",
+    "assets/img/maf/lezhaki/9980/white.webp",
+    "assets/img/maf/lezhaki/9980/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-4/"
   },
   {
@@ -2388,6 +3457,12 @@
    "price": 49400,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/10001/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/10001/main.webp",
+    "assets/img/maf/lezhaki/10001/closeup.webp",
+    "assets/img/maf/lezhaki/10001/white.webp",
+    "assets/img/maf/lezhaki/10001/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-7/"
   },
   {
@@ -2400,6 +3475,12 @@
    "price": 62500,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/12411/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/12411/main.webp",
+    "assets/img/maf/lezhaki/12411/closeup.webp",
+    "assets/img/maf/lezhaki/12411/white.webp",
+    "assets/img/maf/lezhaki/12411/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-8/"
   },
   {
@@ -2412,6 +3493,12 @@
    "price": 42500,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/13783/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/13783/main.webp",
+    "assets/img/maf/lezhaki/13783/closeup.webp",
+    "assets/img/maf/lezhaki/13783/white.webp",
+    "assets/img/maf/lezhaki/13783/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-9/"
   },
   {
@@ -2424,6 +3511,12 @@
    "price": 34600,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/21893/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/21893/main.webp",
+    "assets/img/maf/lezhaki/21893/closeup.webp",
+    "assets/img/maf/lezhaki/21893/white.webp",
+    "assets/img/maf/lezhaki/21893/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-aristotel/"
   },
   {
@@ -2436,6 +3529,12 @@
    "price": 74200,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/11670/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/11670/main.webp",
+    "assets/img/maf/lezhaki/11670/closeup.webp",
+    "assets/img/maf/lezhaki/11670/white.webp",
+    "assets/img/maf/lezhaki/11670/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-nyuton/"
   },
   {
@@ -2448,6 +3547,12 @@
    "price": 46700,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/16645/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/16645/main.webp",
+    "assets/img/maf/lezhaki/16645/closeup.webp",
+    "assets/img/maf/lezhaki/16645/white.webp",
+    "assets/img/maf/lezhaki/16645/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-stalnoy-rastrum/"
   },
   {
@@ -2460,6 +3565,12 @@
    "price": 30600,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/9981/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/9981/main.webp",
+    "assets/img/maf/lezhaki/9981/closeup.webp",
+    "assets/img/maf/lezhaki/9981/white.webp",
+    "assets/img/maf/lezhaki/9981/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-lezhak-volna/"
   },
   {
@@ -2472,6 +3583,12 @@
    "price": 428800,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/12159/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/12159/main.webp",
+    "assets/img/maf/lezhaki/12159/closeup.webp",
+    "assets/img/maf/lezhaki/12159/white.webp",
+    "assets/img/maf/lezhaki/12159/angle.webp"
+   ],
    "url": "maf/lezhaki/parkovyy-shezlong-rakushka/"
   },
   {
@@ -2484,6 +3601,12 @@
    "price": 198600,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/11837/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/11837/main.webp",
+    "assets/img/maf/lezhaki/11837/closeup.webp",
+    "assets/img/maf/lezhaki/11837/white.webp",
+    "assets/img/maf/lezhaki/11837/angle.webp"
+   ],
    "url": "maf/lezhaki/plyazhnaya-razdevalka-komfort/"
   },
   {
@@ -2496,6 +3619,12 @@
    "price": 39100,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/20879/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/20879/main.webp",
+    "assets/img/maf/lezhaki/20879/closeup.webp",
+    "assets/img/maf/lezhaki/20879/white.webp",
+    "assets/img/maf/lezhaki/20879/angle.webp"
+   ],
    "url": "maf/lezhaki/shezlong-parabola/"
   },
   {
@@ -2508,6 +3637,12 @@
    "price": 25000,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/66849/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/66849/main.webp",
+    "assets/img/maf/lezhaki/66849/closeup.webp",
+    "assets/img/maf/lezhaki/66849/white.webp",
+    "assets/img/maf/lezhaki/66849/angle.webp"
+   ],
    "url": "maf/lezhaki/shezlong-plyazh/"
   },
   {
@@ -2520,6 +3655,12 @@
    "price": 149500,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/13983/main.webp",
+   "photos": [
+    "assets/img/maf/lezhaki/13983/main.webp",
+    "assets/img/maf/lezhaki/13983/closeup.webp",
+    "assets/img/maf/lezhaki/13983/white.webp",
+    "assets/img/maf/lezhaki/13983/angle.webp"
+   ],
    "url": "maf/lezhaki/shezlong-vulkan/"
   },
   {
@@ -2532,6 +3673,11 @@
    "price": 12500,
    "underOrder": false,
    "photo": "assets/img/artdeco/veloparkovki/e33-100/hero.webp",
+   "photos": [
+    "assets/img/artdeco/veloparkovki/e33-100/hero.webp",
+    "assets/img/artdeco/veloparkovki/e33-100/facade1.webp",
+    "assets/img/artdeco/veloparkovki/e33-100/facade2.webp"
+   ],
    "url": "maf/veloparkovki/artdeco-e33-100/"
   },
   {
@@ -2544,6 +3690,9 @@
    "price": 12700,
    "underOrder": false,
    "photo": "assets/img/artdeco/veloparkovki/e33-101/hero.webp",
+   "photos": [
+    "assets/img/artdeco/veloparkovki/e33-101/hero.webp"
+   ],
    "url": "maf/veloparkovki/artdeco-e33-101/"
   },
   {
@@ -2556,6 +3705,11 @@
    "price": 9400,
    "underOrder": false,
    "photo": "assets/img/artdeco/veloparkovki/i33-101/hero.webp",
+   "photos": [
+    "assets/img/artdeco/veloparkovki/i33-101/hero.webp",
+    "assets/img/artdeco/veloparkovki/i33-101/facade1.webp",
+    "assets/img/artdeco/veloparkovki/i33-101/facade2.webp"
+   ],
    "url": "maf/veloparkovki/artdeco-i33-101/"
   },
   {
@@ -2568,6 +3722,11 @@
    "price": 9900,
    "underOrder": false,
    "photo": "assets/img/artdeco/veloparkovki/i33-111/hero.webp",
+   "photos": [
+    "assets/img/artdeco/veloparkovki/i33-111/hero.webp",
+    "assets/img/artdeco/veloparkovki/i33-111/facade1.webp",
+    "assets/img/artdeco/veloparkovki/i33-111/facade2.webp"
+   ],
    "url": "maf/veloparkovki/artdeco-i33-111/"
   },
   {
@@ -2580,6 +3739,12 @@
    "price": 43300,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/13778/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/13778/main.webp",
+    "assets/img/maf/veloparkovki/13778/closeup.webp",
+    "assets/img/maf/veloparkovki/13778/white.webp",
+    "assets/img/maf/veloparkovki/13778/angle.webp"
+   ],
    "url": "maf/veloparkovki/parkovka-dlya-samokatov-19i-mestnaya-velo19/"
   },
   {
@@ -2592,6 +3757,12 @@
    "price": 58500,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/14025/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/14025/main.webp",
+    "assets/img/maf/veloparkovki/14025/closeup.webp",
+    "assets/img/maf/veloparkovki/14025/white.webp",
+    "assets/img/maf/veloparkovki/14025/angle.webp"
+   ],
    "url": "maf/veloparkovki/parkovka-dlya-samokatov-s-navesom-lyutik/"
   },
   {
@@ -2604,6 +3775,12 @@
    "price": 6300,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/24045/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/24045/main.webp",
+    "assets/img/maf/veloparkovki/24045/closeup.webp",
+    "assets/img/maf/veloparkovki/24045/white.webp",
+    "assets/img/maf/veloparkovki/24045/angle.webp"
+   ],
    "url": "maf/veloparkovki/veloparkovka-fast/"
   },
   {
@@ -2616,6 +3793,12 @@
    "price": 25200,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/14133/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/14133/main.webp",
+    "assets/img/maf/veloparkovki/14133/closeup.webp",
+    "assets/img/maf/veloparkovki/14133/white.webp",
+    "assets/img/maf/veloparkovki/14133/angle.webp"
+   ],
    "url": "maf/veloparkovki/veloparkovka-freym/"
   },
   {
@@ -2628,6 +3811,12 @@
    "price": 10600,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/20334/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/20334/main.webp",
+    "assets/img/maf/veloparkovki/20334/closeup.webp",
+    "assets/img/maf/veloparkovki/20334/white.webp",
+    "assets/img/maf/veloparkovki/20334/angle.webp"
+   ],
    "url": "maf/veloparkovki/veloparkovka-gorod/"
   },
   {
@@ -2640,6 +3829,12 @@
    "price": 100600,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/13257/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/13257/main.webp",
+    "assets/img/maf/veloparkovki/13257/closeup.webp",
+    "assets/img/maf/veloparkovki/13257/white.webp",
+    "assets/img/maf/veloparkovki/13257/angle.webp"
+   ],
    "url": "maf/veloparkovki/veloparkovka-lokus-iz-nerzhaveyki/"
   },
   {
@@ -2652,6 +3847,12 @@
    "price": 12200,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/25675/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/25675/main.webp",
+    "assets/img/maf/veloparkovki/25675/closeup.webp",
+    "assets/img/maf/veloparkovki/25675/white.webp",
+    "assets/img/maf/veloparkovki/25675/angle.webp"
+   ],
    "url": "maf/veloparkovki/veloparkovka-s-logotipom-tauer2/"
   },
   {
@@ -2664,6 +3865,12 @@
    "price": 7400,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/14029/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/14029/main.webp",
+    "assets/img/maf/veloparkovki/14029/closeup.webp",
+    "assets/img/maf/veloparkovki/14029/white.webp",
+    "assets/img/maf/veloparkovki/14029/angle.webp"
+   ],
    "url": "maf/veloparkovki/veloparkovka-stil/"
   },
   {
@@ -2676,6 +3883,12 @@
    "price": 11100,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/25667/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/25667/main.webp",
+    "assets/img/maf/veloparkovki/25667/closeup.webp",
+    "assets/img/maf/veloparkovki/25667/white.webp",
+    "assets/img/maf/veloparkovki/25667/angle.webp"
+   ],
    "url": "maf/veloparkovki/veloparkovka-tauer1/"
   },
   {
@@ -2688,6 +3901,12 @@
    "price": 12200,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/14026/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/14026/main.webp",
+    "assets/img/maf/veloparkovki/14026/closeup.webp",
+    "assets/img/maf/veloparkovki/14026/white.webp",
+    "assets/img/maf/veloparkovki/14026/angle.webp"
+   ],
    "url": "maf/veloparkovki/veloparkovka-tur/"
   },
   {
@@ -2700,6 +3919,12 @@
    "price": 7700,
    "underOrder": false,
    "photo": "assets/img/maf/veloparkovki/15617/main.webp",
+   "photos": [
+    "assets/img/maf/veloparkovki/15617/main.webp",
+    "assets/img/maf/veloparkovki/15617/closeup.webp",
+    "assets/img/maf/veloparkovki/15617/white.webp",
+    "assets/img/maf/veloparkovki/15617/angle.webp"
+   ],
    "url": "maf/veloparkovki/veloparkovka-vozdukh/"
   },
   {
@@ -2712,6 +3937,12 @@
    "price": 487900,
    "underOrder": false,
    "photo": "assets/img/maf/pavilony-i-navesy/14663/main.webp",
+   "photos": [
+    "assets/img/maf/pavilony-i-navesy/14663/main.webp",
+    "assets/img/maf/pavilony-i-navesy/14663/closeup.webp",
+    "assets/img/maf/pavilony-i-navesy/14663/white.webp",
+    "assets/img/maf/pavilony-i-navesy/14663/angle.webp"
+   ],
    "url": "maf/pavilony-i-navesy/besedka-atmosfera/"
   },
   {
@@ -2724,6 +3955,12 @@
    "price": 580900,
    "underOrder": false,
    "photo": "assets/img/maf/pavilony-i-navesy/14898/main.webp",
+   "photos": [
+    "assets/img/maf/pavilony-i-navesy/14898/main.webp",
+    "assets/img/maf/pavilony-i-navesy/14898/closeup.webp",
+    "assets/img/maf/pavilony-i-navesy/14898/white.webp",
+    "assets/img/maf/pavilony-i-navesy/14898/angle.webp"
+   ],
    "url": "maf/pavilony-i-navesy/besedka-listopad/"
   },
   {
@@ -2736,6 +3973,12 @@
    "price": 345600,
    "underOrder": false,
    "photo": "assets/img/maf/pavilony-i-navesy/20172/main.webp",
+   "photos": [
+    "assets/img/maf/pavilony-i-navesy/20172/main.webp",
+    "assets/img/maf/pavilony-i-navesy/20172/closeup.webp",
+    "assets/img/maf/pavilony-i-navesy/20172/white.webp",
+    "assets/img/maf/pavilony-i-navesy/20172/angle.webp"
+   ],
    "url": "maf/pavilony-i-navesy/besedka-tetatet/"
   },
   {
@@ -2748,6 +3991,12 @@
    "price": 94900,
    "underOrder": false,
    "photo": "assets/img/maf/pavilony-i-navesy/14847/main.webp",
+   "photos": [
+    "assets/img/maf/pavilony-i-navesy/14847/main.webp",
+    "assets/img/maf/pavilony-i-navesy/14847/closeup.webp",
+    "assets/img/maf/pavilony-i-navesy/14847/white.webp",
+    "assets/img/maf/pavilony-i-navesy/14847/angle.webp"
+   ],
    "url": "maf/pavilony-i-navesy/skameyka-s-navesom-filigran-volna/"
   },
   {
@@ -2760,6 +4009,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART06-novaciya/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART06-novaciya/white.webp",
+    "assets/img/korziny/art-deco/ART06-novaciya/main.webp",
+    "assets/img/korziny/art-deco/ART06-novaciya/closeup.webp",
+    "assets/img/korziny/art-deco/ART06-novaciya/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART06-novaciya/"
   },
   {
@@ -2772,6 +4027,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART07-astra/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART07-astra/white.webp",
+    "assets/img/korziny/art-deco/ART07-astra/main.webp",
+    "assets/img/korziny/art-deco/ART07-astra/closeup.webp",
+    "assets/img/korziny/art-deco/ART07-astra/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART07-astra/"
   },
   {
@@ -2784,6 +4045,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART08-dinamika/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART08-dinamika/white.webp",
+    "assets/img/korziny/art-deco/ART08-dinamika/main.webp",
+    "assets/img/korziny/art-deco/ART08-dinamika/closeup.webp",
+    "assets/img/korziny/art-deco/ART08-dinamika/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART08-dinamika/"
   },
   {
@@ -2796,6 +4063,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART09-rezonans/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART09-rezonans/white.webp",
+    "assets/img/korziny/art-deco/ART09-rezonans/main.webp",
+    "assets/img/korziny/art-deco/ART09-rezonans/closeup.webp",
+    "assets/img/korziny/art-deco/ART09-rezonans/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART09-rezonans/"
   },
   {
@@ -2808,6 +4081,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART10-fleksibl/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART10-fleksibl/white.webp",
+    "assets/img/korziny/art-deco/ART10-fleksibl/main.webp",
+    "assets/img/korziny/art-deco/ART10-fleksibl/closeup.webp",
+    "assets/img/korziny/art-deco/ART10-fleksibl/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART10-fleksibl/"
   },
   {
@@ -2820,6 +4099,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART11-serkil/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART11-serkil/white.webp",
+    "assets/img/korziny/art-deco/ART11-serkil/main.webp",
+    "assets/img/korziny/art-deco/ART11-serkil/closeup.webp",
+    "assets/img/korziny/art-deco/ART11-serkil/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART11-serkil/"
   },
   {
@@ -2832,6 +4117,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART12-arabika/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART12-arabika/white.webp",
+    "assets/img/korziny/art-deco/ART12-arabika/main.webp",
+    "assets/img/korziny/art-deco/ART12-arabika/closeup.webp",
+    "assets/img/korziny/art-deco/ART12-arabika/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART12-arabika/"
   },
   {
@@ -2844,6 +4135,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART13-liaf/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART13-liaf/white.webp",
+    "assets/img/korziny/art-deco/ART13-liaf/main.webp",
+    "assets/img/korziny/art-deco/ART13-liaf/closeup.webp",
+    "assets/img/korziny/art-deco/ART13-liaf/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART13-liaf/"
   },
   {
@@ -2856,6 +4153,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART14-volnenie/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART14-volnenie/white.webp",
+    "assets/img/korziny/art-deco/ART14-volnenie/main.webp",
+    "assets/img/korziny/art-deco/ART14-volnenie/closeup.webp",
+    "assets/img/korziny/art-deco/ART14-volnenie/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART14-volnenie/"
   },
   {
@@ -2868,6 +4171,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART15-bereza/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART15-bereza/white.webp",
+    "assets/img/korziny/art-deco/ART15-bereza/main.webp",
+    "assets/img/korziny/art-deco/ART15-bereza/closeup.webp",
+    "assets/img/korziny/art-deco/ART15-bereza/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART15-bereza/"
   },
   {
@@ -2880,6 +4189,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART16-ampir/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART16-ampir/white.webp",
+    "assets/img/korziny/art-deco/ART16-ampir/main.webp",
+    "assets/img/korziny/art-deco/ART16-ampir/closeup.webp",
+    "assets/img/korziny/art-deco/ART16-ampir/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART16-ampir/"
   },
   {
@@ -2892,6 +4207,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART17-modern/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART17-modern/white.webp",
+    "assets/img/korziny/art-deco/ART17-modern/main.webp",
+    "assets/img/korziny/art-deco/ART17-modern/closeup.webp",
+    "assets/img/korziny/art-deco/ART17-modern/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART17-modern/"
   },
   {
@@ -2904,6 +4225,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART18-ampir-2/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART18-ampir-2/white.webp",
+    "assets/img/korziny/art-deco/ART18-ampir-2/main.webp",
+    "assets/img/korziny/art-deco/ART18-ampir-2/closeup.webp",
+    "assets/img/korziny/art-deco/ART18-ampir-2/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART18-ampir-2/"
   },
   {
@@ -2916,6 +4243,12 @@
    "price": 10790,
    "underOrder": false,
    "photo": "assets/img/korziny/art-deco/ART19-rokoko/white.webp",
+   "photos": [
+    "assets/img/korziny/art-deco/ART19-rokoko/white.webp",
+    "assets/img/korziny/art-deco/ART19-rokoko/main.webp",
+    "assets/img/korziny/art-deco/ART19-rokoko/closeup.webp",
+    "assets/img/korziny/art-deco/ART19-rokoko/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/ART19-rokoko/"
   },
   {
@@ -2928,6 +4261,12 @@
    "price": 7500,
    "underOrder": false,
    "photo": "assets/img/korziny/standart/STN01-romb/white.webp",
+   "photos": [
+    "assets/img/korziny/standart/STN01-romb/white.webp",
+    "assets/img/korziny/standart/STN01-romb/main.webp",
+    "assets/img/korziny/standart/STN01-romb/closeup.webp",
+    "assets/img/korziny/standart/STN01-romb/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/STN01-romb/"
   },
   {
@@ -2940,6 +4279,12 @@
    "price": 7500,
    "underOrder": false,
    "photo": "assets/img/korziny/standart/STN02-reshetka/white.webp",
+   "photos": [
+    "assets/img/korziny/standart/STN02-reshetka/white.webp",
+    "assets/img/korziny/standart/STN02-reshetka/main.webp",
+    "assets/img/korziny/standart/STN02-reshetka/closeup.webp",
+    "assets/img/korziny/standart/STN02-reshetka/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/STN02-reshetka/"
   },
   {
@@ -2952,6 +4297,12 @@
    "price": 7500,
    "underOrder": false,
    "photo": "assets/img/korziny/standart/STN03-treugolnik/white.webp",
+   "photos": [
+    "assets/img/korziny/standart/STN03-treugolnik/white.webp",
+    "assets/img/korziny/standart/STN03-treugolnik/main.webp",
+    "assets/img/korziny/standart/STN03-treugolnik/closeup.webp",
+    "assets/img/korziny/standart/STN03-treugolnik/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/STN03-treugolnik/"
   },
   {
@@ -2964,6 +4315,12 @@
    "price": 7500,
    "underOrder": false,
    "photo": "assets/img/korziny/standart/STN04-zvezda/white.webp",
+   "photos": [
+    "assets/img/korziny/standart/STN04-zvezda/white.webp",
+    "assets/img/korziny/standart/STN04-zvezda/main.webp",
+    "assets/img/korziny/standart/STN04-zvezda/closeup.webp",
+    "assets/img/korziny/standart/STN04-zvezda/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/STN04-zvezda/"
   },
   {
@@ -2976,6 +4333,12 @@
    "price": 7500,
    "underOrder": false,
    "photo": "assets/img/korziny/standart/STN05-kirpich/white.webp",
+   "photos": [
+    "assets/img/korziny/standart/STN05-kirpich/white.webp",
+    "assets/img/korziny/standart/STN05-kirpich/main.webp",
+    "assets/img/korziny/standart/STN05-kirpich/closeup.webp",
+    "assets/img/korziny/standart/STN05-kirpich/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/STN05-kirpich/"
   },
   {
@@ -2988,6 +4351,12 @@
    "price": 7500,
    "underOrder": false,
    "photo": "assets/img/korziny/standart/STN06-palma/white.webp",
+   "photos": [
+    "assets/img/korziny/standart/STN06-palma/white.webp",
+    "assets/img/korziny/standart/STN06-palma/main.webp",
+    "assets/img/korziny/standart/STN06-palma/closeup.webp",
+    "assets/img/korziny/standart/STN06-palma/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/STN06-palma/"
   },
   {
@@ -3000,6 +4369,12 @@
    "price": 7500,
    "underOrder": false,
    "photo": "assets/img/korziny/standart/STN07-safari/white.webp",
+   "photos": [
+    "assets/img/korziny/standart/STN07-safari/white.webp",
+    "assets/img/korziny/standart/STN07-safari/main.webp",
+    "assets/img/korziny/standart/STN07-safari/closeup.webp",
+    "assets/img/korziny/standart/STN07-safari/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/STN07-safari/"
   },
   {
@@ -3012,6 +4387,12 @@
    "price": 7500,
    "underOrder": false,
    "photo": "assets/img/korziny/standart/STN08-lepestok/white.webp",
+   "photos": [
+    "assets/img/korziny/standart/STN08-lepestok/white.webp",
+    "assets/img/korziny/standart/STN08-lepestok/main.webp",
+    "assets/img/korziny/standart/STN08-lepestok/closeup.webp",
+    "assets/img/korziny/standart/STN08-lepestok/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/STN08-lepestok/"
   },
   {
@@ -3024,6 +4405,12 @@
    "price": 7500,
    "underOrder": false,
    "photo": "assets/img/korziny/standart/STN09-organika/white.webp",
+   "photos": [
+    "assets/img/korziny/standart/STN09-organika/white.webp",
+    "assets/img/korziny/standart/STN09-organika/main.webp",
+    "assets/img/korziny/standart/STN09-organika/closeup.webp",
+    "assets/img/korziny/standart/STN09-organika/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/STN09-organika/"
   },
   {
@@ -3036,6 +4423,12 @@
    "price": 7500,
    "underOrder": false,
    "photo": "assets/img/korziny/standart/STN10-simmetriya/white.webp",
+   "photos": [
+    "assets/img/korziny/standart/STN10-simmetriya/white.webp",
+    "assets/img/korziny/standart/STN10-simmetriya/main.webp",
+    "assets/img/korziny/standart/STN10-simmetriya/closeup.webp",
+    "assets/img/korziny/standart/STN10-simmetriya/angle.webp"
+   ],
    "url": "metallokonstrukcii/korziny-dlya-konditsionerov/STN10-simmetriya/"
   },
   {
@@ -3048,6 +4441,12 @@
    "price": 875900,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-maf-8/"
   },
   {
@@ -3060,6 +4459,12 @@
    "price": 880800,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13993/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13993/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13993/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13993/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13993/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-maf-9/"
   },
   {
@@ -3072,6 +4477,12 @@
    "price": 567400,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/24114/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/24114/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/24114/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/24114/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/24114/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-nero/"
   },
   {
@@ -3084,6 +4495,12 @@
    "price": 688300,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/31795/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/31795/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/31795/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/31795/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/31795/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-split-kh-s-khozblokom/"
   },
   {
@@ -3096,6 +4513,12 @@
    "price": 465100,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15109/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15109/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15109/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15109/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15109/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-vertikal/"
   },
   {
@@ -3108,6 +4531,12 @@
    "price": 267000,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/19441/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/19441/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/19441/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/19441/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/19441/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-ekologiya/"
   },
   {
@@ -3120,6 +4549,12 @@
    "price": 865000,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15678/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15678/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15678/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15678/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15678/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-panel/"
   },
   {
@@ -3132,6 +4567,12 @@
    "price": 145600,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13880/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13880/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13880/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13880/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13880/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul/"
   },
   {
@@ -3144,6 +4585,12 @@
    "price": 104100,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15162/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15162/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15162/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15162/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15162/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-stalnoy/"
   },
   {
@@ -3156,6 +4603,12 @@
    "price": 176000,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13885/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13885/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13885/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13885/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13885/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-xl/"
   },
   {
@@ -3168,6 +4621,12 @@
    "price": 210700,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15160/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15160/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15160/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15160/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15160/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-xl-stalnoy/"
   },
   {
@@ -3180,6 +4639,12 @@
    "price": 258300,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15113/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15113/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15113/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15113/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15113/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/ograzhdenie-dlya-tbo/"
   },
   {
@@ -3192,6 +4657,12 @@
    "price": 232000,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/40261/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/40261/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/40261/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/40261/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/40261/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/ograzhdenie-dlya-tbo-bunker/"
   },
   {
@@ -3204,6 +4675,12 @@
    "price": 493500,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13996/main.webp",
+   "photos": [
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13996/main.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13996/closeup.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13996/white.webp",
+    "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13996/angle.webp"
+   ],
    "url": "metallokonstrukcii/konteynernye-ploshchadki/ograzhdenie-ploshchadki-dlya-kgm/"
   },
   {
@@ -3216,6 +4693,7 @@
    "price": 1100,
    "underOrder": false,
    "photo": "",
+   "photos": [],
    "url": "ograzhdeniya/gazonnye/"
   },
   {
@@ -3228,8 +4706,8 @@
    "price": 3800,
    "underOrder": false,
    "photo": "",
+   "photos": [],
    "url": "ograzhdeniya/perila/"
   }
- ],
- "updated": "2026-07-05"
+ ]
 }
