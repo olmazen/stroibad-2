@@ -17,6 +17,8 @@ const CSV_SOURCE = {
   'maf/urny': 'urny',
   'metallokonstrukcii/konteynernye-ploshchadki': 'konteynernye_ploshchadki_dlya_tbo',
   'maf/veloparkovki': 'velosipednye_parkovki',
+  'maf/kacheli': 'kacheli_parkovye',
+  'metallokonstrukcii/korziny-dlya-konditsionerov': 'korziny_dlya_konditsionerov',
 };
 
 const [, , fileArg, ...flags] = process.argv;
@@ -43,7 +45,7 @@ const allHtml = [];
   }
 })(ROOT);
 
-function replaceNearLink(file, slug, from, to) {
+function replaceNearLink(file, slug, from, to, sku) {
   let s = readF(file); let n = 0;
   const linkRe = new RegExp(slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '/(index\\.html)?"', 'g');
   let m;
@@ -52,6 +54,10 @@ function replaceNearLink(file, slug, from, to) {
     let win = s.slice(start, start + 2400);
     const close = win.indexOf('</a>'); // карточка/плитка товара заканчивается </a>
     if (close >= 0) win = win.slice(0, close);
+    // карточки-фантомы: модель без своей страницы ссылается на соседа —
+    // если в карточке указан артикул и он НЕ наш, эту карточку не трогаем
+    const art = win.match(/Артикул<\/span>\s*<b>([^<]+)<\/b>/);
+    if (sku && art && art[1].trim() !== String(sku)) continue;
     if (win.includes(from)) {
       const rep = win.replace(from, to); // только первое совпадение внутри своей карточки
       n += 1;
@@ -88,7 +94,7 @@ for (const it of data.items) {
     // карточки на остальных страницах
     for (const f of allHtml) {
       if (f === page) continue;
-      const nn = replaceNearLink(f, it.slug, oldTxt, newTxt);
+      const nn = replaceNearLink(f, it.slug, oldTxt, newTxt, it.sku);
       if (nn) { stats.pages++; stats.repl += nn; }
     }
   } else if (it.oldPrice == null) {
@@ -100,7 +106,7 @@ for (const it of data.items) {
     else stats.warn.push('не нашёл «Под заказ» на ' + it.cat + '/' + it.slug);
     for (const f of allHtml) {
       if (f === page) continue;
-      const nn = replaceNearLink(f, it.slug, '<b>под заказ</b>', '<b>' + newTxt + '</b>');
+      const nn = replaceNearLink(f, it.slug, '<b>под заказ</b>', '<b>' + newTxt + '</b>', it.sku);
       if (nn) { stats.pages++; stats.repl += nn; }
     }
   }

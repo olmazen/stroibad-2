@@ -9,8 +9,8 @@
    "slug": "artdeco-a1-101",
    "sku": "A1-101",
    "name": "Скамейка A1-101",
-   "price": null,
-   "underOrder": true,
+   "price": 44500,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a1-101/hero.webp",
    "url": "maf/skamejki/artdeco-a1-101/"
   },
@@ -21,8 +21,8 @@
    "slug": "artdeco-a1-106",
    "sku": "A1-106",
    "name": "Скамейка A1-106",
-   "price": null,
-   "underOrder": true,
+   "price": 34700,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a1-106/hero.webp",
    "url": "maf/skamejki/artdeco-a1-106/"
   },
@@ -33,8 +33,8 @@
    "slug": "artdeco-a1-126",
    "sku": "A1-126",
    "name": "Скамейка A1-126",
-   "price": null,
-   "underOrder": true,
+   "price": 27600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a1-126/hero.webp",
    "url": "maf/skamejki/artdeco-a1-126/"
   },
@@ -45,8 +45,8 @@
    "slug": "artdeco-a1-251",
    "sku": "A1-251",
    "name": "Скамейка A1-251",
-   "price": null,
-   "underOrder": true,
+   "price": 98600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a1-251/hero.webp",
    "url": "maf/skamejki/artdeco-a1-251/"
   },
@@ -57,8 +57,8 @@
    "slug": "artdeco-a1-306",
    "sku": "A1-306",
    "name": "Скамейка A1-306",
-   "price": null,
-   "underOrder": true,
+   "price": 78400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a1-306/hero.webp",
    "url": "maf/skamejki/artdeco-a1-306/"
   },
@@ -69,8 +69,8 @@
    "slug": "artdeco-a4-1601",
    "sku": "A4-1601",
    "name": "Скамейка A4-1601",
-   "price": null,
-   "underOrder": true,
+   "price": 98450,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a4-1601/hero.webp",
    "url": "maf/skamejki/artdeco-a4-1601/"
   },
@@ -81,8 +81,8 @@
    "slug": "artdeco-a4-2641",
    "sku": "A4-2641",
    "name": "Скамейка A4-2641",
-   "price": null,
-   "underOrder": true,
+   "price": 116000,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a4-2641/hero.webp",
    "url": "maf/skamejki/artdeco-a4-2641/"
   },
@@ -93,8 +93,8 @@
    "slug": "artdeco-a4-2651",
    "sku": "A4-2651",
    "name": "Скамейка A4-2651",
-   "price": null,
-   "underOrder": true,
+   "price": 135700,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a4-2651/hero.webp",
    "url": "maf/skamejki/artdeco-a4-2651/"
   },
@@ -105,8 +105,8 @@
    "slug": "artdeco-a5-101",
    "sku": "A5-101",
    "name": "Скамейка A5-101",
-   "price": null,
-   "underOrder": true,
+   "price": 42600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/a5-101/hero.webp",
    "url": "maf/skamejki/artdeco-a5-101/"
   },
@@ -117,8 +117,8 @@
    "slug": "artdeco-e1-101",
    "sku": "E1-101",
    "name": "Скамейка E1-101",
-   "price": null,
-   "underOrder": true,
+   "price": 29300,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e1-101/hero.webp",
    "url": "maf/skamejki/artdeco-e1-101/"
   },
@@ -129,8 +129,8 @@
    "slug": "artdeco-e1-321",
    "sku": "E1-321",
    "name": "Скамейка E1-321",
-   "price": null,
-   "underOrder": true,
+   "price": 34300,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e1-321/hero.webp",
    "url": "maf/skamejki/artdeco-e1-321/"
   },
@@ -141,8 +141,8 @@
    "slug": "artdeco-e2-151",
    "sku": "E2-151",
    "name": "Скамейка E2-151",
-   "price": null,
-   "underOrder": true,
+   "price": 39600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e2-151/hero.webp",
    "url": "maf/skamejki/artdeco-e2-151/"
   },
@@ -153,8 +153,8 @@
    "slug": "artdeco-e2-210",
    "sku": "E2-210",
    "name": "Скамейка E2-210",
-   "price": null,
-   "underOrder": true,
+   "price": 40100,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e2-210/hero.webp",
    "url": "maf/skamejki/artdeco-e2-210/"
   },
@@ -165,8 +165,8 @@
    "slug": "artdeco-e2-351",
    "sku": "E2-351",
    "name": "Скамейка E2-351",
-   "price": null,
-   "underOrder": true,
+   "price": 132000,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e2-351/hero.webp",
    "url": "maf/skamejki/artdeco-e2-351/"
   },
@@ -177,8 +177,8 @@
    "slug": "artdeco-e3-311",
    "sku": "E3-311",
    "name": "Скамейка E3-311",
-   "price": null,
-   "underOrder": true,
+   "price": 43600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/e3-311/hero.webp",
    "url": "maf/skamejki/artdeco-e3-311/"
   },
@@ -189,8 +189,8 @@
    "slug": "artdeco-i1-101",
    "sku": "I1-101",
    "name": "Скамейка I1-101",
-   "price": null,
-   "underOrder": true,
+   "price": 41060,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-101/hero.webp",
    "url": "maf/skamejki/artdeco-i1-101/"
   },
@@ -201,8 +201,8 @@
    "slug": "artdeco-i1-106",
    "sku": "I1-106",
    "name": "Скамейка I1-106",
-   "price": null,
-   "underOrder": true,
+   "price": 33290,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-106/hero.webp",
    "url": "maf/skamejki/artdeco-i1-106/"
   },
@@ -213,8 +213,8 @@
    "slug": "artdeco-i1-126",
    "sku": "I1-126",
    "name": "Скамейка I1-126",
-   "price": null,
-   "underOrder": true,
+   "price": 20400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-126/hero.webp",
    "url": "maf/skamejki/artdeco-i1-126/"
   },
@@ -225,8 +225,8 @@
    "slug": "artdeco-i1-306",
    "sku": "I1-306",
    "name": "Скамейка I1-306",
-   "price": null,
-   "underOrder": true,
+   "price": 38900,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-306/hero.webp",
    "url": "maf/skamejki/artdeco-i1-306/"
   },
@@ -237,8 +237,8 @@
    "slug": "artdeco-i1-351",
    "sku": "I1-351",
    "name": "Скамейка I1-351",
-   "price": null,
-   "underOrder": true,
+   "price": 75600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-351/hero.webp",
    "url": "maf/skamejki/artdeco-i1-351/"
   },
@@ -249,8 +249,8 @@
    "slug": "artdeco-i1-356",
    "sku": "I1-356",
    "name": "Скамейка I1-356",
-   "price": null,
-   "underOrder": true,
+   "price": 53800,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-356/hero.webp",
    "url": "maf/skamejki/artdeco-i1-356/"
   },
@@ -261,8 +261,8 @@
    "slug": "artdeco-i1-3850",
    "sku": "I1-3850",
    "name": "Скамейка I1-3850",
-   "price": null,
-   "underOrder": true,
+   "price": 45600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-3850/hero.webp",
    "url": "maf/skamejki/artdeco-i1-3850/"
   },
@@ -273,8 +273,8 @@
    "slug": "artdeco-i1-601",
    "sku": "I1-601",
    "name": "Скамейка I1-601",
-   "price": null,
-   "underOrder": true,
+   "price": 157800,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i1-601/hero.webp",
    "url": "maf/skamejki/artdeco-i1-601/"
   },
@@ -285,8 +285,8 @@
    "slug": "artdeco-i2-301",
    "sku": "I2-301",
    "name": "Скамейка I2-301",
-   "price": null,
-   "underOrder": true,
+   "price": 68400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/i2-301/hero.webp",
    "url": "maf/skamejki/artdeco-i2-301/"
   },
@@ -297,8 +297,8 @@
    "slug": "artdeco-o1-1601",
    "sku": "O1-1601",
    "name": "Скамейка O1-1601",
-   "price": null,
-   "underOrder": true,
+   "price": 99400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-1601/hero.webp",
    "url": "maf/skamejki/artdeco-o1-1601/"
   },
@@ -309,8 +309,8 @@
    "slug": "artdeco-o1-1611",
    "sku": "O1-1611",
    "name": "Скамейка O1-1611",
-   "price": null,
-   "underOrder": true,
+   "price": 102430,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-1611/hero.webp",
    "url": "maf/skamejki/artdeco-o1-1611/"
   },
@@ -321,8 +321,8 @@
    "slug": "artdeco-o1-1621",
    "sku": "O1-1621",
    "name": "Скамейка O1-1621",
-   "price": null,
-   "underOrder": true,
+   "price": 77400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-1621/hero.webp",
    "url": "maf/skamejki/artdeco-o1-1621/"
   },
@@ -333,8 +333,8 @@
    "slug": "artdeco-o1-2601",
    "sku": "O1-2601",
    "name": "Скамейка O1-2601",
-   "price": null,
-   "underOrder": true,
+   "price": 97600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-2601/hero.webp",
    "url": "maf/skamejki/artdeco-o1-2601/"
   },
@@ -345,8 +345,8 @@
    "slug": "artdeco-o1-2621",
    "sku": "O1-2621",
    "name": "Скамейка O1-2621",
-   "price": null,
-   "underOrder": true,
+   "price": 86500,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-2621/hero.webp",
    "url": "maf/skamejki/artdeco-o1-2621/"
   },
@@ -357,8 +357,8 @@
    "slug": "artdeco-o1-3221",
    "sku": "O1-3221",
    "name": "Скамейка O1-3221",
-   "price": null,
-   "underOrder": true,
+   "price": 32900,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-3221/hero.webp",
    "url": "maf/skamejki/artdeco-o1-3221/"
   },
@@ -369,8 +369,8 @@
    "slug": "artdeco-o1-3621",
    "sku": "O1-3621",
    "name": "Скамейка O1-3621",
-   "price": null,
-   "underOrder": true,
+   "price": 43700,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-3621/hero.webp",
    "url": "maf/skamejki/artdeco-o1-3621/"
   },
@@ -381,8 +381,8 @@
    "slug": "artdeco-o1-3631",
    "sku": "O1-3631",
    "name": "Скамейка O1-3631",
-   "price": null,
-   "underOrder": true,
+   "price": 76500,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/o1-3631/hero.webp",
    "url": "maf/skamejki/artdeco-o1-3631/"
   },
@@ -393,8 +393,8 @@
    "slug": "artdeco-u1-150",
    "sku": "U1-150",
    "name": "Скамейка U1-150",
-   "price": null,
-   "underOrder": true,
+   "price": 45300,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-150/hero.webp",
    "url": "maf/skamejki/artdeco-u1-150/"
   },
@@ -405,8 +405,8 @@
    "slug": "artdeco-u1-151",
    "sku": "U1-151",
    "name": "Скамейка U1-151",
-   "price": null,
-   "underOrder": true,
+   "price": 47500,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-151/hero.webp",
    "url": "maf/skamejki/artdeco-u1-151/"
   },
@@ -417,8 +417,8 @@
    "slug": "artdeco-u1-153",
    "sku": "U1-153",
    "name": "Скамейка U1-153",
-   "price": null,
-   "underOrder": true,
+   "price": 43480,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-153/hero.webp",
    "url": "maf/skamejki/artdeco-u1-153/"
   },
@@ -429,8 +429,8 @@
    "slug": "artdeco-u1-190",
    "sku": "U1-190",
    "name": "Скамейка U1-190",
-   "price": null,
-   "underOrder": true,
+   "price": 64700,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-190/hero.webp",
    "url": "maf/skamejki/artdeco-u1-190/"
   },
@@ -441,8 +441,8 @@
    "slug": "artdeco-u1-191",
    "sku": "U1-191",
    "name": "Скамейка U1-191",
-   "price": null,
-   "underOrder": true,
+   "price": 67400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-191/hero.webp",
    "url": "maf/skamejki/artdeco-u1-191/"
   },
@@ -453,8 +453,8 @@
    "slug": "artdeco-u1-193",
    "sku": "U1-193",
    "name": "Скамейка U1-193",
-   "price": null,
-   "underOrder": true,
+   "price": 45700,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-193/hero.webp",
    "url": "maf/skamejki/artdeco-u1-193/"
   },
@@ -465,8 +465,8 @@
    "slug": "artdeco-u1-350",
    "sku": "U1-350",
    "name": "Скамейка U1-350",
-   "price": null,
-   "underOrder": true,
+   "price": 120300,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-350/hero.webp",
    "url": "maf/skamejki/artdeco-u1-350/"
   },
@@ -477,8 +477,8 @@
    "slug": "artdeco-u1-351",
    "sku": "U1-351",
    "name": "Скамейка U1-351",
-   "price": null,
-   "underOrder": true,
+   "price": 132600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-351/hero.webp",
    "url": "maf/skamejki/artdeco-u1-351/"
   },
@@ -489,8 +489,8 @@
    "slug": "artdeco-u1-390",
    "sku": "U1-390",
    "name": "Скамейка U1-390",
-   "price": null,
-   "underOrder": true,
+   "price": 143000,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-390/hero.webp",
    "url": "maf/skamejki/artdeco-u1-390/"
   },
@@ -501,8 +501,8 @@
    "slug": "artdeco-u1-510",
    "sku": "U1-510",
    "name": "Скамейка U1-510",
-   "price": null,
-   "underOrder": true,
+   "price": 54300,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u1-510/hero.webp",
    "url": "maf/skamejki/artdeco-u1-510/"
   },
@@ -513,8 +513,8 @@
    "slug": "artdeco-u3-100",
    "sku": "U3-100",
    "name": "Скамейка U3-100",
-   "price": null,
-   "underOrder": true,
+   "price": 43600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u3-100/hero.webp",
    "url": "maf/skamejki/artdeco-u3-100/"
   },
@@ -525,8 +525,8 @@
    "slug": "artdeco-u3-300",
    "sku": "U3-300",
    "name": "Скамейка U3-300",
-   "price": null,
-   "underOrder": true,
+   "price": 75800,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u3-300/hero.webp",
    "url": "maf/skamejki/artdeco-u3-300/"
   },
@@ -537,8 +537,8 @@
    "slug": "artdeco-u3-520",
    "sku": "U3-520",
    "name": "Скамейка U3-520",
-   "price": null,
-   "underOrder": true,
+   "price": 45300,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u3-520/hero.webp",
    "url": "maf/skamejki/artdeco-u3-520/"
   },
@@ -549,8 +549,8 @@
    "slug": "artdeco-u3-600",
    "sku": "U3-600",
    "name": "Скамейка U3-600",
-   "price": null,
-   "underOrder": true,
+   "price": 65400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/skamejki/u3-600/hero.webp",
    "url": "maf/skamejki/artdeco-u3-600/"
   },
@@ -561,7 +561,7 @@
    "slug": "banketka-chugunnaya-varshava",
    "sku": "13422",
    "name": "Банкетка чугунная «Варшава»",
-   "price": 32700,
+   "price": 44500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/13422/main.webp",
    "url": "maf/skamejki/banketka-chugunnaya-varshava/"
@@ -573,7 +573,7 @@
    "slug": "banketka-paradise",
    "sku": "20723",
    "name": "Скамейка стальная «Парадайз» без спинки",
-   "price": 47200,
+   "price": 43650,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/20723/main.webp",
    "url": "maf/skamejki/banketka-paradise/"
@@ -585,7 +585,7 @@
    "slug": "banketka-pifagor",
    "sku": "11129",
    "name": "Скамейка стальная «Пифагор» без спинки",
-   "price": 38000,
+   "price": 35600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/11129/main.webp",
    "url": "maf/skamejki/banketka-pifagor/"
@@ -597,7 +597,7 @@
    "slug": "banketka-stalnaya-mons-filigran",
    "sku": "19677",
    "name": "Скамейка стальная «Монс Филигран» без спинки",
-   "price": 33900,
+   "price": 32560,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/19677/main.webp",
    "url": "maf/skamejki/banketka-stalnaya-mons-filigran/"
@@ -609,7 +609,7 @@
    "slug": "banketka-vizhen",
    "sku": "15078",
    "name": "Скамейка стальная «Вижен» без спинки",
-   "price": 18100,
+   "price": 19600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/15078/main.webp",
    "url": "maf/skamejki/banketka-vizhen/"
@@ -621,7 +621,7 @@
    "slug": "divan-stalnoy-kruglyy",
    "sku": "11354",
    "name": "Скамейка стальная «Диван круглый»",
-   "price": 60100,
+   "price": 98670,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/11354/main.webp",
    "url": "maf/skamejki/divan-stalnoy-kruglyy/"
@@ -633,7 +633,7 @@
    "slug": "divan-stalnoy-sol",
    "sku": "12987",
    "name": "Скамейка стальная круглая «Сол» без спинки",
-   "price": 66300,
+   "price": 78320,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12987/main.webp",
    "url": "maf/skamejki/divan-stalnoy-sol/"
@@ -645,7 +645,7 @@
    "slug": "kreslo-bez-spinki-simpozium",
    "sku": "22378",
    "name": "Кресло стальное «Симпозиум» без спинки",
-   "price": 31500,
+   "price": 29800,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/22378/main.webp",
    "url": "maf/skamejki/kreslo-bez-spinki-simpozium/"
@@ -657,7 +657,7 @@
    "slug": "modulnaya-skameyka-ekopolis-kombi3",
    "sku": "12154",
    "name": "Модульная скамейка «Экополис Комби-3»",
-   "price": 100900,
+   "price": 88760,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12154/main.webp",
    "url": "maf/skamejki/modulnaya-skameyka-ekopolis-kombi3/"
@@ -669,7 +669,7 @@
    "slug": "modulnaya-skameyka-ekopolis2",
    "sku": "12149",
    "name": "Модульная скамейка «Экополис-2»",
-   "price": 44400,
+   "price": 56700,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12149/main.webp",
    "url": "maf/skamejki/modulnaya-skameyka-ekopolis2/"
@@ -681,7 +681,7 @@
    "slug": "sadovoparkovaya-skameyka-duga",
    "sku": "10721",
    "name": "Скамейка стальная «Дуга»",
-   "price": 15500,
+   "price": 22270,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/10721/main.webp",
    "url": "maf/skamejki/sadovoparkovaya-skameyka-duga/"
@@ -693,7 +693,7 @@
    "slug": "sadovoparkovaya-skameyka-radius",
    "sku": "9705",
    "name": "Скамейка стальная «Радиус»",
-   "price": 30800,
+   "price": 33400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/9705/main.webp",
    "url": "maf/skamejki/sadovoparkovaya-skameyka-radius/"
@@ -705,7 +705,7 @@
    "slug": "sadovoparkovaya-skameyka-radius-raund-kruglaya",
    "sku": "22157",
    "name": "Скамейка стальная круглая «Радиус Раунд» без спинки",
-   "price": 495900,
+   "price": 465400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/22157/main.webp",
    "url": "maf/skamejki/sadovoparkovaya-skameyka-radius-raund-kruglaya/"
@@ -717,7 +717,7 @@
    "slug": "sidene-enigma",
    "sku": "21237",
    "name": "Сиденье стальное «Энигма» без спинки",
-   "price": 17500,
+   "price": 19800,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/21237/main.webp",
    "url": "maf/skamejki/sidene-enigma/"
@@ -729,7 +729,7 @@
    "slug": "skameika-modern",
    "sku": "7106",
    "name": "Скамейка стальная «Модерн»",
-   "price": 10400,
+   "price": 14600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/7106/main.webp",
    "url": "maf/skamejki/skameika-modern/"
@@ -741,7 +741,7 @@
    "slug": "skameika-modern-bez-podlokotnikov",
    "sku": "7112",
    "name": "Скамейка стальная «Модерн» без подлокотников",
-   "price": 9600,
+   "price": 12500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/7112/main.webp",
    "url": "maf/skamejki/skameika-modern-bez-podlokotnikov/"
@@ -753,7 +753,7 @@
    "slug": "skameyka-adonis",
    "sku": "14146",
    "name": "Скамейка стальная «Адонис»",
-   "price": 58500,
+   "price": 64600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14146/main.webp",
    "url": "maf/skamejki/skameyka-adonis/"
@@ -765,7 +765,7 @@
    "slug": "skameyka-arkhimed",
    "sku": "11478",
    "name": "Скамейка стальная «Архимед»",
-   "price": 38600,
+   "price": 41780,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/11478/main.webp",
    "url": "maf/skamejki/skameyka-arkhimed/"
@@ -777,7 +777,7 @@
    "slug": "skameyka-bez-spinki-avinon",
    "sku": "15495",
    "name": "Скамейка стальная «Авиньон» без спинки",
-   "price": 52600,
+   "price": 46850,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/15495/main.webp",
    "url": "maf/skamejki/skameyka-bez-spinki-avinon/"
@@ -789,7 +789,7 @@
    "slug": "skameyka-bez-spinki-gloriya",
    "sku": "15621",
    "name": "Скамейка стальная «Глория Вуд» без спинки",
-   "price": 22200,
+   "price": 23440,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/15621/main.webp",
    "url": "maf/skamejki/skameyka-bez-spinki-gloriya/"
@@ -801,7 +801,7 @@
    "slug": "skameyka-bez-spinki-khold",
    "sku": "14037",
    "name": "Скамейка стальная «Холд» без спинки",
-   "price": 38800,
+   "price": 42000,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14037/main.webp",
    "url": "maf/skamejki/skameyka-bez-spinki-khold/"
@@ -813,7 +813,7 @@
    "slug": "skameyka-bez-spinki-tauer",
    "sku": "18177",
    "name": "Скамейка стальная «Тауэр» без спинки",
-   "price": 45000,
+   "price": 51050,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/18177/main.webp",
    "url": "maf/skamejki/skameyka-bez-spinki-tauer/"
@@ -825,7 +825,7 @@
    "slug": "skameyka-bez-spinki-ulichnaya-kolledzh",
    "sku": "13998",
    "name": "Скамейка стальная «Колледж» без спинки",
-   "price": 19200,
+   "price": 20500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/13998/main.webp",
    "url": "maf/skamejki/skameyka-bez-spinki-ulichnaya-kolledzh/"
@@ -837,7 +837,7 @@
    "slug": "skameyka-chugunnaya-goliaf",
    "sku": "12233",
    "name": "Скамейка чугунная «Голиаф»",
-   "price": 39200,
+   "price": 41660,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12233/main.webp",
    "url": "maf/skamejki/skameyka-chugunnaya-goliaf/"
@@ -849,7 +849,7 @@
    "slug": "skameyka-galaktika",
    "sku": "14201",
    "name": "Скамейка стальная «Галактика»",
-   "price": 27300,
+   "price": 25600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14201/main.webp",
    "url": "maf/skamejki/skameyka-galaktika/"
@@ -861,7 +861,7 @@
    "slug": "skameyka-idilliya",
    "sku": "14137",
    "name": "Скамейка стальная «Идиллия»",
-   "price": 33600,
+   "price": 34200,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14137/main.webp",
    "url": "maf/skamejki/skameyka-idilliya/"
@@ -885,7 +885,7 @@
    "slug": "skameyka-kalipso",
    "sku": "14300",
    "name": "Скамейка стальная «Калипсо» без спинки",
-   "price": 43900,
+   "price": 45700,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14300/main.webp",
    "url": "maf/skamejki/skameyka-kalipso/"
@@ -909,7 +909,7 @@
    "slug": "skameyka-leman",
    "sku": "14901",
    "name": "Скамейка стальная «Леман»",
-   "price": 21700,
+   "price": 23400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14901/main.webp",
    "url": "maf/skamejki/skameyka-leman/"
@@ -921,7 +921,7 @@
    "slug": "skameyka-london",
    "sku": "14839",
    "name": "Скамейка стальная «Лондон»",
-   "price": 42800,
+   "price": 45580,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14839/main.webp",
    "url": "maf/skamejki/skameyka-london/"
@@ -933,7 +933,7 @@
    "slug": "skameyka-madrid",
    "sku": "12168",
    "name": "Скамейка стальная «Мадрид»",
-   "price": 28700,
+   "price": 26500,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12168/main.webp",
    "url": "maf/skamejki/skameyka-madrid/"
@@ -993,7 +993,7 @@
    "slug": "skameyka-radiusnaya-artek",
    "sku": "12409",
    "name": "Скамейка стальная радиусная «Артек» без спинки",
-   "price": 20400,
+   "price": 35400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12409/main.webp",
    "url": "maf/skamejki/skameyka-radiusnaya-artek/"
@@ -1005,7 +1005,7 @@
    "slug": "skameyka-s-navesom-filigran-volna",
    "sku": "14847",
    "name": "Скамейка стальная с навесом «Филигран Волна»",
-   "price": 94900,
+   "price": 98600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/14847/main.webp",
    "url": "maf/skamejki/skameyka-s-navesom-filigran-volna/"
@@ -1017,7 +1017,7 @@
    "slug": "skameyka-so-spinkoy-avinon",
    "sku": "15496",
    "name": "Скамейка стальная «Авиньон»",
-   "price": 16200,
+   "price": 23400,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/15496/main.webp",
    "url": "maf/skamejki/skameyka-so-spinkoy-avinon/"
@@ -1101,7 +1101,7 @@
    "slug": "skameyka-stalnaya-kvadrant",
    "sku": "12410",
    "name": "Скамейка стальная «Квадрант» без спинки",
-   "price": 59000,
+   "price": 63600,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/12410/main.webp",
    "url": "maf/skamejki/skameyka-stalnaya-kvadrant/"
@@ -1221,7 +1221,7 @@
    "slug": "skameyka-vokrug-dereva-ekspress",
    "sku": "10728",
    "name": "Скамейка стальная вокруг дерева или столба «Экспресс»",
-   "price": 39400,
+   "price": 45700,
    "underOrder": false,
    "photo": "assets/img/maf/skamejki/10728/main.webp",
    "url": "maf/skamejki/skameyka-vokrug-dereva-ekspress/"
@@ -1245,7 +1245,7 @@
    "slug": "kacheli-bulvar",
    "sku": "12202",
    "name": "Качели садово-парковые «Бульвар»",
-   "price": 69500,
+   "price": 78500,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/12202/main.webp",
    "url": "maf/kacheli/kacheli-bulvar/"
@@ -1257,7 +1257,7 @@
    "slug": "kacheli-miass-raund",
    "sku": "30279",
    "name": "Качели садово-парковые «Миасс Раунд»",
-   "price": 709200,
+   "price": 785000,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/30279/main.webp",
    "url": "maf/kacheli/kacheli-miass-raund/"
@@ -1269,7 +1269,7 @@
    "slug": "kacheli-oazis",
    "sku": "39606",
    "name": "Качели «Оазис»",
-   "price": 2291700,
+   "price": 2450700,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/39606/main.webp",
    "url": "maf/kacheli/kacheli-oazis/"
@@ -1293,7 +1293,7 @@
    "slug": "kacheli-siti",
    "sku": "12189",
    "name": "Качели парковые «Сити»",
-   "price": 605900,
+   "price": 868000,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/12189/main.webp",
    "url": "maf/kacheli/kacheli-siti/"
@@ -1305,7 +1305,7 @@
    "slug": "kacheli-tandem",
    "sku": "61962",
    "name": "Качели парковые «Тандем»",
-   "price": 260300,
+   "price": 296000,
    "underOrder": false,
    "photo": "assets/img/maf/kacheli/61962/main.webp",
    "url": "maf/kacheli/kacheli-tandem/"
@@ -1317,8 +1317,8 @@
    "slug": "artdeco-a20-1101",
    "sku": "A20-1101",
    "name": "Урна A20-1101",
-   "price": null,
-   "underOrder": true,
+   "price": 25400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/a20-1101/hero.webp",
    "url": "maf/urny/artdeco-a20-1101/"
   },
@@ -1329,8 +1329,8 @@
    "slug": "artdeco-a20-5101",
    "sku": "A20-5101",
    "name": "Урна A20-5101",
-   "price": null,
-   "underOrder": true,
+   "price": 32500,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/a20-5101/hero.webp",
    "url": "maf/urny/artdeco-a20-5101/"
   },
@@ -1341,8 +1341,8 @@
    "slug": "artdeco-a20-7101",
    "sku": "A20-7101",
    "name": "Урна A20-7101",
-   "price": null,
-   "underOrder": true,
+   "price": 37870,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/a20-7101/hero.webp",
    "url": "maf/urny/artdeco-a20-7101/"
   },
@@ -1353,8 +1353,8 @@
    "slug": "artdeco-a20-8201",
    "sku": "A20-8201",
    "name": "Урна A20-8201",
-   "price": null,
-   "underOrder": true,
+   "price": 189400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/a20-8201/hero.webp",
    "url": "maf/urny/artdeco-a20-8201/"
   },
@@ -1365,8 +1365,8 @@
    "slug": "artdeco-e20-1100",
    "sku": "E20-1100",
    "name": "Урна E20-1100",
-   "price": null,
-   "underOrder": true,
+   "price": 37800,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/e20-1100/hero.webp",
    "url": "maf/urny/artdeco-e20-1100/"
   },
@@ -1377,8 +1377,8 @@
    "slug": "artdeco-e20-1101",
    "sku": "E20-1101",
    "name": "Урна E20-1101",
-   "price": null,
-   "underOrder": true,
+   "price": 33460,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/e20-1101/hero.webp",
    "url": "maf/urny/artdeco-e20-1101/"
   },
@@ -1389,8 +1389,8 @@
    "slug": "artdeco-e20-1413",
    "sku": "E20-1413",
    "name": "Урна E20-1413",
-   "price": null,
-   "underOrder": true,
+   "price": 34600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/e20-1413/hero.webp",
    "url": "maf/urny/artdeco-e20-1413/"
   },
@@ -1401,8 +1401,8 @@
    "slug": "artdeco-e20-2411",
    "sku": "E20-2411",
    "name": "Урна E20-2411",
-   "price": null,
-   "underOrder": true,
+   "price": 45370,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/e20-2411/hero.webp",
    "url": "maf/urny/artdeco-e20-2411/"
   },
@@ -1413,8 +1413,8 @@
    "slug": "artdeco-e20-4411",
    "sku": "E20-4411",
    "name": "Урна E20-4411",
-   "price": null,
-   "underOrder": true,
+   "price": 175300,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/e20-4411/hero.webp",
    "url": "maf/urny/artdeco-e20-4411/"
   },
@@ -1425,8 +1425,8 @@
    "slug": "artdeco-i20-2001",
    "sku": "I20-2001",
    "name": "Урна I20-2001",
-   "price": null,
-   "underOrder": true,
+   "price": 96400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/i20-2001/hero.webp",
    "url": "maf/urny/artdeco-i20-2001/"
   },
@@ -1437,8 +1437,8 @@
    "slug": "artdeco-i20-2021",
    "sku": "I20-2021",
    "name": "Урна I20-2021",
-   "price": null,
-   "underOrder": true,
+   "price": 123600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/i20-2021/hero.webp",
    "url": "maf/urny/artdeco-i20-2021/"
   },
@@ -1449,8 +1449,8 @@
    "slug": "artdeco-i20-3021",
    "sku": "I20-3021",
    "name": "Урна I20-3021",
-   "price": null,
-   "underOrder": true,
+   "price": 145300,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/i20-3021/hero.webp",
    "url": "maf/urny/artdeco-i20-3021/"
   },
@@ -1461,8 +1461,8 @@
    "slug": "artdeco-i20-4021",
    "sku": "I20-4021",
    "name": "Урна I20-4021",
-   "price": null,
-   "underOrder": true,
+   "price": 175400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/i20-4021/hero.webp",
    "url": "maf/urny/artdeco-i20-4021/"
   },
@@ -1473,8 +1473,8 @@
    "slug": "artdeco-o20-1411",
    "sku": "O20-1411",
    "name": "Урна O20-1411",
-   "price": null,
-   "underOrder": true,
+   "price": 38600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/o20-1411/hero.webp",
    "url": "maf/urny/artdeco-o20-1411/"
   },
@@ -1485,8 +1485,8 @@
    "slug": "artdeco-o20-2411",
    "sku": "O20-2411",
    "name": "Урна O20-2411",
-   "price": null,
-   "underOrder": true,
+   "price": 43200,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/o20-2411/hero.webp",
    "url": "maf/urny/artdeco-o20-2411/"
   },
@@ -1497,8 +1497,8 @@
    "slug": "artdeco-o20-3411",
    "sku": "O20-3411",
    "name": "Урна O20-3411",
-   "price": null,
-   "underOrder": true,
+   "price": 48600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/o20-3411/hero.webp",
    "url": "maf/urny/artdeco-o20-3411/"
   },
@@ -1509,8 +1509,8 @@
    "slug": "artdeco-o20-4411",
    "sku": "O20-4411",
    "name": "Урна O20-4411",
-   "price": null,
-   "underOrder": true,
+   "price": 56300,
+   "underOrder": false,
    "photo": "assets/img/artdeco/urny/o20-4411/hero.webp",
    "url": "maf/urny/artdeco-o20-4411/"
   },
@@ -1533,7 +1533,7 @@
    "slug": "urna-dlya-batareek-kvadratnaya-astrey",
    "sku": "42066",
    "name": "Урна для батареек квадратная «Астрей»",
-   "price": 13500,
+   "price": 18500,
    "underOrder": false,
    "photo": "assets/img/maf/urny/42066/main.webp",
    "url": "maf/urny/urna-dlya-batareek-kvadratnaya-astrey/"
@@ -1545,7 +1545,7 @@
    "slug": "urna-dlya-ekskrementov-korsika",
    "sku": "25579",
    "name": "Урна для экскрементов «Корсика»",
-   "price": 13300,
+   "price": 14300,
    "underOrder": false,
    "photo": "assets/img/maf/urny/25579/main.webp",
    "url": "maf/urny/urna-dlya-ekskrementov-korsika/"
@@ -1557,7 +1557,7 @@
    "slug": "urna-dlya-ekskrementov-variant1",
    "sku": "10549",
    "name": "Урна для экскрементов «Вариант-1»",
-   "price": 18100,
+   "price": 19600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/10549/main.webp",
    "url": "maf/urny/urna-dlya-ekskrementov-variant1/"
@@ -1581,7 +1581,7 @@
    "slug": "urna-dlya-razdelnogo-sbora-musora-alvarium",
    "sku": "12846",
    "name": "Урна для раздельного сбора мусора «Алвариум»",
-   "price": 33000,
+   "price": 43600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12846/main.webp",
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-alvarium/"
@@ -1593,7 +1593,7 @@
    "slug": "urna-dlya-razdelnogo-sbora-musora-gratiya",
    "sku": "12774",
    "name": "Урна для раздельного сбора мусора «Гратия»",
-   "price": 20000,
+   "price": 65000,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12774/main.webp",
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-gratiya/"
@@ -1605,7 +1605,7 @@
    "slug": "urna-dlya-razdelnogo-sbora-musora-korsika",
    "sku": "25577",
    "name": "Урна для раздельного сбора мусора «Корсика»",
-   "price": 33000,
+   "price": 36500,
    "underOrder": false,
    "photo": "assets/img/maf/urny/25577/main.webp",
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-korsika/"
@@ -1617,7 +1617,7 @@
    "slug": "urna-dlya-razdelnogo-sbora-musora-solidum",
    "sku": "12770",
    "name": "Урна для раздельного сбора мусора «Солидум»",
-   "price": 29100,
+   "price": 68600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12770/main.webp",
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-solidum/"
@@ -1653,7 +1653,7 @@
    "slug": "urna-dlya-razdelnogo-sbora-musora-tabula",
    "sku": "12772",
    "name": "Урна для раздельного сбора мусора «Табула»",
-   "price": 13500,
+   "price": 34580,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12772/main.webp",
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-tabula/"
@@ -1665,7 +1665,7 @@
    "slug": "urna-dlya-razdelnogo-sbora-musora-tenoris",
    "sku": "12775",
    "name": "Урна для раздельного сбора мусора «Тенорис»",
-   "price": 21700,
+   "price": 47600,
    "underOrder": false,
    "photo": "assets/img/maf/urny/12775/main.webp",
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-tenoris/"
@@ -1677,7 +1677,7 @@
    "slug": "urna-dlya-razdelnogo-sbora-musora-titaniya",
    "sku": "14865",
    "name": "Урна для раздельного сбора мусора «Титания»",
-   "price": 22900,
+   "price": 40800,
    "underOrder": false,
    "photo": "assets/img/maf/urny/14865/main.webp",
    "url": "maf/urny/urna-dlya-razdelnogo-sbora-musora-titaniya/"
@@ -2181,7 +2181,7 @@
    "slug": "urna-ust-002",
    "sku": "9422",
    "name": "Урна перфорированная «Прометей»",
-   "price": 7300,
+   "price": 9700,
    "underOrder": false,
    "photo": "assets/img/maf/urny/9422/main.webp",
    "url": "maf/urny/urna-ust-002/"
@@ -2205,8 +2205,8 @@
    "slug": "artdeco-a1-2651",
    "sku": "A1-2651",
    "name": "Лежак A1-2651",
-   "price": null,
-   "underOrder": true,
+   "price": 75400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/a1-2651/hero.webp",
    "url": "maf/lezhaki/artdeco-a1-2651/"
   },
@@ -2217,8 +2217,8 @@
    "slug": "artdeco-a1-2661",
    "sku": "A1-2661",
    "name": "Лежак A1-2661",
-   "price": null,
-   "underOrder": true,
+   "price": 72400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/a1-2661/hero.webp",
    "url": "maf/lezhaki/artdeco-a1-2661/"
   },
@@ -2229,8 +2229,8 @@
    "slug": "artdeco-a1-4651",
    "sku": "A1-4651",
    "name": "Лежак A1-4651",
-   "price": null,
-   "underOrder": true,
+   "price": 89700,
+   "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/a1-4651/hero.webp",
    "url": "maf/lezhaki/artdeco-a1-4651/"
   },
@@ -2241,8 +2241,8 @@
    "slug": "artdeco-a1-4661",
    "sku": "A1-4661",
    "name": "Лежак A1-4661",
-   "price": null,
-   "underOrder": true,
+   "price": 89700,
+   "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/a1-4661/hero.webp",
    "url": "maf/lezhaki/artdeco-a1-4661/"
   },
@@ -2253,8 +2253,8 @@
    "slug": "artdeco-i1-3451",
    "sku": "I1-3451",
    "name": "Лежак I1-3451",
-   "price": null,
-   "underOrder": true,
+   "price": 154000,
+   "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/i1-3451/hero.webp",
    "url": "maf/lezhaki/artdeco-i1-3451/"
   },
@@ -2265,8 +2265,8 @@
    "slug": "artdeco-i1-3481-10",
    "sku": "I1-3481-10",
    "name": "Лежак I1-3481-10",
-   "price": null,
-   "underOrder": true,
+   "price": 167400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/i1-3481-10/hero.webp",
    "url": "maf/lezhaki/artdeco-i1-3481-10/"
   },
@@ -2277,8 +2277,8 @@
    "slug": "artdeco-i1-3561",
    "sku": "I1-3561",
    "name": "Лежак I1-3561",
-   "price": null,
-   "underOrder": true,
+   "price": 78600,
+   "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/i1-3561/hero.webp",
    "url": "maf/lezhaki/artdeco-i1-3561/"
   },
@@ -2289,8 +2289,8 @@
    "slug": "artdeco-i1-3651",
    "sku": "I1-3651",
    "name": "Лежак I1-3651",
-   "price": null,
-   "underOrder": true,
+   "price": 56400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/lezhaki/i1-3651/hero.webp",
    "url": "maf/lezhaki/artdeco-i1-3651/"
   },
@@ -2445,7 +2445,7 @@
    "slug": "parkovyy-lezhak-stalnoy-rastrum",
    "sku": "16645",
    "name": "Парковый лежак стальной «Раструм»",
-   "price": 37600,
+   "price": 46700,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/16645/main.webp",
    "url": "maf/lezhaki/parkovyy-lezhak-stalnoy-rastrum/"
@@ -2481,7 +2481,7 @@
    "slug": "plyazhnaya-razdevalka-komfort",
    "sku": "11837",
    "name": "Пляжная раздевалка «Комфорт»",
-   "price": 83000,
+   "price": 198600,
    "underOrder": false,
    "photo": "assets/img/maf/lezhaki/11837/main.webp",
    "url": "maf/lezhaki/plyazhnaya-razdevalka-komfort/"
@@ -2529,8 +2529,8 @@
    "slug": "artdeco-e33-100",
    "sku": "E33-100",
    "name": "Велопарковка E33-100",
-   "price": null,
-   "underOrder": true,
+   "price": 12500,
+   "underOrder": false,
    "photo": "assets/img/artdeco/veloparkovki/e33-100/hero.webp",
    "url": "maf/veloparkovki/artdeco-e33-100/"
   },
@@ -2541,8 +2541,8 @@
    "slug": "artdeco-e33-101",
    "sku": "E33-101",
    "name": "Велопарковка E33-101",
-   "price": null,
-   "underOrder": true,
+   "price": 12700,
+   "underOrder": false,
    "photo": "assets/img/artdeco/veloparkovki/e33-101/hero.webp",
    "url": "maf/veloparkovki/artdeco-e33-101/"
   },
@@ -2553,8 +2553,8 @@
    "slug": "artdeco-i33-101",
    "sku": "I33-101",
    "name": "Велопарковка I33-101",
-   "price": null,
-   "underOrder": true,
+   "price": 9400,
+   "underOrder": false,
    "photo": "assets/img/artdeco/veloparkovki/i33-101/hero.webp",
    "url": "maf/veloparkovki/artdeco-i33-101/"
   },
@@ -2565,8 +2565,8 @@
    "slug": "artdeco-i33-111",
    "sku": "I33-111",
    "name": "Велопарковка I33-111",
-   "price": null,
-   "underOrder": true,
+   "price": 9900,
+   "underOrder": false,
    "photo": "assets/img/artdeco/veloparkovki/i33-111/hero.webp",
    "url": "maf/veloparkovki/artdeco-i33-111/"
   },
@@ -2733,7 +2733,7 @@
    "slug": "besedka-tetatet",
    "sku": "20172",
    "name": "Беседка «Тет-а-тет»",
-   "price": 315800,
+   "price": 345600,
    "underOrder": false,
    "photo": "assets/img/maf/pavilony-i-navesy/20172/main.webp",
    "url": "maf/pavilony-i-navesy/besedka-tetatet/"
@@ -3045,7 +3045,7 @@
    "slug": "konteynernaya-ploshchadka-dlya-tbo-maf-8",
    "sku": "13992",
    "name": "Контейнерная площадка для ТБО «МАФ - 8»",
-   "price": 1171100,
+   "price": 875900,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/main.webp",
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-maf-8/"
@@ -3069,7 +3069,7 @@
    "slug": "konteynernaya-ploshchadka-dlya-tbo-nero",
    "sku": "24114",
    "name": "Контейнерная площадка для ТБО «Неро»",
-   "price": 438400,
+   "price": 567400,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/24114/main.webp",
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-nero/"
@@ -3105,7 +3105,7 @@
    "slug": "konteynernaya-ploshchadka-ekologiya",
    "sku": "19441",
    "name": "Контейнерная площадка «Экология»",
-   "price": 221800,
+   "price": 267000,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/19441/main.webp",
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-ekologiya/"
@@ -3117,7 +3117,7 @@
    "slug": "konteynernaya-ploshchadka-panel",
    "sku": "15678",
    "name": "Контейнерная площадка «Панель»",
-   "price": 586800,
+   "price": 865000,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15678/main.webp",
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-panel/"
@@ -3129,7 +3129,7 @@
    "slug": "konteynernyy-shkaf-modul",
    "sku": "13880",
    "name": "Контейнерный шкаф «Модуль»",
-   "price": 86800,
+   "price": 145600,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13880/main.webp",
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul/"
@@ -3153,7 +3153,7 @@
    "slug": "konteynernyy-shkaf-modul-xl",
    "sku": "13885",
    "name": "Контейнерный шкаф «Модуль XL»",
-   "price": 116300,
+   "price": 176000,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13885/main.webp",
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-xl/"
@@ -3165,7 +3165,7 @@
    "slug": "konteynernyy-shkaf-modul-xl-stalnoy",
    "sku": "15160",
    "name": "Контейнерный шкаф «Модуль XL» стальной",
-   "price": 118000,
+   "price": 210700,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15160/main.webp",
    "url": "metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-xl-stalnoy/"
@@ -3189,7 +3189,7 @@
    "slug": "ograzhdenie-dlya-tbo-bunker",
    "sku": "40261",
    "name": "Ограждение для ТБО «Бункер»",
-   "price": 201000,
+   "price": 232000,
    "underOrder": false,
    "photo": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/40261/main.webp",
    "url": "metallokonstrukcii/konteynernye-ploshchadki/ograzhdenie-dlya-tbo-bunker/"
@@ -3230,5 +3230,6 @@
    "photo": "",
    "url": "ograzhdeniya/perila/"
   }
- ]
+ ],
+ "updated": "2026-07-05"
 }
