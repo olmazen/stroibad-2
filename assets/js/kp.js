@@ -23,6 +23,7 @@
   var auto = P.get('auto') === '1';
   var preview = P.get('preview') === '1';   // мини-превью в корзине (обложка+ведомость, без панели, некликабельно)
   if (preview) { ledgerOnly = true; auto = false; if (document.body) document.body.classList.add('kp-preview-mode'); }
+  if (P.get('embed') === '1' && document.body) document.body.classList.add('kp-embed'); // внутри шторки корзины: свой тулбар не нужен
 
   /* ---------------- утилиты ---------------- */
   function readJSON(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }
@@ -297,9 +298,29 @@
     Promise.all([fonts].concat(waits)).then(function () {
       var m = document.getElementById('kp-ready'); if (m) m.setAttribute('data-ready', '1');
       window.__kpReady = true;
+      fitNarrow();
       if (auto) setTimeout(function () { window.print(); }, 120);
     });
   }
+
+  /* узкий экран (мобилка / шторка): масштабируем A4 точно под ширину, без обрезки */
+  var SHEET_W = 830; // 210mm + отступы
+  function fitNarrow() {
+    var d = document.querySelector('.kp-doc'); if (!d) return;
+    if (window.innerWidth < 820) {
+      d.style.width = SHEET_W + 'px';
+      d.style.transform = 'none';
+      var s = window.innerWidth / SHEET_W;
+      var h = d.scrollHeight;
+      d.style.transform = 'scale(' + s + ')';
+      d.style.transformOrigin = 'top left';
+      d.style.height = Math.ceil(h * s) + 'px';
+    } else {
+      d.style.width = ''; d.style.transform = ''; d.style.transformOrigin = ''; d.style.height = '';
+    }
+  }
+  window.addEventListener('resize', fitNarrow);
+  setTimeout(fitNarrow, 700); // страховка после дозагрузки чертежей
 
   var pb = document.getElementById('kpPrintBtn');
   if (pb) pb.addEventListener('click', function () { window.print(); });

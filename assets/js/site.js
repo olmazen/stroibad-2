@@ -724,43 +724,172 @@ window.__whenVisible = (function () {
     updateSums();
   });
 
-  /* ── КП: живой предпросмотр + выдача только после ввода контактов (лид) ── */
+  /* ── КП: анимированный предпросмотр + шторка с «генерацией» + лид-гейт ── */
   (function wireKpGen() {
     var gen = document.getElementById('kpGen');
     if (!gen) return;
     var HEAD_KEY = 'sp_kp_head_v1', LEADS_KEY = 'sp_leads_v1';
-    var frame = document.getElementById('kpPreviewFrame');
+    var stage = document.getElementById('kpvStage');
     var form = document.getElementById('kpForm');
     var nameEl = document.getElementById('kpName');
     var phoneEl = document.getElementById('kpPhone');
+    var emailEl = document.getElementById('kpEmail');
     var addrEl = document.getElementById('kpAddressee');   // компания → «Кому» в КП
     var okBox = document.getElementById('kpOk');
     var base = C.siteBase || (location.origin + '/');
 
     function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
     function autoNum() { var d = new Date(); return 'КП-' + d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    function money(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
 
     // префилл контактов (если уже оставляли)
     var saved = {}; try { saved = JSON.parse(localStorage.getItem(HEAD_KEY)) || {}; } catch (e) {}
     if (nameEl) nameEl.value = saved.name || '';
     if (phoneEl) phoneEl.value = saved.phone || '';
+    if (emailEl) emailEl.value = saved.email || '';
     if (addrEl) addrEl.value = saved.addressee || '';
 
-    // живой предпросмотр (миниатюра реального КП с товарами из корзины) — с дебаунсом
+    /* — сцены «страниц» КП из реальных товаров корзины (обложка → ведомость → лист изделия) — */
+    function scenesHtml(items) {
+      var first = items[0] || {};
+      var rows = items.slice(0, 5).map(function (it, i) {
+        var price = it.price || it.priceFrom || 0;
+        return '<div class="kpv-row" style="animation-delay:' + (0.35 + i * 0.28) + 's">' +
+          (it.img ? '<img src="' + esc(it.img) + '" alt="">' : '<span class="kpv-noimg"></span>') +
+          '<span class="n">' + esc(it.name) + '</span>' +
+          '<span class="q">×' + (it.qty || 1) + '</span>' +
+          '<span class="p">' + (price ? (it.price ? '' : 'от ') + money(price) + ' ₽' : 'по запросу') + '</span></div>';
+      }).join('');
+      var more = items.length > 5 ? '<div class="kpv-more" style="animation-delay:' + (0.35 + 5 * 0.28) + 's">+ ещё ' + (items.length - 5) + ' позиций</div>' : '';
+      var total = 0, approx = false;
+      items.forEach(function (it) { var p = it.price || it.priceFrom || 0; total += p * (it.qty || 1); if (!it.price) approx = true; });
+      return '' +
+        // сцена 1 — обложка: печатается заголовок, проявляется фото
+        '<div class="kpv-sc" data-sc="0">' +
+          '<div class="kpv-hd"><span class="kpv-logo"><b>EGOE</b> · завод</span><span class="kpv-num"></span></div>' +
+          '<div class="kpv-ph">' + (first.img ? '<img src="' + esc(first.img) + '" alt="">' : '') + '</div>' +
+          '<div class="kpv-h1"><span class="kpv-t">КОММЕРЧЕСКОЕ</span><br><span class="kpv-t kpv-t2 am">ПРЕДЛОЖЕНИЕ</span></div>' +
+          '<div class="kpv-bar" style="animation-delay:1.35s;width:62%"></div>' +
+          '<div class="kpv-bar" style="animation-delay:1.5s;width:44%"></div>' +
+        '</div>' +
+        // сцена 2 — ведомость: строки вписываются одна за другой
+        '<div class="kpv-sc" data-sc="1">' +
+          '<div class="kpv-hd"><span class="kpv-logo"><b>EGOE</b></span><span class="kpv-cap">Ведомость изделий</span></div>' +
+          rows + more +
+          '<div class="kpv-tot" style="animation-delay:' + (0.5 + Math.min(items.length, 5) * 0.28) + 's"><span>Итого' + (approx ? ' ориентировочно' : '') + '</span><b>' + (total ? money(total) + ' ₽' : 'по запросу') + '</b></div>' +
+        '</div>' +
+        // сцена 3 — лист изделия: фото + чертёжная сетка + характеристики
+        '<div class="kpv-sc" data-sc="2">' +
+          '<div class="kpv-hd"><span class="kpv-logo"><b>EGOE</b></span><span class="kpv-cap">Лист изделия · ' + esc(first.id || '') + '</span></div>' +
+          '<div class="kpv-split">' +
+            '<div class="kpv-ph kpv-ph-s">' + (first.img ? '<img src="' + esc(first.img) + '" alt="">' : '') + '</div>' +
+            '<div class="kpv-bp"><i></i><i></i><i></i></div>' +
+          '</div>' +
+          '<div class="kpv-bar" style="animation-delay:.7s;width:88%"></div>' +
+          '<div class="kpv-bar" style="animation-delay:.85s;width:74%"></div>' +
+          '<div class="kpv-bar" style="animation-delay:1s;width:81%"></div>' +
+          '<div class="kpv-bar am" style="animation-delay:1.25s;width:38%"></div>' +
+        '</div>';
+    }
+
+    /* — плеер сцен: .on запускает CSS-анимации; смена сцены = пересоздание узла (рестарт) — */
+    function makePlayer(stageEl) {
+      var timer = null, idx = 0, html = '';
+      function show(i) {
+        var scs = stageEl.querySelectorAll('.kpv-sc');
+        if (!scs.length) return;
+        idx = i % scs.length;
+        scs.forEach(function (sc, j) {
+          if (j === idx) { var fresh = sc.cloneNode(true); sc.parentNode.replaceChild(fresh, sc); fresh.classList.add('on'); }
+          else sc.classList.remove('on');
+        });
+      }
+      return {
+        set: function (items) { html = scenesHtml(items); stageEl.innerHTML = html; },
+        loop: function () { this.stop(); show(0); timer = setInterval(function () { show(idx + 1); }, 3600); },
+        once: function () { this.stop(); show(0); var n = 1; timer = setInterval(function () { if (n > 2) return; show(n++); }, 2200); },
+        stop: function () { if (timer) { clearInterval(timer); timer = null; } }
+      };
+    }
+    var pv = stage ? makePlayer(stage) : null;
+
     var refreshT, lastKey = '';
     function refreshPreview() {
-      if (!frame) return;
+      if (!pv) return;
       clearTimeout(refreshT);
       refreshT = setTimeout(function () {
-        var c = C.read(); if (!c.length) return;
+        var c = C.read(); if (!c.length) { pv.stop(); stage.innerHTML = ''; lastKey = ''; return; }
         var key = JSON.stringify(c.map(function (i) { return [i.id, i.qty, i.price]; }));
-        if (key === lastKey) return;                 // без изменений — не перезагружаем
+        if (key === lastKey) return;
         lastKey = key;
-        frame.src = new URL('kp/index.html?preview=1&_=' + Date.now(), base).href;
-      }, 450);
+        pv.set(c); pv.loop();
+      }, 350);
     }
     window.__kpRefresh = refreshPreview;
     refreshPreview();
+
+    /* — шторка с настоящим КП — */
+    var drawer = document.getElementById('kpDrawer');
+    var dFrame = document.getElementById('kpdFrame');
+    var dStage = document.getElementById('kpdStage');
+    var dSteps = document.getElementById('kpdSteps');
+    var dProg = document.getElementById('kpdProg');
+    var dNum = document.getElementById('kpdNum');
+    var dPlayer = dStage ? makePlayer(dStage) : null;
+    var genTimers = [];
+
+    function openDrawer() {
+      if (!drawer) { window.open(new URL('kp/index.html', base).href, '_blank'); return; }
+      var items = C.read();
+      drawer.classList.remove('ready');
+      drawer.classList.add('open');
+      document.documentElement.classList.add('kpd-lock');
+      if (dNum) dNum.textContent = autoNum() + ' · ' + today().split('-').reverse().join('.');
+      // анимация «генерации»: сцены + шаги-галочки + прогресс
+      genTimers.forEach(clearTimeout); genTimers = [];
+      if (dPlayer) { dPlayer.set(items); dPlayer.once(); }
+      if (dProg) { dProg.style.transition = 'none'; dProg.style.width = '0'; void dProg.offsetWidth; dProg.style.transition = 'width 5.6s cubic-bezier(.3,.6,.4,1)'; dProg.style.width = '96%'; }
+      if (dSteps) {
+        var lis = dSteps.querySelectorAll('li');
+        lis.forEach(function (li) { li.classList.remove('done', 'act'); });
+        lis.forEach(function (li, i) {
+          genTimers.push(setTimeout(function () { li.classList.add('act'); }, 200 + i * 1350));
+          genTimers.push(setTimeout(function () { li.classList.add('done'); }, 200 + i * 1350 + 1200));
+        });
+      }
+      // настоящее КП грузится параллельно; показываем после анимации И загрузки
+      var loaded = false, minDone = false, revealed = false;
+      function tryReveal() {
+        if (revealed || !loaded || !minDone) return;
+        revealed = true;
+        if (dProg) dProg.style.width = '100%';
+        genTimers.push(setTimeout(function () { drawer.classList.add('ready'); if (dPlayer) dPlayer.stop(); }, 350));
+      }
+      dFrame.onload = function () { loaded = true; tryReveal(); };
+      dFrame.src = new URL('kp/index.html?embed=1&_=' + Date.now(), base).href;
+      genTimers.push(setTimeout(function () { minDone = true; tryReveal(); }, 5800));
+      genTimers.push(setTimeout(function () { loaded = true; tryReveal(); }, 12000)); // страховка
+      var tab = document.getElementById('kpdOpenTab');
+      if (tab) tab.href = new URL('kp/index.html', base).href;
+    }
+    function closeDrawer() {
+      if (!drawer) return;
+      drawer.classList.remove('open');
+      document.documentElement.classList.remove('kpd-lock');
+      genTimers.forEach(clearTimeout); genTimers = [];
+      if (dPlayer) dPlayer.stop();
+    }
+    var xBtn = document.getElementById('kpdClose'), backEl = document.getElementById('kpdBack');
+    if (xBtn) xBtn.addEventListener('click', closeDrawer);
+    if (backEl) backEl.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+    var pdfBtn = document.getElementById('kpdPdf');
+    if (pdfBtn) pdfBtn.addEventListener('click', function () {
+      try { dFrame.contentWindow.focus(); dFrame.contentWindow.print(); } catch (e) { window.open(new URL('kp/index.html', base).href, '_blank'); }
+    });
+    var reopen = document.getElementById('kpReopen');
+    if (reopen) reopen.addEventListener('click', function (e) { e.preventDefault(); openDrawer(); });
 
     function digits(s) { return (s || '').replace(/\D/g, ''); }
     function markInvalid(el) { el.classList.add('kp-invalid'); setTimeout(function () { el.classList.remove('kp-invalid'); }, 2500); }
@@ -768,24 +897,25 @@ window.__whenVisible = (function () {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var name = (nameEl.value || '').trim(), phone = (phoneEl.value || '').trim(), company = (addrEl.value || '').trim();
-      var bad = false;
-      if (!name) { markInvalid(nameEl); bad = true; }
-      if (digits(phone).length < 10) { markInvalid(phoneEl); bad = true; }
-      if (bad) { if (!name) nameEl.focus(); else phoneEl.focus(); return; }
+      var email = emailEl ? (emailEl.value || '').trim() : '';
+      var bad = null;
+      if (!name) { markInvalid(nameEl); bad = bad || nameEl; }
+      if (digits(phone).length < 10) { markInvalid(phoneEl); bad = bad || phoneEl; }
+      if (emailEl && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { markInvalid(emailEl); bad = bad || emailEl; }
+      if (bad) { bad.focus(); return; }
 
       // шапка КП: адресат = компания или имя; №/дата — авто
-      var head = { name: name, phone: phone, addressee: company || name, object: '', number: autoNum(), date: today() };
+      var head = { name: name, phone: phone, email: email, addressee: company || name, object: '', number: autoNum(), date: today() };
       try { localStorage.setItem(HEAD_KEY, JSON.stringify(head)); } catch (e2) {}
 
-      // фиксируем лид локально (сервер заберёт позже; TODO: POST на send-spec.php)
+      // фиксируем лид локально (сервер заберёт позже; TODO: POST на send-spec.php + письмо с КП)
       try {
         var leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-        leads.push({ ts: Date.now(), name: name, phone: phone, company: company, items: C.read() });
+        leads.push({ ts: Date.now(), name: name, phone: phone, email: email, company: company, items: C.read() });
         localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
       } catch (e3) {}
 
-      // открыть полное КП
-      window.open(new URL('kp/index.html', base).href, '_blank');
+      openDrawer();
       if (okBox) okBox.style.display = 'block';
     });
   })();

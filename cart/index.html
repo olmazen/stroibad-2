@@ -9,7 +9,7 @@
 <meta name="robots" content="noindex, follow">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=egoe11">
+<link rel="stylesheet" href="../assets/css/style.css?v=egoe12">
 </head>
 <body>
 <div class="topbar"><div class="container">
@@ -63,21 +63,22 @@
 
           <div class="kp-gen" id="kpGen">
             <h4>Получить коммерческое предложение</h4>
-            <div class="kp-preview" id="kpPreview" aria-hidden="true">
-              <iframe id="kpPreviewFrame" title="Предпросмотр КП" scrolling="no" tabindex="-1"></iframe>
+            <div class="kp-preview kpv" id="kpPreview" aria-hidden="true">
+              <div class="kpv-stage" id="kpvStage"></div>
               <div class="kp-preview-fade"></div>
               <div class="kp-preview-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>Предпросмотр · ваши изделия</div>
             </div>
-            <p class="kp-gen-hint">Красивое КП в PDF: обложка, ведомость с ценами, фото и чертёж каждого изделия. Оставьте контакты — откроем полное предложение прямо сейчас.</p>
+            <p class="kp-gen-hint">Красивое КП в PDF: обложка, ведомость с ценами, фото и чертёж каждого изделия. Оставьте контакты — соберём его прямо здесь, копию пришлём на почту.</p>
             <form id="kpForm" novalidate>
               <div class="field"><label>Ваше имя<span class="req">*</span></label><input type="text" id="kpName" placeholder="Как к вам обращаться"></div>
               <div class="field"><label>Телефон<span class="req">*</span></label><input type="tel" id="kpPhone" placeholder="+7 ___ ___-__-__"></div>
+              <div class="field"><label>Почта<span class="req">*</span></label><input type="email" id="kpEmail" placeholder="Пришлём КП на эту почту"></div>
               <div class="field"><label>Компания (необязательно)</label><input type="text" id="kpAddressee" placeholder="Появится в КП как «Кому»"></div>
               <textarea name="items" id="cartFormItems" hidden></textarea>
               <button class="btn btn-primary btn-block" type="submit" id="kpOpen">Получить КП (PDF)</button>
               <p class="consent">Нажимая кнопку, вы соглашаетесь с политикой обработки персональных данных.</p>
             </form>
-            <div class="form-result form-ok" id="kpOk" style="display:none"><b>Готово!</b>КП открылось в новой вкладке — сохраните как PDF. Мы свяжемся с вами по указанному телефону.</div>
+            <div class="form-result form-ok" id="kpOk" style="display:none"><b>Готово!</b>КП собрано — копию пришлём на почту. <a href="#" id="kpReopen">Открыть ещё раз</a></div>
           </div>
         <p class="cartp-note">Завод-производитель · окраска RAL · отгрузка по всей России</p>
       </aside>
@@ -144,6 +145,33 @@
     <div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div></div>
 </div></div>
 
-<script src="../assets/js/site.js?v=egoe11"></script>
+<div class="kpdrawer" id="kpDrawer" aria-hidden="true">
+  <div class="kpd-back" id="kpdBack"></div>
+  <aside class="kpd-panel" role="dialog" aria-label="Коммерческое предложение">
+    <header class="kpd-head">
+      <div class="kpd-title">Коммерческое предложение <span id="kpdNum"></span></div>
+      <button class="kpd-x" id="kpdClose" aria-label="Закрыть">×</button>
+    </header>
+    <div class="kpd-body">
+      <div class="kpd-gen" id="kpdGen">
+        <div class="kpv kpd-mini"><div class="kpv-stage" id="kpdStage"></div></div>
+        <ul class="kpd-steps" id="kpdSteps">
+          <li>Собираем обложку</li>
+          <li>Заполняем ведомость</li>
+          <li>Верстаем листы изделий</li>
+          <li>Готовим условия и контакты</li>
+        </ul>
+        <div class="kpd-prog"><i id="kpdProg"></i></div>
+      </div>
+      <iframe id="kpdFrame" title="Коммерческое предложение"></iframe>
+    </div>
+    <footer class="kpd-foot">
+      <button class="btn btn-primary" id="kpdPdf" type="button">Скачать PDF</button>
+      <a class="kpd-alt" id="kpdOpenTab" target="_blank" rel="noopener">Открыть отдельной вкладкой</a>
+    </footer>
+  </aside>
+</div>
+
+<script src="../assets/js/site.js?v=egoe12"></script>
 </body>
 </html>

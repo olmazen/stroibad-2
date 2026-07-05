@@ -194,6 +194,8 @@ table{border-collapse:collapse;width:100%}
 /* ---------- Режим мини-превью (iframe в корзине) ---------- */
 .kp-preview-mode{pointer-events:none}
 .kp-preview-mode .kp-toolbar{display:none}
+/* ---------- Режим embed (шторка в корзине: кнопки у шторки, тулбар КП не нужен) ---------- */
+.kp-embed .kp-toolbar{display:none}
 
 /* ============================================================
    ЭКРАН — превью «как на бумаге»
@@ -235,5 +237,5 @@ table{border-collapse:collapse;width:100%}
 
 /* мобильный просмотр превью — ужимаем лист */
 @media screen and (max-width:820px){
-  .kp-doc{padding:12px 0;transform:scale(.46);transform-origin:top center}
+  .kp-doc{padding:12px 0} /* масштаб под ширину делает fitNarrow() в kp.js — без обрезки на любом экране */
 }
