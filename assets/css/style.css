@@ -1345,3 +1345,26 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .cookie-in a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(242,111,29,.4)}
 .cookie-in .btn{white-space:nowrap}
 @media(max-width:600px){.cookie-in{gap:11px}.cookie-in .btn{width:100%}}
+
+/* ── блок «Разлом 50/50»: две линейки Стандарт / Art Déco (на категориях) ── */
+.ss-split-sec{padding:0}
+.ss1{display:flex;gap:3px;height:clamp(450px,57vh,600px);border:1px solid var(--line);margin-top:8px}
+.ss1 .pan{position:relative;flex:1;overflow:hidden;cursor:pointer;text-decoration:none;transition:flex .55s cubic-bezier(.4,.05,.15,1)}
+.ss1:hover .pan{flex:.82}.ss1 .pan:hover,.ss1 .pan:focus-visible{flex:1.5}
+.ss1 .pan>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s ease}
+.ss1 .pan:hover>img{transform:scale(1.07)}
+.ss1 .pan::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,11,14,.12) 30%,rgba(9,11,14,.86));transition:background .5s}
+.ss1 .pan:hover::after{background:linear-gradient(180deg,rgba(9,11,14,.08) 20%,rgba(9,11,14,.72))}
+.ss1 .pan>i{position:absolute;top:0;left:0;right:0;height:3px;z-index:3}
+.ss1 .std>i{background:var(--amber)}.ss1 .art>i{background:#c9a45f}
+.ss1 .in{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:28px 32px}
+.ss1 h3{font-family:'Oswald',sans-serif;font-size:clamp(28px,3.2vw,44px);text-transform:uppercase;letter-spacing:.02em;color:#fff;margin:12px 0 8px;line-height:1}
+.ss1 .cnt{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.05em;color:rgba(255,255,255,.66)}
+.ss1 .in p{font-size:13.5px;color:rgba(255,255,255,.82);line-height:1.5;max-width:360px;margin:10px 0 16px;max-height:0;opacity:0;overflow:hidden;transition:max-height .5s,opacity .4s,margin .5s}
+.ss1 .pan:hover p{max-height:96px;opacity:1}
+.ss-badge{display:inline-block;font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;padding:4px 12px;border-radius:1px;color:#151109}
+.ss-badge.std{background:var(--amber)}.ss-badge.art{background:#c9a45f;color:#211b0d}
+.ss-go{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid transparent;transition:gap .25s,border-color .25s}
+.ss-go:hover{gap:13px;border-color:currentColor}
+.ss-go.std{color:var(--amber)}.ss-go.art{color:#c9a45f}
+@media(max-width:820px){.ss1{flex-direction:column;height:auto}.ss1 .pan{height:260px;flex:none!important}.ss1 .pan p{max-height:96px;opacity:1}}
