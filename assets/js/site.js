@@ -1082,22 +1082,22 @@ window.__whenVisible = (function () {
   function mediaFor(k) {
     var cur = '<div class="fw-cur" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L16 19l-3 1.6-3.4-6.4L5 18z"/></svg></div>';
     if (k === 'choose') {
-      var card = function (c, tag, tagCls, name, sub, price, imgs, alt) {
-        return '<div class="fw-ch-card" data-c="' + c + '">' +
+      var card = function (c, cls, series, vibe, name, sub, price, imgs, alt) {
+        return '<div class="fw-ch-card ' + cls + '" data-c="' + c + '">' +
+          '<div class="fw-ch-head"><span class="fw-ch-badge">' + series + '</span><span class="fw-ch-vibe">' + vibe + '</span></div>' +
           '<div class="fw-ch-ph">' +
-          imgs.map(function (src, i) { return '<img class="' + (i === 0 ? 'on' : '') + '" src="' + src + '" alt="' + alt + '">'; }).join('') +
-          '<span class="fw-ch-tag ' + tagCls + '">' + tag + '</span>' +
+          imgs.map(function (src, i) { return '<img class="' + (i === 0 ? 'on' : '') + '" src="' + src + '" alt="' + alt + '" loading="eager">'; }).join('') +
           '<span class="fw-ch-dots">' + imgs.map(function (_, i) { return '<i class="' + (i === 0 ? 'on' : '') + '"></i>'; }).join('') + '</span>' +
           '</div>' +
-          '<div class="fw-ch-info"><b>' + name + '</b><span>' + sub + '</span><em>' + price + '</em></div>' +
-          '<button class="fw-ch-btn" type="button"><span>+</span> В список</button>' +
+          '<div class="fw-ch-info"><b>' + name + '</b><span>' + sub + '</span></div>' +
+          '<div class="fw-ch-buy"><em>' + price + '</em><button class="fw-ch-btn" type="button"><span>+</span> В список</button></div>' +
           '</div>';
       };
       return '<div class="fw-choose">' +
         '<div class="fw-ch-cards">' +
-        card('0', 'Стандарт', 'std', 'Скамейка «Колледж»', 'Сталь + дерево', 'от 19 600 ₽',
+        card('0', 'std', 'Стандарт', 'Рабочая классика', 'Скамейка «Колледж»', 'Сталь + брус хвойных пород · для дворов, парков и улиц', 'от 19 600 ₽',
           ['assets/img/maf/skamejki/9467/main.webp', 'assets/img/maf/skamejki/9467/angle.webp', 'assets/img/maf/skamejki/9467/closeup.webp'], 'Скамейка стальная — серия Стандарт') +
-        card('1', 'Art Déco', 'art', 'Скамейка A1-101', 'Дизайн-серия', 'от 44 500 ₽',
+        card('1', 'art', 'Art Déco', 'Дизайн-линия', 'Скамейка A1-101', 'Авторские формы, термодерево и нержавеющая сталь · премиум', 'от 44 500 ₽',
           ['assets/img/artdeco/skamejki/a1-101/hero.webp', 'assets/img/artdeco/skamejki/a1-101/facade1.webp', 'assets/img/artdeco/skamejki/a1-101/life1.webp'], 'Скамейка дизайнерская — серия Art Déco') +
         '</div>' +
         '<div class="fw-ch-next"><span class="fw-ch-circle" data-cnt>2</span><span class="fw-ch-nx"><b>В списке для расчёта</b><i class="fw-ch-down"><svg viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6"/></svg></i></span></div>' +
@@ -1353,7 +1353,7 @@ window.__whenVisible = (function () {
         if (chCnt) chCnt.textContent = '0';
         ccur.classList.remove('show', 'press');
       }
-      var CARD_MS = 3300;
+      var CARD_MS = 3900;
       api.start = function () {
         running = true;
         (function loop() {
@@ -1363,19 +1363,19 @@ window.__whenVisible = (function () {
           var added = 0;
           chCards.forEach(function (cardEl, ci) {
             var ph = cardEl.querySelector('.fw-ch-ph'), btn = cardEl.querySelector('.fw-ch-btn');
-            var base = 500 + ci * CARD_MS;
-            // курсор осматривает карточку и листает фотокарточки
-            t(function () { curTo(ccur, ph, 520, 0.5, 0.5); }, base);
-            [1, 2, 0].forEach(function (pi, kk) { t(function () { flip(cardEl, pi); }, base + 780 + kk * 560); });
+            var base = 600 + ci * CARD_MS;
+            // курсор наводится на карточку и не спеша листает фотокарточки
+            t(function () { curTo(ccur, ph, 560, 0.5, 0.45); }, base);
+            [1, 2, 0].forEach(function (pi, kk) { t(function () { flip(cardEl, pi); }, base + 820 + kk * 820); });
             // курсор на кнопку → добавляет в список
-            t(function () { curTo(ccur, btn, 440, 0.5, 0.5); }, base + 2500);
-            t(function () { ccur.classList.add('press'); }, base + 2900);
-            t(function () { ccur.classList.remove('press'); cardEl.classList.add('added'); btn.classList.add('done'); added++; if (chCnt) chCnt.textContent = String(added); }, base + 3040);
+            t(function () { curTo(ccur, btn, 480, 0.5, 0.5); }, base + 3080);
+            t(function () { ccur.classList.add('press'); }, base + 3460);
+            t(function () { ccur.classList.remove('press'); cardEl.classList.add('added'); btn.classList.add('done'); added++; if (chCnt) chCnt.textContent = String(added); }, base + 3620);
           });
-          var end = 500 + chCards.length * CARD_MS;
+          var end = 600 + chCards.length * CARD_MS;
           // обе добавлены → появляется кружок со счётчиком и стрелка «дальше»
-          t(function () { ccur.classList.remove('show'); if (chNext) chNext.classList.add('show'); }, end + 150);
-          t(loop, end + 3400);
+          t(function () { ccur.classList.remove('show'); if (chNext) chNext.classList.add('show'); }, end + 250);
+          t(loop, end + 3600);
         })();
       };
       api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; resetChoose(); };

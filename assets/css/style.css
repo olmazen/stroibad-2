@@ -1097,40 +1097,51 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-cur svg{width:22px;height:22px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
 .fw-cur path{fill:#fff;stroke:#0C0F13;stroke-width:1.2}
 /* выбор изделий */
-/* выбор изделий: две карточки Стандарт / Art Déco, курсор листает фото и добавляет */
-.fw-choose{position:relative;max-width:660px}
-.fw-ch-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.fw-ch-card{position:relative;background:var(--srf);border:1px solid var(--line);border-radius:var(--r);padding:10px;transition:border-color .3s,box-shadow .3s,transform .3s}
-.fw-ch-card.added{border-color:var(--amber);box-shadow:0 10px 30px rgba(242,111,29,.16);transform:translateY(-3px)}
-.fw-ch-card[data-c="1"].added{border-color:#d9b871;box-shadow:0 10px 30px rgba(198,154,74,.18)}
-.fw-ch-ph{position:relative;height:150px;border-radius:4px;overflow:hidden;background:#0d1116}
-.fw-ch-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.04);transition:opacity .5s ease,transform .6s ease}
-.fw-ch-ph img.on{opacity:1;transform:none}
-.fw-ch-tag{position:absolute;left:9px;top:9px;z-index:2;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:5px;color:#151109;background:var(--amber)}
-.fw-ch-tag.art{background:linear-gradient(180deg,#d9b871,#c69a4a);color:#211b0d}
-.fw-ch-dots{position:absolute;left:0;right:0;bottom:8px;z-index:2;display:flex;gap:5px;justify-content:center}
-.fw-ch-dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45);transition:background .25s,transform .25s}
-.fw-ch-dots i.on{background:#fff;transform:scale(1.25)}
-.fw-ch-info{padding:10px 2px 4px}
-.fw-ch-info b{display:block;font-size:14px;color:var(--tx);line-height:1.25}
-.fw-ch-info span{font-size:11.5px;color:var(--steel)}
-.fw-ch-info em{display:block;margin-top:4px;font-style:normal;font-family:'Oswald',sans-serif;font-size:16px;color:var(--amber)}
-.fw-ch-card[data-c="1"] .fw-ch-info em{color:#d9b871}
-.fw-ch-btn{width:100%;margin-top:6px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--tx);border-radius:8px;padding:9px;font-family:'Oswald',sans-serif;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:background .25s,border-color .25s,color .25s}
+/* выбор изделий: две линейки Стандарт / Art Déco — крупно, наглядно, курсор листает фото и добавляет */
+.fw-choose{position:relative;max-width:760px}
+.fw-ch-cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.fw-ch-card{position:relative;display:flex;flex-direction:column;background:linear-gradient(180deg,#1a1f26,#13171d);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .35s,box-shadow .35s,transform .35s}
+.fw-ch-card.std::before,.fw-ch-card.art::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;z-index:3}
+.fw-ch-card.std::before{background:linear-gradient(90deg,var(--amber),#ff8a3d)}
+.fw-ch-card.art::before{background:linear-gradient(90deg,#d9b871,#f0d79a)}
+.fw-ch-card.added{transform:translateY(-4px)}
+.fw-ch-card.std.added{border-color:var(--amber);box-shadow:0 14px 40px rgba(242,111,29,.2)}
+.fw-ch-card.art.added{border-color:#d9b871;box-shadow:0 14px 40px rgba(198,154,74,.22)}
+/* шапка серии — громко и с описанием (чтобы разница была очевидна) */
+.fw-ch-head{display:flex;align-items:baseline;gap:10px;padding:14px 15px 11px}
+.fw-ch-badge{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:4px 11px;border-radius:6px;color:#151109;flex-shrink:0}
+.fw-ch-card.std .fw-ch-badge{background:var(--amber)}
+.fw-ch-card.art .fw-ch-badge{background:linear-gradient(120deg,#e6c988,#c69a4a);color:#211b0d;box-shadow:0 0 0 1px rgba(240,215,154,.4) inset}
+.fw-ch-vibe{font-family:'Oswald',sans-serif;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--steel)}
+.fw-ch-card.art .fw-ch-vibe{color:#d9b871}
+.fw-ch-ph{position:relative;height:clamp(200px,25vh,258px);overflow:hidden;background:#0d1116;margin:0 15px;border-radius:10px}
+.fw-ch-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.09);transition:opacity .7s ease,transform 1.6s ease}
+.fw-ch-ph img.on{opacity:1;transform:scale(1)}
+.fw-ch-ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 62%,rgba(9,11,14,.5));pointer-events:none}
+.fw-ch-dots{position:absolute;left:0;right:0;bottom:11px;z-index:2;display:flex;gap:6px;justify-content:center}
+.fw-ch-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);transition:background .3s,transform .3s,width .3s}
+.fw-ch-dots i.on{background:#fff;width:18px;border-radius:4px}
+.fw-ch-info{padding:13px 15px 4px}
+.fw-ch-info b{display:block;font-size:16px;color:#fff;line-height:1.25}
+.fw-ch-info span{display:block;font-size:12.5px;color:var(--steel);margin-top:3px;line-height:1.4}
+.fw-ch-buy{display:flex;align-items:center;gap:12px;padding:12px 15px 15px;margin-top:auto}
+.fw-ch-buy em{font-style:normal;font-family:'Oswald',sans-serif;font-size:19px;color:var(--amber);flex-shrink:0}
+.fw-ch-card.art .fw-ch-buy em{color:#d9b871}
+.fw-ch-btn{margin-left:auto;border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--tx);border-radius:9px;padding:10px 16px;font-family:'Oswald',sans-serif;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background .3s,border-color .3s,color .3s}
 .fw-ch-btn span{color:var(--amber);font-weight:700;margin-right:4px}
-.fw-ch-card.added .fw-ch-btn{background:var(--amber);border-color:var(--amber);color:#151109}
-.fw-ch-card[data-c="1"].added .fw-ch-btn{background:#d9b871;border-color:#d9b871;color:#211b0d}
+.fw-ch-card.std.added .fw-ch-btn{background:var(--amber);border-color:var(--amber);color:#151109}
+.fw-ch-card.art.added .fw-ch-btn{background:linear-gradient(120deg,#e6c988,#c69a4a);border-color:#d9b871;color:#211b0d}
 .fw-ch-btn.done span{display:none}
 .fw-ch-btn.done::before{content:"✓ ";font-weight:700}
-.fw-ch-next{display:flex;align-items:center;gap:12px;margin-top:16px;opacity:0;transform:translateY(6px);transition:opacity .45s ease,transform .45s ease}
+.fw-ch-next{display:flex;align-items:center;gap:13px;margin-top:18px;opacity:0;transform:translateY(6px);transition:opacity .5s ease,transform .5s ease}
 .fw-ch-next.show{opacity:1;transform:none}
-.fw-ch-circle{width:34px;height:34px;border-radius:50%;background:var(--amber);color:#151109;font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fw-ch-circle{width:36px;height:36px;border-radius:50%;background:var(--amber);color:#151109;font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 5px rgba(242,111,29,.12)}
 .fw-ch-nx{display:flex;align-items:center;gap:9px}
-.fw-ch-nx b{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--steel)}
+.fw-ch-nx b{font-family:'Oswald',sans-serif;font-size:13.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--steel)}
 .fw-ch-down{display:inline-flex;color:var(--amber);animation:fwDown 1.5s ease-in-out infinite}
 .fw-ch-down svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-@keyframes fwDown{0%,100%{transform:translateY(-2px)}50%{transform:translateY(4px)}}
-@media(max-width:600px){.fw-ch-ph{height:118px}.fw-ch-cards{gap:11px}}
+@keyframes fwDown{0%,100%{transform:translateY(-2px)}50%{transform:translateY(5px)}}
+@media(max-width:600px){.fw-ch-ph{height:150px}.fw-ch-cards{gap:12px}.fw-ch-head{padding:11px 12px 8px}.fw-ch-badge{font-size:13px}.fw-ch-info,.fw-ch-buy{padding-left:12px;padding-right:12px}.fw-ch-ph{margin:0 12px}}
 /* демо-форма заявки + push */
 .fw-demo{position:relative;pointer-events:none;user-select:none;max-width:640px}
 .fw-demo input{transition:border-color .25s,box-shadow .25s}
