@@ -16763,17 +16763,32 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/a20-1101/hero.webp",
+    "path": "assets/img/artdeco/urny/a20-1101/hero.webp?i11",
     "kind": "main",
-    "label": "A20-1101 · 3D-визуализация"
+    "label": "A20-1101 · каталожное фото"
    },
    {
-    "path": "assets/img/artdeco/urny/a20-1101/facade1.webp",
+    "path": "assets/img/artdeco/urny/a20-1101/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-1101/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-1101/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-1101/facade1.webp?i11",
     "kind": "angle",
     "label": "на объекте"
    },
    {
-    "path": "assets/img/artdeco/urny/a20-1101/facade2.webp",
+    "path": "assets/img/artdeco/urny/a20-1101/facade2.webp?i11",
     "kind": "closeup",
     "label": "в среде"
    }
@@ -16839,17 +16854,32 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/a20-5101/hero.webp",
+    "path": "assets/img/artdeco/urny/a20-5101/hero.webp?i11",
     "kind": "main",
-    "label": "A20-5101 · 3D-визуализация"
+    "label": "A20-5101 · каталожное фото"
    },
    {
-    "path": "assets/img/artdeco/urny/a20-5101/facade1.webp",
+    "path": "assets/img/artdeco/urny/a20-5101/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-5101/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-5101/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-5101/facade1.webp?i11",
     "kind": "angle",
     "label": "на объекте"
    },
    {
-    "path": "assets/img/artdeco/urny/a20-5101/facade2.webp",
+    "path": "assets/img/artdeco/urny/a20-5101/facade2.webp?i11",
     "kind": "closeup",
     "label": "в среде"
    }
@@ -16915,9 +16945,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/a20-7101/hero.webp",
+    "path": "assets/img/artdeco/urny/a20-7101/hero.webp?i11",
     "kind": "main",
-    "label": "A20-7101 · 3D-визуализация"
+    "label": "A20-7101 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-7101/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-7101/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-7101/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/A20-7101.svg"
@@ -16981,9 +17026,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/a20-8201/hero.webp",
+    "path": "assets/img/artdeco/urny/a20-8201/hero.webp?i11",
     "kind": "main",
-    "label": "A20-8201 · 3D-визуализация"
+    "label": "A20-8201 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-8201/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-8201/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/a20-8201/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/A20-8201.svg"
@@ -17047,17 +17107,32 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/e20-1100/hero.webp",
+    "path": "assets/img/artdeco/urny/e20-1100/hero.webp?i11",
     "kind": "main",
-    "label": "E20-1100 · 3D-визуализация"
+    "label": "E20-1100 · каталожное фото"
    },
    {
-    "path": "assets/img/artdeco/urny/e20-1100/facade1.webp",
+    "path": "assets/img/artdeco/urny/e20-1100/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-1100/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-1100/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-1100/facade1.webp?i11",
     "kind": "angle",
     "label": "на объекте"
    },
    {
-    "path": "assets/img/artdeco/urny/e20-1100/facade2.webp",
+    "path": "assets/img/artdeco/urny/e20-1100/facade2.webp?i11",
     "kind": "closeup",
     "label": "в среде"
    }
@@ -17123,17 +17198,32 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/e20-1101/hero.webp",
+    "path": "assets/img/artdeco/urny/e20-1101/hero.webp?i11",
     "kind": "main",
-    "label": "E20-1101 · 3D-визуализация"
+    "label": "E20-1101 · каталожное фото"
    },
    {
-    "path": "assets/img/artdeco/urny/e20-1101/facade1.webp",
+    "path": "assets/img/artdeco/urny/e20-1101/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-1101/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-1101/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-1101/facade1.webp?i11",
     "kind": "angle",
     "label": "на объекте"
    },
    {
-    "path": "assets/img/artdeco/urny/e20-1101/facade2.webp",
+    "path": "assets/img/artdeco/urny/e20-1101/facade2.webp?i11",
     "kind": "closeup",
     "label": "в среде"
    }
@@ -17199,9 +17289,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/e20-1413/hero.webp",
+    "path": "assets/img/artdeco/urny/e20-1413/hero.webp?i11",
     "kind": "main",
-    "label": "E20-1413 · 3D-визуализация"
+    "label": "E20-1413 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-1413/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-1413/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-1413/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/E20-1413.svg"
@@ -17265,9 +17370,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/e20-2411/hero.webp",
+    "path": "assets/img/artdeco/urny/e20-2411/hero.webp?i11",
     "kind": "main",
-    "label": "E20-2411 · 3D-визуализация"
+    "label": "E20-2411 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-2411/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-2411/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-2411/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/E20-2411.svg"
@@ -17331,12 +17451,27 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/e20-4411/hero.webp",
+    "path": "assets/img/artdeco/urny/e20-4411/hero.webp?i11",
     "kind": "main",
-    "label": "E20-4411 · 3D-визуализация"
+    "label": "E20-4411 · каталожное фото"
    },
    {
-    "path": "assets/img/artdeco/urny/e20-4411/facade1.webp",
+    "path": "assets/img/artdeco/urny/e20-4411/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-4411/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-4411/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
+   },
+   {
+    "path": "assets/img/artdeco/urny/e20-4411/facade1.webp?i11",
     "kind": "angle",
     "label": "на объекте"
    }
@@ -17402,9 +17537,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/i20-2001/hero.webp",
+    "path": "assets/img/artdeco/urny/i20-2001/hero.webp?i11",
     "kind": "main",
-    "label": "I20-2001 · 3D-визуализация"
+    "label": "I20-2001 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-2001/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-2001/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-2001/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/I20-2001.svg"
@@ -17468,9 +17618,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/i20-2021/hero.webp",
+    "path": "assets/img/artdeco/urny/i20-2021/hero.webp?i11",
     "kind": "main",
-    "label": "I20-2021 · 3D-визуализация"
+    "label": "I20-2021 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-2021/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-2021/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-2021/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/I20-2021.svg"
@@ -17534,9 +17699,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/i20-3021/hero.webp",
+    "path": "assets/img/artdeco/urny/i20-3021/hero.webp?i11",
     "kind": "main",
-    "label": "I20-3021 · 3D-визуализация"
+    "label": "I20-3021 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-3021/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-3021/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-3021/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/I20-3021.svg"
@@ -17600,9 +17780,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/i20-4021/hero.webp",
+    "path": "assets/img/artdeco/urny/i20-4021/hero.webp?i11",
     "kind": "main",
-    "label": "I20-4021 · 3D-визуализация"
+    "label": "I20-4021 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-4021/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-4021/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/i20-4021/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/I20-4021.svg"
@@ -17666,17 +17861,32 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/o20-1411/hero.webp",
+    "path": "assets/img/artdeco/urny/o20-1411/hero.webp?i11",
     "kind": "main",
-    "label": "O20-1411 · 3D-визуализация"
+    "label": "O20-1411 · каталожное фото"
    },
    {
-    "path": "assets/img/artdeco/urny/o20-1411/facade1.webp",
+    "path": "assets/img/artdeco/urny/o20-1411/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-1411/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-1411/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-1411/facade1.webp?i11",
     "kind": "angle",
     "label": "на объекте"
    },
    {
-    "path": "assets/img/artdeco/urny/o20-1411/facade2.webp",
+    "path": "assets/img/artdeco/urny/o20-1411/facade2.webp?i11",
     "kind": "closeup",
     "label": "в среде"
    }
@@ -17742,9 +17952,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/o20-2411/hero.webp",
+    "path": "assets/img/artdeco/urny/o20-2411/hero.webp?i11",
     "kind": "main",
-    "label": "O20-2411 · 3D-визуализация"
+    "label": "O20-2411 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-2411/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-2411/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-2411/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/O20-2411.svg"
@@ -17808,9 +18033,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/o20-3411/hero.webp",
+    "path": "assets/img/artdeco/urny/o20-3411/hero.webp?i11",
     "kind": "main",
-    "label": "O20-3411 · 3D-визуализация"
+    "label": "O20-3411 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-3411/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-3411/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-3411/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/O20-3411.svg"
@@ -17874,9 +18114,24 @@
   ],
   "images": [
    {
-    "path": "assets/img/artdeco/urny/o20-4411/hero.webp",
+    "path": "assets/img/artdeco/urny/o20-4411/hero.webp?i11",
     "kind": "main",
-    "label": "O20-4411 · 3D-визуализация"
+    "label": "O20-4411 · каталожное фото"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-4411/facade1.webp?i11",
+    "kind": "angle",
+    "label": "в парке"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-4411/facade2.webp?i11",
+    "kind": "closeup",
+    "label": "на объекте"
+   },
+   {
+    "path": "assets/img/artdeco/urny/o20-4411/facade3.webp?i11",
+    "kind": "other",
+    "label": "деталь"
    }
   ],
   "drawing": "assets/drawings/O20-4411.svg"
