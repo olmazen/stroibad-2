@@ -1630,3 +1630,21 @@ window.__whenVisible = (function () {
   layout(); onScroll();
 })();
 
+
+/* ── cookie-уведомление (один раз, путь к политике берём из подвала) ── */
+(function () {
+  try { if (localStorage.getItem('egoe_cookie_ok')) return; } catch (e) {}
+  if (!document.body || document.querySelector('.cookie-bar')) return;
+  var pl = document.querySelector('.foot-bot a[href*="privacy"]');
+  var href = pl ? pl.getAttribute('href') : 'privacy/index.html';
+  var bar = document.createElement('div');
+  bar.className = 'cookie-bar';
+  bar.innerHTML = '<div class="cookie-in"><p>Мы используем файлы cookie для работы сайта (например, чтобы сохранять список изделий). Продолжая пользоваться сайтом, вы соглашаетесь с <a href="' + href + '">политикой обработки персональных данных</a>.</p><button class="btn btn-primary btn-sm" type="button">Принять</button></div>';
+  document.body.appendChild(bar);
+  setTimeout(function () { bar.classList.add('show'); }, 60);
+  bar.querySelector('button').addEventListener('click', function () {
+    try { localStorage.setItem('egoe_cookie_ok', '1'); } catch (e) {}
+    bar.classList.remove('show');
+    setTimeout(function () { if (bar.parentNode) bar.remove(); }, 500);
+  });
+})();

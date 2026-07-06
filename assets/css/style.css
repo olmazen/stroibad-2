@@ -1318,3 +1318,30 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
   .fw-push{top:-8px}
 }
 @media(prefers-reduced-motion:reduce){.fw-cur,.fw-form-ok,.fw-pdf-bar u,.fw-stamp,.fw-pg,.fw-truck,.lg-fill{transition:none;animation:none}.fw-kb.play img{transform:none}}
+
+/* ── правовые страницы (политика ПД) ── */
+.legal{max-width:820px}
+.legal h2{font-family:'Oswald',sans-serif;font-size:20px;text-transform:uppercase;letter-spacing:.03em;color:#fff;margin:34px 0 12px;padding-top:22px;border-top:1px solid var(--line)}
+.legal h2:first-child{border-top:0;padding-top:0;margin-top:0}
+.legal p{color:var(--tx2);line-height:1.7;margin:0 0 12px;font-size:15px}
+.legal ul{margin:0 0 14px;padding-left:20px}
+.legal li{color:var(--tx2);line-height:1.65;margin-bottom:8px;font-size:15px}
+.legal a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(242,111,29,.4)}
+.legal a:hover{border-bottom-color:var(--amber)}
+.legal b{color:#fff;font-weight:600}
+.legal-req{display:grid;gap:0;border:1px solid var(--line);border-radius:var(--r);margin:14px 0 8px;overflow:hidden}
+.legal-req>div{display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;border-top:1px solid var(--line)}
+.legal-req>div:first-child{border-top:0}
+.legal-req span{color:var(--steel);font-size:13px}
+.legal-req b{color:#fff;font-size:14px;font-weight:600}
+.legal-note{color:var(--steel);font-size:13.5px;line-height:1.6;font-style:italic}
+@media(max-width:600px){.legal-req>div{grid-template-columns:1fr;gap:3px}}
+
+/* ── cookie-уведомление ── */
+.cookie-bar{position:fixed;left:0;right:0;bottom:0;z-index:400;background:rgba(15,18,23,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line-2);transform:translateY(110%);transition:transform .45s cubic-bezier(.22,.85,.25,1)}
+.cookie-bar.show{transform:none}
+.cookie-in{max-width:var(--wrap);margin:0 auto;padding:14px var(--gut);display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.cookie-in p{flex:1;min-width:240px;font-size:13px;color:var(--tx2);line-height:1.5;margin:0}
+.cookie-in a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(242,111,29,.4)}
+.cookie-in .btn{white-space:nowrap}
+@media(max-width:600px){.cookie-in{gap:11px}.cookie-in .btn{width:100%}}
