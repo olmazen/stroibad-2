@@ -1207,8 +1207,15 @@ window.__whenVisible = (function () {
   });
 
   var W = 0, H = 0, R = 0, CX = 0, CY = 0, BASE = 0, CARD_R = 0, EDGE = 0, mobile = false;
-  var theta = 0, targetTheta = 0, active = 0, raf = null;
+  var theta = 0, targetTheta = 0, vel = 0, active = 0, raf = null;
   var rad = function (a) { return a * Math.PI / 180; };
+  // магнит: тянет позицию к ближайшему шагу (плато у каждой категории), между шагами — быстрый проезд
+  function magnet(pf) {
+    var i = Math.round(pf), f = pf - i;            // -0.5..0.5
+    var s = f < 0 ? -1 : 1, a = Math.min(1, Math.abs(f) * 2);
+    var e = a * a * (3 - 2 * a);                    // smoothstep — прижимает к целому у краёв, «плато» у шага
+    return i + s * e * 0.5;
+  }
 
   function layout() {
     W = innerWidth; H = innerHeight;
@@ -1265,13 +1272,18 @@ window.__whenVisible = (function () {
     ticksG.setAttribute('transform', 'rotate(' + theta + ' ' + CX + ' ' + CY + ')');
     sticky.style.setProperty('--th', theta.toFixed(2) + 'deg');
   }
+  // Недодемпфированная пружина: во время быстрого скролла theta отстаёт (копит энергию),
+  // на остановке — догоняет и упруго перелетает: выше слабее, ниже ещё слабее… потом замирает.
+  var SPRING_K = 0.11, SPRING_D = 0.80;
   function frame() {
     raf = null;
-    var d = targetTheta - theta;
-    theta = reduced ? targetTheta : theta + d * 0.16;
-    if (Math.abs(targetTheta - theta) < 0.02) theta = targetTheta;
+    if (reduced) { theta = targetTheta; vel = 0; apply(); return; }
+    var disp = targetTheta - theta;
+    vel = (vel + disp * SPRING_K) * SPRING_D;
+    theta += vel;
     apply();
-    if (theta !== targetTheta) raf = requestAnimationFrame(frame);
+    if (Math.abs(disp) < 0.006 && Math.abs(vel) < 0.006) { theta = targetTheta; vel = 0; }
+    else raf = requestAnimationFrame(frame);
   }
   function kick() { if (!raf) raf = requestAnimationFrame(frame); }
   /* ── демо-сцены шагов: печать, курсор, PDF, штамп ── */
@@ -1491,18 +1503,34 @@ window.__whenVisible = (function () {
     steps.forEach(function (s) { s.classList.toggle('on', +s.dataset.i === i); });
     if (ghost) ghost.textContent = pad2(i + 1);
   }
+  var snapT = null, snapping = false;
   function onScroll() {
     var r = track.getBoundingClientRect();
     var total = track.offsetHeight - H;
     var p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
     var pf = p * (N - 1);
+    var mf = magnet(pf);                              // магнит к ближайшей категории
     var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
-    targetTheta = -pf * SP;
+    targetTheta = -mf * SP;
     setActive(idx);
     // паз: главная встала на место → показываем доп; в движении — прячем
-    sticky.classList.toggle('settle', Math.abs(pf - idx) < 0.24);
+    sticky.classList.toggle('settle', Math.abs(mf - Math.round(mf)) < 0.32);
     updateScene();
     kick();
+    // магнетизм страницы: как скролл замер — мягко доводим ровно на категорию (если секция закреплена)
+    if (!reduced && total > 0 && r.top <= 1 && r.bottom >= H) scheduleSnap(idx, total);
+  }
+  function scheduleSnap(idx, total) {
+    if (snapT) clearTimeout(snapT);
+    snapT = setTimeout(function () {
+      if (snapping) return;
+      var top0 = track.getBoundingClientRect().top + (window.scrollY || document.documentElement.scrollTop);
+      var want = Math.round(top0 + (idx / (N - 1)) * total);
+      if (Math.abs((window.scrollY || 0) - want) < 2) return;
+      snapping = true;
+      window.scrollTo({ top: want, behavior: 'smooth' });
+      setTimeout(function () { snapping = false; }, 600);
+    }, 120);
   }
   function scrollToStep(i) {
     var top = track.getBoundingClientRect().top + (window.scrollY || document.documentElement.scrollTop);
@@ -1510,12 +1538,97 @@ window.__whenVisible = (function () {
     window.scrollTo({ top: Math.round(top + (i / (N - 1)) * total) + 2, behavior: reduced ? 'auto' : 'smooth' });
   }
   window.__fwSet = function (p) { // отладочный хук 0..1
-    var pf = p * (N - 1); var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
-    targetTheta = -pf * SP; theta = targetTheta;
-    setActive(idx); sticky.classList.toggle('settle', Math.abs(pf - idx) < 0.24); updateScene(); apply();
+    var pf = p * (N - 1); var mf = magnet(pf); var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
+    targetTheta = -mf * SP; theta = targetTheta; vel = 0;
+    setActive(idx); sticky.classList.toggle('settle', Math.abs(mf - Math.round(mf)) < 0.32); updateScene(); apply();
   };
 
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', layout);
   layout(); onScroll();
+})();
+
+/* ── hero: витрина двух серий (Стандарт / Art Déco) + демо-курсор ── */
+(function () {
+  var hs = document.getElementById('heroSeries');
+  if (!hs) return;
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var tabs = hs.querySelectorAll('.hs-tab');
+  var cursor = hs.querySelector('.hs-cursor');
+  var stage = hs.querySelector('.hs-stage');
+  var cur = 'std', userTook = false, timers = [], io = null, visible = false, demoOn = false;
+
+  function setSeries(s) {
+    cur = s;
+    hs.classList.toggle('art', s === 'art');
+    tabs.forEach(function (t) {
+      var on = t.dataset.s === s;
+      t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    hs.querySelectorAll('.hs-slide').forEach(function (el) { el.classList.toggle('on', el.dataset.s === s); });
+    hs.querySelectorAll('.hs-cap').forEach(function (el) { el.classList.toggle('on', el.classList.contains(s)); });
+    hs.querySelectorAll('.hs-price').forEach(function (el) { el.classList.toggle('on', el.classList.contains(s)); });
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { stopDemo(true); setSeries(t.dataset.s); });
+    t.addEventListener('mouseenter', function () { stopDemo(true); });
+  });
+
+  function clearT() { timers.forEach(function (x) { clearTimeout(x); }); timers = []; }
+  function t(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+  function moveCursorTo(el, cb) {
+    var r = el.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    cursor.classList.add('show', 'move');
+    cursor.style.left = (r.left - s.left + r.width * 0.62) + 'px';
+    cursor.style.top = (r.top - s.top + r.height * 0.55) + 'px';
+    t(cb, 640);
+  }
+  function tap(tab, cb) {
+    cursor.classList.add('press'); tab.classList.add('ripple');
+    t(function () { cursor.classList.remove('press'); tab.classList.remove('ripple'); if (cb) cb(); }, 240);
+  }
+
+  // курсор паркуется у центра сцены между показами
+  function park() {
+    var s = stage.getBoundingClientRect();
+    cursor.classList.remove('move');
+    cursor.style.left = (s.width * 0.5) + 'px';
+    cursor.style.top = (s.height * 0.5) + 'px';
+  }
+
+  function demoStep() {
+    if (userTook || !visible) return;
+    var next = cur === 'std' ? 'art' : 'std';
+    var tab = hs.querySelector('.hs-tab[data-s="' + next + '"]');
+    moveCursorTo(tab, function () {
+      tap(tab, function () {
+        setSeries(next);
+        t(function () { cursor.classList.remove('show'); park(); }, 700);
+        t(demoStep, 3400);           // следующая смена
+      });
+    });
+  }
+  function startDemo() {
+    if (reduced || userTook || demoOn) return;
+    demoOn = true; park();
+    t(demoStep, 1600);               // первая демонстрация чуть погодя
+  }
+  function stopDemo(byUser) {
+    if (byUser) userTook = true;
+    demoOn = false; clearT();
+    cursor.classList.remove('show', 'press', 'move');
+  }
+
+  // запускаем демо только когда hero на экране
+  if ('IntersectionObserver' in window) {
+    io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        visible = e.isIntersecting && e.intersectionRatio > 0.35;
+        if (visible) startDemo(); else if (!userTook) { demoOn = false; clearT(); }
+      });
+    }, { threshold: [0, 0.35, 0.7] });
+    io.observe(hs);
+  } else { visible = true; startDemo(); }
 })();
