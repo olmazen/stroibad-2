@@ -196,15 +196,35 @@ table{border-collapse:collapse;width:100%}
 .kp-preview-mode .kp-toolbar{display:none}
 /* ---------- Режим embed (шторка в корзине: кнопки у шторки, тулбар КП не нужен) ---------- */
 .kp-embed .kp-toolbar{display:none}
-/* ---------- Потоковая «печать» документа (?stream=1, первая генерация состава) ---------- */
-.stx{opacity:0;transform:translateY(12px)}
-tr.stx{transform:none}
-.stx.st-in{opacity:1;transform:none;transition:opacity .34s ease,transform .34s ease}
-.stx-sheet{transform:translateY(26px)}
-.stx-sheet.st-in{transition:opacity .5s ease,transform .5s ease}
-.st-head{position:absolute;width:72px;height:3px;background:var(--amber,#f08018);box-shadow:0 0 14px rgba(240,128,24,.9);border-radius:2px;z-index:40;pointer-events:none;transition:top .3s ease,left .3s ease;animation:stB .72s steps(2,start) infinite}
-@keyframes stB{50%{opacity:.25}}
-@media print{.stx{opacity:1!important;transform:none!important}.st-head{display:none!important}}
+/* ---------- Плавная сборка документа (?stream=1): «таймлайн дизайнера» ----------
+   Блок: серый каркас мягко проявляется → контент вписывается (заголовки печатаются кареткой,
+   фото проявляется из размытия, мелочь мягко возникает). Ничего не летает, движения минимум. */
+.stx{opacity:0}
+.stx.st-in{opacity:1;transition:opacity .5s ease}
+tr.stx{opacity:0}
+tr.stx.st-in{opacity:1;transition:opacity .5s ease}
+.stx-sheet{opacity:0;transform:translateY(16px)}
+.stx-sheet.st-in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s ease}
+/* фаза 1: серый каркас — мягкая плашка на месте будущего блока, растворяется под контентом */
+.st-ghost{position:relative}
+.st-ghost::after{content:'';position:absolute;inset:-2px 0;z-index:3;border-radius:4px;
+ background:linear-gradient(180deg,#eef1f5,#e5e9ee);opacity:0;transition:opacity .38s ease;pointer-events:none}
+.st-ghost.st-on::after{opacity:1}
+.st-ghost.st-shed::after{opacity:0}
+/* фаза 2а: мелкий/вспомогательный контент — просто мягко возникает */
+.st-fade{animation:stFade .55s ease both}
+@keyframes stFade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+/* фаза 2б: фото «проявляется» из размытия (без вращения и движения) */
+.st-photo img{animation:stDev .9s ease both}
+@keyframes stDev{from{opacity:0;filter:blur(10px)}to{opacity:1;filter:none}}
+/* фаза 2в: заголовки печатаются — мигающая каретка у последнего символа */
+.st-caret::after{content:'';display:inline-block;width:2px;height:1.02em;background:var(--amber,#f08018);
+ margin-left:2px;vertical-align:-0.12em;animation:stCar .85s steps(1) infinite}
+@keyframes stCar{50%{opacity:0}}
+@media print{
+ .stx,tr.stx{opacity:1!important;transform:none!important;animation:none!important}
+ .st-ghost::after,.st-caret::after{display:none!important}
+}
 
 /* ============================================================
    ЭКРАН — превью «как на бумаге»

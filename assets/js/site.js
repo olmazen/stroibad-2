@@ -892,10 +892,12 @@ window.__whenVisible = (function () {
       th.textContent = '✓ ' + GB_LABELS[stage] + (stage === 'product' && pn > 1 ? ' · ' + pn : '');
       dGbFilm.appendChild(th);
     }
+    var pendingBuilt = null; // вызывается, когда КП-iframe сообщил, что макет собран (для быстрого показа)
     window.addEventListener('message', function (e) {
       if (e.origin !== location.origin) return;
       var m = e.data && e.data.kpStream;
       if (!m || !dGenbar) return;
+      if (m.built) { if (pendingBuilt) { var f = pendingBuilt; pendingBuilt = null; f(); } return; }
       if (m.done) {
         gbChip(gbStage, gbTotal); gbStage = '';
         if (dGbStatus) dGbStatus.textContent = 'Документ готов';
@@ -951,19 +953,26 @@ window.__whenVisible = (function () {
         if (dProg) { dProg.style.transition = 'none'; dProg.style.width = '100%'; }
         genTimers.push(setTimeout(function () { minDone = true; tryReveal(); }, 400));
       } else {
-        // первая генерация: короткая заставка, дальше документ ПЕЧАТАЕТСЯ потоково в самом КП
+        // первая генерация: короткая заставка, дальше документ СОБИРАЕТСЯ плавно в самом КП
         minDone = true;
+        pendingBuilt = null;
         if (dFilm) dFilm.innerHTML = '';
         if (dPlayer) { dPlayer.set(items); dPlayer.show(0); }
         if (dStatus) dStatus.textContent = 'Запускаем генератор…';
         if (dProg) { dProg.style.transition = 'none'; dProg.style.width = '0'; void dProg.offsetWidth; dProg.style.transition = 'width 2.5s ease'; dProg.style.width = '40%'; }
         gbReset(items.length);
+        // когда iframe сообщит «макет готов» — показываем документ и командуем начать плавную сборку
+        pendingBuilt = function () {
+          loaded = true; tryReveal();
+          setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true }, location.origin); } catch (e2) {} }, 220);
+        };
       }
 
       // настоящее КП грузится параллельно; тот же состав уже загружен (в т.ч. после стрима) — не перезагружаем
       var target = new URL('kp/index.html?embed=1' + (already ? '' : '&stream=1') + '&_=' + genKey, base).href;
       if (dFrame.dataset.loaded === '1' && dFrame.src.indexOf('_=' + genKey) > -1) {
         loaded = true; tryReveal();
+        if (!already) setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true }, location.origin); } catch (e2) {} }, 220);
       } else {
         dFrame.dataset.loaded = '';
         dFrame.onload = function () { dFrame.dataset.loaded = '1'; loaded = true; tryReveal(); };

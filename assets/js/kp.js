@@ -87,14 +87,27 @@
     var d = fmtRu(parseDate(head.date));
     var num = head.number || autoNumber();
     doc.innerHTML = buildKp(rows, num, d);
-    if (stream) { prepStream(); setTimeout(runStream, 380); } // печать стартует сразу; чертежи/фото дозаполняют свои блоки
+    if (stream) {
+      prepStream();
+      window.scrollTo(0, 0);
+      postStream({ built: true });                 // сообщаем шторке: макет готов — можно показывать и запускать сборку
+      setTimeout(runStreamOnce, 1400);             // фолбэк (прямое открытие вкладки без шторки)
+    }
     fillStamp(num);
     injectDrawings(rows).then(finish);   // дождаться вставки чертежей ДО __kpReady/печати
   }
+  var streamStarted = false;
+  function runStreamOnce() { if (streamStarted) return; streamStarted = true; runStream(); }
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin) return;
+    if (e.data && e.data.kpGo) runStreamOnce();     // шторка показала документ — начинаем плавную сборку
+  });
 
-  /* =============== потоковая «печать» документа =============== */
-  var streamUnits = [], streamTimers = [];
+  /* =============== плавная сборка документа («таймлайн дизайнера») =============== */
+  var streamUnits = [], streamTimers = [], typingEls = [];
+  function stAdd(el, role) { if (!el) return; el.classList.add('stx'); streamUnits.push({ el: el, role: role }); }
   function prepStream() {
+    // курируем порядок сборки по разделам — крупными смысловыми блоками, не «каждый чих»
     var sheets = [].slice.call(doc.querySelectorAll('.sheet'));
     var pn = sheets.filter(function (s) { return s.classList.contains('kp-product'); }).length, pi = 0;
     sheets.forEach(function (sheet, si) {
@@ -103,56 +116,125 @@
         : sheet.classList.contains('kp-product') ? 'product' : 'terms';
       if (kind === 'product') pi += 1;
       sheet.classList.add('stx', 'stx-sheet');
-      streamUnits.push({ el: sheet, t: 'sheet', kind: kind, pi: pi, pn: pn, si: si, n: sheets.length });
-      [].slice.call(sheet.children).forEach(function (ch) {
-        var table = ch.tagName === 'TABLE' ? ch : (ch.querySelector ? ch.querySelector('table') : null);
-        if (kind === 'ledger' && table && table.rows.length > 1) {
-          // строки ведомости печатаются по одной
-          [].slice.call(table.rows).forEach(function (tr) { tr.classList.add('stx'); streamUnits.push({ el: tr, t: 'row' }); });
-        } else {
-          ch.classList.add('stx');
-          var t = (ch.querySelector && ch.querySelector('img')) ? 'img'
-            : (/^H[12]$/.test(ch.tagName) || (ch.classList && ch.classList.contains('kp-h'))) ? 'h' : 'b';
-          streamUnits.push({ el: ch, t: t });
-        }
-      });
+      streamUnits.push({ el: sheet, role: 'sheet', kind: kind, pi: pi, pn: pn, si: si, n: sheets.length });
+      var q = function (s) { return sheet.querySelector(s); };
+      if (kind === 'cover') {
+        stAdd(q('.cover-top'), 'fade');
+        stAdd(q('.cover-photo'), 'photo');
+        stAdd(q('.cover-title'), 'type');
+        stAdd(q('.cover-meta'), 'fade');
+      } else if (kind === 'ledger') {
+        stAdd(q('.kp-h'), 'type');
+        stAdd(q('thead tr'), 'fade');
+        [].slice.call(sheet.querySelectorAll('tbody tr')).forEach(function (tr) { stAdd(tr, 'row'); });
+        stAdd(q('.kp-totals'), 'fade');
+        stAdd(q('.kp-note'), 'fade');
+      } else if (kind === 'product') {
+        stAdd(q('.prod-top'), 'fade');
+        stAdd(q('.prod-head'), 'type');
+        stAdd(q('.prod-visual'), 'photo');
+        var data = q('.prod-data');
+        if (data) { stAdd(data.querySelector('.prod-desc'), 'fade'); stAdd(data.querySelector('.spec-list'), 'fade'); stAdd(data.querySelector('.ral-row'), 'fade'); stAdd(data.querySelector('.price-plate'), 'fade'); }
+      } else {
+        stAdd(q('.kp-h'), 'type');
+        [].slice.call(sheet.querySelectorAll('.term')).forEach(function (t) { stAdd(t, 'fade'); });
+        stAdd(q('.kp-valid'), 'fade');
+        stAdd(q('.kp-trust'), 'fade');
+        stAdd(q('.kp-contacts'), 'fade');
+      }
     });
   }
   function postStream(msg) { try { parent.postMessage({ kpStream: msg }, location.origin); } catch (e) {} }
+
+  /* печать текста по буквам с сохранением разметки (<br>, <span>) и мигающей кареткой */
+  function typeMarkup(el, dur, done) {
+    typingEls.push({ el: el, html: el.innerHTML });
+    var nodes = [], total = 0, walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), node;
+    while ((node = walker.nextNode())) { nodes.push({ n: node, full: node.nodeValue }); total += node.nodeValue.length; node.nodeValue = ''; }
+    if (!total) { if (done) done(); return; }
+    el.classList.add('st-caret');
+    var per = Math.max(20, Math.min(52, dur / total));
+    var ni = 0, ci = 0;
+    (function tick() {
+      if (ni >= nodes.length) { el.classList.remove('st-caret'); if (done) done(); return; }
+      var cur = nodes[ni]; ci++; cur.n.nodeValue = cur.full.slice(0, ci);
+      if (ci >= cur.full.length) { ni++; ci = 0; }
+      streamTimers.push(setTimeout(tick, per));
+    })();
+  }
+
+  /* мягкая прокрутка к активному блоку: держим его верх ≈ на 40% высоты, без рывков и без ухода в пустоту */
+  var scrollRAF = null;
+  function smoothScrollTo(y) {
+    if (scrollRAF) cancelAnimationFrame(scrollRAF);
+    y = Math.max(0, y);
+    var start = window.scrollY, dist = y - start, t0 = null, dur = 520;
+    if (Math.abs(dist) < 4) return;
+    function step(ts) {
+      if (t0 == null) t0 = ts; var p = Math.min(1, (ts - t0) / dur);
+      var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      window.scrollTo(0, Math.round(start + dist * e));
+      if (p < 1) scrollRAF = requestAnimationFrame(step);
+    }
+    scrollRAF = requestAnimationFrame(step);
+  }
+  function bringIntoView(el) {
+    var r = el.getBoundingClientRect(), vh = window.innerHeight, want = vh * 0.40;
+    if (r.top > want + 44 || r.top < 44) smoothScrollTo(window.scrollY + (r.top - want));
+  }
+
+  /* каждый крупный блок: серый каркас → контент (заголовки печатаются, фото проявляется);
+     мелочь просто мягко возникает. Общая длительность держится в бюджете (не «супер долго»). */
   function runStream() {
     if (!streamUnits.length) { postStream({ done: true }); return; }
     document.body.classList.add('kp-streaming');
-    var headEl = document.createElement('div'); headEl.className = 'st-head'; document.body.appendChild(headEl);
-    var k = streamUnits.length > 90 ? 90 / streamUnits.length : 1;   // длинные КП печатаются быстрее
-    var delays = { sheet: 380, img: 430, h: 260, row: 135, b: 185 };
-    var t = 250;
+    // оценим «номинальную» длительность и подгоним коэффициент под бюджет ~9–13с
+    var nominal = 0;
     streamUnits.forEach(function (u) {
-      t += Math.max(60, Math.round((delays[u.t] || 185) * k));
-      streamTimers.push(setTimeout(function () {
-        u.el.classList.add('st-in');
-        if (u.t === 'sheet') postStream({ stage: u.kind, pi: u.pi, pn: u.pn, si: u.si, n: u.n });
-        var r = u.el.getBoundingClientRect();
-        headEl.style.top = (r.bottom + window.scrollY + 5) + 'px';
-        headEl.style.left = (r.left + window.scrollX) + 'px';
-        var vh = window.innerHeight;
-        if (r.height > vh * 0.6) { // целая страница: показываем её верх
-          if (r.top > vh * 0.3 || r.top < 0) window.scrollTo(0, window.scrollY + r.top - 80);
-        } else if (r.bottom > vh * 0.78) { // обычный блок: следуем за точкой печати
-          window.scrollTo(0, window.scrollY + (r.bottom - vh * 0.55));
-        }
-      }, t));
+      if (u.role === 'sheet') nominal += 300;
+      else if (u.role === 'row') nominal += 150;
+      else if (u.role === 'type') { var c = (u.el.textContent || '').length; nominal += 320 + Math.min(1000, c * 30); }
+      else if (u.role === 'photo') nominal += 640;
+      else nominal += 190;
     });
-    streamTimers.push(setTimeout(function () {
-      headEl.remove();
+    var budget = Math.max(8500, Math.min(13000, streamUnits.length * 260));
+    var k = Math.min(1, budget / Math.max(1, nominal));
+    var t = 220;
+    function at(dt, fn) { t += Math.max(36, dt * k); streamTimers.push(setTimeout(fn, t)); }
+    streamUnits.forEach(function (u) {
+      var el = u.el;
+      if (u.role === 'sheet') {
+        at(300, function () { el.classList.add('st-in'); bringIntoView(el); postStream({ stage: u.kind, pi: u.pi, pn: u.pn, si: u.si, n: u.n }); });
+        return;
+      }
+      if (u.role === 'row') { at(150, function () { el.classList.add('st-in', 'st-fade'); bringIntoView(el); }); return; }
+      if (u.role === 'type') {
+        var chars = (el.textContent || '').length;
+        var typeDur = Math.min(1000, Math.max(420, chars * 34)) * Math.max(0.55, k);
+        at(160, function () { el.classList.add('st-ghost', 'st-on'); bringIntoView(el); });          // серый каркас
+        at(220, function () { el.classList.add('st-shed', 'st-in'); typeMarkup(el, typeDur); });      // заголовок печатается
+        at(typeDur / k, function () {});                                                              // держим до конца печати
+      } else if (u.role === 'photo') {
+        at(170, function () { el.classList.add('st-ghost', 'st-on'); bringIntoView(el); });           // серый блок под фото
+        at(240, function () { el.classList.add('st-shed', 'st-in', 'st-photo'); });                   // фото проявляется
+        at(360, function () {});
+      } else {
+        at(200, function () { el.classList.add('st-in', 'st-fade'); bringIntoView(el); });            // мелочь просто возникает
+      }
+    });
+    at(520, function () {
       document.body.classList.remove('kp-streaming');
       postStream({ done: true });
-    }, t + 480));
+      smoothScrollTo(0); // элегантный финал — плавно к готовой обложке
+    });
   }
-  function finishStreamNow() {  // печать/скачивание посреди потока: мгновенно допечатать всё
-    if (!streamTimers.length) return;
+  function finishStreamNow() {  // печать/скачивание посреди сборки: мгновенно доверстать всё
+    if (!streamTimers.length && !typingEls.length) return;
     streamTimers.forEach(clearTimeout); streamTimers = [];
-    [].slice.call(document.querySelectorAll('.stx')).forEach(function (el) { el.classList.add('st-in'); });
-    var h = document.querySelector('.st-head'); if (h) h.remove();
+    if (scrollRAF) cancelAnimationFrame(scrollRAF);
+    typingEls.forEach(function (x) { x.el.innerHTML = x.html; x.el.classList.remove('st-caret'); });
+    typingEls = [];
+    [].slice.call(document.querySelectorAll('.stx')).forEach(function (el) { el.classList.add('st-in', 'st-shed'); });
     document.body.classList.remove('kp-streaming');
     postStream({ done: true });
   }
