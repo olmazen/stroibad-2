@@ -1348,7 +1348,7 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 
 /* ── блок «Разлом 50/50»: две линейки Стандарт / Art Déco (на категориях) ── */
 .ss-split-sec{padding:0}
-.ss1{display:flex;gap:3px;height:clamp(450px,57vh,600px);border:1px solid var(--line);margin-top:8px}
+.ss1{display:flex;gap:3px;height:clamp(560px,71vh,750px);border:1px solid var(--line);margin-top:8px}
 .ss1 .pan{position:relative;flex:1;overflow:hidden;cursor:pointer;text-decoration:none;transition:flex .55s cubic-bezier(.4,.05,.15,1)}
 .ss1:hover .pan{flex:.82}.ss1 .pan:hover,.ss1 .pan:focus-visible{flex:1.5}
 .ss1 .pan>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s ease}
