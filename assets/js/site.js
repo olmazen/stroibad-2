@@ -1082,25 +1082,29 @@ window.__whenVisible = (function () {
   function mediaFor(k) {
     var cur = '<div class="fw-cur" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L16 19l-3 1.6-3.4-6.4L5 18z"/></svg></div>';
     if (k === 'choose') {
+      var arrow = function (d) { return '<svg viewBox="0 0 24 24"><path d="' + d + '"/></svg>'; };
       var card = function (c, cls, series, vibe, name, sub, price, imgs, alt) {
         return '<div class="fw-ch-card ' + cls + '" data-c="' + c + '">' +
           '<div class="fw-ch-head"><span class="fw-ch-badge">' + series + '</span><span class="fw-ch-vibe">' + vibe + '</span></div>' +
           '<div class="fw-ch-ph">' +
           imgs.map(function (src, i) { return '<img class="' + (i === 0 ? 'on' : '') + '" src="' + src + '" alt="' + alt + '" loading="eager">'; }).join('') +
+          '<button class="fw-ch-arrow prev" type="button" aria-label="Предыдущее фото">' + arrow('M15 5l-7 7 7 7') + '</button>' +
+          '<button class="fw-ch-arrow next" type="button" aria-label="Следующее фото">' + arrow('M9 5l7 7-7 7') + '</button>' +
           '<span class="fw-ch-dots">' + imgs.map(function (_, i) { return '<i class="' + (i === 0 ? 'on' : '') + '"></i>'; }).join('') + '</span>' +
           '</div>' +
           '<div class="fw-ch-info"><b>' + name + '</b><span>' + sub + '</span></div>' +
-          '<div class="fw-ch-buy"><em>' + price + '</em><button class="fw-ch-btn" type="button"><span>+</span> В список</button></div>' +
+          '<div class="fw-ch-buy"><em>' + price + '</em><button class="fw-ch-btn" type="button"><span>+</span> В корзину</button></div>' +
           '</div>';
       };
       return '<div class="fw-choose">' +
+        '<p class="fw-ch-lead">Каждое изделие — в двух линейках: <b class="std">Стандарт</b> (рабочая классика, доступно) и <b class="art">Art&nbsp;Déco</b> (авторский дизайн, премиум).</p>' +
         '<div class="fw-ch-cards">' +
         card('0', 'std', 'Стандарт', 'Рабочая классика', 'Скамейка «Колледж»', 'Сталь + брус хвойных пород · для дворов, парков и улиц', 'от 19 600 ₽',
-          ['assets/img/maf/skamejki/9467/main.webp', 'assets/img/maf/skamejki/9467/angle.webp', 'assets/img/maf/skamejki/9467/closeup.webp'], 'Скамейка стальная — серия Стандарт') +
+          ['assets/img/maf/skamejki/9467/white.webp', 'assets/img/maf/skamejki/9467/main.webp', 'assets/img/maf/skamejki/9467/angle.webp'], 'Скамейка стальная — серия Стандарт') +
         card('1', 'art', 'Art Déco', 'Дизайн-линия', 'Скамейка A1-101', 'Авторские формы, термодерево и нержавеющая сталь · премиум', 'от 44 500 ₽',
           ['assets/img/artdeco/skamejki/a1-101/hero.webp', 'assets/img/artdeco/skamejki/a1-101/facade1.webp', 'assets/img/artdeco/skamejki/a1-101/life1.webp'], 'Скамейка дизайнерская — серия Art Déco') +
         '</div>' +
-        '<div class="fw-ch-next"><span class="fw-ch-circle" data-cnt>2</span><span class="fw-ch-nx"><b>В списке для расчёта</b><i class="fw-ch-down"><svg viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6"/></svg></i></span></div>' +
+        '<button class="fw-ch-next" type="button"><span class="fw-ch-circle" data-cnt>2</span><span class="fw-ch-nx"><b>В корзине — перейти к заявке</b><i class="fw-ch-down"><svg viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6"/></svg></i></span></button>' +
         cur + '</div>';
     }
     if (k === 'form') return '<div class="fw-form fw-demo" aria-hidden="true">' +
@@ -1201,6 +1205,9 @@ window.__whenVisible = (function () {
       '<p>' + s.d + '</p><div class="fw-media">' + mediaFor(s.k) + '</div></article>';
   }).join('');
   host.classList.add('built');
+  // плашка «перейти к заявке» из шага «Выбор изделий» — аккуратно доводит на шаг 2
+  var chNextBtn = track.querySelector('.fw-ch-next');
+  if (chNextBtn) chNextBtn.addEventListener('click', function () { scrollToStep(1); });
 
   var sticky = track.querySelector('.fw-sticky');
   var svg = track.querySelector('.fw-arc');
@@ -1343,17 +1350,26 @@ window.__whenVisible = (function () {
       var chNext = root.querySelector('.fw-ch-next');
       var chCnt = root.querySelector('[data-cnt]');
       var ccur = root.querySelector('.fw-cur');
-      function flip(cardEl, idx) {
-        cardEl.querySelectorAll('.fw-ch-ph img').forEach(function (im, i) { im.classList.toggle('on', i === idx); });
-        cardEl.querySelectorAll('.fw-ch-dots i').forEach(function (d, i) { d.classList.toggle('on', i === idx); });
-      }
+      // карусель фото каждой карточки — работает и от стрелок вживую, и из демо
+      var idxMap = [];
+      chCards.forEach(function (cardEl, ci) {
+        idxMap[ci] = 0;
+        var imgs = cardEl.querySelectorAll('.fw-ch-ph img'), dots = cardEl.querySelectorAll('.fw-ch-dots i');
+        function show(i) { var n = imgs.length; i = (i % n + n) % n; idxMap[ci] = i; imgs.forEach(function (im, k) { im.classList.toggle('on', k === i); }); dots.forEach(function (d, k) { d.classList.toggle('on', k === i); }); }
+        cardEl.__show = show;
+        var pv = cardEl.querySelector('.fw-ch-arrow.prev'), nx = cardEl.querySelector('.fw-ch-arrow.next');
+        if (pv) pv.addEventListener('click', function (e) { e.stopPropagation(); show(idxMap[ci] - 1); });
+        if (nx) nx.addEventListener('click', function (e) { e.stopPropagation(); show(idxMap[ci] + 1); });
+      });
+      function btnReset(btn) { btn.classList.remove('done'); btn.innerHTML = '<span>+</span> В корзину'; }
+      function btnDone(btn) { btn.classList.add('done'); btn.innerHTML = 'В корзине'; }
       function resetChoose() {
-        chCards.forEach(function (c) { c.classList.remove('added'); c.querySelector('.fw-ch-btn').classList.remove('done'); flip(c, 0); });
+        chCards.forEach(function (c) { c.classList.remove('added'); btnReset(c.querySelector('.fw-ch-btn')); c.__show(0); });
         if (chNext) chNext.classList.remove('show');
         if (chCnt) chCnt.textContent = '0';
         ccur.classList.remove('show', 'press');
       }
-      var CARD_MS = 3900;
+      var CARD_MS = 4200;
       api.start = function () {
         running = true;
         (function loop() {
@@ -1362,20 +1378,24 @@ window.__whenVisible = (function () {
           ccur.classList.add('show');
           var added = 0;
           chCards.forEach(function (cardEl, ci) {
-            var ph = cardEl.querySelector('.fw-ch-ph'), btn = cardEl.querySelector('.fw-ch-btn');
+            var nx = cardEl.querySelector('.fw-ch-arrow.next'), btn = cardEl.querySelector('.fw-ch-btn');
             var base = 600 + ci * CARD_MS;
-            // курсор наводится на карточку и не спеша листает фотокарточки
-            t(function () { curTo(ccur, ph, 560, 0.5, 0.45); }, base);
-            [1, 2, 0].forEach(function (pi, kk) { t(function () { flip(cardEl, pi); }, base + 820 + kk * 820); });
-            // курсор на кнопку → добавляет в список
-            t(function () { curTo(ccur, btn, 480, 0.5, 0.5); }, base + 3080);
-            t(function () { ccur.classList.add('press'); }, base + 3460);
-            t(function () { ccur.classList.remove('press'); cardEl.classList.add('added'); btn.classList.add('done'); added++; if (chCnt) chCnt.textContent = String(added); }, base + 3620);
+            // курсор бьёт по стрелке «вперёд» и листает фотокарточки (2 клика: фото 2 и 3)
+            [0, 1].forEach(function (_, kk) {
+              var at0 = base + kk * 920;
+              t(function () { curTo(ccur, nx, 520, 0.5, 0.5); }, at0);
+              t(function () { ccur.classList.add('press'); }, at0 + 560);
+              t(function () { ccur.classList.remove('press'); cardEl.__show(idxMap[ci] + 1); }, at0 + 700);
+            });
+            // курсор на кнопку → в корзину
+            t(function () { curTo(ccur, btn, 500, 0.5, 0.5); }, base + 2200);
+            t(function () { ccur.classList.add('press'); }, base + 2680);
+            t(function () { ccur.classList.remove('press'); cardEl.classList.add('added'); btnDone(btn); added++; if (chCnt) chCnt.textContent = String(added); }, base + 2840);
           });
           var end = 600 + chCards.length * CARD_MS;
-          // обе добавлены → появляется кружок со счётчиком и стрелка «дальше»
+          // обе в корзине → появляется кликабельная плашка «перейти к заявке»
           t(function () { ccur.classList.remove('show'); if (chNext) chNext.classList.add('show'); }, end + 250);
-          t(loop, end + 3600);
+          t(loop, end + 3800);
         })();
       };
       api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; resetChoose(); };

@@ -1099,6 +1099,10 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 /* выбор изделий */
 /* выбор изделий: две линейки Стандарт / Art Déco — крупно, наглядно, курсор листает фото и добавляет */
 .fw-choose{position:relative;max-width:760px}
+.fw-ch-lead{font-size:13.5px;color:var(--tx2);margin:0 0 15px;line-height:1.5;max-width:660px}
+.fw-ch-lead b{font-weight:600}
+.fw-ch-lead b.std{color:var(--amber)}
+.fw-ch-lead b.art{color:#d9b871}
 .fw-ch-cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .fw-ch-card{position:relative;display:flex;flex-direction:column;background:linear-gradient(180deg,#1a1f26,#13171d);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .35s,box-shadow .35s,transform .35s}
 .fw-ch-card.std::before,.fw-ch-card.art::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;z-index:3}
@@ -1117,7 +1121,14 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-ch-ph{position:relative;height:clamp(200px,25vh,258px);overflow:hidden;background:#0d1116;margin:0 15px;border-radius:10px}
 .fw-ch-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.09);transition:opacity .7s ease,transform 1.6s ease}
 .fw-ch-ph img.on{opacity:1;transform:scale(1)}
-.fw-ch-ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 62%,rgba(9,11,14,.5));pointer-events:none}
+.fw-ch-ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 62%,rgba(9,11,14,.5));pointer-events:none;z-index:1}
+.fw-ch-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:34px;height:34px;border-radius:50%;border:0;background:rgba(12,15,19,.6);backdrop-filter:blur(4px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.55;transition:opacity .25s,background .25s,transform .12s}
+.fw-ch-ph:hover .fw-ch-arrow{opacity:.95}
+.fw-ch-arrow:hover{background:var(--amber);color:#151109}
+.fw-ch-card.art .fw-ch-arrow:hover{background:#d9b871;color:#211b0d}
+.fw-ch-arrow.press{transform:translateY(-50%) scale(.85)}
+.fw-ch-arrow.prev{left:9px}.fw-ch-arrow.next{right:9px}
+.fw-ch-arrow svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .fw-ch-dots{position:absolute;left:0;right:0;bottom:11px;z-index:2;display:flex;gap:6px;justify-content:center}
 .fw-ch-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);transition:background .3s,transform .3s,width .3s}
 .fw-ch-dots i.on{background:#fff;width:18px;border-radius:4px}
@@ -1133,8 +1144,10 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-ch-card.art.added .fw-ch-btn{background:linear-gradient(120deg,#e6c988,#c69a4a);border-color:#d9b871;color:#211b0d}
 .fw-ch-btn.done span{display:none}
 .fw-ch-btn.done::before{content:"✓ ";font-weight:700}
-.fw-ch-next{display:flex;align-items:center;gap:13px;margin-top:18px;opacity:0;transform:translateY(6px);transition:opacity .5s ease,transform .5s ease}
-.fw-ch-next.show{opacity:1;transform:none}
+.fw-ch-next{display:inline-flex;align-items:center;gap:13px;margin-top:18px;padding:8px 16px 8px 8px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.02);opacity:0;transform:translateY(6px);transition:opacity .5s ease,transform .5s ease,border-color .25s,background .25s;pointer-events:none;cursor:pointer;font-family:inherit;text-align:left}
+.fw-ch-next.show{opacity:1;transform:none;pointer-events:auto}
+.fw-ch-next:hover{border-color:var(--amber);background:rgba(242,111,29,.08)}
+.fw-ch-next:hover .fw-ch-down{color:#fff}
 .fw-ch-circle{width:36px;height:36px;border-radius:50%;background:var(--amber);color:#151109;font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 5px rgba(242,111,29,.12)}
 .fw-ch-nx{display:flex;align-items:center;gap:9px}
 .fw-ch-nx b{font-family:'Oswald',sans-serif;font-size:13.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--steel)}
