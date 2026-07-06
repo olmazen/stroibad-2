@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Блок «две линейки» — 5 вариантов | EGOE (demo)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=egoe21">
+<style>
+:root{--std:#F26F1D;--art:#c9a45f}
+.demowrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut)}
+.vlabel{display:flex;align-items:baseline;gap:12px;margin:64px 0 20px;font-family:'Oswald',sans-serif}
+.vlabel b{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--std)}
+.vlabel span{font-size:22px;text-transform:uppercase;letter-spacing:.03em;color:#fff}
+.vlabel i{flex:1;height:1px;background:var(--line)}
+.vlabel em{font-style:normal;font-size:12.5px;color:var(--steel)}
+
+/* общие мелочи */
+.ss-badge{display:inline-block;font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;padding:4px 11px;border-radius:1px;color:#151109}
+.ss-badge.std{background:var(--std)} .ss-badge.art{background:var(--art);color:#211b0d}
+.ss-go{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:#fff;text-decoration:none;border-bottom:1px solid transparent;transition:gap .25s,border-color .25s}
+.ss-go:hover{gap:13px;border-color:currentColor}
+.ss-go.std{color:var(--std)} .ss-go.art{color:var(--art)}
+
+/* ===== Вариант 1 — Разлом 50/50 (панели, расширение по ховеру) ===== */
+.sp1{display:flex;gap:3px;height:clamp(360px,46vh,480px);border:1px solid var(--line)}
+.sp1 .pan{position:relative;flex:1;overflow:hidden;cursor:pointer;transition:flex .55s cubic-bezier(.4,.05,.15,1)}
+.sp1:hover .pan{flex:.82}.sp1 .pan:hover{flex:1.5}
+.sp1 .pan>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s ease}
+.sp1 .pan:hover>img{transform:scale(1.07)}
+.sp1 .pan::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,11,14,.12) 30%,rgba(9,11,14,.86));transition:background .5s}
+.sp1 .pan:hover::after{background:linear-gradient(180deg,rgba(9,11,14,.08) 20%,rgba(9,11,14,.72))}
+.sp1 .pan>i{position:absolute;top:0;left:0;right:0;height:3px;z-index:3}
+.sp1 .std>i{background:var(--std)}.sp1 .art>i{background:var(--art)}
+.sp1 .in{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:26px 30px}
+.sp1 h3{font-family:'Oswald',sans-serif;font-size:clamp(26px,3vw,40px);text-transform:uppercase;letter-spacing:.02em;color:#fff;margin:12px 0 8px;line-height:1}
+.sp1 .cnt{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.05em;color:rgba(255,255,255,.65)}
+.sp1 p{font-size:13.5px;color:rgba(255,255,255,.8);line-height:1.5;max-width:340px;margin:10px 0 16px;max-height:0;opacity:0;overflow:hidden;transition:max-height .5s,opacity .4s,margin .5s}
+.sp1 .pan:hover p{max-height:80px;opacity:1}
+
+/* ===== Вариант 2 — Сравнение ползунком ===== */
+.sp2{position:relative;height:clamp(360px,46vh,480px);overflow:hidden;border:1px solid var(--line);user-select:none;touch-action:none}
+.sp2 .lay{position:absolute;inset:0}.sp2 .lay img{width:100%;height:100%;object-fit:cover}
+.sp2 .lay::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,11,14,.1),rgba(9,11,14,.55))}
+.sp2 .art-lay{clip-path:inset(0 0 0 var(--pos,50%))}
+.sp2 .lab{position:absolute;top:18px;z-index:4;padding:6px 14px;font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.08em;text-transform:uppercase;border-radius:1px;color:#151109}
+.sp2 .lab.std{left:18px;background:var(--std)}.sp2 .lab.art{right:18px;background:var(--art);color:#211b0d}
+.sp2 .cap{position:absolute;bottom:20px;z-index:4;font-family:'Oswald',sans-serif;color:#fff}
+.sp2 .cap.std{left:20px}.sp2 .cap.art{right:20px;text-align:right}
+.sp2 .cap b{display:block;font-size:20px;text-transform:uppercase}.sp2 .cap span{font-size:12.5px;color:rgba(255,255,255,.7)}
+.sp2 .hnd{position:absolute;top:0;bottom:0;left:var(--pos,50%);width:2px;background:#fff;z-index:5;transform:translateX(-1px);cursor:ew-resize}
+.sp2 .hnd::before{content:"⇄";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:#fff;color:#151109;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.sp2 .hint{position:absolute;top:50%;left:50%;transform:translate(-50%,28px);z-index:5;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.85);white-space:nowrap;pointer-events:none;animation:sp2h 2.4s ease-in-out infinite}
+@keyframes sp2h{0%,100%{opacity:.5}50%{opacity:1}}
+.sp2-foot{display:flex;gap:24px;margin-top:14px}
+
+/* ===== Вариант 3 — Веерные стопки ===== */
+.sp3{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.sp3 .col{border:1px solid var(--line);padding:26px;background:var(--srf);transition:border-color .3s}
+.sp3 .col.std:hover{border-color:var(--std)}.sp3 .col.art:hover{border-color:var(--art)}
+.sp3 .fan{position:relative;height:230px;margin-bottom:20px}
+.sp3 .fan img{position:absolute;top:14px;left:50%;width:64%;height:200px;object-fit:cover;border:3px solid #14181e;box-shadow:0 10px 30px rgba(0,0,0,.45);transition:transform .55s cubic-bezier(.3,.8,.3,1)}
+.sp3 .fan img:nth-child(1){transform:translateX(-50%) rotate(-7deg)}
+.sp3 .fan img:nth-child(2){transform:translateX(-50%) rotate(3deg)}
+.sp3 .fan img:nth-child(3){transform:translateX(-50%) rotate(-1deg)}
+.sp3 .col:hover .fan img:nth-child(1){transform:translateX(-108%) rotate(-11deg)}
+.sp3 .col:hover .fan img:nth-child(2){transform:translateX(8%) rotate(9deg)}
+.sp3 .col:hover .fan img:nth-child(3){transform:translateX(-50%) rotate(0deg) translateY(-8px)}
+.sp3 h3{font-family:'Oswald',sans-serif;font-size:28px;text-transform:uppercase;color:#fff;margin:6px 0 8px}
+.sp3 .col.std h3 em{color:var(--std)}.sp3 .col.art h3 em{color:var(--art)}
+.sp3 h3 em{font-style:normal}
+.sp3 p{font-size:13.5px;color:var(--tx2);line-height:1.55;margin:0 0 16px}
+.sp3 .row{display:flex;align-items:center;justify-content:space-between}
+.sp3 .cnt{font-family:'Oswald',sans-serif;font-size:14px;color:var(--steel)}
+
+/* ===== Вариант 4 — Витрина с миниатюрами ===== */
+.sp4{display:grid;grid-template-columns:230px 1fr;gap:2px;border:1px solid var(--line);min-height:clamp(340px,44vh,440px)}
+.sp4 .tabs{display:flex;flex-direction:column;background:var(--srf)}
+.sp4 .tab{flex:1;border:0;background:transparent;color:var(--steel);cursor:pointer;padding:24px 22px;text-align:left;font-family:'Oswald',sans-serif;border-left:3px solid transparent;transition:.3s}
+.sp4 .tab b{display:block;font-size:22px;text-transform:uppercase;color:inherit;line-height:1.1}
+.sp4 .tab span{display:block;font-size:12.5px;margin-top:6px;color:inherit;opacity:.8}
+.sp4 .tab.on{color:#fff;background:#161b22}
+.sp4 .tab.on.std{border-left-color:var(--std)}.sp4 .tab.on.art{border-left-color:var(--art)}
+.sp4 .stage{position:relative;overflow:hidden;background:#0d1116}
+.sp4 .shot{position:absolute;inset:0;opacity:0;transition:opacity .6s ease}
+.sp4 .shot.on{opacity:1}
+.sp4 .shot img{width:100%;height:100%;object-fit:cover}
+.sp4 .stage::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(9,11,14,.85));pointer-events:none;z-index:1}
+.sp4 .ov{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:22px 26px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.sp4 .ov b{font-family:'Oswald',sans-serif;font-size:15px;color:#fff;letter-spacing:.03em}
+.sp4 .ov p{font-size:12.5px;color:rgba(255,255,255,.7);margin:4px 0 0;max-width:360px;line-height:1.5}
+.sp4 .thumbs{position:absolute;top:16px;right:16px;z-index:3;display:flex;gap:7px}
+.sp4 .thumbs i{width:8px;height:8px;background:rgba(255,255,255,.4);cursor:pointer;transition:.3s}
+.sp4 .thumbs i.on{width:22px;background:#fff}
+
+/* ===== Вариант 5 — Дуал-баннер с бегущими лентами ===== */
+.sp5{position:relative;border:1px solid var(--line);overflow:hidden}
+.sp5 .band{display:flex;gap:10px;padding:10px 0;width:max-content;will-change:transform}
+.sp5 .top .band{animation:sp5L 34s linear infinite}
+.sp5 .bot .band{animation:sp5R 40s linear infinite}
+.sp5:hover .band{animation-play-state:paused}
+@keyframes sp5L{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes sp5R{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+.sp5 .band img{height:150px;width:230px;object-fit:cover;filter:grayscale(.15) brightness(.72)}
+.sp5 .top{border-bottom:1px solid var(--line)}
+.sp5 .center{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(60% 80% at 50% 50%,rgba(9,11,14,.78),rgba(9,11,14,.5))}
+.sp5 .cbox{text-align:center;pointer-events:auto}
+.sp5 .cbox h3{font-family:'Oswald',sans-serif;font-size:clamp(24px,3vw,34px);text-transform:uppercase;color:#fff;margin:0 0 6px;letter-spacing:.02em}
+.sp5 .cbox h3 em{font-style:normal;color:var(--art)}
+.sp5 .cbox p{font-size:13px;color:rgba(255,255,255,.75);margin:0 0 16px}
+.sp5 .cbox .btns{display:flex;gap:12px;justify-content:center}
+.sp5 .sbtn{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.05em;text-transform:uppercase;padding:11px 20px;border-radius:1px;text-decoration:none;color:#151109}
+.sp5 .sbtn.std{background:var(--std)}.sp5 .sbtn.art{background:var(--art);color:#211b0d}
+.sp5 .rlab{position:absolute;z-index:4;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:1px}
+.sp5 .rlab.std{top:12px;left:12px;background:var(--std);color:#151109}
+.sp5 .rlab.art{bottom:12px;left:12px;background:var(--art);color:#211b0d}
+
+@media(max-width:820px){
+  .sp1{flex-direction:column;height:auto}.sp1 .pan{height:240px;flex:none!important}.sp1 .pan p{max-height:80px;opacity:1}
+  .sp3{grid-template-columns:1fr}
+  .sp4{grid-template-columns:1fr}.sp4 .tabs{flex-direction:row}.sp4 .stage{min-height:300px}
+  .sp2{height:340px}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="container">
+  <div class="tb-l"><span><b>Производство:</b> г. Балаково</span><span><b>Офис:</b> г. Москва</span><span class="amber">Отгрузка по всей России</span></div>
+  <div class="tb-r"><a href="tel:+70000000000"><b>+7 (000) 000-00-00</b></a><a href="#">WhatsApp</a><a href="#">Telegram</a></div>
+</div></div>
+<header id="siteHeader"><div class="container hdr">
+  <a class="logo" href="../index.html"><span class="logo-mark"></span><span class="logo-txt"><b>EGOE</b><span>Завод металлоконструкций</span></span></a>
+  <nav class="main" id="nav">
+    <a href="../maf/index.html">Каталог</a>
+    <a href="../proizvodstvo/index.html">Производство</a>
+    <a href="../zastrojshchikam/index.html">Застройщикам</a>
+    <a href="../about/index.html">О компании</a>
+    <a href="../contacts/index.html">Контакты</a>
+  </nav>
+  <div class="hdr-actions"><button class="btn btn-primary btn-sm" onclick="alert('demo')">Расчёт по ТЗ</button></div>
+  <div class="burger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+</div></header>
+<main>
+
+<section style="padding-bottom:0">
+  <div class="demowrap">
+    <nav class="crumbs"><a href="../index.html">Главная</a> / <span>Demo · блок «две линейки»</span></nav>
+    <div class="eyebrow" style="margin-top:16px">Выбор варианта</div>
+    <h1 style="margin:10px 0 12px">Блок «Стандарт / Art&nbsp;Déco» — 5 вариантов</h1>
+    <p class="lead" style="max-width:720px">Такой блок встанет на страницах категорий (скамейки, урны, лежаки…) сразу после верхнего экрана — чтобы посетитель сразу понимал: есть две линейки, и мог перейти в нужную. Art&nbsp;Déco — это название дизайн-серии; отличие чисто архитектурное и визуальное, поэтому упор на фото. Ниже — 5 готовых вариантов. Выберите один.</p>
+  </div>
+</section>
+
+<section>
+  <div class="demowrap">
+
+    <!-- Вариант 1 -->
+    <div class="vlabel"><b>Вариант 1</b><span>Разлом 50/50</span><i></i><em>наведите на половину — расширяется</em></div>
+    <div class="sp1">
+      <a class="pan std" href="../maf/skamejki/index.html"><i></i><img src="../assets/img/maf/skamejki/9467/main.webp" alt="Скамейки Стандарт">
+        <div class="in"><span class="ss-badge std">Стандарт</span><h3>Рабочая<br>классика</h3><span class="cnt">57 моделей · сталь + дерево</span>
+          <p>Проверенные формы для дворов, парков и улиц. Доступно, надёжно, серийно.</p><span class="ss-go std" style="margin-top:2px">Смотреть Стандарт →</span></div></a>
+      <a class="pan art" href="../maf/skamejki/index.html#artdeco"><i></i><img src="../assets/img/artdeco/skamejki/a1-101/facade1.webp" alt="Скамейки Art Déco">
+        <div class="in"><span class="ss-badge art">Art Déco</span><h3>Дизайн-<br>линия</h3><span class="cnt">46 моделей · авторские формы</span>
+          <p>То же производство и материалы — другой архитектурный силуэт под дизайн-код территории.</p><span class="ss-go art" style="margin-top:2px">Смотреть Art Déco →</span></div></a>
+    </div>
+
+    <!-- Вариант 2 -->
+    <div class="vlabel"><b>Вариант 2</b><span>Сравнение ползунком</span><i></i><em>перетащите разделитель</em></div>
+    <div class="sp2" id="sp2">
+      <div class="lay std-lay"><img src="../assets/img/maf/skamejki/11129/main.webp" alt="Стандарт"></div>
+      <div class="lay art-lay"><img src="../assets/img/artdeco/skamejki/a1-306/facade1.webp" alt="Art Déco"></div>
+      <span class="lab std">Стандарт</span><span class="lab art">Art Déco</span>
+      <div class="cap std"><b>Рабочая классика</b><span>57 моделей</span></div>
+      <div class="cap art"><b>Дизайн-линия</b><span>46 моделей</span></div>
+      <div class="hnd" id="sp2h"></div>
+      <span class="hint">перетащите</span>
+    </div>
+    <div class="sp2-foot"><a class="ss-go std" href="../maf/skamejki/index.html">Смотреть Стандарт →</a><a class="ss-go art" href="../maf/skamejki/index.html#artdeco">Смотреть Art Déco →</a></div>
+
+    <!-- Вариант 3 -->
+    <div class="vlabel"><b>Вариант 3</b><span>Веерные стопки</span><i></i><em>наведите — фото раскрываются</em></div>
+    <div class="sp3">
+      <div class="col std">
+        <div class="fan"><img src="../assets/img/maf/skamejki/9467/main.webp" alt=""><img src="../assets/img/maf/skamejki/12154/main.webp" alt=""><img src="../assets/img/maf/skamejki/11129/main.webp" alt=""></div>
+        <span class="ss-badge std">Стандарт</span><h3>Рабочая <em>классика</em></h3>
+        <p>Сталь и брус хвойных пород. Серийные формы для дворов, парков и улиц — проверено сотнями объектов.</p>
+        <div class="row"><span class="cnt">57 моделей</span><a class="ss-go std" href="../maf/skamejki/index.html">Смотреть →</a></div>
+      </div>
+      <div class="col art">
+        <div class="fan"><img src="../assets/img/artdeco/skamejki/a1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e2-351/facade1.webp" alt=""></div>
+        <span class="ss-badge art">Art Déco</span><h3>Дизайн-<em>линия</em></h3>
+        <p>Тот же завод и материалы — авторский архитектурный характер. Для набережных, дворов ЖК и премиального благоустройства.</p>
+        <div class="row"><span class="cnt">46 моделей</span><a class="ss-go art" href="../maf/skamejki/index.html#artdeco">Смотреть →</a></div>
+      </div>
+    </div>
+
+    <!-- Вариант 4 -->
+    <div class="vlabel"><b>Вариант 4</b><span>Витрина с миниатюрами</span><i></i><em>вкладки + авто-показ</em></div>
+    <div class="sp4" id="sp4">
+      <div class="tabs">
+        <button class="tab std on" data-s="std"><b>Стандарт</b><span>рабочая классика · 57</span></button>
+        <button class="tab art" data-s="art"><b>Art Déco</b><span>дизайн-линия · 46</span></button>
+      </div>
+      <div class="stage" id="sp4stage">
+        <div class="shot std on"><img src="../assets/img/maf/skamejki/9467/main.webp" alt=""></div>
+        <div class="shot std"><img src="../assets/img/maf/skamejki/11129/main.webp" alt=""></div>
+        <div class="shot std"><img src="../assets/img/maf/skamejki/12154/main.webp" alt=""></div>
+        <div class="shot art"><img src="../assets/img/artdeco/skamejki/a1-101/facade1.webp" alt=""></div>
+        <div class="shot art"><img src="../assets/img/artdeco/skamejki/a1-306/facade1.webp" alt=""></div>
+        <div class="shot art"><img src="../assets/img/artdeco/skamejki/e2-351/facade1.webp" alt=""></div>
+        <div class="thumbs" id="sp4dots"></div>
+        <div class="ov"><div><b data-title>Серия Стандарт</b><p data-desc>Сталь и брус хвойных пород — проверенная классика для дворов и улиц.</p></div><a class="ss-go std" id="sp4go" href="../maf/skamejki/index.html">Смотреть →</a></div>
+      </div>
+    </div>
+
+    <!-- Вариант 5 -->
+    <div class="vlabel"><b>Вариант 5</b><span>Дуал-баннер с лентами</span><i></i><em>две ленты фото навстречу</em></div>
+    <div class="sp5">
+      <span class="rlab std">Стандарт · 57</span><span class="rlab art">Art Déco · 46</span>
+      <div class="top"><div class="band">
+        <img src="../assets/img/maf/skamejki/9467/main.webp" alt=""><img src="../assets/img/maf/skamejki/11129/main.webp" alt=""><img src="../assets/img/maf/skamejki/12154/main.webp" alt=""><img src="../assets/img/maf/skamejki/10721/main.webp" alt="">
+        <img src="../assets/img/maf/skamejki/9467/main.webp" alt=""><img src="../assets/img/maf/skamejki/11129/main.webp" alt=""><img src="../assets/img/maf/skamejki/12154/main.webp" alt=""><img src="../assets/img/maf/skamejki/10721/main.webp" alt="">
+      </div></div>
+      <div class="bot"><div class="band">
+        <img src="../assets/img/artdeco/skamejki/a1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/a1-306/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e2-351/facade1.webp" alt="">
+        <img src="../assets/img/artdeco/skamejki/a1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/a1-306/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e2-351/facade1.webp" alt="">
+      </div></div>
+      <div class="center"><div class="cbox">
+        <h3>Две линейки, один завод: Стандарт и <em>Art&nbsp;Déco</em></h3>
+        <p>Одинаковый металл и качество — разный архитектурный характер. Выберите свою.</p>
+        <div class="btns"><a class="sbtn std" href="../maf/skamejki/index.html">Стандарт · 57</a><a class="sbtn art" href="../maf/skamejki/index.html#artdeco">Art Déco · 46</a></div>
+      </div></div>
+    </div>
+
+    <p style="color:var(--steel);font-size:13px;margin:52px 0 20px">Фото — временные (взяты из каталога). Финальные заменим на подборку из нескольких скамеек каждой серии. Скажите номер варианта — доработаю его финально и поставлю на все категории.</p>
+  </div>
+</section>
+
+</main>
+<footer style="margin-top:0"><div class="container"><div class="foot-bot"><span>© 2026 EGOE. Завод металлоконструкций.</span><a href="../privacy/">Политика обработки персональных данных</a><span>demo-страница</span></div></div></footer>
+
+<script src="../assets/js/site.js?v=egoe21"></script>
+<script>
+/* Вариант 2 — перетаскиваемый ползунок */
+(function(){
+  var box=document.getElementById('sp2'); if(!box) return;
+  function set(x){var r=box.getBoundingClientRect();var p=Math.max(6,Math.min(94,(x-r.left)/r.width*100));box.style.setProperty('--pos',p+'%');}
+  var drag=false;
+  function down(e){drag=true;var t=e.touches?e.touches[0]:e;set(t.clientX);var h=box.querySelector('.hint');if(h)h.style.display='none';e.preventDefault();}
+  function move(e){if(!drag)return;var t=e.touches?e.touches[0]:e;set(t.clientX);}
+  function up(){drag=false;}
+  box.addEventListener('mousedown',down);box.addEventListener('touchstart',down,{passive:false});
+  window.addEventListener('mousemove',move);window.addEventListener('touchmove',move,{passive:false});
+  window.addEventListener('mouseup',up);window.addEventListener('touchend',up);
+})();
+
+/* Вариант 4 — вкладки + авто-показ */
+(function(){
+  var root=document.getElementById('sp4'); if(!root) return;
+  var stage=document.getElementById('sp4stage'), dots=document.getElementById('sp4dots');
+  var titleEl=root.querySelector('[data-title]'), descEl=root.querySelector('[data-desc]'), goEl=document.getElementById('sp4go');
+  var meta={std:{t:'Серия Стандарт',d:'Сталь и брус хвойных пород — проверенная классика для дворов, парков и улиц.',href:'../maf/skamejki/index.html',cls:'std'},
+            art:{t:'Серия Art Déco',d:'Авторские архитектурные формы. Тот же завод и материалы — другой характер.',href:'../maf/skamejki/index.html#artdeco',cls:'art'}};
+  var cur='std', idx=0, timer=null;
+  function shots(){return [].slice.call(stage.querySelectorAll('.shot.'+cur));}
+  function renderDots(){var n=shots().length;dots.innerHTML='';for(var i=0;i<n;i++){(function(i){var d=document.createElement('i');if(i===0)d.className='on';d.addEventListener('click',function(){show(i);restart();});dots.appendChild(d);})(i);}}
+  function show(i){var s=shots();idx=(i+s.length)%s.length;stage.querySelectorAll('.shot').forEach(function(x){x.classList.remove('on');});s[idx].classList.add('on');dots.querySelectorAll('i').forEach(function(d,k){d.classList.toggle('on',k===idx);});}
+  function setSeries(sname){cur=sname;idx=0;root.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('on',t.dataset.s===sname);});var m=meta[sname];titleEl.textContent=m.t;descEl.textContent=m.d;goEl.setAttribute('href',m.href);goEl.className='ss-go '+m.cls;renderDots();show(0);}
+  function restart(){if(timer)clearInterval(timer);timer=setInterval(function(){show(idx+1);},2600);}
+  root.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){setSeries(t.dataset.s);restart();});});
+  setSeries('std');restart();
+})();
+</script>
+</body>
+</html>
