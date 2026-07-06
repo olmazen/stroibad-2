@@ -1108,33 +1108,32 @@ window.__whenVisible = (function () {
         cur + '</div>';
     }
     if (k === 'form') return '<div class="fw-form fw-demo" aria-hidden="true">' +
-      '<div class="fw-push"><i>E</i><div><b>EGOE</b><span>Заявка № 214 принята — перезвоним сегодня</span></div><em>сейчас</em></div>' +
+      '<div class="fw-push"><i>E</i><div><b>EGOE</b><span>Заявка №&nbsp;214 принята — собираем КП по вашей корзине</span></div><em>сейчас</em></div>' +
       '<div class="fw-form-row"><div class="field"><label>Имя</label><input type="text" readonly tabindex="-1" data-df="name" placeholder="Как к вам обращаться"></div>' +
       '<div class="field"><label>Телефон</label><input type="tel" readonly tabindex="-1" data-df="tel" placeholder="+7"></div></div>' +
-      '<span class="btn btn-primary fw-demo-btn">Отправить заявку</span>' +
-      '<div class="fw-form-ok"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M15 27l8 8 15-16"/></svg><b>Заявка принята</b><span>перезвоним в течение рабочего дня</span></div>' +
+      '<span class="btn btn-primary fw-demo-btn">Получить КП</span>' +
+      '<div class="fw-form-ok"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M15 27l8 8 15-16"/></svg><b>Заявка принята</b><span>готовим КП по вашему списку из корзины</span></div>' +
       cur + '</div>' +
       '<button class="fw-own" type="button" onclick="openModal()">Оставить свою заявку →</button>';
     if (k === 'calc') return '<div class="fw-flow2">' +
       '<div class="fw-att-zone">' +
-      '<div class="fw-genline"><b data-pdf>Формируем PDF-смету…</b><span class="fw-pdf-bar"><u></u></span></div>' +
-      '<div class="fw-att"><i>PDF</i><div class="fw-att-tx"><b>смета-214-МК.pdf</b><span>3 страницы · 214 КБ</span></div><em></em></div>' +
-      '<div class="fw-att-hint">кликните — откроется смета</div>' +
+      '<div class="fw-genline"><b data-pdf>Собираем ваше КП по корзине…</b><span class="fw-pdf-bar"><u></u></span></div>' +
+      '<div class="fw-att"><i>PDF</i><div class="fw-att-tx"><b>КП-EGOE-214.pdf</b><span>3 страницы · из вашей корзины</span></div><em></em></div>' +
+      '<div class="fw-att-hint">кликните — откроется КП</div>' +
       cur + '</div>' +
-      '<div class="fw-win fw-pdfwin"><div class="fw-win-bar"><i></i><i></i><i></i><b>смета-214-МК.pdf</b><span data-pgind>1 / 3</span></div>' +
+      '<div class="fw-win fw-pdfwin"><div class="fw-win-bar"><i></i><i></i><i></i><b>КП-EGOE-214.pdf</b><span data-pgind>1 / 3</span></div>' +
       '<div class="fw-win-body"><div class="fw-pages">' +
       '<div class="fw-pg on"><div class="pdf-logo"><s></s>EGOE</div>' +
-        '<div class="pdf-cv"><em>Спецификация № 214-МК</em><b>Благоустройство<br>ЖК «Ваш объект»</b><span>3 позиции · 26 единиц</span></div>' +
+        '<div class="pdf-cv"><em>Коммерческое предложение № 214</em><b>Ваш список<br>из корзины</b><span>2 позиции · 22 единицы</span></div>' +
         '<div class="pdf-foot">EGOE · завод металлоконструкций · egoe-life.ru</div></div>' +
       '<div class="fw-pg"><b class="pdf-h">Ведомость изделий</b><div class="pdf-t">' +
         '<div class="pdf-tr th"><span>Изделие</span><span>RAL</span><span>Кол-во</span><span>Цена, от</span></div>' +
-        '<div class="pdf-tr"><span>Лежак Art Déco A1-2661</span><span>6021</span><span>12</span><span>21 700 ₽</span></div>' +
-        '<div class="pdf-tr"><span>Скамейка A4-2641</span><span>7016</span><span>8</span><span>4 500 ₽</span></div>' +
-        '<div class="pdf-tr"><span>Урна U3-600</span><span>9005</span><span>6</span><span>12 900 ₽</span></div>' +
-        '</div><div class="pdf-sum"><span>ориентировочно, до расчёта КП</span><b>≈ 298 600 ₽</b></div></div>' +
-      '<div class="fw-pg"><div class="pdf-h3"><b>Лежак A1-2661</b><i>Art Déco</i></div>' +
-        '<div class="pdf-media"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp?i10" alt=""><span class="pdf-draw"><img src="assets/img/artdeco/lezhaki/a1-2661/drawing-white.svg" alt=""></span></div>' +
-        '<div class="pdf-spec"><span>Длина</span><b>1842 мм</b></div><div class="pdf-spec"><span>Высота</span><b>760 мм</b></div><div class="pdf-spec"><span>Материал · окраска</span><b>сталь · любой RAL</b></div></div>' +
+        '<div class="pdf-tr"><span>Скамейка A1-101 · Art&nbsp;Déco</span><span>7016</span><span>8</span><span>44 500 ₽</span></div>' +
+        '<div class="pdf-tr"><span>Скамейка «Колледж» · Стандарт</span><span>9005</span><span>14</span><span>19 600 ₽</span></div>' +
+        '</div><div class="pdf-sum"><span>ориентировочно, до финального КП</span><b>≈ 630 400 ₽</b></div></div>' +
+      '<div class="fw-pg"><div class="pdf-h3"><b>Скамейка A1-101</b><i>Art Déco</i></div>' +
+        '<div class="pdf-media"><img src="assets/img/artdeco/skamejki/a1-101/hero.webp" alt=""><span class="pdf-draw"><img src="assets/img/artdeco/skamejki/a1-101/drawing-white.svg" alt=""></span></div>' +
+        '<div class="pdf-spec"><span>Серия</span><b>Art Déco · коллекция A</b></div><div class="pdf-spec"><span>Материал</span><b>сталь · термодерево</b></div><div class="pdf-spec"><span>Окраска</span><b>любой RAL</b></div></div>' +
       '</div><div class="fw-pgdots"><i class="on"></i><i></i><i></i></div></div></div></div>';
     if (k === 'contract') return '<div class="fw-flow2">' +
       '<div class="fw-att-zone"><div class="fw-checklist">' +
