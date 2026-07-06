@@ -329,13 +329,13 @@ svg.drawn .bp-fade{opacity:1}
 .form-ok b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:6px;color:var(--amber)}
 
 /* ============ section hero (внутренние) ============ */
-.shero{position:relative;background:var(--bg);color:#fff;overflow:hidden;border-bottom:1px solid var(--line)}
+.shero{position:relative;background:var(--bg);color:#fff;overflow:hidden;border-bottom:1px solid var(--line);min-height:calc(100vh - 104px);display:flex;align-items:center}
 .shero-bg{position:absolute;inset:0;z-index:0}
 .shero-bg .ph{position:absolute;inset:0;height:100%;border:none;background-color:#10141A}
 .shero-bg .ph::before,.shero-bg .ph::after{display:none}
 .shero::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(95deg,rgba(12,14,18,.96) 0%,rgba(12,14,18,.85) 38%,rgba(12,14,18,.45) 78%,rgba(12,14,18,.3) 100%)}
 .shero .container{position:relative;z-index:2}
-.shero-inner{padding:104px 0 100px;max-width:800px}
+.shero-inner{padding:56px 0;max-width:800px;width:100%}
 .shero .eyebrow{margin-bottom:18px}
 .shero h1{font-size:clamp(34px,4.6vw,58px);line-height:1.02;margin-bottom:20px}
 .shero h1 em{font-style:normal;color:var(--amber)}
@@ -1347,8 +1347,8 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 @media(max-width:600px){.cookie-in{gap:11px}.cookie-in .btn{width:100%}}
 
 /* ── блок «Разлом 50/50»: две линейки Стандарт / Art Déco (на категориях) ── */
-.ss-split-sec{padding:0}
-.ss1{display:flex;gap:3px;height:clamp(560px,71vh,750px);border:1px solid var(--line);margin-top:8px}
+.ss-split-sec{padding:clamp(72px,9vh,110px) 0 clamp(40px,5vh,56px)}
+.ss1{display:flex;gap:3px;height:clamp(560px,71vh,750px);border:1px solid var(--line);margin-top:0}
 .ss1 .pan{position:relative;flex:1;overflow:hidden;cursor:pointer;text-decoration:none;transition:flex .55s cubic-bezier(.4,.05,.15,1)}
 .ss1:hover .pan{flex:.82}.ss1 .pan:hover,.ss1 .pan:focus-visible{flex:1.5}
 .ss1 .pan>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s ease}
