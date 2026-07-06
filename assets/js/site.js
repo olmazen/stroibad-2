@@ -1081,12 +1081,28 @@ window.__whenVisible = (function () {
   function chips(a) { return '<div class="fw-chips">' + a.map(function (c) { return '<span>' + c + '</span>'; }).join('') + '</div>'; }
   function mediaFor(k) {
     var cur = '<div class="fw-cur" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L16 19l-3 1.6-3.4-6.4L5 18z"/></svg></div>';
-    if (k === 'choose') return '<div class="fw-pick">' +
-      '<div class="fw-pick-row">' +
-      '<div class="fw-pk" data-pk="0"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp?i10" alt="Лежак Art Déco"><b>Лежак A1-2661</b><span>от 21 700 ₽</span><i></i></div>' +
-      '<div class="fw-pk" data-pk="1"><img src="assets/img/maf/skamejki/9467/main.webp" alt="Скамейка уличная"><b>Скамейка</b><span>от 4 500 ₽</span><i></i></div>' +
-      '<div class="fw-pk" data-pk="2"><img src="assets/img/korziny/standart/STN03-treugolnik/main.webp" alt="Корзина для кондиционера"><b>Корзина</b><span>от 1 900 ₽</span><i></i></div>' +
-      '</div><div class="fw-pick-cnt">В списке для расчёта: <b data-cnt>0</b></div>' + cur + '</div>';
+    if (k === 'choose') {
+      var card = function (c, tag, tagCls, name, sub, price, imgs, alt) {
+        return '<div class="fw-ch-card" data-c="' + c + '">' +
+          '<div class="fw-ch-ph">' +
+          imgs.map(function (src, i) { return '<img class="' + (i === 0 ? 'on' : '') + '" src="' + src + '" alt="' + alt + '">'; }).join('') +
+          '<span class="fw-ch-tag ' + tagCls + '">' + tag + '</span>' +
+          '<span class="fw-ch-dots">' + imgs.map(function (_, i) { return '<i class="' + (i === 0 ? 'on' : '') + '"></i>'; }).join('') + '</span>' +
+          '</div>' +
+          '<div class="fw-ch-info"><b>' + name + '</b><span>' + sub + '</span><em>' + price + '</em></div>' +
+          '<button class="fw-ch-btn" type="button"><span>+</span> В список</button>' +
+          '</div>';
+      };
+      return '<div class="fw-choose">' +
+        '<div class="fw-ch-cards">' +
+        card('0', 'Стандарт', 'std', 'Скамейка «Колледж»', 'Сталь + дерево', 'от 19 600 ₽',
+          ['assets/img/maf/skamejki/9467/main.webp', 'assets/img/maf/skamejki/9467/angle.webp', 'assets/img/maf/skamejki/9467/closeup.webp'], 'Скамейка стальная — серия Стандарт') +
+        card('1', 'Art Déco', 'art', 'Скамейка A1-101', 'Дизайн-серия', 'от 44 500 ₽',
+          ['assets/img/artdeco/skamejki/a1-101/hero.webp', 'assets/img/artdeco/skamejki/a1-101/facade1.webp', 'assets/img/artdeco/skamejki/a1-101/life1.webp'], 'Скамейка дизайнерская — серия Art Déco') +
+        '</div>' +
+        '<div class="fw-ch-next"><span class="fw-ch-circle" data-cnt>2</span><span class="fw-ch-nx"><b>В списке для расчёта</b><i class="fw-ch-down"><svg viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6"/></svg></i></span></div>' +
+        cur + '</div>';
+    }
     if (k === 'form') return '<div class="fw-form fw-demo" aria-hidden="true">' +
       '<div class="fw-push"><i>E</i><div><b>EGOE</b><span>Заявка № 214 принята — перезвоним сегодня</span></div><em>сейчас</em></div>' +
       '<div class="fw-form-row"><div class="field"><label>Имя</label><input type="text" readonly tabindex="-1" data-df="name" placeholder="Как к вам обращаться"></div>' +
@@ -1209,13 +1225,12 @@ window.__whenVisible = (function () {
   var W = 0, H = 0, R = 0, CX = 0, CY = 0, BASE = 0, CARD_R = 0, EDGE = 0, mobile = false;
   var theta = 0, targetTheta = 0, vel = 0, active = 0, raf = null;
   var rad = function (a) { return a * Math.PI / 180; };
-  // магнит: тянет позицию к ближайшему шагу (плато у каждой категории), между шагами — быстрый проезд
+  // мягкий магнит: лёгкое притяжение к ближайшей категории, БЕЗ жёсткого плато (аккуратно, плавно)
   function magnet(pf) {
     var i = Math.round(pf), f = pf - i;            // -0.5..0.5
-    var s = f < 0 ? -1 : 1, a = Math.min(1, Math.abs(f) * 2);
-    var e = a * a * (3 - 2 * a);                    // smoothstep — прижимает к целому у краёв, «плато» у шага
-    return i + s * e * 0.5;
+    return i + f * (0.9 + 0.1 * Math.min(1, Math.abs(f) * 2));
   }
+  var tickEls = [], tickDefs = [];
 
   function layout() {
     W = innerWidth; H = innerHeight;
@@ -1243,15 +1258,31 @@ window.__whenVisible = (function () {
     svg.setAttribute('width', W); svg.setAttribute('height', H);
     ring.setAttribute('cx', CX); ring.setAttribute('cy', CY); ring.setAttribute('r', R);
     ring2.setAttribute('cx', CX); ring2.setAttribute('cy', CY); ring2.setAttribute('r', Math.max(R - 54, 80));
-    var t = '';
+    // риски дуги — создаём как элементы (обновляются пофреймово: у указателя чуть удлиняются и подсвечиваются)
+    tickEls = []; tickDefs = []; ticksG.innerHTML = '';
     for (var b = -34; b <= (N - 1) * SP + 34; b += 3) {
       var mj = b >= -0.01 && b <= (N - 1) * SP + 0.01 && Math.abs(((b % SP) + SP) % SP) < 0.01;
-      var A = BASE + b, len = mj ? 30 : 12, r1 = R - 4 - len, r2 = R - 4;
-      t += '<line class="' + (mj ? 'mj' : '') + '" x1="' + (CX + r1 * Math.cos(rad(A))).toFixed(1) + '" y1="' + (CY + r1 * Math.sin(rad(A))).toFixed(1) +
-        '" x2="' + (CX + r2 * Math.cos(rad(A))).toFixed(1) + '" y2="' + (CY + r2 * Math.sin(rad(A))).toFixed(1) + '"/>';
+      var ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      if (mj) ln.setAttribute('class', 'mj');
+      ticksG.appendChild(ln);
+      tickEls.push(ln); tickDefs.push({ b: b, mj: mj });
     }
-    ticksG.innerHTML = t;
     apply();
+  }
+  function drawTicks() {
+    for (var k = 0; k < tickEls.length; k++) {
+      var d = tickDefs[k], off = d.b + theta, A = BASE + off;      // theta «вшита» — риски едут с колесом
+      var prox = Math.max(0, 1 - Math.abs(off) / 15);              // 1 у указателя → 0 за 15°
+      var grow = prox * prox;
+      var len = (d.mj ? 22 : 10) + grow * (d.mj ? 18 : 14);        // у указателя длиннее
+      var r2 = R - 4, r1 = r2 - len, ca = Math.cos(rad(A)), sa = Math.sin(rad(A));
+      var el = tickEls[k];
+      el.setAttribute('x1', (CX + r1 * ca).toFixed(1)); el.setAttribute('y1', (CY + r1 * sa).toFixed(1));
+      el.setAttribute('x2', (CX + r2 * ca).toFixed(1)); el.setAttribute('y2', (CY + r2 * sa).toFixed(1));
+      el.style.opacity = ((d.mj ? 0.5 : 0.26) + grow * 0.5).toFixed(2);
+      el.style.strokeWidth = ((d.mj ? 1.8 : 1.1) + grow * 1.7).toFixed(2);
+      if (prox > 0.5) el.classList.add('near'); else el.classList.remove('near');
+    }
   }
 
   function apply() {
@@ -1269,12 +1300,12 @@ window.__whenVisible = (function () {
       el.style.filter = (!reduced && t > 8) ? 'blur(' + Math.min((t - 8) / 9, 4.5).toFixed(2) + 'px)' : 'none';
       el.classList.toggle('on', t < SP / 2);
     }
-    ticksG.setAttribute('transform', 'rotate(' + theta + ' ' + CX + ' ' + CY + ')');
+    drawTicks();
     sticky.style.setProperty('--th', theta.toFixed(2) + 'deg');
   }
-  // Недодемпфированная пружина: во время быстрого скролла theta отстаёт (копит энергию),
-  // на остановке — догоняет и упруго перелетает: выше слабее, ниже ещё слабее… потом замирает.
-  var SPRING_K = 0.11, SPRING_D = 0.80;
+  // Мягкая недодемпфированная пружина: во время быстрого скролла theta отстаёт, на остановке
+  // плавно догоняет с лёгким перелётом (~119%, ~0.9с) — аккуратно, без топорности.
+  var SPRING_K = 0.10, SPRING_D = 0.76;
   function frame() {
     raf = null;
     if (reduced) { theta = targetTheta; vel = 0; apply(); return; }
@@ -1308,26 +1339,46 @@ window.__whenVisible = (function () {
     var api = { start: function () {}, stop: function () {} };
 
     if (kind === 'choose') {
-      var picks = root.querySelectorAll('.fw-pk');
-      var cnt = root.querySelector('[data-cnt]');
+      var chCards = root.querySelectorAll('.fw-ch-card');
+      var chNext = root.querySelector('.fw-ch-next');
+      var chCnt = root.querySelector('[data-cnt]');
       var ccur = root.querySelector('.fw-cur');
+      function flip(cardEl, idx) {
+        cardEl.querySelectorAll('.fw-ch-ph img').forEach(function (im, i) { im.classList.toggle('on', i === idx); });
+        cardEl.querySelectorAll('.fw-ch-dots i').forEach(function (d, i) { d.classList.toggle('on', i === idx); });
+      }
+      function resetChoose() {
+        chCards.forEach(function (c) { c.classList.remove('added'); c.querySelector('.fw-ch-btn').classList.remove('done'); flip(c, 0); });
+        if (chNext) chNext.classList.remove('show');
+        if (chCnt) chCnt.textContent = '0';
+        ccur.classList.remove('show', 'press');
+      }
+      var CARD_MS = 3300;
       api.start = function () {
         running = true;
         (function loop() {
           if (!running) return;
-          picks.forEach(function (p) { p.classList.remove('on'); });
-          if (cnt) cnt.textContent = '0';
+          resetChoose();
           ccur.classList.add('show');
-          picks.forEach(function (p, i) {
-            t(function () { curTo(ccur, p, 550, 0.62, 0.55); }, 500 + i * 1050);
-            t(function () { ccur.classList.add('press'); p.classList.add('on'); if (cnt) cnt.textContent = String(i + 1); }, 1080 + i * 1050);
-            t(function () { ccur.classList.remove('press'); }, 1260 + i * 1050);
+          var added = 0;
+          chCards.forEach(function (cardEl, ci) {
+            var ph = cardEl.querySelector('.fw-ch-ph'), btn = cardEl.querySelector('.fw-ch-btn');
+            var base = 500 + ci * CARD_MS;
+            // курсор осматривает карточку и листает фотокарточки
+            t(function () { curTo(ccur, ph, 520, 0.5, 0.5); }, base);
+            [1, 2, 0].forEach(function (pi, kk) { t(function () { flip(cardEl, pi); }, base + 780 + kk * 560); });
+            // курсор на кнопку → добавляет в список
+            t(function () { curTo(ccur, btn, 440, 0.5, 0.5); }, base + 2500);
+            t(function () { ccur.classList.add('press'); }, base + 2900);
+            t(function () { ccur.classList.remove('press'); cardEl.classList.add('added'); btn.classList.add('done'); added++; if (chCnt) chCnt.textContent = String(added); }, base + 3040);
           });
-          t(function () { ccur.classList.remove('show'); }, 500 + picks.length * 1050 + 500);
-          t(loop, 500 + picks.length * 1050 + 2600);
+          var end = 500 + chCards.length * CARD_MS;
+          // обе добавлены → появляется кружок со счётчиком и стрелка «дальше»
+          t(function () { ccur.classList.remove('show'); if (chNext) chNext.classList.add('show'); }, end + 150);
+          t(loop, end + 3400);
         })();
       };
-      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; picks.forEach(function (p) { p.classList.remove('on'); }); if (cnt) cnt.textContent = '0'; ccur.classList.remove('show', 'press'); };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; resetChoose(); };
     }
 
     if (kind === 'form') {
@@ -1520,17 +1571,29 @@ window.__whenVisible = (function () {
     // магнетизм страницы: как скролл замер — мягко доводим ровно на категорию (если секция закреплена)
     if (!reduced && total > 0 && r.top <= 1 && r.bottom >= H) scheduleSnap(idx, total);
   }
+  var snapRAF = null;
   function scheduleSnap(idx, total) {
+    if (snapping) return;
     if (snapT) clearTimeout(snapT);
-    snapT = setTimeout(function () {
-      if (snapping) return;
+    snapT = setTimeout(function () {                    // доводим только когда скролл РЕАЛЬНО замер
       var top0 = track.getBoundingClientRect().top + (window.scrollY || document.documentElement.scrollTop);
       var want = Math.round(top0 + (idx / (N - 1)) * total);
-      if (Math.abs((window.scrollY || 0) - want) < 2) return;
+      var start = window.scrollY || 0, dist = want - start;
+      if (Math.abs(dist) < 2) return;
+      // собственная плавная eased-прокрутка (мягче и аккуратнее нативного smooth), длительность по расстоянию
       snapping = true;
-      window.scrollTo({ top: want, behavior: 'smooth' });
-      setTimeout(function () { snapping = false; }, 600);
-    }, 120);
+      var t0 = null, dur = Math.min(680, 300 + Math.abs(dist) * 1.1);
+      if (snapRAF) cancelAnimationFrame(snapRAF);
+      function step(ts) {
+        if (t0 == null) t0 = ts;
+        var q = Math.min(1, (ts - t0) / dur);
+        var e = q < 0.5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;   // easeInOutCubic — плавно
+        window.scrollTo(0, Math.round(start + dist * e));
+        if (q < 1) snapRAF = requestAnimationFrame(step);
+        else { snapping = false; snapRAF = null; }
+      }
+      snapRAF = requestAnimationFrame(step);
+    }, 150);
   }
   function scrollToStep(i) {
     var top = track.getBoundingClientRect().top + (window.scrollY || document.documentElement.scrollTop);
@@ -1548,87 +1611,3 @@ window.__whenVisible = (function () {
   layout(); onScroll();
 })();
 
-/* ── hero: витрина двух серий (Стандарт / Art Déco) + демо-курсор ── */
-(function () {
-  var hs = document.getElementById('heroSeries');
-  if (!hs) return;
-  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var tabs = hs.querySelectorAll('.hs-tab');
-  var cursor = hs.querySelector('.hs-cursor');
-  var stage = hs.querySelector('.hs-stage');
-  var cur = 'std', userTook = false, timers = [], io = null, visible = false, demoOn = false;
-
-  function setSeries(s) {
-    cur = s;
-    hs.classList.toggle('art', s === 'art');
-    tabs.forEach(function (t) {
-      var on = t.dataset.s === s;
-      t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false');
-    });
-    hs.querySelectorAll('.hs-slide').forEach(function (el) { el.classList.toggle('on', el.dataset.s === s); });
-    hs.querySelectorAll('.hs-cap').forEach(function (el) { el.classList.toggle('on', el.classList.contains(s)); });
-    hs.querySelectorAll('.hs-price').forEach(function (el) { el.classList.toggle('on', el.classList.contains(s)); });
-  }
-
-  tabs.forEach(function (t) {
-    t.addEventListener('click', function () { stopDemo(true); setSeries(t.dataset.s); });
-    t.addEventListener('mouseenter', function () { stopDemo(true); });
-  });
-
-  function clearT() { timers.forEach(function (x) { clearTimeout(x); }); timers = []; }
-  function t(fn, ms) { timers.push(setTimeout(fn, ms)); }
-
-  function moveCursorTo(el, cb) {
-    var r = el.getBoundingClientRect(), s = stage.getBoundingClientRect();
-    cursor.classList.add('show', 'move');
-    cursor.style.left = (r.left - s.left + r.width * 0.62) + 'px';
-    cursor.style.top = (r.top - s.top + r.height * 0.55) + 'px';
-    t(cb, 640);
-  }
-  function tap(tab, cb) {
-    cursor.classList.add('press'); tab.classList.add('ripple');
-    t(function () { cursor.classList.remove('press'); tab.classList.remove('ripple'); if (cb) cb(); }, 240);
-  }
-
-  // курсор паркуется у центра сцены между показами
-  function park() {
-    var s = stage.getBoundingClientRect();
-    cursor.classList.remove('move');
-    cursor.style.left = (s.width * 0.5) + 'px';
-    cursor.style.top = (s.height * 0.5) + 'px';
-  }
-
-  function demoStep() {
-    if (userTook || !visible) return;
-    var next = cur === 'std' ? 'art' : 'std';
-    var tab = hs.querySelector('.hs-tab[data-s="' + next + '"]');
-    moveCursorTo(tab, function () {
-      tap(tab, function () {
-        setSeries(next);
-        t(function () { cursor.classList.remove('show'); park(); }, 700);
-        t(demoStep, 3400);           // следующая смена
-      });
-    });
-  }
-  function startDemo() {
-    if (reduced || userTook || demoOn) return;
-    demoOn = true; park();
-    t(demoStep, 1600);               // первая демонстрация чуть погодя
-  }
-  function stopDemo(byUser) {
-    if (byUser) userTook = true;
-    demoOn = false; clearT();
-    cursor.classList.remove('show', 'press', 'move');
-  }
-
-  // запускаем демо только когда hero на экране
-  if ('IntersectionObserver' in window) {
-    io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        visible = e.isIntersecting && e.intersectionRatio > 0.35;
-        if (visible) startDemo(); else if (!userTook) { demoOn = false; clearT(); }
-      });
-    }, { threshold: [0, 0.35, 0.7] });
-    io.observe(hs);
-  } else { visible = true; startDemo(); }
-})();

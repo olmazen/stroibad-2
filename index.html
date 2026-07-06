@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=egoe16">
+<link rel="stylesheet" href="assets/css/style.css?v=egoe17">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -106,37 +106,58 @@
         <span class="scrollcue">Листайте <i></i></span>
       </div>
       <div class="hero-r">
-        <div class="hs" id="heroSeries">
-          <div class="hs-top">
-            <span class="hs-eyebrow">Две линейки благоустройства</span>
-            <div class="hs-tabs" role="tablist">
-              <button class="hs-tab on" data-s="std" role="tab" aria-selected="true"><b>Стандарт</b><span>сталь + дерево</span></button>
-              <button class="hs-tab" data-s="art" role="tab" aria-selected="false"><b>Art&nbsp;Déco</b><span>дизайн-серия</span></button>
-              <span class="hs-ink" aria-hidden="true"></span>
-            </div>
-          </div>
-          <div class="hs-stage">
-            <div class="hs-slide std on" data-s="std">
-              <div class="hs-hero"><img src="assets/img/maf/skamejki/9467/main.webp" alt="Скамейка стальная с деревом — серия Стандарт" loading="eager"><span class="hs-badge">Стандарт</span></div>
-              <div class="hs-thumbs">
-                <span class="hs-th"><img src="assets/img/maf/urny/9421/main.webp" alt="Урна уличная" loading="eager"></span>
-                <span class="hs-th"><img src="assets/img/korziny/standart/STN03-treugolnik/main.webp" alt="Корзина для кондиционера" loading="eager"></span>
-              </div>
-            </div>
-            <div class="hs-slide art" data-s="art">
-              <div class="hs-hero"><img src="assets/img/artdeco/lezhaki/a1-2661/facade1.webp?i10" alt="Лежак дизайнерский — серия Art Déco" loading="eager"><span class="hs-badge art">Art&nbsp;Déco</span></div>
-              <div class="hs-thumbs">
-                <span class="hs-th"><img src="assets/img/artdeco/urny/i20-4021/facade1.webp?i11" alt="Урна дизайнерская Art Déco" loading="eager"></span>
-                <span class="hs-th"><img src="assets/img/artdeco/lezhaki/a1-2651/facade1.webp?i10" alt="Лежак Art Déco" loading="eager"></span>
-              </div>
-            </div>
-            <div class="hs-cursor" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L16 19l-3 1.6-3.4-6.4L5 18z"/></svg></div>
-          </div>
-          <div class="hs-foot">
-            <div class="hs-cap std on"><b>Серия Стандарт</b><p>Сталь и брус хвойных пород высшей категории. Рабочая классика для дворов, парков и улиц — скамейки, урны, корзины, велопарковки.</p></div>
-            <div class="hs-cap art"><b>Серия Art&nbsp;Déco</b><p>Дизайнерские формы, термодерево и нержавеющая сталь. Премиальное благоустройство под дизайн-код территории.</p></div>
-            <a class="hs-go" href="maf/index.html"><span class="hs-price std on">от 1 900 ₽</span><span class="hs-price art">от 21 700 ₽</span><em>Весь каталог →</em></a>
-          </div>
+        <div class="bp-wrap">
+          <span class="bp-corner tl">EGOE · ЧЕРТЁЖ СК-01</span>
+          <span class="bp-corner bl">ПАРКОВАЯ СО СПИНКОЙ</span>
+          <span class="bp-corner br">МАСШТАБ 1:10</span>
+          <svg id="bpHero" data-draw viewBox="0 128 640 392" role="img" aria-label="Чертёж парковой скамейки со спинкой">
+            <!-- земля -->
+            <line class="bp-thin" x1="46" y1="452" x2="594" y2="452"></line>
+            <line class="bp-thin" x1="80" y1="466" x2="94" y2="452"></line>
+            <line class="bp-thin" x1="150" y1="466" x2="164" y2="452"></line>
+            <line class="bp-thin" x1="220" y1="466" x2="234" y2="452"></line>
+            <line class="bp-thin" x1="290" y1="466" x2="304" y2="452"></line>
+            <line class="bp-thin" x1="360" y1="466" x2="374" y2="452"></line>
+            <line class="bp-thin" x1="430" y1="466" x2="444" y2="452"></line>
+            <line class="bp-thin" x1="500" y1="466" x2="514" y2="452"></line>
+            <!-- ноги -->
+            <line class="bp-steel" x1="150" y1="452" x2="150" y2="336"></line>
+            <line class="bp-steel" x1="490" y1="452" x2="490" y2="336"></line>
+            <rect class="bp-thin" x="132" y="444" width="36" height="8"></rect>
+            <rect class="bp-thin" x="472" y="444" width="36" height="8"></rect>
+            <!-- стойки спинки -->
+            <line class="bp-steel" x1="150" y1="336" x2="150" y2="206"></line>
+            <line class="bp-steel" x1="490" y1="336" x2="490" y2="206"></line>
+            <!-- царга под сиденьем -->
+            <line class="bp-thin" x1="150" y1="352" x2="490" y2="352"></line>
+            <!-- сиденье (дерево) -->
+            <rect class="bp-wood" x="108" y="316" width="424" height="20" rx="2"></rect>
+            <!-- спинка (дерево, 2 ламели) -->
+            <rect class="bp-wood" x="108" y="202" width="424" height="18" rx="2"></rect>
+            <rect class="bp-wood" x="108" y="236" width="424" height="18" rx="2"></rect>
+            <!-- размер: ширина -->
+            <line class="bp-dim" x1="108" y1="486" x2="532" y2="486"></line>
+            <line class="bp-dim" x1="108" y1="478" x2="108" y2="494"></line>
+            <line class="bp-dim" x1="532" y1="478" x2="532" y2="494"></line>
+            <text class="bp-txt a bp-fade" x="320" y="510" text-anchor="middle">2 000 ММ</text>
+            <!-- размер: высота -->
+            <line class="bp-dim" x1="66" y1="202" x2="66" y2="452"></line>
+            <line class="bp-dim" x1="58" y1="202" x2="74" y2="202"></line>
+            <line class="bp-dim" x1="58" y1="452" x2="74" y2="452"></line>
+            <text class="bp-txt a bp-fade" x="54" y="330" text-anchor="middle" transform="rotate(-90 54 330)">850 ММ</text>
+            <!-- выноска: дерево -->
+            <polyline class="bp-thin" points="420,210 462,158 478,158"></polyline>
+            <text class="bp-txt bp-fade" x="484" y="162">ХВ. ПОРОДА</text>
+            <!-- выноска: металл -->
+            <polyline class="bp-thin" points="492,394 524,372 540,372"></polyline>
+            <text class="bp-txt bp-fade" x="546" y="376">СТАЛЬ 40×40</text>
+            <!-- крест-визир -->
+            <g class="bp-pulse">
+              <circle class="bp-dim" cx="320" cy="326" r="11" fill="none"></circle>
+              <line class="bp-dim" x1="320" y1="306" x2="320" y2="346"></line>
+              <line class="bp-dim" x1="300" y1="326" x2="340" y2="326"></line>
+            </g>
+          </svg>
         </div>
       </div>
     </div>
@@ -434,6 +455,6 @@
   </div>
 </div>
 
-<script src="assets/js/site.js?v=egoe16"></script>
+<script src="assets/js/site.js?v=egoe17"></script>
 </body>
 </html>
