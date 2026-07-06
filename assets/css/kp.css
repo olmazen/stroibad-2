@@ -196,6 +196,15 @@ table{border-collapse:collapse;width:100%}
 .kp-preview-mode .kp-toolbar{display:none}
 /* ---------- Режим embed (шторка в корзине: кнопки у шторки, тулбар КП не нужен) ---------- */
 .kp-embed .kp-toolbar{display:none}
+/* ---------- Потоковая «печать» документа (?stream=1, первая генерация состава) ---------- */
+.stx{opacity:0;transform:translateY(12px)}
+tr.stx{transform:none}
+.stx.st-in{opacity:1;transform:none;transition:opacity .34s ease,transform .34s ease}
+.stx-sheet{transform:translateY(26px)}
+.stx-sheet.st-in{transition:opacity .5s ease,transform .5s ease}
+.st-head{position:absolute;width:72px;height:3px;background:var(--amber,#f08018);box-shadow:0 0 14px rgba(240,128,24,.9);border-radius:2px;z-index:40;pointer-events:none;transition:top .3s ease,left .3s ease;animation:stB .72s steps(2,start) infinite}
+@keyframes stB{50%{opacity:.25}}
+@media print{.stx{opacity:1!important;transform:none!important}.st-head{display:none!important}}
 
 /* ============================================================
    ЭКРАН — превью «как на бумаге»

@@ -944,6 +944,17 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .kpd-status{font-size:13px;color:var(--steel);min-height:18px;letter-spacing:.02em}
 .kpd-prog{width:min(340px,74vw);height:4px;background:var(--line);border-radius:99px;overflow:hidden}
 .kpd-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),#ffc858)}
+/* полоса живой генерации над документом (пока КП «печатается» в iframe) */
+.kpd-genbar{position:absolute;top:0;left:0;right:0;z-index:4;display:flex;align-items:center;gap:12px;padding:9px 16px 11px;background:rgba(15,18,23,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);transform:translateY(0);transition:transform .4s ease,opacity .4s ease}
+.kpd-genbar.off{transform:translateY(-105%);opacity:0;pointer-events:none}
+.gb-dot{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 10px rgba(255,166,0,.9);animation:gbPulse 1s ease-in-out infinite;flex-shrink:0}
+.kpd-genbar.done .gb-dot{animation:none;background:#3ecf72;box-shadow:0 0 10px rgba(62,207,114,.7)}
+@keyframes gbPulse{50%{opacity:.35}}
+.gb-status{font-size:13px;color:#fff;letter-spacing:.02em;white-space:nowrap}
+.gb-film{display:flex;gap:6px;margin-left:auto;overflow:hidden}
+.gb-th{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--amber);border:1px solid rgba(255,166,0,.4);border-radius:2px;padding:2px 7px;white-space:nowrap;animation:kpdThIn .3s ease}
+.gb-prog{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--amber),#ffc858);width:0;transition:width .5s ease}
+@media(max-width:640px){.gb-film{display:none}}
 .kpd-foot{display:flex;gap:16px;align-items:center;padding:13px 20px;border-top:1px solid var(--line)}
 .kpd-foot .btn{flex-shrink:0}
 .kpd-alt{font-size:13px;color:var(--steel);text-decoration:underline;text-underline-offset:3px}

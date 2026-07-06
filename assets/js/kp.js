@@ -24,6 +24,9 @@
   var preview = P.get('preview') === '1';   // мини-превью в корзине (обложка+ведомость, без панели, некликабельно)
   if (preview) { ledgerOnly = true; auto = false; if (document.body) document.body.classList.add('kp-preview-mode'); }
   if (P.get('embed') === '1' && document.body) document.body.classList.add('kp-embed'); // внутри шторки корзины: свой тулбар не нужен
+  // потоковый режим: документ «печатается» блок за блоком (только при первой генерации состава)
+  var stream = P.get('stream') === '1' && !preview
+    && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   /* ---------------- утилиты ---------------- */
   function readJSON(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }
@@ -84,9 +87,76 @@
     var d = fmtRu(parseDate(head.date));
     var num = head.number || autoNumber();
     doc.innerHTML = buildKp(rows, num, d);
+    if (stream) { prepStream(); setTimeout(runStream, 380); } // печать стартует сразу; чертежи/фото дозаполняют свои блоки
     fillStamp(num);
     injectDrawings(rows).then(finish);   // дождаться вставки чертежей ДО __kpReady/печати
   }
+
+  /* =============== потоковая «печать» документа =============== */
+  var streamUnits = [], streamTimers = [];
+  function prepStream() {
+    var sheets = [].slice.call(doc.querySelectorAll('.sheet'));
+    var pn = sheets.filter(function (s) { return s.classList.contains('kp-product'); }).length, pi = 0;
+    sheets.forEach(function (sheet, si) {
+      var kind = sheet.classList.contains('kp-cover') ? 'cover'
+        : sheet.classList.contains('kp-ledger') ? 'ledger'
+        : sheet.classList.contains('kp-product') ? 'product' : 'terms';
+      if (kind === 'product') pi += 1;
+      sheet.classList.add('stx', 'stx-sheet');
+      streamUnits.push({ el: sheet, t: 'sheet', kind: kind, pi: pi, pn: pn, si: si, n: sheets.length });
+      [].slice.call(sheet.children).forEach(function (ch) {
+        var table = ch.tagName === 'TABLE' ? ch : (ch.querySelector ? ch.querySelector('table') : null);
+        if (kind === 'ledger' && table && table.rows.length > 1) {
+          // строки ведомости печатаются по одной
+          [].slice.call(table.rows).forEach(function (tr) { tr.classList.add('stx'); streamUnits.push({ el: tr, t: 'row' }); });
+        } else {
+          ch.classList.add('stx');
+          var t = (ch.querySelector && ch.querySelector('img')) ? 'img'
+            : (/^H[12]$/.test(ch.tagName) || (ch.classList && ch.classList.contains('kp-h'))) ? 'h' : 'b';
+          streamUnits.push({ el: ch, t: t });
+        }
+      });
+    });
+  }
+  function postStream(msg) { try { parent.postMessage({ kpStream: msg }, location.origin); } catch (e) {} }
+  function runStream() {
+    if (!streamUnits.length) { postStream({ done: true }); return; }
+    document.body.classList.add('kp-streaming');
+    var headEl = document.createElement('div'); headEl.className = 'st-head'; document.body.appendChild(headEl);
+    var k = streamUnits.length > 90 ? 90 / streamUnits.length : 1;   // длинные КП печатаются быстрее
+    var delays = { sheet: 380, img: 430, h: 260, row: 135, b: 185 };
+    var t = 250;
+    streamUnits.forEach(function (u) {
+      t += Math.max(60, Math.round((delays[u.t] || 185) * k));
+      streamTimers.push(setTimeout(function () {
+        u.el.classList.add('st-in');
+        if (u.t === 'sheet') postStream({ stage: u.kind, pi: u.pi, pn: u.pn, si: u.si, n: u.n });
+        var r = u.el.getBoundingClientRect();
+        headEl.style.top = (r.bottom + window.scrollY + 5) + 'px';
+        headEl.style.left = (r.left + window.scrollX) + 'px';
+        var vh = window.innerHeight;
+        if (r.height > vh * 0.6) { // целая страница: показываем её верх
+          if (r.top > vh * 0.3 || r.top < 0) window.scrollTo(0, window.scrollY + r.top - 80);
+        } else if (r.bottom > vh * 0.78) { // обычный блок: следуем за точкой печати
+          window.scrollTo(0, window.scrollY + (r.bottom - vh * 0.55));
+        }
+      }, t));
+    });
+    streamTimers.push(setTimeout(function () {
+      headEl.remove();
+      document.body.classList.remove('kp-streaming');
+      postStream({ done: true });
+    }, t + 480));
+  }
+  function finishStreamNow() {  // печать/скачивание посреди потока: мгновенно допечатать всё
+    if (!streamTimers.length) return;
+    streamTimers.forEach(clearTimeout); streamTimers = [];
+    [].slice.call(document.querySelectorAll('.stx')).forEach(function (el) { el.classList.add('st-in'); });
+    var h = document.querySelector('.st-head'); if (h) h.remove();
+    document.body.classList.remove('kp-streaming');
+    postStream({ done: true });
+  }
+  window.addEventListener('beforeprint', finishStreamNow);
   function autoNumber() {
     var d = parseDate(head.date);
     return 'КП-' + d.getFullYear() + '-' + pad2(d.getMonth() + 1) + pad2(d.getDate());
@@ -307,6 +377,7 @@
   var SHEET_W = 830; // 210mm + отступы
   function fitNarrow() {
     var d = document.querySelector('.kp-doc'); if (!d) return;
+    if (window.innerWidth < 60) return; // вырожденный вьюпорт (скрытый iframe) — не трогаем
     if (window.innerWidth < 820) {
       d.style.width = SHEET_W + 'px';
       d.style.transform = 'none';

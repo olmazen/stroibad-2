@@ -864,11 +864,55 @@ window.__whenVisible = (function () {
     var dStatus = document.getElementById('kpdStatus');
     var dProg = document.getElementById('kpdProg');
     var dNum = document.getElementById('kpdNum');
+    var dGenbar = document.getElementById('kpdGenbar');
+    var dGbStatus = document.getElementById('kpdGbStatus');
+    var dGbFilm = document.getElementById('kpdGbFilm');
+    var dGbProg = document.getElementById('kpdGbProg');
     var dPlayer = dStage ? makePlayer(dStage) : null;
     var genTimers = [];
     var GEN_KEY = 'sp_kp_generated_v1'; // какой состав КП уже «сгенерирован» — второй раз не пересобираем
+    var lastGenKey = '', gbStage = '', gbTotal = 0;
     function hashStr(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
     function cartGenKey(items) { return hashStr(JSON.stringify(items.map(function (i) { return [i.id, i.qty, i.price || 0]; }))); }
+
+    /* — полоса генерации над документом: статус + чипы готовых разделов + прогресс — */
+    var GB_LABELS = { cover: 'обложка', ledger: 'ведомость', product: 'листы изделий', terms: 'условия' };
+    function gbReset(n) {
+      gbStage = ''; gbTotal = n;
+      if (!dGenbar) return;
+      dGenbar.hidden = true; dGenbar.classList.remove('off', 'done');
+      if (dGbFilm) dGbFilm.innerHTML = '';
+      if (dGbStatus) dGbStatus.textContent = 'Пишем обложку…';
+      if (dGbProg) dGbProg.style.width = '4%';
+    }
+    function gbChip(stage, pn) {
+      if (!dGbFilm || !stage) return;
+      var th = document.createElement('span');
+      th.className = 'gb-th';
+      th.textContent = '✓ ' + GB_LABELS[stage] + (stage === 'product' && pn > 1 ? ' · ' + pn : '');
+      dGbFilm.appendChild(th);
+    }
+    window.addEventListener('message', function (e) {
+      if (e.origin !== location.origin) return;
+      var m = e.data && e.data.kpStream;
+      if (!m || !dGenbar) return;
+      if (m.done) {
+        gbChip(gbStage, gbTotal); gbStage = '';
+        if (dGbStatus) dGbStatus.textContent = 'Документ готов';
+        if (dGbProg) dGbProg.style.width = '100%';
+        dGenbar.classList.add('done');
+        try { localStorage.setItem(GEN_KEY, lastGenKey); } catch (e2) {}
+        setTimeout(function () { dGenbar.classList.add('off'); }, 1600);
+        return;
+      }
+      if (m.stage !== gbStage) { gbChip(gbStage, m.pn || gbTotal); gbStage = m.stage; }
+      if (dGbStatus) dGbStatus.textContent =
+        m.stage === 'cover' ? 'Пишем обложку…'
+        : m.stage === 'ledger' ? 'Заполняем ведомость…'
+        : m.stage === 'product' ? ('Верстаем лист изделия ' + m.pi + ' из ' + m.pn + '…')
+        : 'Условия и контакты…';
+      if (dGbProg && m.n) dGbProg.style.width = Math.max(4, Math.round(100 * m.si / m.n)) + '%';
+    });
 
     function openDrawer() {
       if (!drawer) { window.open(new URL('kp/index.html', base).href, '_blank'); return; }
@@ -882,68 +926,43 @@ window.__whenVisible = (function () {
       if (dNum) dNum.textContent = autoNum() + ' · ' + today().split('-').reverse().join('.');
       genTimers.forEach(clearTimeout); genTimers = [];
 
-      // «генерация» постранично: обложка → ведомость → листы изделий (по счёту) → условия.
-      // Если ровно этот состав уже собирали — генератор не запускается, документ открывается сразу.
+      // Первая генерация: документ «печатается» потоково прямо в КП (стрим из iframe),
+      // повтор того же состава — открывается сразу, без генератора.
+      lastGenKey = genKey;
       var minDone = false, loaded = false, revealed = false;
       function tryReveal() {
         if (revealed || !loaded || !minDone) return;
         revealed = true;
-        if (dProg) dProg.style.width = '100%';
-        if (dStatus) dStatus.textContent = 'Документ готов';
-        try { localStorage.setItem(GEN_KEY, genKey); } catch (e) {}
-        genTimers.push(setTimeout(function () { drawer.classList.add('ready'); if (dPlayer) dPlayer.stop(); }, 380));
+        if (already) {
+          if (dProg) dProg.style.width = '100%';
+          if (dStatus) dStatus.textContent = 'Документ готов';
+          try { localStorage.setItem(GEN_KEY, genKey); } catch (e) {}
+        } else if (dGenbar) {
+          dGenbar.hidden = false; dGenbar.classList.remove('off', 'done');
+        }
+        genTimers.push(setTimeout(function () { drawer.classList.add('ready'); if (dPlayer) dPlayer.stop(); }, already ? 380 : 150));
       }
 
       if (already) {
-        // повторное открытие того же КП: без пересборки
+        // повторное открытие того же КП: генератор не запускается, документ сразу
         if (dFilm) dFilm.innerHTML = '';
         if (dStage) dStage.innerHTML = '';
         if (dStatus) dStatus.textContent = 'КП уже собрано — открываем…';
         if (dProg) { dProg.style.transition = 'none'; dProg.style.width = '100%'; }
         genTimers.push(setTimeout(function () { minDone = true; tryReveal(); }, 400));
       } else {
-        var nProd = Math.max(1, items.length);
-        var pages = [
-          { sc: 0, label: 'обложка', status: 'Рисуем обложку…', dur: 1500 },
-          { sc: 1, label: 'ведомость', status: 'Заполняем ведомость…', dur: 1600 },
-          { sc: 2, label: 'листы изделий', status: '', dur: 700 + Math.min(nProd, 8) * 340 },
-          { sc: 3, label: 'условия', status: 'Условия и контакты…', dur: 1100 },
-        ];
-        var totalDur = pages.reduce(function (a, p) { return a + p.dur; }, 0);
+        // первая генерация: короткая заставка, дальше документ ПЕЧАТАЕТСЯ потоково в самом КП
+        minDone = true;
         if (dFilm) dFilm.innerHTML = '';
-        if (dPlayer) dPlayer.set(items);
-        if (dProg) { dProg.style.transition = 'none'; dProg.style.width = '0'; void dProg.offsetWidth; dProg.style.transition = 'width ' + (totalDur / 1000) + 's cubic-bezier(.3,.6,.4,1)'; dProg.style.width = '96%'; }
-        var t = 0;
-        pages.forEach(function (p, pi) {
-          genTimers.push(setTimeout(function () {
-            if (dPlayer) dPlayer.show(p.sc);
-            if (dStatus && p.status) dStatus.textContent = p.status;
-            if (p.sc === 2) { // счётчик листов: «Лист изделия i из N»
-              for (var i = 1; i <= Math.min(nProd, 8); i++) {
-                (function (i) {
-                  genTimers.push(setTimeout(function () {
-                    if (dStatus) dStatus.textContent = 'Верстаем лист изделия ' + i + ' из ' + nProd + '…';
-                  }, 300 + (i - 1) * 340));
-                })(i);
-              }
-            }
-          }, t));
-          genTimers.push(setTimeout(function () {
-            if (dFilm) {
-              var th = document.createElement('span');
-              th.className = 'kpd-th';
-              th.innerHTML = '<i>✓</i>' + p.label + (p.sc === 2 && nProd > 1 ? ' · ' + nProd : '');
-              dFilm.appendChild(th);
-            }
-          }, t + p.dur - 120));
-          t += p.dur;
-        });
-        genTimers.push(setTimeout(function () { minDone = true; tryReveal(); }, totalDur + 150));
+        if (dPlayer) { dPlayer.set(items); dPlayer.show(0); }
+        if (dStatus) dStatus.textContent = 'Запускаем генератор…';
+        if (dProg) { dProg.style.transition = 'none'; dProg.style.width = '0'; void dProg.offsetWidth; dProg.style.transition = 'width 2.5s ease'; dProg.style.width = '40%'; }
+        gbReset(items.length);
       }
 
-      // настоящее КП грузится параллельно (тот же состав = тот же URL; уже загружен — не перезагружаем)
-      var target = new URL('kp/index.html?embed=1&_=' + genKey, base).href;
-      if (dFrame.src === target && dFrame.dataset.loaded === '1') {
+      // настоящее КП грузится параллельно; тот же состав уже загружен (в т.ч. после стрима) — не перезагружаем
+      var target = new URL('kp/index.html?embed=1' + (already ? '' : '&stream=1') + '&_=' + genKey, base).href;
+      if (dFrame.dataset.loaded === '1' && dFrame.src.indexOf('_=' + genKey) > -1) {
         loaded = true; tryReveal();
       } else {
         dFrame.dataset.loaded = '';
