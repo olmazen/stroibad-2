@@ -865,53 +865,57 @@ body.mnav-lock{overflow:hidden}
 #kpOpen{margin-top:4px}
 .kp-gen .form-ok{margin-top:12px}
 
-/* ── КП: анимированный предпросмотр (сцены-«страницы» из товаров корзины) ── */
-.kpv .kpv-stage{position:absolute;inset:0;background:#fff}
-.kpv-sc{position:absolute;inset:0;padding:16px 15px;opacity:0;transition:opacity .45s;color:#171b20;font-family:'Oswald',sans-serif}
+/* ── КП: «генератор» — тёмные чертёжные сцены в стиле сайта, оранжевые линии рисуются ── */
+.kp-preview{background:#14181e;border-color:var(--line-2)}
+.kpv .kpv-stage{position:absolute;inset:0;background:
+ radial-gradient(circle at 18% 12%,rgba(255,166,0,.05),transparent 42%),
+ repeating-linear-gradient(0deg,rgba(255,255,255,.028) 0 1px,transparent 1px 22px),
+ repeating-linear-gradient(90deg,rgba(255,255,255,.028) 0 1px,transparent 1px 22px),#14181e}
+.kpv-sc{position:absolute;inset:0;padding:16px 15px;opacity:0;transition:opacity .45s;font-family:'Oswald',sans-serif;color:#dfe3e7}
+.kp-preview .kpv-sc{padding-top:38px} /* в сайдбаре сверху лежит бейдж «Предпросмотр» */
 .kpv-sc.on{opacity:1}
-.kpv-hd{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #171b20;padding-bottom:7px}
-.kpv-logo{font-weight:700;letter-spacing:.1em;font-size:12px;text-transform:uppercase}
-.kpv-logo b{color:var(--amber)}
-.kpv-cap{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#8a929b}
-.kpv-ph{margin-top:12px;height:132px;background:#f1f3f5;overflow:hidden}
-.kpv-ph img{width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.14)}
-.kpv-sc.on .kpv-ph img{animation:kpvPh .9s .45s cubic-bezier(.2,.7,.3,1) forwards}
-@keyframes kpvPh{to{opacity:1;transform:scale(1)}}
-.kpv-h1{margin-top:13px;font-size:19px;line-height:1.12;font-weight:600;letter-spacing:.02em}
-.kpv-h1 .am{color:var(--amber)}
-.kpv-t{display:inline-block;overflow:hidden;white-space:nowrap;max-width:0;vertical-align:bottom}
-.kpv-sc.on .kpv-t{animation:kpvType .55s .15s steps(14,end) forwards}
-.kpv-sc.on .kpv-t2{animation-delay:.7s}
+.kpv-sc::before,.kpv-sc::after{content:'';position:absolute;width:16px;height:16px;border:1px solid rgba(255,166,0,.5)}
+.kpv-sc::before{left:7px;top:7px;border-right:0;border-bottom:0}
+.kpv-sc::after{right:7px;bottom:7px;border-left:0;border-top:0}
+.k2-hd{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line-2);padding-bottom:7px;margin-bottom:4px}
+.k2-logo{font-weight:700;letter-spacing:.1em;font-size:12px;text-transform:uppercase;color:#fff}
+.k2-logo b{color:var(--amber)}
+.k2-cap,.k2-num{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel)}
+.k2-svg{display:block;width:100%;margin-top:10px}
+.k2d{stroke:var(--amber);stroke-width:1.6;stroke-dasharray:100;stroke-dashoffset:100;opacity:.9}
+.k2d2{stroke:rgba(255,166,0,.45);stroke-width:1.1}
+.k2d3{stroke:#7c8894;stroke-width:1.1}
+.kpv-sc.on .k2d{animation:k2draw .9s ease forwards}
+.kpv-sc.on .k2d2{animation-delay:.45s}
+.kpv-sc.on .k2d3{animation-delay:.75s}
+@keyframes k2draw{to{stroke-dashoffset:0}}
+.k2-h1{margin-top:11px;font-size:19px;line-height:1.12;font-weight:600;letter-spacing:.02em;color:#fff}
+.k2-h1 .am,.kpv-h1 .am{color:var(--amber)}
+.kpv-t{display:inline-block;overflow:hidden;white-space:nowrap;max-width:0;vertical-align:bottom;border-right:2px solid var(--amber)}
+.kpv-sc.on .kpv-t{animation:kpvType .55s .15s steps(14,end) forwards,kpvCaret .9s 1.4s forwards}
+.kpv-sc.on .kpv-t2{animation-delay:.7s,1.6s}
 @keyframes kpvType{to{max-width:100%}}
-.kpv-bar{height:7px;background:#e8eaee;margin-top:9px;transform:scaleX(0);transform-origin:left}
-.kpv-bar.am{background:var(--amber)}
-.kpv-sc.on .kpv-bar{animation:kpvBar .5s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes kpvCaret{to{border-color:transparent}}
+.k2-bar{height:6px;background:rgba(255,255,255,.09);margin-top:9px;transform:scaleX(0);transform-origin:left}
+.k2-bar.am{background:var(--amber)}
+.kpv-sc.on .k2-bar{animation:kpvBar .5s cubic-bezier(.2,.7,.3,1) forwards}
 @keyframes kpvBar{to{transform:scaleX(1)}}
-.kpv-row{display:flex;gap:7px;align-items:center;padding:6px 0;border-bottom:1px solid #edeff2;opacity:0;transform:translateY(8px)}
-.kpv-sc.on .kpv-row{animation:kpvRow .4s cubic-bezier(.2,.7,.3,1) forwards}
-@keyframes kpvRow{to{opacity:1;transform:none}}
-.kpv-row img,.kpv-noimg{width:32px;height:24px;object-fit:cover;background:#f1f3f5;flex-shrink:0}
-.kpv-row .n{flex:1;font-family:'Inter',-apple-system,sans-serif;font-size:8.5px;line-height:1.25;color:#3c434b;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.kpv-row .q{font-size:9px;color:#8a929b}
-.kpv-row .p{font-size:9.5px;font-weight:600;white-space:nowrap}
-.kpv-more{font-family:'Inter',sans-serif;font-size:8.5px;color:#8a929b;padding:7px 0;opacity:0}
-.kpv-sc.on .kpv-more{animation:kpvRow .4s forwards}
-.kpv-tot{display:flex;justify-content:space-between;align-items:baseline;margin-top:9px;padding-top:8px;border-top:2px solid #171b20;opacity:0}
-.kpv-sc.on .kpv-tot{animation:kpvRow .45s forwards}
-.kpv-tot span{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:#8a929b}
-.kpv-tot b{font-size:14px;color:var(--amber)}
-.kpv-split{display:flex;gap:8px;margin-top:12px}
-.kpv-ph-s{flex:1.25;height:108px;margin-top:0}
-.kpv-bp{flex:1;height:108px;position:relative;background:repeating-linear-gradient(0deg,#eef1f4 0 1px,transparent 1px 12px),repeating-linear-gradient(90deg,#eef1f4 0 1px,transparent 1px 12px),#fbfcfd;border:1px solid #e4e7eb;overflow:hidden}
-.kpv-bp i{position:absolute;border:1.5px solid #9aa6b2;opacity:0}
-.kpv-bp i:nth-child(1){left:18%;top:22%;width:56%;height:44%;border-radius:2px}
-.kpv-bp i:nth-child(2){left:26%;top:66%;width:10%;height:16%}
-.kpv-bp i:nth-child(3){left:58%;top:66%;width:10%;height:16%}
-.kpv-sc.on .kpv-bp i{animation:kpvDraw .55s forwards}
-.kpv-sc.on .kpv-bp i:nth-child(2){animation-delay:.35s}
-.kpv-sc.on .kpv-bp i:nth-child(3){animation-delay:.5s}
-@keyframes kpvDraw{from{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0)}}
-.kpv-num{font-size:9px;color:#8a929b;letter-spacing:.06em}
+.k2-row{display:flex;gap:8px;align-items:center;padding:6.5px 0;border-bottom:1px solid rgba(255,255,255,.07);opacity:0;transform:translateX(-10px)}
+.kpv-sc.on .k2-row{animation:k2row .4s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes k2row{to{opacity:1;transform:none}}
+.k2-ri{width:14px;font-size:9px;color:var(--amber);flex-shrink:0}
+.k2-rn{flex:1;font-family:'Inter',-apple-system,sans-serif;font-size:8.5px;line-height:1.25;color:#aab3bb;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+.k2-rq{font-size:9px;color:var(--steel)}
+.k2-rp{font-size:9.5px;font-weight:600;color:#fff;background:rgba(255,166,0,.14);border:1px solid rgba(255,166,0,.3);padding:1px 6px;border-radius:2px;white-space:nowrap}
+.k2-more{font-family:'Inter',sans-serif;font-size:8.5px;color:var(--steel);padding:7px 0;opacity:0}
+.kpv-sc.on .k2-more{animation:k2row .4s forwards}
+.k2-tot{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:8px;border-top:1px solid var(--amber);opacity:0}
+.kpv-sc.on .k2-tot{animation:k2row .45s forwards}
+.k2-tot span{font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--steel)}
+.k2-tot b{font-size:15px;color:var(--amber)}
+.k2-grid{background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 13px),repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 13px)}
+.k2-sign{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel);opacity:0;margin-top:6px}
+.kpv-sc.on .k2-sign{animation:k2row .5s forwards}
 
 /* ── КП: выезжающая шторка с настоящим документом ── */
 html.kpd-lock,html.kpd-lock body{overflow:hidden}
@@ -931,18 +935,14 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .kpdrawer.ready .kpd-body iframe{opacity:1}
 .kpd-gen{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:24px;transition:opacity .45s}
 .kpdrawer.ready .kpd-gen{opacity:0;pointer-events:none}
-.kpd-mini{position:relative;width:min(320px,72vw);height:352px;background:#fff;border-radius:3px;box-shadow:0 24px 70px rgba(0,0,0,.5);overflow:hidden;animation:kpdFloat 4.5s ease-in-out infinite}
+.kpd-mini{position:relative;width:min(340px,74vw);height:372px;background:#14181e;border:1px solid var(--line-2);border-radius:3px;box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 0 1px rgba(255,166,0,.08);overflow:hidden;animation:kpdFloat 4.5s ease-in-out infinite}
 @keyframes kpdFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-.kpd-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;min-width:min(320px,72vw)}
-.kpd-steps li{position:relative;padding-left:28px;font-size:13px;color:var(--steel);transition:color .3s}
-.kpd-steps li::before{content:'';position:absolute;left:0;top:1px;width:16px;height:16px;border:1.5px solid var(--line-2);border-radius:50%;transition:all .3s}
-.kpd-steps li.act{color:#fff}
-.kpd-steps li.act::before{border-color:var(--amber)}
-.kpd-steps li.act:not(.done)::before{animation:kpdPulse 1s ease-in-out infinite}
-@keyframes kpdPulse{50%{box-shadow:0 0 0 4px rgba(255,166,0,.18)}}
-.kpd-steps li.done::before{background:var(--amber);border-color:var(--amber)}
-.kpd-steps li.done::after{content:'';position:absolute;left:4.5px;top:6px;width:7px;height:4px;border-left:2px solid #14181e;border-bottom:2px solid #14181e;transform:rotate(-45deg)}
-.kpd-prog{width:min(320px,72vw);height:4px;background:var(--line);border-radius:99px;overflow:hidden}
+.kpd-film{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:26px}
+.kpd-th{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:#fff;border:1px solid rgba(255,166,0,.45);background:rgba(255,166,0,.1);border-radius:2px;padding:4px 10px;animation:kpdThIn .35s cubic-bezier(.2,.8,.3,1.2)}
+.kpd-th i{font-style:normal;color:var(--amber)}
+@keyframes kpdThIn{from{opacity:0;transform:translateY(8px) scale(.9)}}
+.kpd-status{font-size:13px;color:var(--steel);min-height:18px;letter-spacing:.02em}
+.kpd-prog{width:min(340px,74vw);height:4px;background:var(--line);border-radius:99px;overflow:hidden}
 .kpd-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),#ffc858)}
 .kpd-foot{display:flex;gap:16px;align-items:center;padding:13px 20px;border-top:1px solid var(--line)}
 .kpd-foot .btn{flex-shrink:0}
