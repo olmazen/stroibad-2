@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Песочница · переход фото в каталоге · EGOE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0e12; --bg2:#0f131824; --line:#242a31; --line2:#333b44;
+  --tx:#e9ecef; --tx2:#9aa2ab; --steel:#79828c;
+  --amber:#f26f1d; --amber-h:#ff8a3d; --gold:#c9a45f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:
+  radial-gradient(1200px 600px at 50% -10%,rgba(242,111,29,.06),transparent 60%),
+  var(--bg);
+  color:var(--tx);font-family:'PT Sans',system-ui,sans-serif;line-height:1.55;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+
+/* header */
+.top{padding:64px 0 26px;text-align:center}
+.eyebrow{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.22em;
+  font-size:12px;color:var(--amber);margin-bottom:16px}
+h1{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;
+  font-size:clamp(28px,4.4vw,50px);line-height:1.03;letter-spacing:.01em}
+h1 em{font-style:normal;color:var(--amber)}
+.sub{color:var(--tx2);font-size:16.5px;max-width:640px;margin:18px auto 0}
+.sub b{color:var(--tx)}
+
+/* mode switcher */
+.modes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:34px 0 8px}
+.modes .m{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;
+  font-size:13px;color:var(--tx2);background:transparent;border:1px solid var(--line2);
+  padding:11px 20px;border-radius:3px;cursor:pointer;transition:.25s;position:relative}
+.modes .m:hover{color:var(--tx);border-color:var(--steel)}
+.modes .m.on{color:#fff;border-color:var(--amber);background:rgba(242,111,29,.1)}
+.modes .m small{display:block;font-family:'PT Sans';text-transform:none;letter-spacing:0;
+  font-size:11px;color:var(--steel);margin-top:2px}
+.modes .m.on small{color:var(--amber-h)}
+.modehint{text-align:center;color:var(--steel);font-size:13px;margin:4px 0 40px;min-height:18px}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;padding-bottom:30px}
+@media(max-width:900px){.grid{grid-template-columns:1fr;gap:34px;max-width:520px;margin:0 auto}}
+
+/* card */
+.rc{position:relative;border:1px solid var(--line);background:#05070a;border-radius:4px;
+  overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.stage{position:relative;aspect-ratio:4/3;overflow:hidden;background:#05070a}
+.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;will-change:opacity,transform;
+  transition:opacity .8s cubic-bezier(.4,0,.15,1),transform 1.1s cubic-bezier(.2,.5,.15,1),
+             clip-path .85s cubic-bezier(.5,0,.15,1),filter .8s ease}
+.from{opacity:1;transform:scale(1.005);z-index:1}
+.to{opacity:0;z-index:2}
+/* moody veil so default is "eле заметное" */
+.veil{position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(120% 80% at 50% 38%,transparent 0%,rgba(4,6,9,.34) 62%,rgba(4,6,9,.72) 100%);
+  transition:opacity .8s ease;opacity:1}
+/* warm bloom of light */
+.glow{position:absolute;left:50%;top:34%;width:78%;height:70%;transform:translate(-50%,-50%) scale(.55);
+  z-index:4;pointer-events:none;opacity:0;mix-blend-mode:screen;
+  background:radial-gradient(closest-side,rgba(255,196,120,.55),rgba(255,150,60,.18) 46%,transparent 72%);
+  transition:opacity .85s ease,transform 1s cubic-bezier(.2,.6,.2,1)}
+/* light sweep bar (wipe mode) */
+.sweep{position:absolute;top:-10%;left:-40%;width:38%;height:120%;z-index:5;pointer-events:none;opacity:0;
+  transform:skewX(-12deg);
+  background:linear-gradient(90deg,transparent,rgba(255,235,205,.0) 20%,rgba(255,236,206,.5),transparent);
+  transition:opacity .1s}
+
+/* corner ticks */
+.stage::before,.stage::after{content:"";position:absolute;width:16px;height:16px;z-index:6;
+  border:1px solid rgba(255,255,255,.22);transition:border-color .5s}
+.stage::before{top:12px;left:12px;border-right:none;border-bottom:none}
+.stage::after{bottom:12px;right:12px;border-left:none;border-top:none}
+
+/* ==== REVEAL (hover desktop / .rev touch) ==== */
+@media(hover:hover){
+  .rc:hover .from{opacity:0;transform:scale(1.05)}
+  .rc:hover .to{opacity:1}
+  .rc:hover .veil{opacity:0}
+  .rc:hover .stage::before,.rc:hover .stage::after{border-color:var(--amber)}
+}
+.rc.rev .from{opacity:0;transform:scale(1.05)}
+.rc.rev .to{opacity:1}
+.rc.rev .veil{opacity:0}
+.rc.rev .stage::before,.rc.rev .stage::after{border-color:var(--amber)}
+
+/* mode: glow (default) — warm bloom */
+.sandbox.mode-glow .rc:hover .glow,.sandbox.mode-glow .rc.rev .glow{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* mode: zoom — cleaner, stronger push-in, no bloom */
+.sandbox.mode-zoom .to{transform:scale(1.14)}
+.sandbox.mode-zoom .rc:hover .to,.sandbox.mode-zoom .rc.rev .to{transform:scale(1)}
+.sandbox.mode-zoom .rc:hover .from,.sandbox.mode-zoom .rc.rev .from{transform:scale(1.1)}
+
+/* mode: wipe — bright image revealed by a light curtain + sweep */
+.sandbox.mode-wipe .to{clip-path:inset(0 100% 0 0);opacity:1;transform:scale(1.02)}
+.sandbox.mode-wipe .rc:hover .to,.sandbox.mode-wipe .rc.rev .to{clip-path:inset(0 0 0 0);transform:scale(1)}
+.sandbox.mode-wipe .rc:hover .from,.sandbox.mode-wipe .rc.rev .from{opacity:1}
+.sandbox.mode-wipe .rc:hover .sweep,.sandbox.mode-wipe .rc.rev .sweep{opacity:1;left:120%;
+  transition:left .85s cubic-bezier(.5,0,.2,1),opacity .2s}
+
+/* caption */
+.cap{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:16px 18px;border-top:1px solid var(--line)}
+.tag{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;
+  font-size:16px;color:#fff;display:flex;align-items:center;gap:9px}
+.dot{width:11px;height:11px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.25)}
+.d-dark{background:#14181d}.d-warm{background:linear-gradient(135deg,#e88a34,#b5641d)}.d-white{background:#eef0f2}
+.arw{color:var(--steel);font-size:14px}
+.hint{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.08em;
+  font-size:11px;color:var(--steel);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.hint::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--amber);
+  animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+
+/* footer note */
+.note{border:1px solid var(--line);background:var(--bg2);border-radius:4px;
+  padding:22px 24px;margin:22px 0 70px;color:var(--tx2);font-size:14.5px}
+.note b{color:var(--tx)}
+.note .k{color:var(--amber);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:13px}
+
+/* "reveal all" master toggle */
+.master{display:flex;justify-content:center;margin:0 0 30px}
+.master button{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;
+  font-size:12.5px;color:var(--tx2);background:transparent;border:1px dashed var(--line2);
+  padding:9px 18px;border-radius:3px;cursor:pointer;transition:.25s}
+.master button:hover{color:#fff;border-color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="sandbox mode-glow" id="sandbox">
+  <div class="wrap">
+
+    <div class="top">
+      <div class="eyebrow">Каталог МАФ · концепт</div>
+      <h1>Фото <em>оживает</em> под курсором</h1>
+      <p class="sub">По умолчанию карточка тёмная, приглушённая. При наведении (на телефоне — при свайпе / прокрутке) она мягко «загорается» и переходит на светлый кадр. Ниже — три пары перехода и три стиля анимации. Выбери, что нравится.</p>
+    </div>
+
+    <div class="modes" id="modes">
+      <button class="m on" data-mode="glow">Свечение<small>тёплый ореол</small></button>
+      <button class="m" data-mode="zoom">Зум<small>плавный наезд</small></button>
+      <button class="m" data-mode="wipe">Штора света<small>луч раскрывает</small></button>
+    </div>
+    <div class="modehint" id="modehint">Тёмный кадр «загорается» тёплым светом и уступает место светлому.</div>
+
+    <div class="grid">
+      <figure class="rc">
+        <div class="stage">
+          <img class="ph from" src="img/dark.webp" alt="Скамейка — тёмный кадр" loading="lazy">
+          <img class="ph to" src="img/warm.webp" alt="Скамейка — тёплый кадр" loading="lazy">
+          <span class="glow"></span><span class="sweep"></span><span class="veil"></span>
+        </div>
+        <div class="cap">
+          <span class="tag"><i class="dot d-dark"></i>Тёмный<span class="arw">→</span><i class="dot d-warm"></i>Жёлтый</span>
+          <span class="hint">наведи · свайп</span>
+        </div>
+      </figure>
+
+      <figure class="rc">
+        <div class="stage">
+          <img class="ph from" src="img/dark.webp" alt="Скамейка — тёмный кадр" loading="lazy">
+          <img class="ph to" src="img/white.webp" alt="Скамейка — белый кадр" loading="lazy">
+          <span class="glow"></span><span class="sweep"></span><span class="veil"></span>
+        </div>
+        <div class="cap">
+          <span class="tag"><i class="dot d-dark"></i>Тёмный<span class="arw">→</span><i class="dot d-white"></i>Белый</span>
+          <span class="hint">наведи · свайп</span>
+        </div>
+      </figure>
+
+      <figure class="rc">
+        <div class="stage">
+          <img class="ph from" src="img/warm.webp" alt="Скамейка — тёплый кадр" loading="lazy">
+          <img class="ph to" src="img/white.webp" alt="Скамейка — белый кадр" loading="lazy">
+          <span class="glow"></span><span class="sweep"></span><span class="veil"></span>
+        </div>
+        <div class="cap">
+          <span class="tag"><i class="dot d-warm"></i>Жёлтый<span class="arw">→</span><i class="dot d-white"></i>Белый</span>
+          <span class="hint">наведи · свайп</span>
+        </div>
+      </figure>
+    </div>
+
+    <div class="master"><button id="revAll">▶ Проиграть все переходы</button></div>
+
+    <div class="note">
+      <span class="k">Как это будет в каталоге</span><br><br>
+      В сетке товаров МАФ каждая карточка по умолчанию показывает <b>тёмный, приглушённый</b> кадр — сетка выглядит спокойной и графичной. Наводишь курсор — товар «выходит на свет» и показывает <b>детальный светлый</b> кадр. На мобильном тот же переход срабатывает при <b>прокрутке</b> карточки к центру экрана или по тапу.<br><br>
+      Здесь показаны 3 сочетания на одной скамейке, чтобы сравнить контраст «до/после». Стиль анимации переключается кнопками сверху. Скажи, какая пара и какой стиль — внедрю на каталог.
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var sandbox=document.getElementById('sandbox');
+  var hints={
+    glow:'Тёмный кадр «загорается» тёплым светом и уступает место светлому.',
+    zoom:'Чистый плавный наезд: светлый кадр наплывает и встаёт на место.',
+    wipe:'Луч света «шторой» проходит по кадру и раскрывает светлую версию.'
+  };
+  // mode switch
+  document.getElementById('modes').addEventListener('click',function(e){
+    var b=e.target.closest('.m'); if(!b) return;
+    document.querySelectorAll('.modes .m').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    sandbox.className='sandbox mode-'+b.dataset.mode;
+    document.getElementById('modehint').textContent=hints[b.dataset.mode];
+  });
+
+  var cards=[].slice.call(document.querySelectorAll('.rc'));
+
+  // touch: tap toggles reveal
+  var isTouch=window.matchMedia('(hover: none)').matches;
+  cards.forEach(function(c){
+    c.addEventListener('click',function(){ c.classList.toggle('rev'); });
+  });
+
+  // mobile: reveal when card is near viewport center (свайп / прокрутка)
+  if('IntersectionObserver' in window && isTouch){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting) en.target.classList.add('rev');
+        else en.target.classList.remove('rev');
+      });
+    },{rootMargin:'-38% 0px -38% 0px',threshold:0});
+    cards.forEach(function(c){io.observe(c)});
+  }
+
+  // "play all" — sequentially reveal then reset (works on desktop too)
+  document.getElementById('revAll').addEventListener('click',function(){
+    cards.forEach(function(c,i){
+      setTimeout(function(){c.classList.add('rev');},i*260);
+      setTimeout(function(){c.classList.remove('rev');},1600+i*260);
+    });
+  });
+})();
+</script>
+</body>
+</html>
