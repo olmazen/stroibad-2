@@ -117,11 +117,113 @@
 .sp5 .rlab.std{top:12px;left:12px;background:var(--std);color:#151109}
 .sp5 .rlab.art{bottom:12px;left:12px;background:var(--art);color:#211b0d}
 
+/* ================= ПОКОЛЕНИЕ 2 (по мотивам 1 и 3) ================= */
+.g2div{margin:78px 0 8px;padding-top:30px;border-top:1px solid var(--line)}
+.g2div .eyebrow{color:var(--art)}
+.g2div h2{font-family:'Oswald',sans-serif;font-size:26px;text-transform:uppercase;letter-spacing:.03em;color:#fff;margin:8px 0 8px}
+.g2div p{color:var(--tx2);font-size:14px;max-width:720px;line-height:1.55}
+
+/* 6 — Разлом с веером внутри (1 × 3) */
+.sp6{display:flex;gap:3px;border:1px solid var(--line)}
+.sp6 .half{position:relative;flex:1;background:#0f1319;padding:32px 30px 24px;overflow:hidden;cursor:pointer;min-height:clamp(400px,50vh,520px);display:flex;flex-direction:column;transition:flex .55s cubic-bezier(.4,.05,.15,1),background .4s}
+.sp6:hover .half{flex:.82}.sp6 .half:hover,.sp6 .half.hov{flex:1.42;background:#12171f}
+.sp6 .half>i{position:absolute;top:0;left:0;right:0;height:3px;z-index:4}
+.sp6 .std>i{background:var(--std)}.sp6 .art>i{background:var(--art)}
+.sp6 .fan{position:relative;flex:1;margin:14px 0 20px}
+.sp6 .fan img{position:absolute;top:0;left:50%;width:66%;height:90%;object-fit:cover;border:4px solid #0f1319;box-shadow:0 16px 38px rgba(0,0,0,.55);transition:transform .6s cubic-bezier(.3,.8,.3,1)}
+.sp6 .fan img:nth-child(1){transform:translateX(-50%) rotate(-6deg)}
+.sp6 .fan img:nth-child(2){transform:translateX(-50%) rotate(4deg)}
+.sp6 .fan img:nth-child(3){transform:translateX(-50%) rotate(-1deg)}
+.sp6 .half:hover .fan img:nth-child(1),.sp6 .half.hov .fan img:nth-child(1){transform:translateX(-100%) rotate(-11deg)}
+.sp6 .half:hover .fan img:nth-child(2),.sp6 .half.hov .fan img:nth-child(2){transform:translateX(0) rotate(9deg)}
+.sp6 .half:hover .fan img:nth-child(3),.sp6 .half.hov .fan img:nth-child(3){transform:translateX(-50%) rotate(0) translateY(-8px)}
+.sp6 h3{font-family:'Oswald',sans-serif;font-size:clamp(24px,2.6vw,34px);text-transform:uppercase;color:#fff;margin:8px 0 6px;line-height:1}
+.sp6 .foot{display:flex;align-items:center;justify-content:space-between}
+.sp6 .cnt{font-family:'Oswald',sans-serif;font-size:13.5px;color:var(--steel)}
+
+/* 7 — Диагональный разлом (рублено) */
+.sp7{position:relative;height:clamp(400px,50vh,520px);border:1px solid var(--line);overflow:hidden}
+.sp7 .side{position:absolute;inset:0;overflow:hidden}
+.sp7 .side img{width:100%;height:100%;object-fit:cover;transition:transform .7s ease}
+.sp7 .side::after{content:"";position:absolute;inset:0}
+.sp7 .side.std{clip-path:polygon(0 0,61% 0,41% 100%,0 100%)}
+.sp7 .side.std::after{background:linear-gradient(120deg,rgba(9,11,14,.35),rgba(9,11,14,.85))}
+.sp7 .side.art{clip-path:polygon(63% 0,100% 0,100% 100%,43% 100%)}
+.sp7 .side.art::after{background:linear-gradient(300deg,rgba(9,11,14,.35),rgba(9,11,14,.85))}
+.sp7:hover .side.std img{transform:scale(1.05)}.sp7:hover .side.art img{transform:scale(1.05)}
+.sp7 .seamsvg{position:absolute;inset:0;z-index:3;width:100%;height:100%}
+.sp7 .in{position:absolute;z-index:4;max-width:300px}
+.sp7 .in.std{left:30px;bottom:28px}
+.sp7 .in.art{right:30px;top:28px;text-align:right}
+.sp7 h3{font-family:'Oswald',sans-serif;font-size:clamp(26px,3vw,38px);text-transform:uppercase;color:#fff;margin:10px 0 6px;line-height:1}
+.sp7 .cnt{font-family:'Oswald',sans-serif;font-size:13.5px;color:rgba(255,255,255,.7);display:block;margin-bottom:12px}
+
+/* 8 — Разлом с выезжающей лентой моделей (1 + галерея) */
+.sp8{display:flex;gap:3px;height:clamp(420px,52vh,540px);border:1px solid var(--line)}
+.sp8 .half{position:relative;flex:1;overflow:hidden;cursor:pointer;transition:flex .55s cubic-bezier(.4,.05,.15,1)}
+.sp8:hover .half{flex:.85}.sp8 .half:hover,.sp8 .half.hov{flex:1.4}
+.sp8 .half>.hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s}
+.sp8 .half:hover .hero,.sp8 .half.hov .hero{transform:scale(1.06)}
+.sp8 .half::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,11,14,.12) 25%,rgba(9,11,14,.9))}
+.sp8 .half>i{position:absolute;top:0;left:0;right:0;height:3px;z-index:4}
+.sp8 .std>i{background:var(--std)}.sp8 .art>i{background:var(--art)}
+.sp8 .in{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:24px 28px;transition:transform .5s}
+.sp8 .half:hover .in,.sp8 .half.hov .in{transform:translateY(-96px)}
+.sp8 h3{font-family:'Oswald',sans-serif;font-size:clamp(24px,2.6vw,34px);text-transform:uppercase;color:#fff;margin:8px 0 4px;line-height:1}
+.sp8 .cnt{font-family:'Oswald',sans-serif;font-size:13.5px;color:rgba(255,255,255,.72)}
+.sp8 .strip{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;gap:6px;padding:12px 14px;transform:translateY(100%);transition:transform .5s cubic-bezier(.3,.8,.3,1);background:linear-gradient(180deg,transparent,rgba(9,11,14,.6))}
+.sp8 .half:hover .strip,.sp8 .half.hov .strip{transform:none}
+.sp8 .strip img{flex:1;min-width:0;height:78px;object-fit:cover;border:1px solid rgba(255,255,255,.12)}
+
+/* 9 — Двойная лента-веер во всю ширину (3 × полоса) */
+.sp9{border:1px solid var(--line)}
+.sp9 .band{position:relative;display:flex;align-items:center;gap:20px;padding:24px 28px;overflow:hidden;cursor:pointer;transition:background .35s}
+.sp9 .band+.band{border-top:1px solid var(--line)}
+.sp9 .band.std:hover,.sp9 .band.std.hov{background:rgba(242,111,29,.06)}
+.sp9 .band.art:hover,.sp9 .band.art.hov{background:rgba(201,164,95,.06)}
+.sp9 .lab{flex-shrink:0;width:230px}
+.sp9 h3{font-family:'Oswald',sans-serif;font-size:26px;text-transform:uppercase;color:#fff;margin:8px 0 6px;line-height:1}
+.sp9 .lab p{font-size:12.5px;color:var(--tx2);line-height:1.5;margin:0 0 12px}
+.sp9 .cards{position:relative;flex:1;height:168px}
+.sp9 .cards img{position:absolute;top:0;height:168px;width:230px;object-fit:cover;border:3px solid #14181e;box-shadow:0 10px 26px rgba(0,0,0,.4);transition:transform .55s cubic-bezier(.3,.8,.3,1)}
+.sp9 .cards img:nth-child(1){left:0;transform:rotate(-2deg)}
+.sp9 .cards img:nth-child(2){left:120px;transform:rotate(1.5deg)}
+.sp9 .cards img:nth-child(3){left:240px;transform:rotate(-1deg)}
+.sp9 .cards img:nth-child(4){left:360px;transform:rotate(2deg)}
+.sp9 .band:hover .cards img:nth-child(1),.sp9 .band.hov .cards img:nth-child(1){transform:rotate(-2deg) translateX(-6px)}
+.sp9 .band:hover .cards img:nth-child(2),.sp9 .band.hov .cards img:nth-child(2){transform:rotate(1.5deg) translateX(58px)}
+.sp9 .band:hover .cards img:nth-child(3),.sp9 .band.hov .cards img:nth-child(3){transform:rotate(-1deg) translateX(122px)}
+.sp9 .band:hover .cards img:nth-child(4),.sp9 .band.hov .cards img:nth-child(4){transform:rotate(2deg) translateX(186px)}
+
+/* 10 — Иммерсивный разлом с угловым веером (1 + 3-акцент) */
+.sp10{display:flex;gap:3px;height:clamp(420px,52vh,540px);border:1px solid var(--line)}
+.sp10 .half{position:relative;flex:1;overflow:hidden;cursor:pointer;transition:flex .55s cubic-bezier(.4,.05,.15,1)}
+.sp10:hover .half{flex:.85}.sp10 .half:hover,.sp10 .half.hov{flex:1.4}
+.sp10 .half>.hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s}
+.sp10 .half:hover .hero,.sp10 .half.hov .hero{transform:scale(1.05)}
+.sp10 .half::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,11,14,.1) 30%,rgba(9,11,14,.86))}
+.sp10 .half>i{position:absolute;top:0;left:0;right:0;height:3px;z-index:4}
+.sp10 .std>i{background:var(--std)}.sp10 .art>i{background:var(--art)}
+.sp10 .mini{position:absolute;top:22px;right:22px;z-index:3;width:118px;height:150px}
+.sp10 .mini img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:3px solid #14181e;box-shadow:0 10px 24px rgba(0,0,0,.5);transition:transform .55s cubic-bezier(.3,.8,.3,1)}
+.sp10 .mini img:nth-child(1){transform:rotate(-8deg)}
+.sp10 .mini img:nth-child(2){transform:rotate(-3deg) translateY(4px)}
+.sp10 .mini img:nth-child(3){transform:rotate(2deg)}
+.sp10 .half:hover .mini img:nth-child(1),.sp10 .half.hov .mini img:nth-child(1){transform:translate(-124px,10px) rotate(-10deg)}
+.sp10 .half:hover .mini img:nth-child(2),.sp10 .half.hov .mini img:nth-child(2){transform:translate(-62px,6px) rotate(-4deg)}
+.sp10 .miniN{position:absolute;top:-22px;right:0;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.sp10 .in{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:26px 28px}
+.sp10 h3{font-family:'Oswald',sans-serif;font-size:clamp(26px,3vw,38px);text-transform:uppercase;color:#fff;margin:8px 0 6px;line-height:1}
+.sp10 .cnt{font-family:'Oswald',sans-serif;font-size:13.5px;color:rgba(255,255,255,.72)}
+
 @media(max-width:820px){
   .sp1{flex-direction:column;height:auto}.sp1 .pan{height:240px;flex:none!important}.sp1 .pan p{max-height:80px;opacity:1}
   .sp3{grid-template-columns:1fr}
   .sp4{grid-template-columns:1fr}.sp4 .tabs{flex-direction:row}.sp4 .stage{min-height:300px}
   .sp2{height:340px}
+  .sp6,.sp8,.sp10{flex-direction:column;height:auto}.sp6 .half,.sp8 .half,.sp10 .half{flex:none!important;min-height:360px}
+  .sp7{height:auto}.sp7 .side{position:relative;clip-path:none!important}.sp7 .side.art{margin-top:3px}.sp7 .seamsvg{display:none}.sp7 .in{position:static;text-align:left!important;padding:18px 22px}
+  .sp9 .band{flex-direction:column;align-items:stretch}.sp9 .lab{width:auto}.sp9 .cards{height:150px}
 }
 </style>
 </head>
@@ -235,7 +337,74 @@
       </div></div>
     </div>
 
-    <p style="color:var(--steel);font-size:13px;margin:52px 0 20px">Фото — временные (взяты из каталога). Финальные заменим на подборку из нескольких скамеек каждой серии. Скажите номер варианта — доработаю его финально и поставлю на все категории.</p>
+    <!-- ===== ПОКОЛЕНИЕ 2 ===== -->
+    <div class="g2div">
+      <div class="eyebrow">Поколение 2 · по мотивам 1 и 3</div>
+      <h2>Гибриды: крупный разлом × многофотковый веер</h2>
+      <p>Взял сильное из первого (большой иммерсивный разлом на две линейки) и третьего (веер из нескольких фото на серию) — и собрал 5 сочетаний.</p>
+    </div>
+
+    <!-- Вариант 6 -->
+    <div class="vlabel"><b>Вариант 6</b><span>Разлом с веером внутри</span><i></i><em>наведите — половина растёт, фото раскрываются</em></div>
+    <div class="sp6">
+      <a class="half std" href="../maf/skamejki/index.html"><i></i>
+        <span class="ss-badge std">Стандарт</span>
+        <div class="fan"><img src="../assets/img/maf/skamejki/9467/main.webp" alt=""><img src="../assets/img/maf/skamejki/12154/main.webp" alt=""><img src="../assets/img/maf/skamejki/11129/main.webp" alt=""></div>
+        <h3>Рабочая классика</h3>
+        <div class="foot"><span class="cnt">57 моделей · сталь + дерево</span><span class="ss-go std">Смотреть →</span></div></a>
+      <a class="half art" href="../maf/skamejki/index.html#artdeco"><i></i>
+        <span class="ss-badge art">Art Déco</span>
+        <div class="fan"><img src="../assets/img/artdeco/skamejki/a1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e2-351/facade1.webp" alt=""></div>
+        <h3>Дизайн-линия</h3>
+        <div class="foot"><span class="cnt">46 моделей · авторские формы</span><span class="ss-go art">Смотреть →</span></div></a>
+    </div>
+
+    <!-- Вариант 7 -->
+    <div class="vlabel"><b>Вариант 7</b><span>Диагональный разлом</span><i></i><em>рублёный косой шов</em></div>
+    <div class="sp7">
+      <div class="side std"><img src="../assets/img/maf/skamejki/9467/main.webp" alt=""></div>
+      <div class="side art"><img src="../assets/img/artdeco/skamejki/a1-306/facade1.webp" alt=""></div>
+      <svg class="seamsvg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="62" y1="0" x2="42" y2="100" stroke="url(#seamg)" stroke-width="0.5"/><defs><linearGradient id="seamg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F26F1D"/><stop offset="1" stop-color="#c9a45f"/></linearGradient></defs></svg>
+      <div class="in std"><span class="ss-badge std">Стандарт</span><h3>Рабочая<br>классика</h3><span class="cnt">57 моделей</span><a class="ss-go std" href="../maf/skamejki/index.html">Смотреть →</a></div>
+      <div class="in art"><span class="ss-badge art">Art Déco</span><h3>Дизайн-<br>линия</h3><span class="cnt">46 моделей</span><a class="ss-go art" href="../maf/skamejki/index.html#artdeco">Смотреть →</a></div>
+    </div>
+
+    <!-- Вариант 8 -->
+    <div class="vlabel"><b>Вариант 8</b><span>Разлом с выезжающей лентой</span><i></i><em>наведите — снизу выезжают модели</em></div>
+    <div class="sp8">
+      <a class="half std" href="../maf/skamejki/index.html"><i></i><img class="hero" src="../assets/img/maf/skamejki/9467/main.webp" alt="">
+        <div class="strip"><img src="../assets/img/maf/skamejki/11129/main.webp" alt=""><img src="../assets/img/maf/skamejki/12154/main.webp" alt=""><img src="../assets/img/maf/skamejki/10721/main.webp" alt=""></div>
+        <div class="in"><span class="ss-badge std">Стандарт</span><h3>Рабочая классика</h3><span class="cnt">57 моделей · сталь + дерево</span></div></a>
+      <a class="half art" href="../maf/skamejki/index.html#artdeco"><i></i><img class="hero" src="../assets/img/artdeco/skamejki/a1-101/facade1.webp" alt="">
+        <div class="strip"><img src="../assets/img/artdeco/skamejki/a1-306/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e2-351/facade1.webp" alt=""></div>
+        <div class="in"><span class="ss-badge art">Art Déco</span><h3>Дизайн-линия</h3><span class="cnt">46 моделей · авторские формы</span></div></a>
+    </div>
+
+    <!-- Вариант 9 -->
+    <div class="vlabel"><b>Вариант 9</b><span>Двойная лента-веер</span><i></i><em>наведите на строку — карточки разъезжаются</em></div>
+    <div class="sp9">
+      <a class="band std" href="../maf/skamejki/index.html">
+        <div class="lab"><span class="ss-badge std">Стандарт</span><h3>Рабочая классика</h3><p>Сталь и брус хвойных пород — для дворов и улиц.</p><span class="ss-go std">57 моделей →</span></div>
+        <div class="cards"><img src="../assets/img/maf/skamejki/9467/main.webp" alt=""><img src="../assets/img/maf/skamejki/11129/main.webp" alt=""><img src="../assets/img/maf/skamejki/12154/main.webp" alt=""><img src="../assets/img/maf/skamejki/10721/main.webp" alt=""></div>
+      </a>
+      <a class="band art" href="../maf/skamejki/index.html#artdeco">
+        <div class="lab"><span class="ss-badge art">Art Déco</span><h3>Дизайн-линия</h3><p>Тот же завод — авторский архитектурный характер.</p><span class="ss-go art">46 моделей →</span></div>
+        <div class="cards"><img src="../assets/img/artdeco/skamejki/a1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/a1-306/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e2-351/facade1.webp" alt=""></div>
+      </a>
+    </div>
+
+    <!-- Вариант 10 -->
+    <div class="vlabel"><b>Вариант 10</b><span>Иммерсивный разлом с угловым веером</span><i></i><em>наведите — половина растёт, в углу раскрывается веер моделей</em></div>
+    <div class="sp10">
+      <a class="half std" href="../maf/skamejki/index.html"><i></i><img class="hero" src="../assets/img/maf/skamejki/9467/main.webp" alt="">
+        <div class="mini"><span class="miniN">ещё 56</span><img src="../assets/img/maf/skamejki/11129/main.webp" alt=""><img src="../assets/img/maf/skamejki/12154/main.webp" alt=""><img src="../assets/img/maf/skamejki/10721/main.webp" alt=""></div>
+        <div class="in"><span class="ss-badge std">Стандарт</span><h3>Рабочая классика</h3><span class="cnt">57 моделей · сталь + дерево</span></div></a>
+      <a class="half art" href="../maf/skamejki/index.html#artdeco"><i></i><img class="hero" src="../assets/img/artdeco/skamejki/a1-101/facade1.webp" alt="">
+        <div class="mini"><span class="miniN">ещё 45</span><img src="../assets/img/artdeco/skamejki/a1-306/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e1-101/facade1.webp" alt=""><img src="../assets/img/artdeco/skamejki/e2-351/facade1.webp" alt=""></div>
+        <div class="in"><span class="ss-badge art">Art Déco</span><h3>Дизайн-линия</h3><span class="cnt">46 моделей · авторские формы</span></div></a>
+    </div>
+
+    <p style="color:var(--steel);font-size:13px;margin:52px 0 20px">Фото — временные (взяты из каталога). Финальные заменим на подборку из нескольких скамеек каждой серии. Скажите номер варианта (или комбинацию) — доработаю финально и поставлю на все категории.</p>
   </div>
 </section>
 
