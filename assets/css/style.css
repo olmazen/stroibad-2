@@ -220,22 +220,34 @@ svg.drawn .bp-fade{opacity:1}
 .dir-body h3{font-size:22px;margin-bottom:8px}
 .dir-body p{color:var(--steel);font-size:14.5px;flex:1}
 .dir-body .dir-link{margin-top:16px}
-/* карточка категории: 3 фото на белом, переключение по зоне курсора (лево/центр/право) */
-.dir-ph .dv{opacity:0;transition:opacity .45s ease}
-.dir-ph .dv1{opacity:1}
-.dir-ph:has(.z0:hover) .dv1,.dir-ph:has(.z2:hover) .dv1{opacity:0}
-.dir-ph:has(.z0:hover) .dv0{opacity:1}
-.dir-ph:has(.z2:hover) .dv2{opacity:1}
-.dir-ph .dz{position:absolute;top:0;bottom:0;width:33.34%;z-index:3;cursor:pointer}
-.dir-ph .z0{left:0}.dir-ph .z1{left:33.33%}.dir-ph .z2{left:66.66%}
-.dir-ph .ph-label{pointer-events:none;z-index:4}
-.dir-ph .dir-dots{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:4;pointer-events:none}
-.dir-ph .dir-dots i{width:15px;height:3px;border-radius:2px;background:rgba(20,24,28,.2);transition:background .3s,width .3s}
-.dir-ph .dir-dots i:nth-child(2){background:var(--amber);width:22px}
-.dir-ph:has(.z0:hover) .dir-dots i:nth-child(2){background:rgba(20,24,28,.2);width:15px}
-.dir-ph:has(.z0:hover) .dir-dots i:nth-child(1){background:var(--amber);width:22px}
-.dir-ph:has(.z2:hover) .dir-dots i:nth-child(2){background:rgba(20,24,28,.2);width:15px}
-.dir-ph:has(.z2:hover) .dir-dots i:nth-child(3){background:var(--amber);width:22px}
+/* карточка категории: тёмный кадр «загорается» → светлый (наведение на пк / прокрутка на мобилке) */
+.dir-rv{overflow:hidden;background:#090c10}
+.dir-rv .rv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;
+  will-change:opacity,transform;
+  transition:opacity .8s cubic-bezier(.4,0,.15,1),transform 1.1s cubic-bezier(.2,.5,.15,1)}
+.dir-rv .from{opacity:1;transform:scale(1.004)}
+.dir-rv .to{opacity:0;z-index:2}
+.dir-rv .rv-glow{position:absolute;left:50%;top:36%;width:82%;height:74%;
+  transform:translate(-50%,-50%) scale(.55);z-index:3;pointer-events:none;opacity:0;mix-blend-mode:screen;
+  background:radial-gradient(closest-side,rgba(255,196,120,.5),rgba(255,150,60,.16) 46%,transparent 72%);
+  transition:opacity .85s ease,transform 1s cubic-bezier(.2,.6,.2,1)}
+.dir-rv .ph-label{position:absolute;left:0;right:0;bottom:0;z-index:4;pointer-events:none;
+  width:100%;text-align:left;color:#fff;padding:38px 16px 14px;
+  background:linear-gradient(180deg,transparent,rgba(6,8,11,.72))}
+.dir-card:hover .ph.dir-rv{filter:none}
+.dir-rv::before,.dir-rv::after{transition:border-color .6s}
+/* раскрытие: наведение (только где есть hover) + .rev (тач, по прокрутке) */
+@media(hover:hover){
+  .dir-card:hover .dir-rv .from{opacity:0;transform:scale(1.05)}
+  .dir-card:hover .dir-rv .to{opacity:1}
+  .dir-card:hover .dir-rv .rv-glow{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  .dir-card:hover .dir-rv::before,.dir-card:hover .dir-rv::after{border-color:var(--amber)}
+}
+.dir-rv.rev .from{opacity:0;transform:scale(1.05)}
+.dir-rv.rev .to{opacity:1}
+.dir-rv.rev .rv-glow{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.dir-rv.rev::before,.dir-rv.rev::after{border-color:var(--amber)}
+@media(prefers-reduced-motion:reduce){.dir-rv .rv,.dir-rv .rv-glow{transition-duration:.25s}}
 
 /* ============ why (тёмная) ============ */
 .why{background:#0A0D10;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
