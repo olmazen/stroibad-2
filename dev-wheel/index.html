@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<base href="../">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Колесо — 5 настроек скролла · EGOE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=egoe28">
+<style>
+  .dw-bar{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;align-items:center;gap:12px;
+    padding:8px 14px;background:linear-gradient(#0b0e12f2,#0b0e12cc);backdrop-filter:blur(10px);border-bottom:1px solid #1c2128}
+  .dw-bar .brand{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:11px;color:#f26f1d;white-space:nowrap;flex:none}
+  .dw-btns{display:flex;gap:3px;margin-left:auto;overflow:auto;scrollbar-width:none;padding:2px;background:#12161c;border:1px solid #2a2f38;border-radius:999px}
+  .dw-btns::-webkit-scrollbar{display:none}
+  .dw-btns button{-webkit-appearance:none;appearance:none;border:0;background:transparent;cursor:pointer;
+    font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em;font-size:12px;color:#9aa2ab;
+    padding:8px 14px;border-radius:999px;white-space:nowrap;transition:.2s}
+  .dw-btns button:hover{color:#fff}
+  .dw-btns button.on{color:#fff;background:#f26f1d}
+  .dw-info{position:fixed;left:14px;bottom:14px;z-index:9998;max-width:min(440px,74vw);
+    background:#12161ccc;backdrop-filter:blur(10px);border:1px solid #2a2f38;border-radius:12px;padding:11px 14px;pointer-events:none}
+  .dw-info b{display:block;font-family:'Oswald',sans-serif;font-size:15px;color:#fff;margin-bottom:3px}
+  .dw-info span{display:block;font-size:12.5px;color:#9aa2ab;line-height:1.45}
+  @media(max-width:640px){.dw-info{max-width:calc(100vw - 28px)}}
+  .dw-edge{min-height:78vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:40px 24px;color:#6c757d}
+  .dw-edge .k{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.2em;font-size:12px;color:#f26f1d}
+  .dw-edge h2{font-family:'Oswald',sans-serif;font-size:clamp(24px,4vw,40px);color:#e9ecef;margin:0}
+  .dw-edge p{font-size:14px;max-width:440px;margin:0}
+  .dw-edge .arrow{font-size:26px;color:#f26f1d;animation:dwb 1.8s ease-in-out infinite}
+  @keyframes dwb{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+</style>
+</head>
+<body>
+<div class="dw-bar"><span class="brand">EGOE · настройка скролла колеса</span><div class="dw-btns" id="dwBtns"></div></div>
+<div class="dw-info"><b id="dwLb"></b><span id="dwBl"></span></div>
+
+<div class="dw-edge"><span class="k">Песочница</span><h2>Крути колесо скроллом</h2><p>Ниже — реальное колесо заказа с выбранной настройкой скролла. Прокрути вниз, чтобы войти в него, и дальше — чтобы выйти (проверь, что концы не залипают). На телефоне — обычным свайпом.</p><span class="arrow">↓</span></div>
+
+<section class="fwsec" style="padding:0">
+  <div class="fwheel" id="flowWheel">
+    <div class="fw-head-src"><div class="dim"><span class="tick"></span>03 — Как проходит заказ</div><h2>От заявки до отгрузки</h2></div>
+    <ol class="fdial-list">
+      <li data-t="Выбор изделий" data-k="choose" data-d="Соберите список из каталога — лежаки, скамейки, урны, корзины. Или пришлите свой референс.">Выбор изделий — из каталога</li>
+      <li data-t="Заявка и расчёт" data-k="quote" data-d="Имя и телефон — и сразу готовое КП в PDF по вашей корзине, прямо в браузере. Так быстро КП не выдаёт почти никто.">Заявка и расчёт — КП в PDF сразу</li>
+      <li data-t="Договор" data-k="contract" data-d="Договор с НДС, работа по 44-ФЗ и 223-ФЗ — полный пакет документов для тендера.">Договор — с НДС</li>
+      <li data-t="Чертежи и производство" data-k="prod" data-d="Готовим КМД-документацию, согласуем каждую деталь — и запускаем в цех: лазерная резка, гибка, сварка и порошковая окраска RAL.">Чертежи и производство</li>
+      <li data-t="Отгрузка" data-k="ship" data-d="Доставляем на объект по всей России, партиями под этапы стройки. Монтаж — по запросу.">Отгрузка — на объект</li>
+    </ol>
+  </div>
+</section>
+
+<div class="dw-edge"><span class="k">Вышли из колеса</span><h2>Конец — скролл свободен</h2><p>Если ты долистал сюда без залипаний — концы работают правильно. Прокрути обратно вверх, чтобы вернуться в колесо.</p></div>
+
+<script src="dev-wheel/wheel.js?v=w1"></script>
+<script>
+window.openModal = function(){};
+var PRESETS = {
+ '1':{name:'Прямой', blurb:'Колесо чётко следует за скроллом — минимум сглаживания, самый отзывчивый и «честный».', cfg:{mode:'lerp', lerp:0.5, magnet:false, pageSnap:false, trackVh:100}},
+ '2':{name:'Плавная инерция', blurb:'Мягкий «масляный» ход с лёгкой инерцией. Спокойно и дорого, ничего не дёргается.', cfg:{mode:'lerp', lerp:0.12, magnet:false, pageSnap:false, trackVh:108}},
+ '3':{name:'Мягкий магнит', blurb:'Лёгкое притяжение к каждому шагу — но БЕЗ рывков страницы. Золотая середина.', cfg:{mode:'lerp', lerp:0.2, magnet:true, pageSnap:false, trackVh:92}},
+ '4':{name:'Пружина (софт)', blurb:'Живой характер с лёгким перелётом-«баунсом», смягчённый. Без страничной доводки.', cfg:{mode:'spring', springK:0.09, springD:0.80, magnet:true, pageSnap:false, trackVh:92}},
+ '5':{name:'Магнит + доводка', blurb:'Как остановился рядом — страница мягко доводит ровно на шаг. На концах доводка отключена, чтобы не залипало.', cfg:{mode:'lerp', lerp:0.22, magnet:true, pageSnap:true, snapMs:240, trackVh:80}}
+};
+var v=(location.search.match(/[?&]v=([1-5])/)||[])[1] || '1';
+var P=PRESETS[v] || PRESETS['1'];
+document.getElementById('dwLb').textContent=v+' · '+P.name;
+document.getElementById('dwBl').textContent=P.blurb;
+var bar=document.getElementById('dwBtns');
+Object.keys(PRESETS).forEach(function(k){
+  var b=document.createElement('button'); b.textContent=PRESETS[k].name; if(k===v) b.classList.add('on');
+  b.addEventListener('click',function(){ location.search='?v='+k; });
+  bar.appendChild(b);
+});
+try{ window.buildFlowWheel(P.cfg); }catch(e){ console.error('wheel build failed:',e); }
+</script>
+</body>
+</html>
