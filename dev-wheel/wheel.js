@@ -523,7 +523,7 @@ window.buildFlowWheel = function (CFG) {
     targetTheta = -mf * SP;
     setActive(idx);
     // паз: главная встала на место → показываем доп; в движении — прячем
-    sticky.classList.toggle('settle', Math.abs(mf - Math.round(mf)) < 0.32);
+    sticky.classList.add('settle');
     updateScene();
     kick();
     // страничная доводка — ТОЛЬКО если включена в пресете и НЕ на крайних шагах (чтобы концы всегда пролистывались дальше)
@@ -561,7 +561,7 @@ window.buildFlowWheel = function (CFG) {
   window.__fwSet = function (p) { // отладочный хук 0..1
     var pf = p * (N - 1); var mf = magnet(pf); var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
     targetTheta = -mf * SP; theta = targetTheta; vel = 0;
-    setActive(idx); sticky.classList.toggle('settle', Math.abs(mf - Math.round(mf)) < 0.32); updateScene(); apply();
+    setActive(idx); sticky.classList.add('settle'); updateScene(); apply();
   };
 
   addEventListener('scroll', onScroll, { passive: true });

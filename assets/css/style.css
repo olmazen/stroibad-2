@@ -1043,8 +1043,8 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-head h2{margin-top:16px;font-size:clamp(22px,2.2vw,32px)}
 /* панель ДОП: описание + медиа; появляется когда шаг встал в паз */
 .fw-body{position:absolute;top:max(150px,17vh);bottom:var(--fwbot,90px);left:var(--fwleft,300px);right:max(var(--gut),calc((100vw - var(--wrap))/2 + var(--gut)));z-index:5;display:flex;align-items:center}
-.fw-step{position:absolute;left:0;right:0;max-width:860px;opacity:0;transform:translateY(26px);pointer-events:none;transition:opacity .16s ease,transform .2s ease}
-.fw-sticky.settle .fw-step.on{opacity:1;transform:none;pointer-events:auto;transition:opacity .5s .14s cubic-bezier(.2,.7,.2,1),transform .55s .14s cubic-bezier(.2,.7,.2,1)}
+.fw-step{position:absolute;left:0;right:0;max-width:860px;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .3s ease,transform .32s ease}
+.fw-sticky.settle .fw-step.on{opacity:1;transform:none;pointer-events:auto;transition:opacity .34s cubic-bezier(.2,.7,.2,1),transform .38s cubic-bezier(.2,.7,.2,1)}
 .fw-step p{color:var(--tx2);font-size:17px;line-height:1.62;max-width:620px;margin-bottom:22px}
 .fw-media:empty{display:none}
 .fw-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}

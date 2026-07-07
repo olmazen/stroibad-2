@@ -1310,13 +1310,12 @@ window.__whenVisible = (function () {
     drawTicks();
     sticky.style.setProperty('--th', theta.toFixed(2) + 'deg');
   }
-  // Плавное сглаживание (lerp) — колесо мягко догоняет цель без перелёта и дёрганья.
-  // Пресет «Мягкий магнит»: без пружины и без программной доводки страницы.
+  // Плавная инерция (lerp) — колесо мягко, «по-масляному» догоняет цель. Без пружины и доводки.
   function frame() {
     raf = null;
     if (reduced) { theta = targetTheta; vel = 0; apply(); return; }
     var disp = targetTheta - theta;
-    theta += disp * 0.2;
+    theta += disp * 0.12;
     apply();
     if (Math.abs(disp) < 0.02) { theta = targetTheta; vel = 0; }
     else raf = requestAnimationFrame(frame);
@@ -1561,12 +1560,12 @@ window.__whenVisible = (function () {
     var total = track.offsetHeight - H;
     var p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
     var pf = p * (N - 1);
-    var mf = magnet(pf);                              // магнит к ближайшей категории
+    var mf = pf;                                      // «Плавная инерция»: линейный маппинг, без магнита
     var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
     targetTheta = -mf * SP;
     setActive(idx);
-    // паз: главная встала на место → показываем доп; в движении — прячем
-    sticky.classList.toggle('settle', Math.abs(mf - Math.round(mf)) < 0.38);
+    // контент шага виден ВСЕГДА (ближайший шаг) — переключение чётко на середине, без «мёртвого» пространства
+    sticky.classList.add('settle');
     updateScene();
     kick();
     // Программная доводка страницы (scheduleSnap) отключена: именно она дёргала скролл и
@@ -1602,9 +1601,9 @@ window.__whenVisible = (function () {
     window.scrollTo({ top: Math.round(top + (i / (N - 1)) * total) + 2, behavior: reduced ? 'auto' : 'smooth' });
   }
   window.__fwSet = function (p) { // отладочный хук 0..1
-    var pf = p * (N - 1); var mf = magnet(pf); var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
+    var pf = p * (N - 1); var mf = pf; var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
     targetTheta = -mf * SP; theta = targetTheta; vel = 0;
-    setActive(idx); sticky.classList.toggle('settle', Math.abs(mf - Math.round(mf)) < 0.32); updateScene(); apply();
+    setActive(idx); sticky.classList.add('settle'); updateScene(); apply();
   };
 
   addEventListener('scroll', onScroll, { passive: true });
