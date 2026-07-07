@@ -1421,3 +1421,54 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .ss-go:hover{gap:13px;border-color:currentColor}
 .ss-go.std{color:var(--amber)}.ss-go.art{color:#c9a45f}
 @media(max-width:820px){.ss1{flex-direction:column;height:auto}.ss1 .pan{height:260px;flex:none!important}.ss1 .pan p{max-height:96px;opacity:1}}
+
+/* ===== О КОМПАНИИ (объединённая: производство + компания), разнообразная вёрстка ===== */
+.ab-story{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(30px,5vw,72px);align-items:center}
+.ab-story .ph{aspect-ratio:16/10}
+.ab-story .prose p:first-of-type::first-letter{font-family:'Oswald',sans-serif;font-weight:600;font-size:3.3em;line-height:.8;float:left;color:var(--amber);margin:8px 14px 0 0}
+@media(max-width:860px){.ab-story{grid-template-columns:1fr;gap:24px}}
+/* горизонтальный процесс-конвейер (6 операций как лента цеха) */
+.ab-proc-wrap{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:34px calc(var(--gut)*-1) 0;padding:6px var(--gut) 4px}
+.ab-proc-wrap::-webkit-scrollbar{display:none}
+.ab-proc{display:flex;min-width:max-content;position:relative}
+.ab-proc::before{content:"";position:absolute;left:8px;right:40px;top:62px;height:2px;background:linear-gradient(90deg,var(--amber),var(--amber) 90%,transparent)}
+.ab-op{position:relative;width:clamp(210px,16.6vw,252px);flex:none;padding-right:26px}
+.ab-op-n{font-family:'Oswald',sans-serif;font-weight:600;font-size:38px;line-height:1;color:#fff}
+.ab-op::after{content:"";position:absolute;top:56px;left:0;width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--amber);z-index:2}
+.ab-op-ico{width:40px;height:40px;margin:32px 0 12px;color:var(--amber)}
+.ab-op-ico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.6}
+.ab-op-ico .svg-amber{stroke:var(--amber)}.ab-op-ico .svg-fill-a{fill:var(--amber);stroke:none}.ab-op-ico .svg-stroke{stroke:currentColor}
+.ab-op h3{font-size:17.5px;margin-bottom:6px}
+.ab-op p{font-size:13px;color:var(--steel);line-height:1.5;max-width:205px}
+.ab-proc-hint{margin-top:12px;font-size:11px;color:var(--steel);font-family:'Oswald',sans-serif;letter-spacing:.14em;text-transform:uppercase}
+/* два цеха — зигзаг-развороты */
+.ab-shop{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,60px);align-items:center;margin-top:46px}
+.ab-shop .ph{aspect-ratio:4/3}
+.ab-shop.rev .ab-shop-ph{order:2}
+.ab-shop-facts{list-style:none;margin-top:18px}
+.ab-shop-facts li{display:grid;grid-template-columns:132px 1fr;gap:14px;padding:11px 0;border-top:1px solid var(--line);font-size:14.5px;color:var(--tx2)}
+.ab-shop-facts b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em;font-size:13px;color:var(--amber)}
+@media(max-width:860px){.ab-shop,.ab-shop.rev{grid-template-columns:1fr;gap:18px}.ab-shop.rev .ab-shop-ph{order:0}.ab-shop-facts li{grid-template-columns:118px 1fr}}
+/* основатель — pull-quote во всю ширину */
+.ab-founder2{display:grid;grid-template-columns:minmax(220px,330px) 1fr;gap:clamp(30px,5vw,64px);align-items:center;margin-top:42px}
+.ab-founder2 .ph{aspect-ratio:3/4}
+.ab-pq{font-family:'Oswald',sans-serif;font-weight:400;font-size:clamp(22px,3.1vw,38px);line-height:1.24;color:#fff}
+.ab-pq b{color:var(--amber);font-weight:600}
+.ab-pq-sign{margin-top:24px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:15px;color:var(--amber)}
+.ab-pq-sign small{display:block;text-transform:none;letter-spacing:0;color:var(--steel);font-size:13px;margin-top:3px}
+.ab-pq-facts{display:flex;gap:36px;flex-wrap:wrap;margin-top:24px}
+.ab-pq-facts b{display:block;font-family:'Oswald',sans-serif;font-size:21px;color:#fff}
+.ab-pq-facts span{font-size:12.5px;color:var(--steel)}
+@media(max-width:860px){.ab-founder2{grid-template-columns:1fr;gap:22px}}
+/* B2B — нумерованный редакционный список */
+.ab-aud{border-top:1px solid var(--line);margin-top:28px}
+.ab-aud-i{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(16px,3vw,40px);align-items:center;padding:clamp(20px,3vh,32px) 0;border-bottom:1px solid var(--line);transition:background .3s}
+.ab-aud-i:hover{background:var(--bg2)}
+.ab-aud-n{font-family:'Oswald',sans-serif;font-weight:600;font-size:clamp(30px,4vw,52px);color:var(--line-2);line-height:.9;transition:color .3s}
+.ab-aud-i:hover .ab-aud-n{color:var(--amber)}
+.ab-aud-tx{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.5fr);gap:22px;align-items:baseline}
+.ab-aud-tx h3{font-size:clamp(18px,2.1vw,25px)}
+.ab-aud-tx p{color:var(--steel);font-size:15px}
+@media(max-width:720px){.ab-aud-tx{grid-template-columns:1fr;gap:5px}}
+.ab-logos{display:flex;flex-wrap:wrap;gap:12px 32px;align-items:center;margin-top:30px;opacity:.55}
+.ab-logos span{font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:.04em;font-size:14px;color:var(--steel)}
