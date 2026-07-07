@@ -1226,6 +1226,31 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-att em::after{content:"";position:absolute;left:6px;top:4px;width:5px;height:9px;border:solid #0C0F13;border-width:0 2px 2px 0;transform:rotate(42deg)}
 .fw-att.ready em{opacity:1;transform:scale(1)}
 .fw-att-hint{margin-top:9px;font-size:11px;color:var(--steel-l)}
+/* шаг «Заявка и расчёт»: мини-корзина + быстрая форма (2 поля) + PDF */
+.fw-cart{background:var(--srf);border:1px solid var(--line);border-radius:10px;padding:13px 15px;transition:opacity .45s,transform .45s,filter .45s}
+.fw-cart-h{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.fw-cart-ic{width:19px;height:19px;color:var(--amber);flex:none}
+.fw-cart-ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.fw-cart-h b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:14px}
+.fw-cart-h em{margin-left:auto;font-style:normal;font-size:11.5px;color:var(--steel)}
+.fw-ci{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+.fw-ci-ph{width:54px;height:44px;flex:none;border-radius:6px;overflow:hidden;background:#eef0f2;border:1px solid var(--line)}
+.fw-ci-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.fw-ci-tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.fw-ci-tx b{font-size:12.5px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fw-ci-tx i{font-style:normal;font-size:12px;color:var(--amber)}
+.fw-qform{margin-top:13px;transition:opacity .4s,transform .4s}
+.fw-qrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px}
+.fw-qform .field{margin:0}
+.fw-qform .field input{width:100%;background:#0f1319;border:1px solid var(--line-2);border-radius:7px;padding:12px 13px;color:#fff;font-size:14px;transition:border-color .25s,box-shadow .25s}
+.fw-qform .field input.focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(242,111,29,.12)}
+.fw-q-btn{display:block;width:100%;text-align:center;transition:transform .12s,filter .12s}
+.fw-q-btn.press{transform:scale(.96);filter:brightness(1.15)}
+.fw-quote .fw-genline{opacity:0;max-height:0;margin-top:0;overflow:hidden;transition:opacity .4s,max-height .45s,margin-top .4s}
+.fw-quote.sent .fw-cart{opacity:.4;filter:blur(.5px);transform:scale(.99)}
+.fw-quote.sent .fw-qform{opacity:0;transform:translateY(-6px);pointer-events:none;height:0;margin:0;overflow:hidden}
+.fw-quote.sent .fw-genline{opacity:1;max-height:70px;margin-top:14px}
+@media(max-width:380px){.fw-qrow{grid-template-columns:1fr}}
 /* окно-просмотрщик */
 .fw-win{background:#12161C;border:1px solid var(--line-2);border-radius:10px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55);opacity:0;transform:translateY(14px) scale(.97);transition:opacity .45s,transform .5s cubic-bezier(.2,.9,.3,1)}
 .fw-flow2.opened .fw-win,.fw-win.open{opacity:1 !important;transform:none !important}

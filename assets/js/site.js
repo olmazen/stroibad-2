@@ -1107,19 +1107,19 @@ window.__whenVisible = (function () {
         '<button class="fw-ch-next" type="button"><span class="fw-ch-circle" data-cnt>2</span><span class="fw-ch-nx"><b>В корзине — перейти к заявке</b><i class="fw-ch-down"><svg viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6"/></svg></i></span></button>' +
         cur + '</div>';
     }
-    if (k === 'form') return '<div class="fw-form fw-demo" aria-hidden="true">' +
-      '<div class="fw-push"><i>E</i><div><b>EGOE</b><span>Заявка №&nbsp;214 принята — собираем КП по вашей корзине</span></div><em>сейчас</em></div>' +
-      '<div class="fw-form-row"><div class="field"><label>Имя</label><input type="text" readonly tabindex="-1" data-df="name" placeholder="Как к вам обращаться"></div>' +
-      '<div class="field"><label>Телефон</label><input type="tel" readonly tabindex="-1" data-df="tel" placeholder="+7"></div></div>' +
-      '<span class="btn btn-primary fw-demo-btn">Получить КП</span>' +
-      '<div class="fw-form-ok"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M15 27l8 8 15-16"/></svg><b>Заявка принята</b><span>готовим КП по вашему списку из корзины</span></div>' +
-      cur + '</div>' +
-      '<button class="fw-own" type="button" onclick="openModal()">Оставить свою заявку →</button>';
-    if (k === 'calc') return '<div class="fw-flow2">' +
+    if (k === 'quote') return '<div class="fw-quote fw-flow2">' +
       '<div class="fw-att-zone">' +
+      '<div class="fw-cart">' +
+        '<div class="fw-cart-h"><span class="fw-cart-ic"><svg viewBox="0 0 24 24"><path d="M4 5h2l2 11h9l2-8H7"/><circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg></span><b>Ваша корзина</b><em>2 позиции</em></div>' +
+        '<div class="fw-ci"><span class="fw-ci-ph"><img src="assets/img/artdeco/skamejki/a1-101/hero.webp?i12" alt="Скамейка A1-101"></span><span class="fw-ci-tx"><b>Скамейка A1-101 · Art&nbsp;Déco</b><i>8 шт · от 44 500 ₽</i></span></div>' +
+        '<div class="fw-ci"><span class="fw-ci-ph"><img src="assets/img/maf/skamejki/9467/white.webp" alt="Скамейка Колледж"></span><span class="fw-ci-tx"><b>Скамейка «Колледж» · Стандарт</b><i>14 шт · от 19 600 ₽</i></span></div>' +
+      '</div>' +
+      '<div class="fw-qform">' +
+        '<div class="fw-qrow"><div class="field"><input type="text" readonly tabindex="-1" data-df="name" placeholder="Ваше имя"></div>' +
+        '<div class="field"><input type="tel" readonly tabindex="-1" data-df="tel" placeholder="Телефон"></div></div>' +
+        '<span class="btn btn-primary fw-q-btn">Получить КП в PDF →</span>' +
+      '</div>' +
       '<div class="fw-genline"><b data-pdf>Собираем ваше КП по корзине…</b><span class="fw-pdf-bar"><u></u></span></div>' +
-      '<div class="fw-att"><i>PDF</i><div class="fw-att-tx"><b>КП-EGOE-214.pdf</b><span>3 страницы · из вашей корзины</span></div><em></em></div>' +
-      '<div class="fw-att-hint">кликните — откроется КП</div>' +
       cur + '</div>' +
       '<div class="fw-win fw-pdfwin"><div class="fw-win-bar"><i></i><i></i><i></i><b>КП-EGOE-214.pdf</b><span data-pgind>1 / 3</span></div>' +
       '<div class="fw-win-body"><div class="fw-pages">' +
@@ -1134,7 +1134,8 @@ window.__whenVisible = (function () {
       '<div class="fw-pg"><div class="pdf-h3"><b>Скамейка A1-101</b><i>Art Déco</i></div>' +
         '<div class="pdf-media"><img src="assets/img/artdeco/skamejki/a1-101/hero.webp?i12" alt=""><span class="pdf-draw"><img src="assets/img/artdeco/skamejki/a1-101/drawing-white.svg" alt=""></span></div>' +
         '<div class="pdf-spec"><span>Серия</span><b>Art Déco · коллекция A</b></div><div class="pdf-spec"><span>Материал</span><b>сталь · термодерево</b></div><div class="pdf-spec"><span>Окраска</span><b>любой RAL</b></div></div>' +
-      '</div><div class="fw-pgdots"><i class="on"></i><i></i><i></i></div></div></div></div>';
+      '</div><div class="fw-pgdots"><i class="on"></i><i></i><i></i></div></div></div></div>' +
+      '<button class="fw-own" type="button" onclick="openModal()">Оставить свою заявку →</button>';
     if (k === 'contract') return '<div class="fw-flow2">' +
       '<div class="fw-att-zone"><div class="fw-checklist">' +
       '<div class="fw-ck"><i></i>Работа по 44-ФЗ и 223-ФЗ</div>' +
@@ -1400,74 +1401,57 @@ window.__whenVisible = (function () {
       api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; resetChoose(); };
     }
 
-    if (kind === 'form') {
+    if (kind === 'quote') {
+      var qflow = root.querySelector('.fw-quote');
       var nameI = root.querySelector('[data-df="name"]');
       var telI = root.querySelector('[data-df="tel"]');
-      var btn = root.querySelector('.fw-demo-btn');
-      var ok = root.querySelector('.fw-form-ok');
-      var cur = root.querySelector('.fw-cur');
-      var demo = root.querySelector('.fw-demo');
-      api.start = function () {
-        running = true;
-        (function loop() {
-          if (!running) return;
-          nameI.value = ''; telI.value = '';
-          demo.classList.remove('sent'); ok.classList.remove('show'); btn.classList.remove('press');
-          root.querySelector('.fw-push').classList.remove('show');
-          cur.classList.add('show'); curTo(cur, nameI, 10, 0.2, 0.7);
-          t(function () { nameI.classList.add('focus'); typeVal(nameI, 'Алексей', 85); }, 600);
-          t(function () { nameI.classList.remove('focus'); telI.classList.add('focus'); curTo(cur, telI, 500, 0.25, 0.7); }, 1600);
-          t(function () { typeVal(telI, '+7 912 000-00-00', 55); }, 2200);
-          t(function () { telI.classList.remove('focus'); curTo(cur, btn, 650, 0.5, 0.55); }, 3400);
-          t(function () { btn.classList.add('press'); cur.classList.add('press'); }, 4150);
-          t(function () { btn.classList.remove('press'); cur.classList.remove('press'); demo.classList.add('sent'); ok.classList.add('show'); cur.classList.remove('show'); }, 4420);
-          t(function () { root.querySelector('.fw-push').classList.add('show'); }, 5250);
-          t(loop, 9400);
-        })();
-      };
-      api.stop = function () {
-        running = false; timers.forEach(clearTimeout); timers = [];
-        nameI.value = ''; telI.value = '';
-        nameI.classList.remove('focus'); telI.classList.remove('focus');
-        demo.classList.remove('sent'); ok.classList.remove('show'); btn.classList.remove('press'); cur.classList.remove('show', 'press');
-        var pu = root.querySelector('.fw-push'); if (pu) pu.classList.remove('show');
-      };
-    }
-
-    if (kind === 'calc') {
-      var flow = root.querySelector('.fw-flow2');
+      var qBtn = root.querySelector('.fw-q-btn');
       var gen = root.querySelector('.fw-genline');
       var genTx = root.querySelector('[data-pdf]');
-      var att = root.querySelector('.fw-att');
       var win = root.querySelector('.fw-pdfwin');
       var pgs = root.querySelectorAll('.fw-pg');
       var dots = root.querySelectorAll('.fw-pgdots i');
       var pgInd = root.querySelector('[data-pgind]');
-      var pcur = root.querySelector('.fw-att-zone .fw-cur');
+      var cur = root.querySelector('.fw-quote .fw-cur');
       function showPg(n) {
         pgs.forEach(function (p, i) { p.classList.toggle('on', i === n); });
         dots.forEach(function (d, i) { d.classList.toggle('on', i === n); });
         if (pgInd) pgInd.textContent = (n + 1) + ' / ' + pgs.length;
       }
+      function reset() {
+        nameI.value = ''; telI.value = '';
+        nameI.classList.remove('focus'); telI.classList.remove('focus'); qBtn.classList.remove('press');
+        qflow.classList.remove('sent', 'opened'); gen.classList.remove('go', 'ok');
+        if (genTx) genTx.textContent = 'Собираем ваше КП по корзине…';
+        winShow(win, false); showPg(0); cur.classList.remove('show', 'press');
+      }
       api.start = function () {
         running = true;
         (function loop() {
           if (!running) return;
-          flow.classList.remove('opened'); winShow(win, false);
-          gen.classList.remove('go', 'ok'); att.classList.remove('ready', 'press');
-          if (genTx) genTx.textContent = 'Формируем PDF-смету…';
-          showPg(0);
-          t(function () { gen.classList.add('go'); }, 350);
-          t(function () { gen.classList.add('ok'); if (genTx) genTx.textContent = 'Смета готова ✓'; att.classList.add('ready'); }, 1700);
-          t(function () { pcur.classList.add('show'); curTo(pcur, att, 10, 0.15, 1.25); curTo(pcur, att, 620, 0.55, 0.55); }, 2100);
-          t(function () { pcur.classList.add('press'); att.classList.add('press'); }, 2850);
-          t(function () { pcur.classList.remove('press'); att.classList.remove('press'); pcur.classList.remove('show'); flow.classList.add('opened'); winShow(win, true); }, 3100);
-          t(function () { showPg(1); }, 5300);
-          t(function () { showPg(2); }, 7500);
-          t(loop, 10400);
+          reset();
+          cur.classList.add('show'); curTo(cur, nameI, 10, 0.2, 0.7);
+          t(function () { nameI.classList.add('focus'); typeVal(nameI, 'Алексей', 85); }, 650);
+          t(function () { nameI.classList.remove('focus'); telI.classList.add('focus'); curTo(cur, telI, 500, 0.25, 0.7); }, 1700);
+          t(function () { typeVal(telI, '+7 912 000-00-00', 55); }, 2300);
+          t(function () { telI.classList.remove('focus'); curTo(cur, qBtn, 650, 0.5, 0.55); }, 3550);
+          t(function () { qBtn.classList.add('press'); cur.classList.add('press'); }, 4300);
+          t(function () { qBtn.classList.remove('press'); cur.classList.remove('press', 'show'); qflow.classList.add('sent'); gen.classList.add('go'); }, 4580);
+          t(function () { gen.classList.add('ok'); if (genTx) genTx.textContent = 'КП готово ✓ · отправили на почту'; }, 5950);
+          t(function () { qflow.classList.add('opened'); winShow(win, true); }, 6300);
+          t(function () { showPg(1); }, 8500);
+          t(function () { showPg(2); }, 10700);
+          t(loop, 13400);
         })();
       };
-      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; gen.classList.add('ok'); att.classList.add('ready'); flow.classList.add('opened'); winShow(win, true); showPg(0); if (pcur) pcur.classList.remove('show', 'press'); };
+      api.stop = function () {
+        running = false; timers.forEach(clearTimeout); timers = [];
+        nameI.value = 'Алексей'; telI.value = '+7 912 000-00-00';
+        nameI.classList.remove('focus'); telI.classList.remove('focus'); qBtn.classList.remove('press');
+        qflow.classList.add('sent', 'opened'); gen.classList.add('go', 'ok');
+        if (genTx) genTx.textContent = 'КП готово ✓';
+        winShow(win, true); showPg(0); cur.classList.remove('show', 'press');
+      };
     }
 
     if (kind === 'contract') {
