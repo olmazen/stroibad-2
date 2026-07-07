@@ -1102,7 +1102,7 @@ window.__whenVisible = (function () {
         card('0', 'std', 'Стандарт', 'Рабочая классика', 'Скамейка «Колледж»', 'Сталь + брус хвойных пород · для дворов, парков и улиц', 'от 19 600 ₽',
           ['assets/img/maf/skamejki/9467/white.webp', 'assets/img/maf/skamejki/9467/main.webp', 'assets/img/maf/skamejki/9467/angle.webp'], 'Скамейка стальная — серия Стандарт') +
         card('1', 'art', 'Art Déco', 'Дизайн-линия', 'Скамейка A1-101', 'Авторские формы, термодерево и нержавеющая сталь · премиум', 'от 44 500 ₽',
-          ['assets/img/artdeco/skamejki/a1-101/hero.webp', 'assets/img/artdeco/skamejki/a1-101/facade1.webp', 'assets/img/artdeco/skamejki/a1-101/life1.webp'], 'Скамейка дизайнерская — серия Art Déco') +
+          ['assets/img/artdeco/skamejki/a1-101/hero.webp?i12', 'assets/img/artdeco/skamejki/a1-101/facade1.webp?i12', 'assets/img/artdeco/skamejki/a1-101/life1.webp'], 'Скамейка дизайнерская — серия Art Déco') +
         '</div>' +
         '<button class="fw-ch-next" type="button"><span class="fw-ch-circle" data-cnt>2</span><span class="fw-ch-nx"><b>В корзине — перейти к заявке</b><i class="fw-ch-down"><svg viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6"/></svg></i></span></button>' +
         cur + '</div>';
@@ -1132,7 +1132,7 @@ window.__whenVisible = (function () {
         '<div class="pdf-tr"><span>Скамейка «Колледж» · Стандарт</span><span>9005</span><span>14</span><span>19 600 ₽</span></div>' +
         '</div><div class="pdf-sum"><span>ориентировочно, до финального КП</span><b>≈ 630 400 ₽</b></div></div>' +
       '<div class="fw-pg"><div class="pdf-h3"><b>Скамейка A1-101</b><i>Art Déco</i></div>' +
-        '<div class="pdf-media"><img src="assets/img/artdeco/skamejki/a1-101/hero.webp" alt=""><span class="pdf-draw"><img src="assets/img/artdeco/skamejki/a1-101/drawing-white.svg" alt=""></span></div>' +
+        '<div class="pdf-media"><img src="assets/img/artdeco/skamejki/a1-101/hero.webp?i12" alt=""><span class="pdf-draw"><img src="assets/img/artdeco/skamejki/a1-101/drawing-white.svg" alt=""></span></div>' +
         '<div class="pdf-spec"><span>Серия</span><b>Art Déco · коллекция A</b></div><div class="pdf-spec"><span>Материал</span><b>сталь · термодерево</b></div><div class="pdf-spec"><span>Окраска</span><b>любой RAL</b></div></div>' +
       '</div><div class="fw-pgdots"><i class="on"></i><i></i><i></i></div></div></div></div>';
     if (k === 'contract') return '<div class="fw-flow2">' +
