@@ -1178,7 +1178,7 @@ window.__whenVisible = (function () {
   }
   var track = document.createElement('div');
   track.className = 'fw-track';
-  track.style.height = (N * 88 + 16) + 'vh';
+  track.style.height = (N * 92 + 16) + 'vh';
   track.innerHTML =
     '<div class="fw-sticky">' +
       '<div class="fw-sheets" aria-hidden="true">' +
@@ -1310,17 +1310,15 @@ window.__whenVisible = (function () {
     drawTicks();
     sticky.style.setProperty('--th', theta.toFixed(2) + 'deg');
   }
-  // Мягкая недодемпфированная пружина: во время быстрого скролла theta отстаёт, на остановке
-  // плавно догоняет с лёгким перелётом (~119%, ~0.9с) — аккуратно, без топорности.
-  var SPRING_K = 0.10, SPRING_D = 0.76;
+  // Плавное сглаживание (lerp) — колесо мягко догоняет цель без перелёта и дёрганья.
+  // Пресет «Мягкий магнит»: без пружины и без программной доводки страницы.
   function frame() {
     raf = null;
     if (reduced) { theta = targetTheta; vel = 0; apply(); return; }
     var disp = targetTheta - theta;
-    vel = (vel + disp * SPRING_K) * SPRING_D;
-    theta += vel;
+    theta += disp * 0.2;
     apply();
-    if (Math.abs(disp) < 0.006 && Math.abs(vel) < 0.006) { theta = targetTheta; vel = 0; }
+    if (Math.abs(disp) < 0.02) { theta = targetTheta; vel = 0; }
     else raf = requestAnimationFrame(frame);
   }
   function kick() { if (!raf) raf = requestAnimationFrame(frame); }
@@ -1568,11 +1566,11 @@ window.__whenVisible = (function () {
     targetTheta = -mf * SP;
     setActive(idx);
     // паз: главная встала на место → показываем доп; в движении — прячем
-    sticky.classList.toggle('settle', Math.abs(mf - Math.round(mf)) < 0.32);
+    sticky.classList.toggle('settle', Math.abs(mf - Math.round(mf)) < 0.38);
     updateScene();
     kick();
-    // магнетизм страницы: как скролл замер — мягко доводим ровно на категорию (если секция закреплена)
-    if (!reduced && total > 0 && r.top <= 1 && r.bottom >= H) scheduleSnap(idx, total);
+    // Программная доводка страницы (scheduleSnap) отключена: именно она дёргала скролл и
+    // залипала на концах. Магнит остаётся в маппинге (мягкое притяжение к шагам без рывка).
   }
   var snapRAF = null;
   function scheduleSnap(idx, total) {
