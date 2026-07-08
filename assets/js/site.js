@@ -1306,8 +1306,10 @@ window.__whenVisible = (function () {
   }
   function kick() { if (!raf) raf = requestAnimationFrame(frame); }
   /* ── демо-сцены шагов: печать, курсор, PDF, штамп ── */
-  function makeScene(root, kind) {
+  function makeScene(root, kind, idx) {
     var timers = [], running = false;
+    // авто-переход на следующий шаг после проигрыша демо (гид-облёт: 0→1→2→3→4); на последнем шаге стоп
+    function advance() { if (running && idx != null && idx < N - 1) scrollToStep(idx + 1); }
     function t(fn, ms) { timers.push(setTimeout(fn, ms)); }
     function every(fn, ms) { timers.push(setInterval(fn, ms)); }
     function typeVal(inp, str, cps, done) {
@@ -1416,11 +1418,11 @@ window.__whenVisible = (function () {
           t(function () { if (!running) return; ccur.classList.add('press'); if (rr[1]) rr[1].querySelector('.fw-add').classList.add('on'); setCnt(2); }, T.add1 + 620);
           t(function () { if (!running) return; ccur.classList.remove('press'); }, T.add1 + 810);
           // 5) курсор на корзину (в углу, вне камеры) → визуальное нажатие. Реальный переход на шаг 2 — по КЛИКУ пользователя (демо страницу не дёргает)
-          t(function () { if (!running) return; curTo(ccur, cart, 640, 0.5, 0.5); }, T.cart);
+          t(function () { if (!running) return; curTo(ccur, cart, 640, 0.42, 0.16); }, T.cart);
           t(function () { if (!running) return; ccur.classList.add('press'); cart.classList.add('press'); }, T.press);
           t(function () { if (!running) return; ccur.classList.remove('press', 'show'); cart.classList.remove('press'); }, T.press + 260);
-          // держим финал и повторяем цикл (без авто-скролла)
-          t(function () { if (!running) return; loop(); }, T.loop);
+          // после «нажатия» корзины — авто-переход на шаг 2
+          t(function () { if (!running) return; advance(); }, T.loop);
         })();
       };
       api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; finalState(); };
@@ -1466,7 +1468,7 @@ window.__whenVisible = (function () {
           t(function () { qflow.classList.add('opened'); winShow(win, true); }, 6300);
           t(function () { showPg(1); }, 8500);
           t(function () { showPg(2); }, 10700);
-          t(loop, 13400);
+          t(advance, 13400);
         })();
       };
       api.stop = function () {
@@ -1499,7 +1501,7 @@ window.__whenVisible = (function () {
           cks.forEach(function (c, i) { t(function () { c.classList.add('in'); }, 560 + i * 620); });
           t(function () { sign.classList.add('draw'); }, 420 + pars.length * 620 + 300);
           t(function () { stamp.classList.add('slam'); page.classList.add('shake'); }, 420 + pars.length * 620 + 1350);
-          t(loop, 420 + pars.length * 620 + 6300);
+          t(advance, 420 + pars.length * 620 + 4600);
         })();
       };
       api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; cflow.classList.add('opened'); winShow(cwin, true); pars.forEach(function (p) { p.classList.add('in'); }); cks.forEach(function (c) { c.classList.add('in'); }); sign.classList.add('draw'); stamp.classList.add('slam'); page.classList.remove('shake'); };
@@ -1531,6 +1533,7 @@ window.__whenVisible = (function () {
           pchips.forEach(function (c, j) { c.classList.toggle('on', j === i); c.classList.toggle('done', j < i); });
         }, 1100);
         pchips.forEach(function (c, j) { c.classList.toggle('on', j === 0); });
+        t(advance, pchips.length * 1100 + 1400);   // прошлись по операциям → переход на «Отгрузку»
       };
       api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; ph.classList.remove('play'); pchips.forEach(function (c) { c.classList.remove('on', 'done'); }); };
     }
@@ -1557,7 +1560,7 @@ window.__whenVisible = (function () {
           t(function () { stage(1); }, 1300);
           t(function () { stage(2); }, 2700);
           t(function () { stage(3); }, 4100);
-          t(loop, 7600);
+          t(advance, 6400);   // последний шаг: advance() на idx=N-1 ничего не делает → демо замирает на «Доставлено»
         })();
       };
       api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; logi.classList.remove('play'); stage(3); truck.classList.remove('go'); };
@@ -1566,10 +1569,11 @@ window.__whenVisible = (function () {
     return api;
   }
   var sceneOf = {};
-  steps.forEach(function (s, i) { var k = items[i].k; if (k) sceneOf[i] = makeScene(s, k); });
+  steps.forEach(function (s, i) { var k = items[i].k; if (k) sceneOf[i] = makeScene(s, k, i); });
   var playingScene = -1;
+  var inView = false;   // колесо реально закреплено во вьюпорте (иначе демо/авто-переход НЕ запускаем — иначе страница уедет с hero)
   function updateScene() {
-    var want = sticky.classList.contains('settle') ? active : -1;
+    var want = (sticky.classList.contains('settle') && inView) ? active : -1;
     if (want === playingScene) return;
     if (playingScene >= 0 && sceneOf[playingScene]) sceneOf[playingScene].stop();
     playingScene = want;
@@ -1590,6 +1594,7 @@ window.__whenVisible = (function () {
     var pf = p * (N - 1);
     var mf = pf;                                      // «Плавная инерция»: линейный маппинг, без магнита
     var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
+    inView = r.top <= 4 && r.bottom >= H - 4;         // секция закреплена и заполняет вьюпорт
     targetTheta = -mf * SP;
     setActive(idx);
     // контент шага виден ВСЕГДА (ближайший шаг) — переключение чётко на середине, без «мёртвого» пространства
@@ -1631,6 +1636,7 @@ window.__whenVisible = (function () {
   window.__fwSet = function (p) { // отладочный хук 0..1
     var pf = p * (N - 1); var mf = pf; var idx = Math.max(0, Math.min(N - 1, Math.round(pf)));
     targetTheta = -mf * SP; theta = targetTheta; vel = 0;
+    inView = true;
     setActive(idx); sticky.classList.add('settle'); updateScene(); apply();
   };
 
