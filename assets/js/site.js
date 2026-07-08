@@ -1402,8 +1402,8 @@ window.__whenVisible = (function () {
           var rr = reals();
           var m = catalog.classList.contains('is-mobile');
           var T = m
-            ? { lead: 420, fill0: 1650, fill1: 2200, dolly: 2850, add0: 3950, add1: 5100, cart: 6350, press: 6950, loop: 9700 }
-            : { lead: 420, fill0: 1750, fill1: 2300, dolly: 3000, add0: 4250, add1: 5450, cart: 6700, press: 7350, loop: 10300 };
+            ? { lead: 420, fill0: 1650, fill1: 2200, dolly: 2850, add0: 3950, add1: 5100, cart: 6350, press: 6970, loop: 7770 }
+            : { lead: 420, fill0: 1750, fill1: 2300, dolly: 3000, add0: 4250, add1: 5450, cart: 6700, press: 7320, loop: 8120 };
           // 1) плитки каталога появляются из центра кольцами (задержка = кольцо, чистый CSS) — с лид-ином, помедленнее
           t(function () { if (!running) return; grid.classList.add('in'); }, T.lead);
           // 2) две центральные карточки заполняются данными ПО ОЧЕРЕДИ
@@ -1419,7 +1419,7 @@ window.__whenVisible = (function () {
           t(function () { if (!running) return; ccur.classList.add('press'); if (rr[1]) rr[1].querySelector('.fw-add').classList.add('on'); setCnt(2); }, T.add1 + 620);
           t(function () { if (!running) return; ccur.classList.remove('press'); }, T.add1 + 810);
           // 5) курсор на корзину (в углу, вне камеры) → визуальное нажатие. Реальный переход на шаг 2 — по КЛИКУ пользователя (демо страницу не дёргает)
-          t(function () { if (!running) return; curTo(ccur, cart, 640, 0.26, 0.04); }, T.cart);
+          t(function () { if (!running) return; curTo(ccur, cart, 500, 0.3, 0.16); }, T.cart);
           t(function () { if (!running) return; ccur.classList.add('press'); cart.classList.add('press'); }, T.press);
           t(function () { if (!running) return; ccur.classList.remove('press', 'show'); cart.classList.remove('press'); }, T.press + 260);
           // после «нажатия» корзины — авто-переход на шаг 2
