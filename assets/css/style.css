@@ -703,8 +703,15 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
   .model-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:600px){
-  section{padding:54px 0}
+  section{padding:44px 0}
   .container{padding:0 18px}
+  /* карточка товара компактнее: без дублей заголовка/бейджа/артикула (они уже в .page-head), цена в столбик */
+  .prodpage{gap:20px}
+  .pp-info>.ad-badge,.pp-info>h1,.pp-info>.pp-art{display:none}
+  .pp-price{flex-direction:column;align-items:flex-start;gap:5px;padding:14px 0;margin-bottom:16px}
+  .pp-price .note{font-size:12.5px}
+  .opt-row{margin-bottom:14px}
+  .obj-note{margin-top:16px;padding:14px 16px;font-size:13.5px}
   .dir-grid,.why-grid,.tiles4,.tiles3,.stats,.spot-grid{grid-template-columns:1fr}
   .icards{grid-template-columns:1fr}
   .model-grid{grid-template-columns:1fr}
@@ -717,10 +724,12 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
   .topbar .tb-r a[href^="tel:"]{margin-right:auto}
   .topbar .tb-r a[href^="tel:"] b{color:#fff;letter-spacing:.02em}
   .formpanel{padding:28px 22px}
-  .page-head{padding:36px 0 32px}
+  .page-head{padding:24px 0 18px}
+  .page-head h1{margin-bottom:8px}
+  .page-head p{font-size:14.5px}
   .shero-inner{padding:64px 0 60px}
   .pp-price .big{font-size:28px}
-  .gallery .thumbs{grid-template-columns:repeat(2,1fr)}
+  .gallery .thumbs{grid-template-columns:repeat(3,1fr)}
   .gallery-open{opacity:1;transform:none;top:10px;right:10px;font-size:10px;padding:8px 10px}
   .gallery-lightbox{grid-template-columns:1fr;padding:14px}
   .gallery-lightbox__frame{width:100%;max-height:calc(100vh - 28px)}
