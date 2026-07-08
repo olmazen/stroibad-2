@@ -1472,3 +1472,8 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 @media(max-width:720px){.ab-aud-tx{grid-template-columns:1fr;gap:5px}}
 .ab-logos{display:flex;flex-wrap:wrap;gap:12px 32px;align-items:center;margin-top:30px;opacity:.55}
 .ab-logos span{font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:.04em;font-size:14px;color:var(--steel)}
+/* чертёж-блюпринт ограждения (плейсхолдер плитки направления, пока нет фото) */
+.bp-fence-ph{position:relative}
+.bp-fence{width:min(76%,352px);height:auto;color:var(--steel);opacity:.92;overflow:visible}
+.bp-fence .fa{stroke:var(--amber)}
+.bp-fence .fp{stroke:var(--steel-l)}
