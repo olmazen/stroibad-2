@@ -1094,10 +1094,11 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
   .fw-head{left:var(--gut);top:72px}
   .fw-head h2{font-size:21px;margin-top:12px}
   .fw-body{left:var(--gut);right:var(--gut);top:116px;bottom:var(--fwbot,300px);align-items:flex-start}
-  .fw-step{position:static;max-width:none;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-  .fw-step::-webkit-scrollbar{display:none}
+  /* блок анимации ОГРАНИЧЕН по высоте и БЕЗ внутреннего скролла — контент вписывается */
+  .fw-step{position:static;max-width:none;height:100%;display:flex;flex-direction:column;overflow:hidden}
   .fw-step:not(.on){display:none}
-  .fw-step p{font-size:14.5px;margin-bottom:12px}
+  .fw-step>p{flex:none;font-size:14px;margin-bottom:9px}
+  .fw-media{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;overflow:hidden}
   .fw-ph img{max-height:190px}
   .fw-bp{min-height:170px;padding:12px}
   .fw-bp img{max-height:175px}
@@ -1584,4 +1585,70 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
   .fw-cell,.fw-cam,.fw-real .fw-thumb img,.fw-real .fw-tag,.fw-real .fw-cap,.fw-add,.fw-catcart-cnt{transition:none !important;animation:none !important}
   .fw-cam{transform:none !important}
   .fw-cell{filter:none !important}
+}
+/* ── МОБИЛКА: сцены колеса вписаны в ограниченный блок анимации, без внутреннего скролла ── */
+@media(max-width:900px){
+  /* двухколоночные сцены (заявка/договор) → одна колонка; «окно» накрывает действие внахлёст */
+  .fw-flow2{grid-template-columns:1fr;gap:0;flex:1;min-height:0;height:auto;position:relative}
+  .fw-att-zone{position:relative;z-index:1;padding-top:2px;display:flex;flex-direction:column;gap:9px;min-height:0}
+  .fw-win{position:absolute;inset:0;z-index:6;max-width:none;display:flex;flex-direction:column;border-radius:8px;box-shadow:0 18px 44px rgba(0,0,0,.6)}
+  .fw-win-bar{flex:none}
+  .fw-win-body{flex:1;min-height:0;padding:9px;display:flex;flex-direction:column}
+  /* страницы PDF/договора вписываются во ВЕСЬ доступный блок (flex), а не фикс. высота 330px */
+  .fw-pages{flex:1;min-height:0;height:auto}
+  .fw-pgdots{flex:none;margin-top:7px}
+  .fw-pg{padding:11px 12px}
+  .pdf-cv b{font-size:17px}
+  .pdf-cv span{font-size:11px}
+  .pdf-h3{margin-bottom:7px}
+  .pdf-h3 b{font-size:13px}
+  .pdf-media{margin-bottom:7px}
+  .pdf-spec{padding:4px 0;font-size:11px}
+  .pdf-tr{font-size:10.5px;padding:5px 0}
+  .pdf-sum{padding-top:8px}
+  /* — Заявка и расчёт — */
+  .fw-cart{padding:9px 11px}
+  .fw-cart-h{margin-bottom:7px}
+  .fw-cart-h b{font-size:13px}
+  .fw-cart-h em{font-size:10.5px}
+  .fw-ci{padding:6px 0;gap:9px}
+  .fw-ci-ph{width:34px;height:34px;flex:none}
+  .fw-ci-tx b{font-size:11.5px}
+  .fw-ci-tx i{font-size:10.5px}
+  .fw-qrow{grid-template-columns:1fr 1fr;gap:8px}
+  .fw-qrow .field input{font-size:13px;padding:10px 11px}
+  .fw-q-btn{font-size:12px;padding:11px}
+  .fw-genline{margin-top:2px}
+  .fw-genline b{font-size:11px}
+  .fw-quote.opened .fw-att-zone{opacity:.12;filter:blur(2px)}
+  .fw-pdfwin .fw-win-body{padding:9px}
+  .fw-own{display:none}
+  /* — Договор — */
+  .fw-checklist{gap:8px}
+  .fw-ck{font-size:12.5px;gap:9px}
+  .fw-ck i{width:18px;height:18px;min-width:18px}
+  .fw-docwin .fw-ct{min-height:0;padding:13px 15px}
+  .fw-docwin .ct-h{font-size:15px}
+  .fw-docwin .ct-sub{font-size:10px;margin:3px 0 12px}
+  .fw-docwin .ct-par{margin-bottom:9px}
+  .fw-docwin .ct-par u{height:5.5px;margin-bottom:5px}
+  .fw-docwin .ct-sign{gap:12px;padding-top:8px;margin-top:6px}
+  .fw-docwin .ct-s svg{width:104px;height:28px}
+  .fw-docwin .fw-stamp{position:absolute;right:12px;bottom:auto;top:2px;width:70px;height:70px;font-size:7px}
+  .fw-docwin .fw-stamp b{font-size:14px}
+  /* — Чертежи и производство: чипы + фото на всю оставшуюся высоту — */
+  .fw-stagechips{flex:none;margin-bottom:9px}
+  .fw-stagechips span{font-size:11.5px;padding:8px 12px 8px 24px}
+  .fw-stagechips span::before{left:10px}
+  .fw-ph{flex:1;min-height:0;max-width:none;margin-bottom:0}
+  .fw-ph img{max-height:none;height:100%;object-fit:cover}
+  /* — Отгрузка: статус + трек + фото на всю оставшуюся высоту — */
+  .fw-logi{flex:none;max-width:none;margin-bottom:10px}
+  .fw-lg-status b{font-size:11.5px}
+  .fw-lg-track{height:46px;margin:0 4px}
+  .lg-node b{font-size:8px;margin-top:6px}
+  .lg-node i{width:11px;height:11px}
+  .fw-truck svg{width:38px;height:21px}
+  .fw-shipph{flex:1;min-height:0;max-width:none;margin-top:0}
+  .fw-shipph img{max-height:none;height:100%;object-fit:cover}
 }
