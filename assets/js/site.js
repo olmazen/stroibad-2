@@ -1344,8 +1344,9 @@ window.__whenVisible = (function () {
         return '<div class="fw-cell fw-real ' + p.cls + '" data-pk="' + i + '" style="--rd:0">' +
           '<span class="fw-thumb"><img src="' + p.img + '" alt="' + p.alt + '" loading="lazy"></span>' +
           '<em class="fw-tag">' + p.tag + '</em>' +
-          '<i class="fw-add" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h2l1.7 8.5h9L18.5 8H7"/><circle cx="9.5" cy="18" r="1.3"/><circle cx="16" cy="18" r="1.3"/></svg></i>' +
-          '<div class="fw-pan"><b>' + p.name + '</b><span class="fw-price">' + p.price + '</span></div></div>';
+          '<div class="fw-pan"><b>' + p.name + '</b>' +
+          '<div class="fw-pfoot"><span class="fw-price">' + p.price + '</span>' +
+          '<i class="fw-add" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h2l1.7 8.5h9L18.5 8H7"/><circle cx="9.5" cy="18" r="1.3"/><circle cx="16" cy="18" r="1.3"/></svg></i></div></div></div>';
       }
       function buildGrid() {
         var m = mq.matches;
@@ -1418,7 +1419,7 @@ window.__whenVisible = (function () {
           t(function () { if (!running) return; ccur.classList.add('press'); if (rr[1]) rr[1].querySelector('.fw-add').classList.add('on'); setCnt(2); }, T.add1 + 620);
           t(function () { if (!running) return; ccur.classList.remove('press'); }, T.add1 + 810);
           // 5) курсор на корзину (в углу, вне камеры) → визуальное нажатие. Реальный переход на шаг 2 — по КЛИКУ пользователя (демо страницу не дёргает)
-          t(function () { if (!running) return; curTo(ccur, cart, 640, 0.42, 0.16); }, T.cart);
+          t(function () { if (!running) return; curTo(ccur, cart, 640, 0.26, 0.04); }, T.cart);
           t(function () { if (!running) return; ccur.classList.add('press'); cart.classList.add('press'); }, T.press);
           t(function () { if (!running) return; ccur.classList.remove('press', 'show'); cart.classList.remove('press'); }, T.press + 260);
           // после «нажатия» корзины — авто-переход на шаг 2
