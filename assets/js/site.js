@@ -1384,9 +1384,13 @@ window.__whenVisible = (function () {
         cart.classList.add('has'); cart.classList.remove('press');
         ccur.classList.remove('show', 'press');
       }
+      var lastMob = mq.matches;
       buildGrid();
       if (reduced) finalState();
-      if (mq.addEventListener) mq.addEventListener('change', function () { buildGrid(); if (!running) finalState(); });
+      // пересобираем сетку при смене брейкпоинта (resize/поворот) — window.resize надёжнее matchMedia change
+      function onRz() { var m = mq.matches; if (m !== lastMob) { lastMob = m; buildGrid(); if (!running) finalState(); } }
+      addEventListener('resize', onRz);
+      if (mq.addEventListener) mq.addEventListener('change', onRz);
       // реальный клик по корзине пользователем → аккуратно доводит на шаг 2 «Заявка и расчёт»
       cart.addEventListener('click', function () { scrollToStep(1); });
       api.start = function () {
@@ -1397,27 +1401,27 @@ window.__whenVisible = (function () {
           var rr = reals();
           var m = catalog.classList.contains('is-mobile');
           var T = m
-            ? { fill: 1750, dolly: 2250, add0: 3300, add1: 4250, cart: 4780, press: 5320, go: 5580, loop: 8400 }
-            : { fill: 2000, dolly: 2600, add0: 3850, add1: 4900, cart: 5960, press: 6650, go: 6960, loop: 9800 };
-          // 1) плитки каталога появляются из центра (задержка = кольцо, чистый CSS)
-          t(function () { if (!running) return; grid.classList.add('in'); }, 120);
-          // 2) две центральные карточки заполняются данными
-          t(function () { if (!running) return; rr.forEach(function (el) { el.classList.add('filled'); }); }, T.fill);
+            ? { lead: 420, fill0: 1650, fill1: 2200, dolly: 2850, add0: 3950, add1: 5100, cart: 6350, press: 6950, loop: 9700 }
+            : { lead: 420, fill0: 1750, fill1: 2300, dolly: 3000, add0: 4250, add1: 5450, cart: 6700, press: 7350, loop: 10300 };
+          // 1) плитки каталога появляются из центра кольцами (задержка = кольцо, чистый CSS) — с лид-ином, помедленнее
+          t(function () { if (!running) return; grid.classList.add('in'); }, T.lead);
+          // 2) две центральные карточки заполняются данными ПО ОЧЕРЕДИ
+          t(function () { if (!running) return; if (rr[0]) rr[0].classList.add('filled'); }, T.fill0);
+          t(function () { if (!running) return; if (rr[1]) rr[1].classList.add('filled'); }, T.fill1);
           // 3) «камера» приближается к паре (origin — по живым rect карточек)
           t(function () { if (!running) return; setDollyOrigin(); cam.classList.add('will', 'dolly'); }, T.dolly);
           // 4) курсор добавляет каждую карточку (строго ПОСЛЕ доводки камеры — цель не движется)
-          t(function () { if (!running) return; ccur.classList.add('show'); if (rr[0]) curTo(ccur, rr[0].querySelector('.fw-add'), 540, 0.5, 0.5); }, T.add0);
-          t(function () { if (!running) return; ccur.classList.add('press'); if (rr[0]) rr[0].querySelector('.fw-add').classList.add('on'); setCnt(1); }, T.add0 + 640);
-          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.add0 + 820);
-          t(function () { if (!running) return; if (rr[1]) curTo(ccur, rr[1].querySelector('.fw-add'), 500, 0.5, 0.5); }, T.add1);
-          t(function () { if (!running) return; ccur.classList.add('press'); if (rr[1]) rr[1].querySelector('.fw-add').classList.add('on'); setCnt(2); }, T.add1 + 600);
-          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.add1 + 780);
-          // 5) курсор на корзину (в углу, вне камеры → всегда доступна) → нажатие → авто-переход на шаг 2
-          t(function () { if (!running) return; curTo(ccur, cart, 620, 0.5, 0.5); }, T.cart);
+          t(function () { if (!running) return; ccur.classList.add('show'); if (rr[0]) curTo(ccur, rr[0].querySelector('.fw-add'), 560, 0.5, 0.5); }, T.add0);
+          t(function () { if (!running) return; ccur.classList.add('press'); if (rr[0]) rr[0].querySelector('.fw-add').classList.add('on'); setCnt(1); }, T.add0 + 660);
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.add0 + 850);
+          t(function () { if (!running) return; if (rr[1]) curTo(ccur, rr[1].querySelector('.fw-add'), 520, 0.5, 0.5); }, T.add1);
+          t(function () { if (!running) return; ccur.classList.add('press'); if (rr[1]) rr[1].querySelector('.fw-add').classList.add('on'); setCnt(2); }, T.add1 + 620);
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.add1 + 810);
+          // 5) курсор на корзину (в углу, вне камеры) → визуальное нажатие. Реальный переход на шаг 2 — по КЛИКУ пользователя (демо страницу не дёргает)
+          t(function () { if (!running) return; curTo(ccur, cart, 640, 0.5, 0.5); }, T.cart);
           t(function () { if (!running) return; ccur.classList.add('press'); cart.classList.add('press'); }, T.press);
-          t(function () { if (!running) return; ccur.classList.remove('press'); cart.classList.remove('press'); }, T.press + 240);
-          t(function () { if (!running) return; scrollToStep(1); }, T.go);
-          // резерв: если переход не случился (остались на шаге) — сброс и повтор
+          t(function () { if (!running) return; ccur.classList.remove('press', 'show'); cart.classList.remove('press'); }, T.press + 260);
+          // держим финал и повторяем цикл (без авто-скролла)
           t(function () { if (!running) return; loop(); }, T.loop);
         })();
       };

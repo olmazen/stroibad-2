@@ -1520,28 +1520,29 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 }
 /* ── сцена «Выбор изделий» v3: радиальный каталог + камера-долли (Apple/Telegram-grade) ── */
 .fw-catalog{position:relative;overflow:hidden;min-height:clamp(360px,50vh,486px)}
-.fw-catalog.is-mobile{min-height:min(58vh,414px)}
+.fw-catalog.is-mobile{min-height:min(50vh,344px)}
 /* .fw-catalog = неподвижная клип-рамка «камеры»; .fw-cam = контент, к которому применяется долли-зум (origin — по паре карточек, считается в JS) */
 .fw-cam{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform-origin:50% 50%;transition:transform 1100ms cubic-bezier(.16,.84,.24,1)}
 .fw-cam.will{will-change:transform}
-.fw-cam.dolly{transform:scale(1.5)}
-.fw-catalog.is-mobile .fw-cam{transition-duration:900ms}
-.fw-catalog.is-mobile .fw-cam.dolly{transform:scale(1.4)}
+.fw-cam.dolly{transform:scale(1.78)}
+.fw-catalog.is-mobile .fw-cam{transition-duration:1000ms}
+.fw-catalog.is-mobile .fw-cam.dolly{transform:scale(1.64)}
 /* сетка каталога (нечётные 7 колонок сдвинуты, чтобы шов пары встал по центру; долли-origin — из живых rect) */
 .fw-cgrid{display:grid;grid-template-columns:repeat(7,128px);gap:12px;transform:translateX(-70px)}
 .fw-catalog.is-mobile .fw-cgrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;width:100%;transform:none}
 /* плитка: появление зумом+фейдом, задержка = кольцо от центра (чистый CSS transition-delay) */
-.fw-cell{position:relative;aspect-ratio:4/3;background:var(--srf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;opacity:0;transform:scale(.66);z-index:calc(10 - var(--rd));transition:opacity .48s cubic-bezier(.2,.9,.25,1),transform .5s cubic-bezier(.34,1.26,.5,1);transition-delay:calc(var(--rd) * 90ms)}
-.fw-catalog.is-mobile .fw-cell{aspect-ratio:3/4;transition-delay:calc(var(--rd) * 70ms)}
+.fw-cell{position:relative;aspect-ratio:4/3;background:var(--srf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;opacity:0;transform:scale(.66);z-index:calc(10 - var(--rd));transition:opacity .6s cubic-bezier(.2,.9,.25,1),transform .64s cubic-bezier(.34,1.24,.5,1);transition-delay:calc(var(--rd) * 150ms)}
+.fw-catalog.is-mobile .fw-cell{aspect-ratio:3/4;transition-delay:calc(var(--rd) * 120ms)}
 .fw-cgrid.in .fw-cell{opacity:var(--restop,1);transform:none}
-/* внешние кольца — тусклее и слегка размыты (размытие только на десктопе) */
-.fw-cell[style*="--rd:2"]{--restop:.5}
-.fw-cell[style*="--rd:3"]{--restop:.32;filter:blur(2px)}
-.fw-cell[style*="--rd:4"]{--restop:.22;filter:blur(2.4px)}
-.fw-catalog.is-mobile .fw-cell{filter:none !important}
-/* скелет-плитка (пустая и реальная до .filled выглядят одинаково серо) */
-.fw-cell::before{content:"";position:absolute;left:9px;right:9px;top:9px;bottom:38%;border-radius:3px;background:var(--srf2);opacity:1;transition:opacity .3s}
-.fw-cell::after{content:"";position:absolute;left:9px;bottom:23%;width:56%;height:6px;border-radius:3px;background:var(--srf2);opacity:1;transition:opacity .3s}
+/* внешние кольца — заметно тусклее + размытие (в т.ч. на мобилке, но легче) */
+.fw-cell[style*="--rd:2"]{--restop:.42;filter:blur(1.4px)}
+.fw-cell[style*="--rd:3"]{--restop:.24;filter:blur(3px)}
+.fw-cell[style*="--rd:4"]{--restop:.16;filter:blur(3px)}
+.fw-catalog.is-mobile .fw-cell[style*="--rd:2"]{filter:blur(1px)}
+.fw-catalog.is-mobile .fw-cell[style*="--rd:3"],.fw-catalog.is-mobile .fw-cell[style*="--rd:4"]{filter:blur(2px)}
+/* скелет-плитка более «настоящая»: фото-блок с бликом + строка названия + строка цены */
+.fw-cell::before{content:"";position:absolute;left:8px;right:8px;top:8px;height:54%;border-radius:3px;background:linear-gradient(115deg,var(--srf2) 0%,#242b34 46%,var(--srf2) 72%);opacity:1;transition:opacity .3s}
+.fw-cell::after{content:"";position:absolute;left:8px;right:8px;bottom:9px;height:20px;background:linear-gradient(var(--srf2),var(--srf2)) 0 0/62% 7px no-repeat,linear-gradient(var(--srf2),var(--srf2)) 0 13px/40% 6px no-repeat;opacity:1;transition:opacity .3s}
 /* реальная карточка = фото-плитка с подписью; на .filled скелет гаснет, проступают фото/текст/кнопка */
 .fw-real.filled::before,.fw-real.filled::after{opacity:0}
 .fw-real .fw-thumb{position:absolute;inset:0;z-index:1;overflow:hidden}
