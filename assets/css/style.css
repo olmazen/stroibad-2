@@ -790,6 +790,13 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 .btn-cart{border-color:var(--amber);color:#fff}
 .btn-cart::before{content:"";width:17px;height:17px;background:currentColor;-webkit-mask:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.8" stroke-linecap="round"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>') center/contain no-repeat;mask:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.8" stroke-linecap="round"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>') center/contain no-repeat;margin-right:9px;vertical-align:-3px;display:inline-block}
 .btn-cart:hover{background:rgba(242,111,29,.12);border-color:var(--amber)}
+/* Art Déco: «Запросить КП» — тонкая белая, ведёт к форме (стрелка вниз) */
+.pp-actions-ad{gap:14px;align-items:center}
+.pp-actions-ad .btn-cart.btn-gold::before{background:#1c1305}
+.btn-kp{background:transparent;border:1px solid rgba(255,255,255,.26);color:#fff;font-weight:500;box-shadow:none;padding:13px 20px;font-size:13px;letter-spacing:.04em}
+.btn-kp::after{content:"↓";margin-left:3px;font-size:15px;line-height:1;opacity:.65;transition:transform .2s,opacity .2s}
+.btn-kp:hover{border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.05);color:#fff}
+.btn-kp:hover::after{transform:translateY(2px);opacity:1}
 @media(max-width:600px){
   .search-ov{padding:9vh 14px 14px}
   .search-field input{font-size:16px}

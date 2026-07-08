@@ -574,6 +574,19 @@ window.__whenVisible = (function () {
     b.innerHTML = 'В корзину';
     b.addEventListener('click', function () { addToCartFromPage(b); });
     ppActions.insertBefore(b, ppActions.firstChild);
+    // Art Déco: «В корзину» — золотая (главная); «Запросить КП» — тонкая белая, ведёт к форме; «Позвонить» убираем
+    if (document.querySelector('.gallery.ad-tint')) {
+      ppActions.classList.add('pp-actions-ad');
+      b.classList.add('btn-gold');
+      var tel = ppActions.querySelector('a[href^="tel:"]'); if (tel) tel.remove();
+      Array.prototype.forEach.call(ppActions.querySelectorAll('.btn'), function (x) {
+        if (x !== b && /запрос/i.test(x.textContent)) {
+          x.classList.remove('btn-gold'); x.classList.add('btn-kp');
+          x.removeAttribute('onclick');
+          x.addEventListener('click', function (e) { e.preventDefault(); var f = document.querySelector('.formpanel'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+        }
+      });
+    }
   }
 
   /* ================= ПОИСК ================= */
