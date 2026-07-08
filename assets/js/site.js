@@ -1341,8 +1341,9 @@ window.__whenVisible = (function () {
       function realCell(p, i) {
         return '<div class="fw-cell fw-real ' + p.cls + '" data-pk="' + i + '" style="--rd:0">' +
           '<span class="fw-thumb"><img src="' + p.img + '" alt="' + p.alt + '" loading="lazy"></span>' +
-          '<em class="fw-tag">' + p.tag + '</em><i class="fw-add"></i>' +
-          '<span class="fw-cap"><b>' + p.name + '</b><span class="fw-price">' + p.price + '</span></span></div>';
+          '<em class="fw-tag">' + p.tag + '</em>' +
+          '<i class="fw-add" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h2l1.7 8.5h9L18.5 8H7"/><circle cx="9.5" cy="18" r="1.3"/><circle cx="16" cy="18" r="1.3"/></svg></i>' +
+          '<div class="fw-pan"><b>' + p.name + '</b><span class="fw-price">' + p.price + '</span></div></div>';
       }
       function buildGrid() {
         var m = mq.matches;
@@ -1363,11 +1364,8 @@ window.__whenVisible = (function () {
         if (cnt) { cnt.textContent = String(n); cnt.classList.remove('bump'); void cnt.offsetWidth; cnt.classList.add('bump'); }
         cart.classList.toggle('has', n > 0);
       }
-      function setDollyOrigin() {
-        var rr = reals(); if (!rr[0] || !rr[1]) return;
-        var a = rr[0].getBoundingClientRect(), b = rr[1].getBoundingClientRect(), pc = cam.getBoundingClientRect();
-        cam.style.transformOrigin = ((a.left + a.right + b.left + b.right) / 4 - pc.left) + 'px ' + ((a.top + a.bottom) / 2 - pc.top) + 'px';
-      }
+      // пара всегда стоит по центру рамки (нечётные колонки центрируются сдвигом сетки),
+      // поэтому долли-зум идёт из центра камеры (CSS transform-origin:50% 50%) — надёжнее, чем считать origin по rect
       function resetChoose() {
         grid.classList.remove('in');
         cam.classList.remove('dolly', 'will'); cam.style.transformOrigin = '';
@@ -1409,7 +1407,7 @@ window.__whenVisible = (function () {
           t(function () { if (!running) return; if (rr[0]) rr[0].classList.add('filled'); }, T.fill0);
           t(function () { if (!running) return; if (rr[1]) rr[1].classList.add('filled'); }, T.fill1);
           // 3) «камера» приближается к паре (origin — по живым rect карточек)
-          t(function () { if (!running) return; setDollyOrigin(); cam.classList.add('will', 'dolly'); }, T.dolly);
+          t(function () { if (!running) return; cam.classList.add('will', 'dolly'); }, T.dolly);
           // 4) курсор добавляет каждую карточку (строго ПОСЛЕ доводки камеры — цель не движется)
           t(function () { if (!running) return; ccur.classList.add('show'); if (rr[0]) curTo(ccur, rr[0].querySelector('.fw-add'), 560, 0.5, 0.5); }, T.add0);
           t(function () { if (!running) return; ccur.classList.add('press'); if (rr[0]) rr[0].querySelector('.fw-add').classList.add('on'); setCnt(1); }, T.add0 + 660);
