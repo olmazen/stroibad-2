@@ -562,6 +562,9 @@ body.gallery-lock{overflow:hidden}
 /* ============ контентные плитки / FAQ ============ */
 .tiles4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--line)}
 .tiles3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--line)}
+/* спек-грид Art Déco: «Габариты» во всю ширину; одинокая последняя ячейка тоже (чтобы ничего не «выпирало») */
+.ad-dimrow li:first-child{grid-column:1/-1}
+.ad-dimrow li:last-child:nth-child(even){grid-column:1/-1}
 .tile{background:var(--bg2);box-shadow:0 0 0 1px var(--line);padding:24px;transition:background .25s,transform .3s;position:relative;overflow:hidden}
 .tile:hover{background:var(--srf);transform:translateY(-3px);z-index:2}
 .tile .ph{margin-bottom:16px;border:none;transition:filter .4s}
@@ -712,7 +715,8 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
   .pp-price .note{font-size:12.5px}
   .opt-row{margin-bottom:14px}
   .obj-note{margin-top:16px;padding:14px 16px;font-size:13.5px}
-  .dir-grid,.why-grid,.tiles4,.tiles3,.stats,.spot-grid{grid-template-columns:1fr}
+  .dir-grid,.why-grid,.tiles4,.stats,.spot-grid{grid-template-columns:1fr}
+  .tiles3{grid-template-columns:repeat(2,1fr)}
   .icards{grid-template-columns:1fr}
   .model-grid{grid-template-columns:1fr}
   .flow{grid-template-columns:repeat(2,1fr)}
@@ -1668,3 +1672,15 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
   .fw-shipph{flex:1;min-height:0;max-width:none;margin-top:0}
   .fw-shipph img{max-height:none;height:100%;object-fit:cover}
 }
+/* прикрепление файла (чертёж/ТЗ) в формах заявки — drag&drop */
+.lead-file{margin-bottom:16px}
+.lead-file>label{display:block;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--steel);margin-bottom:9px}
+.filedrop{border:1.5px dashed var(--line-2);border-radius:var(--r);background:rgba(255,255,255,.02);padding:15px 17px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:border-color .2s,background .2s;min-height:58px;color:var(--steel)}
+.filedrop::before{content:"";width:22px;height:22px;flex:none;background:currentColor;-webkit-mask:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>') center/contain no-repeat;mask:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>') center/contain no-repeat}
+.filedrop:hover,.filedrop.drag{border-color:var(--amber);background:rgba(242,111,29,.06);color:var(--amber-h)}
+.filedrop.has{border-color:#43C383;border-style:solid;background:rgba(67,195,131,.06);color:#43C383}
+.filedrop.err{border-color:#E25A4E;border-style:solid;background:rgba(226,90,78,.07);color:#E25A4E}
+.filedrop-txt{font-size:13px;color:var(--tx2);line-height:1.35}
+.filedrop-txt b{color:#fff;font-weight:600}
+.filedrop-txt small{display:block;color:var(--steel);font-size:11px;margin-top:3px}
+.filedrop-x{color:var(--amber);cursor:pointer;text-decoration:underline}

@@ -589,6 +589,38 @@ window.__whenVisible = (function () {
     }
   }
 
+  /* прикрепление файла (чертёж/ТЗ) в формах заявки — drag&drop + лимит; готово под будущую CRM */
+  (function () {
+    var MAX = 10 * 1024 * 1024;  // 10 МБ
+    var ACCEPT = '.pdf,.jpg,.jpeg,.png,.webp,.dwg,.dxf,.doc,.docx,.xls,.xlsx,.zip';
+    var forms = document.querySelectorAll('form[onsubmit*="submitLead"]');
+    Array.prototype.forEach.call(forms, function (form) {
+      if (form.querySelector('.lead-file')) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'field lead-file';
+      wrap.innerHTML = '<label>Прикрепить файл (чертёж, ТЗ, план) — необязательно</label>' +
+        '<div class="filedrop" tabindex="0" role="button" aria-label="Прикрепить файл">' +
+        '<input type="file" name="attachment" accept="' + ACCEPT + '" hidden>' +
+        '<span class="filedrop-txt"><b>Перетащите файл</b> сюда или нажмите<small>до 10 МБ · PDF, JPG, PNG, DWG, DOC, XLS, ZIP</small></span></div>';
+      var submit = form.querySelector('button[type="submit"], .btn[type="submit"], button.btn-block');
+      if (submit) form.insertBefore(wrap, submit); else form.appendChild(wrap);
+      var drop = wrap.querySelector('.filedrop'), input = wrap.querySelector('input[type="file"]'), txt = wrap.querySelector('.filedrop-txt');
+      function setFile(file) {
+        if (!file) return;
+        if (file.size > MAX) { drop.classList.add('err'); drop.classList.remove('has'); txt.innerHTML = '<b>Файл больше 10 МБ</b><small>' + file.name + ' — выберите файл поменьше</small>'; input.value = ''; return; }
+        drop.classList.remove('err'); drop.classList.add('has');
+        txt.innerHTML = '<b>' + file.name + '</b><small>' + Math.round(file.size / 1024) + ' КБ · прикреплён · <span class="filedrop-x">убрать</span></small>';
+        form.__attachment = file;  // ссылка для будущей отправки в CRM
+      }
+      drop.addEventListener('click', function (e) { if (e.target.closest('.filedrop-x')) { e.stopPropagation(); input.value = ''; form.__attachment = null; drop.classList.remove('has', 'err'); txt.innerHTML = '<b>Перетащите файл</b> сюда или нажмите<small>до 10 МБ · PDF, JPG, PNG, DWG, DOC, XLS, ZIP</small>'; return; } input.click(); });
+      drop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
+      input.addEventListener('change', function () { setFile(input.files[0]); });
+      ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('drag'); }); });
+      ['dragleave', 'dragend', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('drag'); }); });
+      drop.addEventListener('drop', function (e) { var f = e.dataTransfer && e.dataTransfer.files[0]; if (f) { try { input.files = e.dataTransfer.files; } catch (_) {} setFile(f); } });
+    });
+  })();
+
   /* ================= ПОИСК ================= */
   var searchOv = wrap.querySelector('#searchOv'), input = wrap.querySelector('#searchInput'),
       results = wrap.querySelector('#searchResults'), INDEX = null, sel = -1;
