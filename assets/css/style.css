@@ -1518,38 +1518,69 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
   .stat b{font-size:26px}
   .stat span{font-size:11px}
 }
-/* ── сцена «Выбор изделий» v2: сетка каталога → 2 карточки → в корзину ── */
-.fw-choose2{position:relative;min-height:322px;padding:2px}
-.fw-catgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;transition:opacity .55s ease,filter .55s ease,transform .55s ease}
-.fw-catgrid.recede{opacity:.2;filter:blur(3px) grayscale(.35);transform:scale(.975)}
-.fw-cat{aspect-ratio:1/1;background:#0f1319;border:1px solid var(--line);border-radius:2px;overflow:hidden;opacity:0;transform:translateY(15px) scale(.93);transition:opacity .5s ease,transform .55s cubic-bezier(.2,.85,.25,1)}
-.fw-cat.in{opacity:1;transform:none}
-.fw-cat img{width:100%;height:100%;object-fit:cover;display:block}
-.fw-cs-cards{position:absolute;left:0;right:0;top:50%;transform:translateY(calc(-50% + 22px));display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:600px;margin:0 auto;opacity:0;pointer-events:none;transition:opacity .55s ease .05s,transform .6s cubic-bezier(.2,.85,.25,1) .05s}
-.fw-cs-cards.in{opacity:1;transform:translateY(-50%);pointer-events:auto}
-.fw-cs-card{position:relative;background:var(--srf);border:1px solid var(--line);border-radius:3px;padding:13px 13px 15px;box-shadow:0 26px 60px rgba(0,0,0,.5)}
-.fw-cs-card::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;background:var(--amber);transform:scaleY(0);transform-origin:top;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
-.fw-cs-card.art::after{background:#c9a45f}
-.fw-cs-card.added::after{transform:scaleY(1)}
-.fw-cs-badge{display:inline-block;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:10.5px;padding:4px 9px;border-radius:2px;background:var(--amber);color:#fff;margin-bottom:11px}
-.fw-cs-card.art .fw-cs-badge{background:#c9a45f;color:#1a1206}
-.fw-cs-ph{aspect-ratio:4/3;background:#eceef0;border-radius:2px;overflow:hidden;margin-bottom:11px}
-.fw-cs-ph img{width:100%;height:100%;object-fit:cover;display:block}
-.fw-cs-info b{display:block;font-family:'Oswald',sans-serif;font-size:15.5px;color:#fff;line-height:1.15}
-.fw-cs-info em{font-style:normal;color:var(--amber);font-size:14px;font-weight:600}
-.fw-cs-card.art .fw-cs-info em{color:#d8b979}
-.fw-cs-btn{margin-top:12px;width:100%;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:12px;padding:10px;background:transparent;border:1px solid var(--line-2);border-radius:2px;color:var(--tx2);cursor:pointer;transition:background .25s,border-color .25s,color .25s}
-.fw-cs-btn>span{color:var(--amber);font-weight:700}
-.fw-cs-btn.done{background:var(--amber);border-color:var(--amber);color:#fff}
-.fw-cs-card.art .fw-cs-btn.done{background:#c9a45f;border-color:#c9a45f;color:#1a1206}
+/* ── сцена «Выбор изделий» v3: радиальный каталог + камера-долли (Apple/Telegram-grade) ── */
+.fw-catalog{position:relative;overflow:hidden;min-height:clamp(360px,50vh,486px)}
+.fw-catalog.is-mobile{min-height:min(58vh,414px)}
+/* .fw-catalog = неподвижная клип-рамка «камеры»; .fw-cam = контент, к которому применяется долли-зум (origin — по паре карточек, считается в JS) */
+.fw-cam{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform-origin:50% 50%;transition:transform 1100ms cubic-bezier(.16,.84,.24,1)}
+.fw-cam.will{will-change:transform}
+.fw-cam.dolly{transform:scale(1.5)}
+.fw-catalog.is-mobile .fw-cam{transition-duration:900ms}
+.fw-catalog.is-mobile .fw-cam.dolly{transform:scale(1.4)}
+/* сетка каталога (нечётные 7 колонок сдвинуты, чтобы шов пары встал по центру; долли-origin — из живых rect) */
+.fw-cgrid{display:grid;grid-template-columns:repeat(7,128px);gap:12px;transform:translateX(-70px)}
+.fw-catalog.is-mobile .fw-cgrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;width:100%;transform:none}
+/* плитка: появление зумом+фейдом, задержка = кольцо от центра (чистый CSS transition-delay) */
+.fw-cell{position:relative;aspect-ratio:4/3;background:var(--srf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;opacity:0;transform:scale(.66);z-index:calc(10 - var(--rd));transition:opacity .48s cubic-bezier(.2,.9,.25,1),transform .5s cubic-bezier(.34,1.26,.5,1);transition-delay:calc(var(--rd) * 90ms)}
+.fw-catalog.is-mobile .fw-cell{aspect-ratio:3/4;transition-delay:calc(var(--rd) * 70ms)}
+.fw-cgrid.in .fw-cell{opacity:var(--restop,1);transform:none}
+/* внешние кольца — тусклее и слегка размыты (размытие только на десктопе) */
+.fw-cell[style*="--rd:2"]{--restop:.5}
+.fw-cell[style*="--rd:3"]{--restop:.32;filter:blur(2px)}
+.fw-cell[style*="--rd:4"]{--restop:.22;filter:blur(2.4px)}
+.fw-catalog.is-mobile .fw-cell{filter:none !important}
+/* скелет-плитка (пустая и реальная до .filled выглядят одинаково серо) */
+.fw-cell::before{content:"";position:absolute;left:9px;right:9px;top:9px;bottom:38%;border-radius:3px;background:var(--srf2);opacity:1;transition:opacity .3s}
+.fw-cell::after{content:"";position:absolute;left:9px;bottom:23%;width:56%;height:6px;border-radius:3px;background:var(--srf2);opacity:1;transition:opacity .3s}
+/* реальная карточка = фото-плитка с подписью; на .filled скелет гаснет, проступают фото/текст/кнопка */
+.fw-real.filled::before,.fw-real.filled::after{opacity:0}
+.fw-real .fw-thumb{position:absolute;inset:0;z-index:1;overflow:hidden}
+.fw-real .fw-thumb img{width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity .5s ease}
+.fw-real.filled .fw-thumb img{opacity:1}
+.fw-real .fw-tag{position:absolute;top:6px;left:6px;z-index:3;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;font-size:9px;padding:3px 7px;border-radius:2px;background:var(--amber);color:#fff;opacity:0;transform:translateY(-4px);transition:opacity .35s,transform .38s cubic-bezier(.2,.7,.2,1)}
+.fw-real.art .fw-tag{background:#c9a45f;color:#1a1206}
+.fw-real.filled .fw-tag{opacity:1;transform:none}
+.fw-real .fw-cap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:22px 8px 7px;background:linear-gradient(180deg,transparent,rgba(8,10,13,.92));opacity:0;transform:translateY(9px);transition:opacity .42s ease,transform .44s cubic-bezier(.2,.7,.2,1)}
+.fw-real.filled .fw-cap{opacity:1;transform:none}
+.fw-real .fw-cap b{display:block;font-family:'Oswald',sans-serif;font-size:12px;color:#fff;line-height:1.1}
+.fw-real .fw-cap .fw-price{display:block;margin-top:2px;font-size:11px;color:var(--amber);font-weight:600}
+.fw-real.art .fw-cap .fw-price{color:#d8b979}
+/* мини-кнопка «в корзину» на карточке: + → галочка */
+.fw-add{position:absolute;top:6px;right:6px;z-index:4;width:23px;height:23px;border-radius:50%;border:1.5px solid var(--line-2);background:rgba(14,17,20,.72);opacity:0;transform:scale(.4);transition:opacity .25s ease,transform .34s cubic-bezier(.2,1.5,.4,1),background .2s,border-color .2s}
+.fw-real.filled .fw-add{opacity:1;transform:none}
+.fw-add::before,.fw-add::after{content:"";position:absolute;left:50%;top:50%;background:var(--tx2);transition:.2s}
+.fw-add::before{width:9px;height:1.7px;transform:translate(-50%,-50%)}
+.fw-add::after{width:1.7px;height:9px;transform:translate(-50%,-50%)}
+.fw-add.on{background:var(--amber);border-color:var(--amber)}
+.fw-add.on::before{width:6px;height:10px;background:transparent;border:solid #1c1305;border-width:0 2px 2px 0;transform:translate(-50%,-64%) rotate(43deg)}
+.fw-add.on::after{opacity:0}
+/* корзина в углу — сиблинг камеры (вне трансформа), всегда кликабельна; это и есть кнопка «к разделу 2» */
+.fw-catcart{position:absolute;top:6px;right:6px;z-index:9;display:flex;align-items:center;gap:6px;background:var(--srf2);border:1px solid var(--line);border-radius:22px;padding:7px 13px 7px 11px;color:var(--tx2);cursor:pointer;transition:border-color .25s,box-shadow .25s,transform .18s,color .25s}
+.fw-catcart svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.fw-catcart.has{border-color:var(--amber);color:#fff;box-shadow:0 10px 26px rgba(242,111,29,.2)}
+.fw-catcart.has svg{stroke:var(--amber)}
+.fw-catcart.press{transform:scale(.93)}
+.fw-catcart-cnt{font-family:'Oswald',sans-serif;font-size:13px;line-height:1;min-width:13px;text-align:center;color:var(--amber)}
+.fw-catcart-cnt.bump{animation:catBump .3s cubic-bezier(.2,1.4,.4,1)}
+@keyframes catBump{0%{transform:scale(1)}42%{transform:scale(1.45)}100%{transform:scale(1)}}
 @media(max-width:900px){
-  .fw-choose2{min-height:300px}
-  .fw-catgrid{gap:6px}
-  .fw-cs-cards{gap:9px;max-width:none;transform:translateY(calc(-50% + 16px))}
-  .fw-cs-card{padding:8px 8px 10px;box-shadow:0 14px 34px rgba(0,0,0,.46)}
-  .fw-cs-badge{font-size:9.5px;margin-bottom:8px;padding:3px 7px}
-  .fw-cs-ph{aspect-ratio:1/1;margin-bottom:8px}
-  .fw-cs-info b{font-size:12.5px}
-  .fw-cs-info em{font-size:12px}
-  .fw-cs-btn{font-size:10.5px;padding:8px;margin-top:9px}
+  .fw-catcart{top:4px;right:4px;padding:6px 11px 6px 9px}
+  .fw-real .fw-cap b{font-size:11px}
+  .fw-real .fw-cap .fw-price{font-size:10px}
+  .fw-real .fw-tag{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .fw-cell,.fw-cam,.fw-real .fw-thumb img,.fw-real .fw-tag,.fw-real .fw-cap,.fw-add,.fw-catcart-cnt{transition:none !important;animation:none !important}
+  .fw-cam{transform:none !important}
+  .fw-cell{filter:none !important}
 }

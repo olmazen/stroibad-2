@@ -1082,24 +1082,12 @@ window.__whenVisible = (function () {
   function mediaFor(k) {
     var cur = '<div class="fw-cur" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L16 19l-3 1.6-3.4-6.4L5 18z"/></svg></div>';
     if (k === 'choose') {
-      var thumbs = ['assets/img/maf/skamejki/9467/main.webp', 'assets/img/maf/kacheli/12189/main.webp',
-        'assets/img/maf/urny/7280/main.webp', 'assets/img/artdeco/lezhaki/a1-2651/facade1.webp?i14',
-        'assets/img/maf/veloparkovki/13778/main.webp', 'assets/img/korziny/standart/STN03-treugolnik/main.webp',
-        'assets/img/maf/skamejki/7106/main.webp', 'assets/img/artdeco/skamejki/e2-351/facade1.webp?i13'];
-      var grid = '<div class="fw-catgrid" aria-hidden="true">' +
-        thumbs.map(function (s) { return '<span class="fw-cat"><img src="' + s + '" alt="" loading="eager"></span>'; }).join('') + '</div>';
-      var csCard = function (cls, series, name, price, img, alt) {
-        return '<div class="fw-cs-card ' + cls + '"><span class="fw-cs-badge">' + series + '</span>' +
-          '<div class="fw-cs-ph"><img src="' + img + '" alt="' + alt + '" loading="eager"></div>' +
-          '<div class="fw-cs-info"><b>' + name + '</b><em>' + price + '</em></div>' +
-          '<button class="fw-cs-btn" type="button"><span>+</span> В корзину</button></div>';
-      };
-      return '<div class="fw-choose2">' + grid +
-        '<div class="fw-cs-cards">' +
-          csCard('std', 'Стандарт', 'Скамейка «Колледж»', 'от 19 600 ₽', 'assets/img/maf/skamejki/9467/white.webp', 'Скамейка Колледж — Стандарт') +
-          csCard('art', 'Art Déco', 'Скамейка A1-101', 'от 44 500 ₽', 'assets/img/artdeco/skamejki/a1-101/hero.webp?i12', 'Скамейка A1-101 — Art Déco') +
-        '</div>' +
-        '<button class="fw-ch-next" type="button"><span class="fw-ch-circle" data-cnt>2</span><span class="fw-ch-nx"><b>В корзине — к заявке</b><i class="fw-ch-down"><svg viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6"/></svg></i></span></button>' +
+      // каркас: корзина в углу (вне камеры) + камера с сеткой (плитки строит makeScene по вьюпорту) + курсор
+      return '<div class="fw-catalog">' +
+        '<button class="fw-catcart" type="button" aria-label="Перейти к заявке и расчёту">' +
+          '<svg viewBox="0 0 24 24"><path d="M3.5 5h2.2l2 10h9.4l1.9-7.2H7"/><circle cx="9.5" cy="19" r="1.35"/><circle cx="16.5" cy="19" r="1.35"/></svg>' +
+          '<b class="fw-catcart-cnt" data-cnt>0</b></button>' +
+        '<div class="fw-cam"><div class="fw-cgrid"></div></div>' +
         cur + '</div>';
     }
     if (k === 'quote') return '<div class="fw-quote fw-flow2">' +
@@ -1238,7 +1226,8 @@ window.__whenVisible = (function () {
     W = innerWidth; H = innerHeight;
     mobile = W < 900;
     if (mobile) {
-      var crestGap = Math.min(210, Math.max(150, Math.round(H * 0.22)));
+      // колесо опущено ниже (лайфхак юзера) → больше вертикального места сцене-анимации
+      var crestGap = Math.min(170, Math.max(120, Math.round(H * 0.17)));
       var crest = H - crestGap;                  // верхняя точка нижнего колеса
       R = Math.max(Math.round(W * 0.8), 360);
       CX = Math.round(W / 2); CY = crest + R;
@@ -1246,7 +1235,7 @@ window.__whenVisible = (function () {
       marker.className = 'fw-marker down';
       marker.style.left = CX + 'px'; marker.style.top = (crest - 24) + 'px';
       // карточка стоит на 46px выше crest и сама ~60px высотой → низ контента держим выше её верха
-      sticky.style.setProperty('--fwbot', (H - crest + 122) + 'px');
+      sticky.style.setProperty('--fwbot', (H - crest + 104) + 'px');
     } else {
       EDGE = Math.round(Math.max(150, Math.min(0.15 * W, 225)));
       R = Math.round(Math.max(H * 0.78, 540));
@@ -1338,57 +1327,98 @@ window.__whenVisible = (function () {
     var api = { start: function () {}, stop: function () {} };
 
     if (kind === 'choose') {
-      var cGrid = root.querySelector('.fw-catgrid');
-      var cats = root.querySelectorAll('.fw-cat');
-      var csBox = root.querySelector('.fw-cs-cards');
-      var csCards = root.querySelectorAll('.fw-cs-card');
-      var chNext = root.querySelector('.fw-ch-next');
-      var chCnt = root.querySelector('[data-cnt]');
+      var catalog = root.querySelector('.fw-catalog');
+      var cam = root.querySelector('.fw-cam');
+      var grid = root.querySelector('.fw-cgrid');
+      var cart = root.querySelector('.fw-catcart');
+      var cnt = root.querySelector('.fw-catcart-cnt');
       var ccur = root.querySelector('.fw-cur');
-      function btnDone(btn) { btn.classList.add('done'); btn.innerHTML = 'В корзине'; }
-      function btnReset(btn) { btn.classList.remove('done'); btn.innerHTML = '<span>+</span> В корзину'; }
+      var mq = window.matchMedia('(max-width:900px)');
+      var PRODUCTS = [
+        { cls: 'std', tag: 'Стандарт', name: 'Скамейка «Колледж»', price: 'от 19 600 ₽', img: 'assets/img/maf/skamejki/9467/white.webp', alt: 'Скамейка «Колледж» — Стандарт' },
+        { cls: 'art', tag: 'Art Déco', name: 'Скамейка A1-101', price: 'от 44 500 ₽', img: 'assets/img/artdeco/skamejki/a1-101/hero.webp?i12', alt: 'Скамейка A1-101 — Art Déco' }
+      ];
+      function realCell(p, i) {
+        return '<div class="fw-cell fw-real ' + p.cls + '" data-pk="' + i + '" style="--rd:0">' +
+          '<span class="fw-thumb"><img src="' + p.img + '" alt="' + p.alt + '" loading="lazy"></span>' +
+          '<em class="fw-tag">' + p.tag + '</em><i class="fw-add"></i>' +
+          '<span class="fw-cap"><b>' + p.name + '</b><span class="fw-price">' + p.price + '</span></span></div>';
+      }
+      function buildGrid() {
+        var m = mq.matches;
+        var cols = m ? 4 : 7, rows = m ? 7 : 5, cRow = m ? 3 : 2, cA = m ? 1 : 3, cB = m ? 2 : 4;
+        var html = '';
+        for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+          var ring = Math.max(Math.abs(r - cRow), Math.min(Math.abs(c - cA), Math.abs(c - cB)));
+          if (r === cRow && c === cA) html += realCell(PRODUCTS[0], 0);
+          else if (r === cRow && c === cB) html += realCell(PRODUCTS[1], 1);
+          else html += '<div class="fw-cell" style="--rd:' + ring + '"></div>';
+        }
+        grid.innerHTML = html;
+        grid.setAttribute('data-cols', cols);
+        catalog.classList.toggle('is-mobile', m);
+      }
+      function reals() { return grid.querySelectorAll('.fw-real'); }
+      function setCnt(n) {
+        if (cnt) { cnt.textContent = String(n); cnt.classList.remove('bump'); void cnt.offsetWidth; cnt.classList.add('bump'); }
+        cart.classList.toggle('has', n > 0);
+      }
+      function setDollyOrigin() {
+        var rr = reals(); if (!rr[0] || !rr[1]) return;
+        var a = rr[0].getBoundingClientRect(), b = rr[1].getBoundingClientRect(), pc = cam.getBoundingClientRect();
+        cam.style.transformOrigin = ((a.left + a.right + b.left + b.right) / 4 - pc.left) + 'px ' + ((a.top + a.bottom) / 2 - pc.top) + 'px';
+      }
       function resetChoose() {
-        if (cGrid) cGrid.classList.remove('recede');
-        cats.forEach(function (c) { c.classList.remove('in'); });
-        if (csBox) csBox.classList.remove('in');
-        csCards.forEach(function (c) { c.classList.remove('added'); btnReset(c.querySelector('.fw-cs-btn')); });
-        if (chNext) chNext.classList.remove('show');
-        if (chCnt) chCnt.textContent = '0';
+        grid.classList.remove('in');
+        cam.classList.remove('dolly', 'will'); cam.style.transformOrigin = '';
+        reals().forEach(function (el) { el.classList.remove('filled'); var ad = el.querySelector('.fw-add'); if (ad) ad.classList.remove('on'); });
+        if (cnt) cnt.textContent = '0';
+        cart.classList.remove('has', 'press');
         ccur.classList.remove('show', 'press');
       }
-      function finalState() {
-        if (cGrid) cGrid.classList.add('recede');
-        cats.forEach(function (c) { c.classList.add('in'); });
-        if (csBox) csBox.classList.add('in');
-        csCards.forEach(function (c) { c.classList.add('added'); btnDone(c.querySelector('.fw-cs-btn')); });
-        if (chCnt) chCnt.textContent = String(csCards.length);
-        if (chNext) chNext.classList.add('show');
+      function finalState() {   // статичный «готовый» кадр (для stop() и prefers-reduced-motion)
+        grid.classList.add('in');
+        cam.classList.remove('dolly', 'will'); cam.style.transformOrigin = '';
+        reals().forEach(function (el) { el.classList.add('filled'); var ad = el.querySelector('.fw-add'); if (ad) ad.classList.add('on'); });
+        if (cnt) cnt.textContent = '2';
+        cart.classList.add('has'); cart.classList.remove('press');
         ccur.classList.remove('show', 'press');
       }
+      buildGrid();
+      if (reduced) finalState();
+      if (mq.addEventListener) mq.addEventListener('change', function () { buildGrid(); if (!running) finalState(); });
+      // реальный клик по корзине пользователем → аккуратно доводит на шаг 2 «Заявка и расчёт»
+      cart.addEventListener('click', function () { scrollToStep(1); });
       api.start = function () {
         running = true;
         (function loop() {
           if (!running) return;
           resetChoose();
-          // 1) сетка каталога появляется по одной плитке + курсор «просматривает»
-          cats.forEach(function (c, i) { t(function () { c.classList.add('in'); }, 220 + i * 90); });
-          t(function () { ccur.classList.add('show'); if (cats[2]) curTo(ccur, cats[2], 420, 0.5, 0.5); }, 560);
-          t(function () { if (cats[6]) curTo(ccur, cats[6], 620, 0.5, 0.5); }, 1350);
-          // 2) сетка уходит на задний план, выезжают две карточки
-          t(function () { if (cGrid) cGrid.classList.add('recede'); if (csBox) csBox.classList.add('in'); }, 2100);
-          // 3) курсор добавляет каждую карточку в корзину
-          var added = 0;
-          csCards.forEach(function (card, ci) {
-            var btn = card.querySelector('.fw-cs-btn');
-            var at = 2900 + ci * 1250;
-            t(function () { curTo(ccur, btn, 560, 0.5, 0.5); }, at);
-            t(function () { ccur.classList.add('press'); }, at + 600);
-            t(function () { ccur.classList.remove('press'); card.classList.add('added'); btnDone(btn); added++; if (chCnt) chCnt.textContent = String(added); }, at + 760);
-          });
-          // 4) обе в корзине → плашка «к заявке»
-          var end = 2900 + csCards.length * 1250;
-          t(function () { ccur.classList.remove('show'); if (chNext) chNext.classList.add('show'); }, end + 350);
-          t(loop, end + 4000);
+          var rr = reals();
+          var m = catalog.classList.contains('is-mobile');
+          var T = m
+            ? { fill: 1750, dolly: 2250, add0: 3300, add1: 4250, cart: 4780, press: 5320, go: 5580, loop: 8400 }
+            : { fill: 2000, dolly: 2600, add0: 3850, add1: 4900, cart: 5960, press: 6650, go: 6960, loop: 9800 };
+          // 1) плитки каталога появляются из центра (задержка = кольцо, чистый CSS)
+          t(function () { if (!running) return; grid.classList.add('in'); }, 120);
+          // 2) две центральные карточки заполняются данными
+          t(function () { if (!running) return; rr.forEach(function (el) { el.classList.add('filled'); }); }, T.fill);
+          // 3) «камера» приближается к паре (origin — по живым rect карточек)
+          t(function () { if (!running) return; setDollyOrigin(); cam.classList.add('will', 'dolly'); }, T.dolly);
+          // 4) курсор добавляет каждую карточку (строго ПОСЛЕ доводки камеры — цель не движется)
+          t(function () { if (!running) return; ccur.classList.add('show'); if (rr[0]) curTo(ccur, rr[0].querySelector('.fw-add'), 540, 0.5, 0.5); }, T.add0);
+          t(function () { if (!running) return; ccur.classList.add('press'); if (rr[0]) rr[0].querySelector('.fw-add').classList.add('on'); setCnt(1); }, T.add0 + 640);
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.add0 + 820);
+          t(function () { if (!running) return; if (rr[1]) curTo(ccur, rr[1].querySelector('.fw-add'), 500, 0.5, 0.5); }, T.add1);
+          t(function () { if (!running) return; ccur.classList.add('press'); if (rr[1]) rr[1].querySelector('.fw-add').classList.add('on'); setCnt(2); }, T.add1 + 600);
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.add1 + 780);
+          // 5) курсор на корзину (в углу, вне камеры → всегда доступна) → нажатие → авто-переход на шаг 2
+          t(function () { if (!running) return; curTo(ccur, cart, 620, 0.5, 0.5); }, T.cart);
+          t(function () { if (!running) return; ccur.classList.add('press'); cart.classList.add('press'); }, T.press);
+          t(function () { if (!running) return; ccur.classList.remove('press'); cart.classList.remove('press'); }, T.press + 240);
+          t(function () { if (!running) return; scrollToStep(1); }, T.go);
+          // резерв: если переход не случился (остались на шаге) — сброс и повтор
+          t(function () { if (!running) return; loop(); }, T.loop);
         })();
       };
       api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; finalState(); };
