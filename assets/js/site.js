@@ -1082,29 +1082,24 @@ window.__whenVisible = (function () {
   function mediaFor(k) {
     var cur = '<div class="fw-cur" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L16 19l-3 1.6-3.4-6.4L5 18z"/></svg></div>';
     if (k === 'choose') {
-      var arrow = function (d) { return '<svg viewBox="0 0 24 24"><path d="' + d + '"/></svg>'; };
-      var card = function (c, cls, series, vibe, name, sub, price, imgs, alt) {
-        return '<div class="fw-ch-card ' + cls + '" data-c="' + c + '">' +
-          '<div class="fw-ch-head"><span class="fw-ch-badge">' + series + '</span><span class="fw-ch-vibe">' + vibe + '</span></div>' +
-          '<div class="fw-ch-ph">' +
-          imgs.map(function (src, i) { return '<img class="' + (i === 0 ? 'on' : '') + '" src="' + src + '" alt="' + alt + '" loading="eager">'; }).join('') +
-          '<button class="fw-ch-arrow prev" type="button" aria-label="Предыдущее фото">' + arrow('M15 5l-7 7 7 7') + '</button>' +
-          '<button class="fw-ch-arrow next" type="button" aria-label="Следующее фото">' + arrow('M9 5l7 7-7 7') + '</button>' +
-          '<span class="fw-ch-dots">' + imgs.map(function (_, i) { return '<i class="' + (i === 0 ? 'on' : '') + '"></i>'; }).join('') + '</span>' +
-          '</div>' +
-          '<div class="fw-ch-info"><b>' + name + '</b><span>' + sub + '</span></div>' +
-          '<div class="fw-ch-buy"><em>' + price + '</em><button class="fw-ch-btn" type="button"><span>+</span> В корзину</button></div>' +
-          '</div>';
+      var thumbs = ['assets/img/maf/skamejki/9467/main.webp', 'assets/img/maf/kacheli/12189/main.webp',
+        'assets/img/maf/urny/7280/main.webp', 'assets/img/artdeco/lezhaki/a1-2651/facade1.webp?i14',
+        'assets/img/maf/veloparkovki/13778/main.webp', 'assets/img/korziny/standart/STN03-treugolnik/main.webp',
+        'assets/img/maf/skamejki/7106/main.webp', 'assets/img/artdeco/skamejki/e2-351/facade1.webp?i13'];
+      var grid = '<div class="fw-catgrid" aria-hidden="true">' +
+        thumbs.map(function (s) { return '<span class="fw-cat"><img src="' + s + '" alt="" loading="eager"></span>'; }).join('') + '</div>';
+      var csCard = function (cls, series, name, price, img, alt) {
+        return '<div class="fw-cs-card ' + cls + '"><span class="fw-cs-badge">' + series + '</span>' +
+          '<div class="fw-cs-ph"><img src="' + img + '" alt="' + alt + '" loading="eager"></div>' +
+          '<div class="fw-cs-info"><b>' + name + '</b><em>' + price + '</em></div>' +
+          '<button class="fw-cs-btn" type="button"><span>+</span> В корзину</button></div>';
       };
-      return '<div class="fw-choose">' +
-        '<p class="fw-ch-lead">Каждое изделие — в двух линейках: <b class="std">Стандарт</b> (рабочая классика, доступно) и <b class="art">Art&nbsp;Déco</b> (авторский дизайн, премиум).</p>' +
-        '<div class="fw-ch-cards">' +
-        card('0', 'std', 'Стандарт', 'Рабочая классика', 'Скамейка «Колледж»', 'Сталь + брус хвойных пород · для дворов, парков и улиц', 'от 19 600 ₽',
-          ['assets/img/maf/skamejki/9467/white.webp', 'assets/img/maf/skamejki/9467/main.webp', 'assets/img/maf/skamejki/9467/angle.webp'], 'Скамейка стальная — серия Стандарт') +
-        card('1', 'art', 'Art Déco', 'Дизайн-линия', 'Скамейка A1-101', 'Авторские формы, термодерево и нержавеющая сталь · премиум', 'от 44 500 ₽',
-          ['assets/img/artdeco/skamejki/a1-101/hero.webp?i12', 'assets/img/artdeco/skamejki/a1-101/facade1.webp?i12', 'assets/img/artdeco/skamejki/a1-101/life1.webp'], 'Скамейка дизайнерская — серия Art Déco') +
+      return '<div class="fw-choose2">' + grid +
+        '<div class="fw-cs-cards">' +
+          csCard('std', 'Стандарт', 'Скамейка «Колледж»', 'от 19 600 ₽', 'assets/img/maf/skamejki/9467/white.webp', 'Скамейка Колледж — Стандарт') +
+          csCard('art', 'Art Déco', 'Скамейка A1-101', 'от 44 500 ₽', 'assets/img/artdeco/skamejki/a1-101/hero.webp?i12', 'Скамейка A1-101 — Art Déco') +
         '</div>' +
-        '<button class="fw-ch-next" type="button"><span class="fw-ch-circle" data-cnt>2</span><span class="fw-ch-nx"><b>В корзине — перейти к заявке</b><i class="fw-ch-down"><svg viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6"/></svg></i></span></button>' +
+        '<button class="fw-ch-next" type="button"><span class="fw-ch-circle" data-cnt>2</span><span class="fw-ch-nx"><b>В корзине — к заявке</b><i class="fw-ch-down"><svg viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6"/></svg></i></span></button>' +
         cur + '</div>';
     }
     if (k === 'quote') return '<div class="fw-quote fw-flow2">' +
@@ -1343,59 +1338,60 @@ window.__whenVisible = (function () {
     var api = { start: function () {}, stop: function () {} };
 
     if (kind === 'choose') {
-      var chCards = root.querySelectorAll('.fw-ch-card');
+      var cGrid = root.querySelector('.fw-catgrid');
+      var cats = root.querySelectorAll('.fw-cat');
+      var csBox = root.querySelector('.fw-cs-cards');
+      var csCards = root.querySelectorAll('.fw-cs-card');
       var chNext = root.querySelector('.fw-ch-next');
       var chCnt = root.querySelector('[data-cnt]');
       var ccur = root.querySelector('.fw-cur');
-      // карусель фото каждой карточки — работает и от стрелок вживую, и из демо
-      var idxMap = [];
-      chCards.forEach(function (cardEl, ci) {
-        idxMap[ci] = 0;
-        var imgs = cardEl.querySelectorAll('.fw-ch-ph img'), dots = cardEl.querySelectorAll('.fw-ch-dots i');
-        function show(i) { var n = imgs.length; i = (i % n + n) % n; idxMap[ci] = i; imgs.forEach(function (im, k) { im.classList.toggle('on', k === i); }); dots.forEach(function (d, k) { d.classList.toggle('on', k === i); }); }
-        cardEl.__show = show;
-        var pv = cardEl.querySelector('.fw-ch-arrow.prev'), nx = cardEl.querySelector('.fw-ch-arrow.next');
-        if (pv) pv.addEventListener('click', function (e) { e.stopPropagation(); show(idxMap[ci] - 1); });
-        if (nx) nx.addEventListener('click', function (e) { e.stopPropagation(); show(idxMap[ci] + 1); });
-      });
-      function btnReset(btn) { btn.classList.remove('done'); btn.innerHTML = '<span>+</span> В корзину'; }
       function btnDone(btn) { btn.classList.add('done'); btn.innerHTML = 'В корзине'; }
+      function btnReset(btn) { btn.classList.remove('done'); btn.innerHTML = '<span>+</span> В корзину'; }
       function resetChoose() {
-        chCards.forEach(function (c) { c.classList.remove('added'); btnReset(c.querySelector('.fw-ch-btn')); c.__show(0); });
+        if (cGrid) cGrid.classList.remove('recede');
+        cats.forEach(function (c) { c.classList.remove('in'); });
+        if (csBox) csBox.classList.remove('in');
+        csCards.forEach(function (c) { c.classList.remove('added'); btnReset(c.querySelector('.fw-cs-btn')); });
         if (chNext) chNext.classList.remove('show');
         if (chCnt) chCnt.textContent = '0';
         ccur.classList.remove('show', 'press');
       }
-      var CARD_MS = 4200;
+      function finalState() {
+        if (cGrid) cGrid.classList.add('recede');
+        cats.forEach(function (c) { c.classList.add('in'); });
+        if (csBox) csBox.classList.add('in');
+        csCards.forEach(function (c) { c.classList.add('added'); btnDone(c.querySelector('.fw-cs-btn')); });
+        if (chCnt) chCnt.textContent = String(csCards.length);
+        if (chNext) chNext.classList.add('show');
+        ccur.classList.remove('show', 'press');
+      }
       api.start = function () {
         running = true;
         (function loop() {
           if (!running) return;
           resetChoose();
-          ccur.classList.add('show');
+          // 1) сетка каталога появляется по одной плитке + курсор «просматривает»
+          cats.forEach(function (c, i) { t(function () { c.classList.add('in'); }, 220 + i * 90); });
+          t(function () { ccur.classList.add('show'); if (cats[2]) curTo(ccur, cats[2], 420, 0.5, 0.5); }, 560);
+          t(function () { if (cats[6]) curTo(ccur, cats[6], 620, 0.5, 0.5); }, 1350);
+          // 2) сетка уходит на задний план, выезжают две карточки
+          t(function () { if (cGrid) cGrid.classList.add('recede'); if (csBox) csBox.classList.add('in'); }, 2100);
+          // 3) курсор добавляет каждую карточку в корзину
           var added = 0;
-          chCards.forEach(function (cardEl, ci) {
-            var nx = cardEl.querySelector('.fw-ch-arrow.next'), btn = cardEl.querySelector('.fw-ch-btn');
-            var base = 600 + ci * CARD_MS;
-            // курсор бьёт по стрелке «вперёд» и листает фотокарточки (2 клика: фото 2 и 3)
-            [0, 1].forEach(function (_, kk) {
-              var at0 = base + kk * 920;
-              t(function () { curTo(ccur, nx, 520, 0.5, 0.5); }, at0);
-              t(function () { ccur.classList.add('press'); }, at0 + 560);
-              t(function () { ccur.classList.remove('press'); cardEl.__show(idxMap[ci] + 1); }, at0 + 700);
-            });
-            // курсор на кнопку → в корзину
-            t(function () { curTo(ccur, btn, 500, 0.5, 0.5); }, base + 2200);
-            t(function () { ccur.classList.add('press'); }, base + 2680);
-            t(function () { ccur.classList.remove('press'); cardEl.classList.add('added'); btnDone(btn); added++; if (chCnt) chCnt.textContent = String(added); }, base + 2840);
+          csCards.forEach(function (card, ci) {
+            var btn = card.querySelector('.fw-cs-btn');
+            var at = 2900 + ci * 1250;
+            t(function () { curTo(ccur, btn, 560, 0.5, 0.5); }, at);
+            t(function () { ccur.classList.add('press'); }, at + 600);
+            t(function () { ccur.classList.remove('press'); card.classList.add('added'); btnDone(btn); added++; if (chCnt) chCnt.textContent = String(added); }, at + 760);
           });
-          var end = 600 + chCards.length * CARD_MS;
-          // обе в корзине → появляется кликабельная плашка «перейти к заявке»
-          t(function () { ccur.classList.remove('show'); if (chNext) chNext.classList.add('show'); }, end + 250);
-          t(loop, end + 3800);
+          // 4) обе в корзине → плашка «к заявке»
+          var end = 2900 + csCards.length * 1250;
+          t(function () { ccur.classList.remove('show'); if (chNext) chNext.classList.add('show'); }, end + 350);
+          t(loop, end + 4000);
         })();
       };
-      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; resetChoose(); };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; finalState(); };
     }
 
     if (kind === 'quote') {

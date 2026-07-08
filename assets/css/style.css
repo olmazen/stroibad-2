@@ -1497,3 +1497,59 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .dcard:hover .dcard-go{gap:12px}
 @media(max-width:900px){.dirs2{grid-template-columns:1fr;gap:12px}.dcard{aspect-ratio:4/5}.dcard-bp .bp-fence{width:min(66%,300px)}}
 @media(max-width:520px){.dcard{aspect-ratio:3/4}}
+/* блок «Преимущества» компактнее: статы = тонкая полоса, преимущества плотнее — меньше монотонных прямоугольников */
+.stats{grid-template-columns:repeat(4,1fr)!important;gap:0;background:transparent;margin-top:24px}
+.stat{padding:16px 20px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:none}
+.stat b{font-size:clamp(26px,3.2vw,36px)}
+.stat span{font-size:12px;color:var(--steel)}
+.why{padding-top:clamp(54px,6vh,86px);padding-bottom:clamp(54px,6vh,86px)}
+@media(max-width:600px){
+  .why-grid{grid-template-columns:repeat(2,1fr)!important}
+  .why-card{padding:17px 15px}
+  .why-card .n{margin-bottom:9px;font-size:12px}
+  .why-card h3{font-size:15px;margin-bottom:6px;line-height:1.1}
+  .why-card p{font-size:12.5px;line-height:1.4}
+  .stats{grid-template-columns:repeat(2,1fr)!important;margin-top:18px}
+  .stat{padding:14px 16px}
+  .stat:nth-child(odd){border-right:1px solid var(--line)}
+  .stat:nth-child(even){border-right:none}
+  .stat:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .stat b{font-size:26px}
+  .stat span{font-size:11px}
+}
+/* ── сцена «Выбор изделий» v2: сетка каталога → 2 карточки → в корзину ── */
+.fw-choose2{position:relative;min-height:322px;padding:2px}
+.fw-catgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;transition:opacity .55s ease,filter .55s ease,transform .55s ease}
+.fw-catgrid.recede{opacity:.2;filter:blur(3px) grayscale(.35);transform:scale(.975)}
+.fw-cat{aspect-ratio:1/1;background:#0f1319;border:1px solid var(--line);border-radius:2px;overflow:hidden;opacity:0;transform:translateY(15px) scale(.93);transition:opacity .5s ease,transform .55s cubic-bezier(.2,.85,.25,1)}
+.fw-cat.in{opacity:1;transform:none}
+.fw-cat img{width:100%;height:100%;object-fit:cover;display:block}
+.fw-cs-cards{position:absolute;left:0;right:0;top:50%;transform:translateY(calc(-50% + 22px));display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:600px;margin:0 auto;opacity:0;pointer-events:none;transition:opacity .55s ease .05s,transform .6s cubic-bezier(.2,.85,.25,1) .05s}
+.fw-cs-cards.in{opacity:1;transform:translateY(-50%);pointer-events:auto}
+.fw-cs-card{position:relative;background:var(--srf);border:1px solid var(--line);border-radius:3px;padding:13px 13px 15px;box-shadow:0 26px 60px rgba(0,0,0,.5)}
+.fw-cs-card::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;background:var(--amber);transform:scaleY(0);transform-origin:top;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.fw-cs-card.art::after{background:#c9a45f}
+.fw-cs-card.added::after{transform:scaleY(1)}
+.fw-cs-badge{display:inline-block;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:10.5px;padding:4px 9px;border-radius:2px;background:var(--amber);color:#fff;margin-bottom:11px}
+.fw-cs-card.art .fw-cs-badge{background:#c9a45f;color:#1a1206}
+.fw-cs-ph{aspect-ratio:4/3;background:#eceef0;border-radius:2px;overflow:hidden;margin-bottom:11px}
+.fw-cs-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.fw-cs-info b{display:block;font-family:'Oswald',sans-serif;font-size:15.5px;color:#fff;line-height:1.15}
+.fw-cs-info em{font-style:normal;color:var(--amber);font-size:14px;font-weight:600}
+.fw-cs-card.art .fw-cs-info em{color:#d8b979}
+.fw-cs-btn{margin-top:12px;width:100%;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:12px;padding:10px;background:transparent;border:1px solid var(--line-2);border-radius:2px;color:var(--tx2);cursor:pointer;transition:background .25s,border-color .25s,color .25s}
+.fw-cs-btn>span{color:var(--amber);font-weight:700}
+.fw-cs-btn.done{background:var(--amber);border-color:var(--amber);color:#fff}
+.fw-cs-card.art .fw-cs-btn.done{background:#c9a45f;border-color:#c9a45f;color:#1a1206}
+@media(max-width:900px){
+  .fw-choose2{min-height:300px}
+  .fw-catgrid{gap:6px}
+  .fw-cs-cards{gap:9px;max-width:none;transform:translateY(calc(-50% + 16px))}
+  .fw-cs-card{padding:8px 8px 10px;box-shadow:0 14px 34px rgba(0,0,0,.46)}
+  .fw-cs-badge{font-size:9.5px;margin-bottom:8px;padding:3px 7px}
+  .fw-cs-ph{aspect-ratio:1/1;margin-bottom:8px}
+  .fw-cs-info b{font-size:12.5px}
+  .fw-cs-info em{font-size:12px}
+  .fw-cs-btn{font-size:10.5px;padding:8px;margin-top:9px}
+}
