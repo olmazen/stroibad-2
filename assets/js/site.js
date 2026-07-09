@@ -271,6 +271,17 @@ window.__whenVisible = (function () {
   els.forEach(function (e) {
     window.__whenVisible(e, function (el) { el.classList.add('in'); });
   });
+  // страховка от «пустых карточек»: на слабых устройствах появление может застрять, и сквозь
+  // невидимую карточку проступает blueprint-фон. Принудительно показываем всё, что уже в зоне
+  // видимости (и выше), через 2с и 5с — контент никогда не остаётся невидимым.
+  function revealVisible(){
+    var vh = innerHeight;
+    document.querySelectorAll('.reveal:not(.in)').forEach(function (el){
+      if (el.getBoundingClientRect().top < vh) el.classList.add('in');
+    });
+  }
+  setTimeout(revealVisible, 2000);
+  setTimeout(revealVisible, 5000);
 })();
 
 /* ── анимированные счётчики ── */
@@ -1326,6 +1337,7 @@ window.__whenVisible = (function () {
   // Плавная инерция (lerp) — колесо мягко, «по-масляному» догоняет цель. Без пружины и доводки.
   function frame() {
     raf = null;
+    if (liteOff) return;                          /* lite: колесо заморожено в статик */
     if (reduced) { theta = targetTheta; vel = 0; apply(); return; }
     var disp = targetTheta - theta;
     theta += disp * 0.12;
@@ -1630,6 +1642,7 @@ window.__whenVisible = (function () {
   var playingScene = -1;
   var inView = false;   // колесо реально закреплено во вьюпорте (иначе демо/авто-переход НЕ запускаем — иначе страница уедет с hero)
   function updateScene() {
+    if (liteOff) return;                          /* lite: демо-сцены шагов выключены */
     var want = (sticky.classList.contains('settle') && inView) ? active : -1;
     if (want === playingScene) return;
     if (playingScene >= 0 && sceneOf[playingScene]) sceneOf[playingScene].stop();
@@ -1645,6 +1658,7 @@ window.__whenVisible = (function () {
   }
   var snapT = null, snapping = false;
   function onScroll() {
+    if (liteOff) return;                          /* lite: скролл-драйвер колеса выключен */
     var r = track.getBoundingClientRect();
     var total = track.offsetHeight - H;
     var p = total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
@@ -1700,6 +1714,31 @@ window.__whenVisible = (function () {
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', layout);
   layout(); onScroll();
+
+  /* ── lite-режим (слабое устройство): замораживаем колесо в статичный читаемый список.
+        Срабатывает ТОЛЬКО по событию от lite-движка → мощные телефоны/ПК не затрагиваются. ── */
+  var liteOff = false;
+  function goStatic() {
+    if (liteOff) return;
+    liteOff = true;
+    try {
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+      if (playingScene >= 0 && sceneOf[playingScene]) sceneOf[playingScene].stop();
+      if (track) track.style.height = '';
+      if (sticky) { sticky.style.height = ''; sticky.style.removeProperty('--th'); }
+      steps.forEach(function (s) {
+        s.removeAttribute('style'); s.classList.add('on');
+        s.style.setProperty('opacity', '1', 'important');
+        s.style.setProperty('transform', 'none', 'important');
+        s.style.setProperty('position', 'static', 'important');
+        s.style.setProperty('transition', 'none', 'important');
+      });
+      cards.forEach(function (c) { c.removeAttribute('style'); });
+      host.classList.add('fw-lite');
+    } catch (e) {}
+  }
+  document.addEventListener('egoe:lite', goStatic);
+  if (document.documentElement.hasAttribute('data-lite')) goStatic();
 })();
 
 
@@ -1836,6 +1875,36 @@ window.__whenVisible = (function () {
     });
   }
 
+  /* Джанк ИМЕННО на скролле — главный признак «телефон не тянет» (idle-проба его не ловит).
+     Меряем время кадра во время активной прокрутки; 2 тяжёлых берста подряд
+     (>40% кадров ниже 30fps на ≥15 кадрах) → lite. Мощный телефон скроллит гладко → не сработает. */
+  function scrollJankWatch(){
+    var lastScroll = 0, watching = false, last = 0, jank = 0, total = 0, badBursts = 0;
+    addEventListener('scroll', function (){
+      lastScroll = performance.now();
+      if (!watching && !STATE && !optedOut() && !perfLocked && document.visibilityState === 'visible'){
+        watching = true; last = lastScroll; requestAnimationFrame(tick);
+      }
+    }, { passive: true });
+    function tick(now){
+      if (STATE || optedOut() || perfLocked){ watching = false; return; }
+      var dt = now - last; last = now;
+      if ((now - lastScroll) < 180 && dt > 0 && dt < 400){    /* только во время активного скролла */
+        total++; if (dt > 33) jank++;
+      }
+      if (now - lastScroll > 500){                            /* скролл-берст закончился */
+        watching = false;
+        if (total >= 15){
+          if (jank / total > 0.4) badBursts++; else badBursts = 0;
+          if (badBursts >= 2) enterLite('perf');
+        }
+        jank = total = 0;
+        return;
+      }
+      requestAnimationFrame(tick);
+    }
+  }
+
   /* ── вход/выход. Все упрощения делает CSS через [data-lite] — JS их не трогает,
         поэтому выход чисто восстанавливает полную версию. ── */
   function enterLite(reason){
@@ -1843,6 +1912,7 @@ window.__whenVisible = (function () {
     STATE = reason;
     if (reason === 'net') netCooldownUntil = performance.now() + 60000;
     doc.setAttribute('data-lite', reason);
+    try { document.dispatchEvent(new CustomEvent('egoe:lite', { detail: { reason: reason } })); } catch (e) {}
     showBar(reason);
   }
   function exitLite(manual){
@@ -1909,6 +1979,7 @@ window.__whenVisible = (function () {
   /* ── старт: сперва проверка сети, затем FPS после «устаканивания» страницы ── */
   function boot(){
     if (optedOut()) return;
+    scrollJankWatch();                                                  /* ловим лаги на скролле — главный сигнал */
     var f = fastNetSignal();
     if (f === 'weak'){ enterLite('net'); return; }
     if (f === null && bufferNetWeak()){ enterLite('net'); return; }     /* iOS/3g: замер по загрузке */

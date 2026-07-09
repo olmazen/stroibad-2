@@ -1859,3 +1859,13 @@ html[data-lite] .reveal{opacity:1!important;transform:none!important}
   background:rgba(15,18,23,.98);border:1px solid var(--line-2);border-radius:8px;padding:10px 16px;
   font-size:13px;color:var(--tx);opacity:0;transition:opacity .35s,transform .35s;max-width:90vw;text-align:center}
 .lite-toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* колесо заказа → статичный читаемый список (класс ставит JS при lite) */
+#flowWheel.fw-lite .fw-arc,#flowWheel.fw-lite .fw-cards,#flowWheel.fw-lite .fw-marker,#flowWheel.fw-lite .fw-ghost,#flowWheel.fw-lite .fw-sheets{display:none!important}
+#flowWheel.fw-lite .fw-sticky{position:static!important;height:auto!important;display:block;padding:0}
+#flowWheel.fw-lite .fw-track{height:auto!important;min-height:0!important}
+#flowWheel.fw-lite .fw-body{position:static!important;height:auto!important}
+#flowWheel.fw-lite .fw-step{position:static!important;opacity:1!important;transform:none!important;filter:none!important;display:block!important;visibility:visible!important;margin:0 0 26px;pointer-events:auto}
+#flowWheel.fw-lite .fw-head{position:static!important;transform:none!important}
+/* портфолио на слабых: пропускаем отрисовку/декод вне экрана */
+html[data-lite] .pf-ph{content-visibility:auto;contain-intrinsic-size:auto 420px}
