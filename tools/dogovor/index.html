@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Конструктор договоров поставки · EGOE / Фабрика САМШИТ</title>
+<style>
+:root{--bg:#0f1216;--pnl:#161b22;--pnl2:#1c232c;--line:#2a323d;--ink:#e8edf2;--mut:#93a1b0;--amber:#f26f1d;--ok:#39c07a}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:14px;line-height:1.5}
+.app{display:grid;grid-template-columns:minmax(340px,420px) 1fr;min-height:100vh}
+/* ---------- LEFT CONTROLS ---------- */
+.side{background:var(--pnl);border-right:1px solid var(--line);padding:18px 18px 60px;overflow-y:auto;max-height:100vh;position:sticky;top:0}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.brand .m{width:26px;height:26px;background:var(--amber);border-radius:5px;display:grid;place-items:center;color:#fff;font-weight:800}
+.brand b{font-size:15px;letter-spacing:.02em}
+.sub{color:var(--mut);font-size:12px;margin:0 0 16px}
+.grp{border:1px solid var(--line);border-radius:9px;margin-bottom:12px;overflow:hidden;background:var(--pnl2)}
+.grp>summary{cursor:pointer;padding:11px 14px;font-weight:600;font-size:13px;list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.grp>summary::-webkit-details-marker{display:none}
+.grp>summary::after{content:"▾";color:var(--mut);transition:.2s}
+.grp[open]>summary::after{transform:rotate(180deg)}
+.grp .body{padding:4px 14px 14px}
+label.f{display:block;margin:9px 0 3px;font-size:11.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+input,textarea,select{width:100%;background:#0e1217;border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:8px 10px;font:inherit;font-size:13px}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--amber)}
+textarea{resize:vertical;min-height:44px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.hint{font-size:11px;color:var(--mut);margin:6px 0 0}
+.seller{font-size:12px;color:var(--mut);line-height:1.55}
+.seller b{color:var(--ink)}
+/* nomenclature picker */
+.pickbar{display:flex;gap:6px;margin:2px 0 10px;flex-wrap:wrap}
+.chip{font-size:12px;border:1px solid var(--line);background:#0e1217;color:var(--mut);border-radius:20px;padding:5px 11px;cursor:pointer}
+.chip.on{background:var(--amber);border-color:var(--amber);color:#fff}
+.cat{display:grid;gap:7px;max-height:340px;overflow-y:auto;padding-right:4px}
+.item{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#0e1217;cursor:pointer}
+.item.sel{border-color:var(--amber)}
+.item img{width:34px;height:34px;object-fit:cover;border-radius:5px;background:#222}
+.item .nm{font-size:12.5px;font-weight:600}
+.item .cd{font-size:11px;color:var(--mut)}
+.item .pr{font-size:11.5px;color:var(--mut);white-space:nowrap}
+.selrow{border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:7px;background:#0e1217}
+.selrow .top{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:6px}
+.selrow .top b{font-size:12.5px}
+.selrow .x{cursor:pointer;color:var(--mut);border:none;background:none;font-size:15px}
+.selrow .g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.selrow label.f{margin:0 0 2px}
+.mini{font-size:11px}
+.addcustom{width:100%;border:1px dashed var(--line);background:none;color:var(--mut);border-radius:8px;padding:9px;cursor:pointer;font:inherit}
+.actions{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--pnl) 30%);padding:14px 0 0;margin-top:8px;display:flex;gap:8px}
+.btn{flex:1;border:none;border-radius:8px;padding:11px;font:inherit;font-weight:700;cursor:pointer}
+.btn.pri{background:var(--amber);color:#fff}
+.btn.sec{background:#26303b;color:var(--ink)}
+.total-pill{background:#0e1217;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.total-pill b{font-size:16px}
+.total-pill small{color:var(--mut)}
+/* ---------- RIGHT: DOCUMENT ---------- */
+.stage{padding:26px;overflow-y:auto;max-height:100vh;background:#20262e}
+.paper{background:#fff;color:#111;width:210mm;max-width:100%;margin:0 auto 20px;padding:18mm 16mm;box-shadow:0 10px 40px rgba(0,0,0,.4);font-family:'Times New Roman',Georgia,serif;font-size:12.2px;line-height:1.42}
+.paper h1{font-size:15px;text-align:center;margin:0 0 2px}
+.paper h2{font-size:13px;margin:15px 0 5px}
+.paper .meta{display:flex;justify-content:space-between;font-size:12px;margin:6px 0 14px}
+.paper p{margin:5px 0;text-align:justify}
+.paper .cl{margin:4px 0;text-align:justify}
+.paper .cl b{font-weight:bold}
+.paper .req{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #333;margin-top:8px;font-size:11.4px}
+.paper .req>div{padding:7px 9px;border-bottom:1px solid #ccc}
+.paper .req>div:nth-child(2n){border-left:1px solid #ccc}
+.paper .req h3{font-size:12px;margin:0 0 4px}
+.paper table.spec{width:100%;border-collapse:collapse;margin-top:8px;font-size:11px}
+.paper table.spec th,.paper table.spec td{border:1px solid #444;padding:5px 6px;vertical-align:top}
+.paper table.spec th{background:#eee;text-align:center;font-size:10.5px}
+.paper table.spec td.c{text-align:center}
+.paper table.spec td.r{text-align:right;white-space:nowrap}
+.paper table.spec img{width:78px;height:58px;object-fit:cover;display:block;margin:auto;border:1px solid #ccc}
+.paper .tot{font-weight:bold;background:#f4f4f4}
+.paper .sign{display:flex;justify-content:space-between;margin-top:26px;font-size:11.6px}
+.paper .sign .col{width:46%}
+.paper .sign .ln{margin-top:26px;border-top:1px solid #333;padding-top:3px;font-size:10.5px;color:#333}
+.pgbreak{page-break-before:always}
+.wm{position:fixed;right:26px;top:16px;font-size:11px;color:var(--mut)}
+@media(max-width:1000px){.app{grid-template-columns:1fr}.side{position:static;max-height:none}.stage{max-height:none}}
+@media print{
+  body{background:#fff}
+  .side,.actions,.wm{display:none!important}
+  .app{display:block}
+  .stage{padding:0;max-height:none;overflow:visible;background:#fff}
+  .paper{box-shadow:none;margin:0;width:auto;padding:12mm 14mm}
+  .paper+.paper{page-break-before:always}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ============ CONTROLS ============ -->
+  <aside class="side">
+    <div class="brand"><span class="m">E</span><b>Конструктор договоров</b></div>
+    <p class="sub">Договор поставки · ООО «Фабрика «САМШИТ» → покупатель. Заполните — документ соберётся справа, печать → «Сохранить как PDF».</p>
+
+    <details class="grp" open><summary>Реквизиты договора</summary><div class="body">
+      <div class="row"><div><label class="f">Договор №</label><input id="dNo" value="103.039"></div><div><label class="f">Дата</label><input id="dDate" type="date"></div></div>
+      <label class="f">Город</label><input id="dCity" value="г. Балаково">
+      <label class="f">НДС</label>
+      <select id="dVat">
+        <option value="usn">НДС не облагается (УСН)</option>
+        <option value="vat20">В том числе НДС 20%</option>
+      </select>
+    </div></details>
+
+    <details class="grp" open><summary>Покупатель</summary><div class="body">
+      <label class="f">Наименование</label><input id="bName" placeholder="ООО СЗ «Вымпел»">
+      <label class="f">В лице (должность, ФИО)</label><input id="bSign" placeholder="генерального директора Барышевой М. В.">
+      <label class="f">Действует на основании</label><input id="bBasis" value="Устава">
+      <div class="row"><div><label class="f">ИНН</label><input id="bInn"></div><div><label class="f">КПП</label><input id="bKpp"></div></div>
+      <label class="f">ОГРН</label><input id="bOgrn">
+      <label class="f">Юридический адрес</label><textarea id="bAddr"></textarea>
+      <label class="f">Р/с</label><input id="bRs">
+      <label class="f">Банк</label><input id="bBank">
+      <div class="row"><div><label class="f">К/с</label><input id="bKs"></div><div><label class="f">БИК</label><input id="bBik"></div></div>
+    </div></details>
+
+    <details class="grp" open><summary>Номенклатура (корзины)</summary><div class="body">
+      <div class="pickbar">
+        <span class="chip on" data-flt="all">Все</span>
+        <span class="chip" data-flt="Стандарт">Стандарт</span>
+        <span class="chip" data-flt="Art Déco">Art Déco</span>
+      </div>
+      <div class="cat" id="cat"></div>
+      <div style="margin-top:10px" id="selWrap"></div>
+      <button class="addcustom" id="addCustom">+ Добавить свою позицию</button>
+    </div></details>
+
+    <details class="grp"><summary>Условия (предзаполнено)</summary><div class="body">
+      <label class="f">Срок поставки, рабочих дней</label><input id="cTerm" value="45">
+      <label class="f">Аванс, %</label><input id="cAdv" value="70">
+      <p class="hint">Гарантия: ЛКМ дерева — 12 мес · покрытие металла — 36 мес · конструкция — 60 мес.</p>
+      <label class="f">Гарантия · дерево (ЛКМ), мес</label><input id="wWood" value="12">
+      <label class="f">Гарантия · покрытие металла, мес</label><input id="wPaint" value="36">
+      <label class="f">Гарантия · конструкция, мес</label><input id="wConstr" value="60">
+    </div></details>
+
+    <details class="grp"><summary>Поставщик (фикс.)</summary><div class="body">
+      <p class="seller"><b>ООО «Фабрика «САМШИТ»</b><br>ИНН 6439086125 · КПП 643901001<br>ОГРН 1146439002863<br>413801, Саратовская обл., Балаковский р-н, с. Натальино, тупик Безымянный, д. 1<br>Р/с 40702810600000008505<br>АО «Банк «Агророс», г. Саратов<br>К/с 30101810600000000772 · БИК 046311772<br>Директор Рафиков Ринат Мубинович<br>тел. 8 (8453) 655-777 · samshitbalakovo@mail.ru</p>
+    </div></details>
+
+    <div class="total-pill"><small>Сумма договора</small><b id="pillTotal">0 ₽</b></div>
+    <div class="actions">
+      <button class="btn sec" id="btnReset">Очистить</button>
+      <button class="btn pri" id="btnPrint">Печать / PDF</button>
+    </div>
+  </aside>
+
+  <!-- ============ DOCUMENT ============ -->
+  <main class="stage">
+    <span class="wm">предпросмотр · A4</span>
+    <div class="paper" id="pageContract"></div>
+    <div class="paper pgbreak" id="pageSpec"></div>
+    <div class="paper pgbreak" id="pageWarranty"></div>
+  </main>
+</div>
+
+<script>
+const CATALOG = [{"code":"STN01","name":"Ромб","series":"Стандарт","priceFrom":7500,"img":"../../assets/img/korziny/standart/STN01-romb/white.webp"},{"code":"STN02","name":"Решётка","series":"Стандарт","priceFrom":7500,"img":"../../assets/img/korziny/standart/STN02-reshetka/white.webp"},{"code":"STN03","name":"Треугольник","series":"Стандарт","priceFrom":7500,"img":"../../assets/img/korziny/standart/STN03-treugolnik/white.webp"},{"code":"STN04","name":"Звезда","series":"Стандарт","priceFrom":7500,"img":"../../assets/img/korziny/standart/STN04-zvezda/white.webp"},{"code":"STN05","name":"Кирпич","series":"Стандарт","priceFrom":7500,"img":"../../assets/img/korziny/standart/STN05-kirpich/white.webp"},{"code":"STN06","name":"Пальма","series":"Стандарт","priceFrom":7500,"img":"../../assets/img/korziny/standart/STN06-palma/white.webp"},{"code":"STN07","name":"Сафари","series":"Стандарт","priceFrom":7500,"img":"../../assets/img/korziny/standart/STN07-safari/white.webp"},{"code":"STN08","name":"Лепесток","series":"Стандарт","priceFrom":7500,"img":"../../assets/img/korziny/standart/STN08-lepestok/white.webp"},{"code":"STN09","name":"Органика","series":"Стандарт","priceFrom":7500,"img":"../../assets/img/korziny/standart/STN09-organika/white.webp"},{"code":"STN10","name":"Симметрия","series":"Стандарт","priceFrom":7500,"img":"../../assets/img/korziny/standart/STN10-simmetriya/white.webp"},{"code":"ART06","name":"Новация","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART06-novaciya/white.webp"},{"code":"ART07","name":"Астра","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART07-astra/white.webp"},{"code":"ART08","name":"Динамика","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART08-dinamika/white.webp"},{"code":"ART09","name":"Резонанс","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART09-rezonans/white.webp"},{"code":"ART10","name":"Флексибл","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART10-fleksibl/white.webp"},{"code":"ART11","name":"Сёркил","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART11-serkil/white.webp"},{"code":"ART12","name":"Арабика","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART12-arabika/white.webp"},{"code":"ART13","name":"Лиаф","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART13-liaf/white.webp"},{"code":"ART14","name":"Волнение","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART14-volnenie/white.webp"},{"code":"ART15","name":"Берёза","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART15-bereza/white.webp"},{"code":"ART16","name":"Ампир","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART16-ampir/white.webp"},{"code":"ART17","name":"Модерн","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART17-modern/white.webp"},{"code":"ART18","name":"Ампир 2","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART18-ampir-2/white.webp"},{"code":"ART19","name":"Рококо","series":"Art Déco","priceFrom":10790,"img":"../../assets/img/korziny/art-deco/ART19-rokoko/white.webp"}];
+
+// ---------- state ----------
+// lines: {id, kind:'cat'|'custom', code, name, img, desc, size, ral, qty, price}
+let lines = [];
+let uid = 1;
+
+// ---------- number → words (рубли) ----------
+function rubToWords(n){
+  n = Math.round(n);
+  const rub = Math.floor(n), kop = Math.round((n-rub)*100);
+  if(rub===0) return 'ноль рублей '+String(kop).padStart(2,'0')+' копеек';
+  const ones=['','один','два','три','четыре','пять','шесть','семь','восемь','девять','десять','одиннадцать','двенадцать','тринадцать','четырнадцать','пятнадцать','шестнадцать','семнадцать','восемнадцать','девятнадцать'];
+  const onesF=['','одна','две','три','четыре','пять','шесть','семь','восемь','девять','десять','одиннадцать','двенадцать','тринадцать','четырнадцать','пятнадцать','шестнадцать','семнадцать','восемнадцать','девятнадцать'];
+  const tens=['','','двадцать','тридцать','сорок','пятьдесят','шестьдесят','семьдесят','восемьдесят','девяносто'];
+  const huns=['','сто','двести','триста','четыреста','пятьсот','шестьсот','семьсот','восемьсот','девятьсот'];
+  function triple(num,fem){
+    let s=[], h=Math.floor(num/100), t=Math.floor((num%100)/10), o=num%10;
+    if(h) s.push(huns[h]);
+    if(t>1){ s.push(tens[t]); if(o) s.push((fem?onesF:ones)[o]); }
+    else if(t===1) s.push(ones[10+o]);
+    else if(o) s.push((fem?onesF:ones)[o]);
+    return s.join(' ');
+  }
+  function plural(num,f){ const n1=num%10,n2=num%100; if(n2>=11&&n2<=14)return f[2]; if(n1===1)return f[0]; if(n1>=2&&n1<=4)return f[1]; return f[2]; }
+  const mil=Math.floor(rub/1e6), th=Math.floor((rub%1e6)/1000), r=rub%1000;
+  let parts=[];
+  if(mil) parts.push(triple(mil,false)+' '+plural(mil,['миллион','миллиона','миллионов']));
+  if(th) parts.push(triple(th,true)+' '+plural(th,['тысяча','тысячи','тысяч']));
+  if(r||(!mil&&!th)) parts.push(triple(r,false));
+  let words=parts.join(' ').replace(/\s+/g,' ').trim();
+  words=words.charAt(0).toUpperCase()+words.slice(1);
+  return words+' '+plural(rub,['рубль','рубля','рублей'])+' '+String(kop).padStart(2,'0')+' копеек';
+}
+const fmt = n => n.toLocaleString('ru-RU');
+
+// ---------- render picker ----------
+const catEl = document.getElementById('cat');
+let flt='all';
+function renderCat(){
+  catEl.innerHTML='';
+  CATALOG.filter(m=>flt==='all'||m.series===flt).forEach(m=>{
+    const sel = lines.some(l=>l.kind==='cat'&&l.code===m.code);
+    const d=document.createElement('div'); d.className='item'+(sel?' sel':'');
+    d.innerHTML='<img src="'+m.img+'" alt=""><div><div class="nm">'+m.name+'</div><div class="cd">'+m.code+' · '+m.series+'</div></div><div class="pr">от '+fmt(m.priceFrom)+' ₽</div>';
+    d.onclick=()=>{ toggleCat(m); };
+    catEl.appendChild(d);
+  });
+}
+function toggleCat(m){
+  const i = lines.findIndex(l=>l.kind==='cat'&&l.code===m.code);
+  if(i>=0) lines.splice(i,1);
+  else lines.push({id:uid++,kind:'cat',code:m.code,name:m.name,img:m.img,series:m.series,
+    desc:'Корзина для внешнего блока кондиционера «'+m.name+'» ('+m.code+'), серия '+m.series,
+    size:'700×1000×600', ral:'RAL 7016', qty:1, price:m.priceFrom});
+  renderCat(); renderSel(); renderDoc();
+}
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');flt=c.dataset.flt;renderCat();});
+
+// ---------- selected rows editor ----------
+const selWrap=document.getElementById('selWrap');
+function renderSel(){
+  selWrap.innerHTML='';
+  if(!lines.length){ selWrap.innerHTML='<p class="hint">Позиции не выбраны — отметьте модели выше или добавьте свою.</p>'; return; }
+  lines.forEach(l=>{
+    const r=document.createElement('div'); r.className='selrow';
+    r.innerHTML='<div class="top"><b>'+(l.kind==='cat'?l.code+' · '+l.name:'Своя позиция')+'</b><button class="x" title="Удалить">×</button></div>'+
+      (l.kind==='custom'?'<label class="f">Наименование</label><textarea class="mini" data-k="desc">'+(l.desc||'')+'</textarea>':'')+
+      '<div class="g">'+
+        '<div><label class="f">Размер В×Ш×Г</label><input class="mini" data-k="size" value="'+(l.size||'')+'"></div>'+
+        '<div><label class="f">Цвет / RAL</label><input class="mini" data-k="ral" value="'+(l.ral||'')+'"></div>'+
+        '<div><label class="f">Кол-во</label><input class="mini" data-k="qty" type="number" min="1" value="'+l.qty+'"></div>'+
+      '</div>'+
+      '<div class="g" style="margin-top:6px"><div><label class="f">Цена ₽/шт</label><input class="mini" data-k="price" type="number" value="'+l.price+'"></div>'+
+        '<div style="grid-column:span 2"><label class="f">Стоимость</label><input class="mini" value="'+fmt(l.qty*l.price)+' ₽" disabled></div></div>';
+    r.querySelector('.x').onclick=()=>{ lines=lines.filter(x=>x.id!==l.id); renderCat(); renderSel(); renderDoc(); };
+    r.querySelectorAll('[data-k]').forEach(inp=>{
+      inp.oninput=()=>{ const k=inp.dataset.k; l[k]=(k==='qty'||k==='price')?(+inp.value||0):inp.value; renderDoc(); if(k==='qty'||k==='price') renderSel(); };
+    });
+    selWrap.appendChild(r);
+  });
+}
+document.getElementById('addCustom').onclick=()=>{ lines.push({id:uid++,kind:'custom',desc:'Изделие по чертежам заказчика',size:'',ral:'RAL 7016',qty:1,price:0}); renderSel(); renderDoc(); };
+
+// ---------- gather inputs ----------
+const $=id=>document.getElementById(id);
+const F=['dNo','dDate','dCity','dVat','bName','bSign','bBasis','bInn','bKpp','bOgrn','bAddr','bRs','bBank','bKs','bBik','cTerm','cAdv','wWood','wPaint','wConstr'];
+F.forEach(id=>{ const e=$(id); if(e) e.addEventListener('input',renderDoc); });
+
+function ruDate(v){ if(!v) return '«___» __________ 20__ г.'; const [y,m,d]=v.split('-'); const mn=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']; return '«'+d+'» '+mn[+m-1]+' '+y+' г.'; }
+function or(v,ph){ return (v&&v.trim())?v:'<span style="color:#b00">'+ph+'</span>'; }
+
+// ---------- build document ----------
+function renderDoc(){
+  const total = lines.reduce((s,l)=>s+l.qty*l.price,0);
+  $('pillTotal').textContent=fmt(total)+' ₽';
+  const vat = $('dVat').value==='vat20';
+  const vatPhrase = vat ? 'в том числе НДС 20%' : 'НДС не облагается в связи с применением Поставщиком упрощённой системы налогообложения';
+  const adv = Math.min(100,Math.max(0,+$('cAdv').value||0));
+  const advSum = Math.round(total*adv/100), restSum = total-advSum;
+  const term=$('cTerm').value||'45';
+  const wWood=$('wWood').value||'12', wPaint=$('wPaint').value||'36', wConstr=$('wConstr').value||'60';
+
+  // ---- CONTRACT ----
+  $('pageContract').innerHTML = `
+    <h1>ДОГОВОР ПОСТАВКИ № ${or($('dNo').value,'____')}</h1>
+    <div class="meta"><span>${$('dCity').value||'г. Балаково'}</span><span>${ruDate($('dDate').value)}</span></div>
+    <p><b>Общество с ограниченной ответственностью «Фабрика «САМШИТ»</b>, именуемое в дальнейшем «Поставщик», в лице директора Рафикова Рината Мубиновича, действующего на основании Устава, с одной стороны, и <b>${or($('bName').value,'Наименование покупателя')}</b>, именуемое в дальнейшем «Покупатель», в лице ${or($('bSign').value,'должность, ФИО')}, действующего на основании ${$('bBasis').value||'Устава'}, с другой стороны, заключили настоящий договор о нижеследующем:</p>
+    <h2>1. ПРЕДМЕТ ДОГОВОРА</h2>
+    <div class="cl">1.1. Поставщик обязуется изготовить и передать в собственность Покупателя, а Покупатель обязуется принять и оплатить Товар в ассортименте, количестве и по цене согласно спецификации (Приложение № 1), являющейся неотъемлемой частью настоящего договора.</div>
+    <div class="cl">1.2. В состав спецификации включены маркировки изделий по проектной документации объекта.</div>
+    <div class="cl">1.3. Условия доставки — на объект транспортом за счёт Покупателя. График отгрузки согласовывается сторонами; Поставщик может оказать услугу по организации доставки по соглашению сторон.</div>
+    <div class="cl">1.4. Право собственности на Товар переходит к Покупателю в момент передачи Товара на складе Поставщика и оформляется актом приёма-передачи.</div>
+    <div class="cl">1.5. Гарантийный срок исчисляется с момента передачи Товара и составляет: на лакокрасочное покрытие деревянных элементов — <b>${wWood} месяцев</b>; на защитно-декоративное (порошковое) покрытие металла — <b>${wPaint} месяцев</b>; на металлоконструкцию изделия (сварные соединения, несущая способность) — <b>${wConstr} месяцев</b>. Гарантия действительна при соблюдении Покупателем правил эксплуатации (Приложение № 2).</div>
+    <div class="cl">1.6. Претензии по качеству принимаются в период гарантийного срока по письменному заявлению Покупателя с приложением копии акта приёма-передачи и фотографий.</div>
+    <h2>2. ОБЯЗАННОСТИ ПОСТАВЩИКА</h2>
+    <div class="cl">2.1. Поставщик обязан передать Покупателю Товар на основании Спецификации (Приложение № 1) при условии исполнения Покупателем обязательств по п. 3, в срок до <b>${term} рабочих дней</b> с момента внесения последних изменений в техническое задание.</div>
+    <div class="cl">2.2. В течение срока действия договора Поставщик передаёт Товар партиями согласно условиям договора.</div>
+    <h2>3. ОБЯЗАННОСТИ ПОКУПАТЕЛЯ</h2>
+    <div class="cl">3.1. Оплатить Товар согласно п. 5.4 настоящего договора.</div>
+    <div class="cl">3.2. Выдать Поставщику полное техническое задание в течение 3 рабочих дней с момента подписания договора.</div>
+    <h2>4. УСЛОВИЯ ПОСТАВКИ И ПРИЁМКИ</h2>
+    <div class="cl">4.1. Поставка осуществляется партиями по спецификации; срок передачи каждой партии согласовывается сторонами.</div>
+    <div class="cl">4.2. Количество, ассортимент и цена окончательно согласовываются в Спецификации.</div>
+    <div class="cl">4.3. Претензии по количеству и качеству отмечаются в момент приёмки Товара на складе Поставщика.</div>
+    <h2>5. ЦЕНА ДОГОВОРА И ПОРЯДОК РАСЧЁТОВ</h2>
+    <div class="cl">5.1. Цена договора включает стоимость тары, упаковки, маркировки и составляет <b>${fmt(total)} (${rubToWords(total)})</b>, ${vatPhrase}.</div>
+    <div class="cl">5.2. Цена на Товар является фиксированной. 5.3. Расчёты производятся в российских рублях.</div>
+    <div class="cl">5.4. Оплата производится перечислением на расчётный счёт Поставщика в два этапа:</div>
+    <div class="cl">• авансовый платёж — <b>${fmt(advSum)} (${rubToWords(advSum)})</b> (${adv}%) в течение трёх рабочих дней с момента подписания договора;</div>
+    <div class="cl">• окончательный расчёт — <b>${fmt(restSum)} (${rubToWords(restSum)})</b> в течение трёх рабочих дней до отгрузки.</div>
+    <h2>6. ОТВЕТСТВЕННОСТЬ СТОРОН</h2>
+    <div class="cl">6.1. Ответственность сторон определяется законодательством РФ. При нарушении сроков оплаты (п. 5.4) Покупатель уплачивает неустойку 0,1% от суммы долга за каждый день просрочки, но не более 10% от стоимости заказа.</div>
+    <div class="cl">6.2. При нарушении сроков поставки (п. 2.1) Поставщик уплачивает неустойку 0,1% за каждый день просрочки, но не более 10% от стоимости заказа.</div>
+    <div class="cl">6.3. Поставщик не отвечает за качество при некачественном монтаже, небрежной эксплуатации, внешних воздействиях, ремонте неквалифицированным персоналом, самовольной переделке изделия и несоблюдении правил эксплуатации (Приложение № 2).</div>
+    <div class="cl">6.4. При обоснованной претензии по качеству Поставщик устраняет дефект в срок до 30 рабочих дней.</div>
+    <h2>7. РАЗРЕШЕНИЕ СПОРОВ</h2>
+    <div class="cl">7.1. Споры разрешаются переговорами; при недостижении согласия — в Арбитражном суде по месту нахождения Истца.</div>
+    <h2>8. ПРОЧИЕ УСЛОВИЯ</h2>
+    <div class="cl">8.1. Договор вступает в силу с момента подписания и действует до полного исполнения обязательств. 8.2. Изменения оформляются письменно. 8.3. Договор составлен в 2 экземплярах равной силы. 8.4. Стороны признают юридическую силу документов, переданных по электронной связи.</div>
+    <h2>9. ФОРС-МАЖОР</h2>
+    <div class="cl">9.1. При наступлении форс-мажорных обстоятельств стороны освобождаются от ответственности; сторона, ссылающаяся на форс-мажор, извещает другую в течение 10 рабочих дней.</div>
+    <h2>10. РЕКВИЗИТЫ И ПОДПИСИ СТОРОН</h2>
+    <div class="req">
+      <div><h3>ПОСТАВЩИК</h3>ООО «Фабрика «САМШИТ»<br>ИНН 6439086125 / КПП 643901001<br>ОГРН 1146439002863<br>413801, Саратовская обл., Балаковский р-н, с. Натальино, тупик Безымянный, д. 1<br>Р/с 40702810600000008505<br>АО «Банк «Агророс», г. Саратов<br>К/с 30101810600000000772<br>БИК 046311772<br>тел. 8 (8453) 655-777</div>
+      <div><h3>ПОКУПАТЕЛЬ</h3>${or($('bName').value,'Наименование')}<br>ИНН ${or($('bInn').value,'—')} / КПП ${$('bKpp').value||'—'}<br>ОГРН ${$('bOgrn').value||'—'}<br>${($('bAddr').value||'Юридический адрес').replace(/\n/g,'<br>')}<br>Р/с ${$('bRs').value||'—'}<br>${$('bBank').value||'Банк'}<br>К/с ${$('bKs').value||'—'}<br>БИК ${$('bBik').value||'—'}</div>
+    </div>
+    <div class="sign"><div class="col">Директор ______________ / Рафиков Р. М.<div class="ln">М.П.</div></div><div class="col">______________ / ${or($('bSign').value ? $('bSign').value.split(' ').slice(-2).join(' ') : '','Ф. И. О.')}<div class="ln">М.П.</div></div></div>
+  `;
+
+  // ---- SPEC (Приложение №1) ----
+  let rows='';
+  lines.forEach((l,i)=>{
+    rows+=`<tr>
+      <td class="c">${i+1}</td>
+      <td class="c">${l.img?'<img src="'+l.img+'" alt="">':'—'}</td>
+      <td>${l.kind==='cat'?('Корзина «'+l.name+'» ('+l.code+'), серия '+l.series):(l.desc||'Изделие по чертежам')}<br><span style="color:#555">Размер В×Ш×Г ${l.size||'—'} мм, покраска порошковая ${l.ral||''}</span></td>
+      <td class="c">${l.qty}</td>
+      <td class="r">${fmt(l.price)}</td>
+      <td class="r">${fmt(l.qty*l.price)}</td>
+    </tr>`;
+  });
+  if(!lines.length) rows='<tr><td class="c" colspan="6" style="color:#999;padding:18px">Добавьте позиции в левой панели</td></tr>';
+  const totalQty=lines.reduce((s,l)=>s+l.qty,0);
+  $('pageSpec').innerHTML=`
+    <div style="text-align:right;font-size:11px">Приложение № 1<br>к договору поставки № ${or($('dNo').value,'____')} от ${ruDate($('dDate').value)}</div>
+    <h1 style="margin-top:10px">СПЕЦИФИКАЦИЯ</h1>
+    <p style="text-align:center;margin:2px 0 8px"><b>Изделие:</b> Корзины для внешнего блока кондиционера с кронштейнами. <b>Материал:</b> кронштейны — оцинкованная сталь 2,5 мм, экраны — оцинкованная сталь 1 мм. Соответствие ТУ 28.25.12-001-24405486-2024.</p>
+    <table class="spec">
+      <thead><tr><th style="width:26px">№</th><th style="width:90px">Фото</th><th>Наименование, характеристики</th><th style="width:46px">Кол-во, шт</th><th style="width:74px">Цена, ₽/шт</th><th style="width:88px">Стоимость, ₽</th></tr></thead>
+      <tbody>${rows}
+        <tr class="tot"><td class="c" colspan="3">ИТОГО</td><td class="c">${totalQty}</td><td></td><td class="r">${fmt(total)}</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:8px"><b>Всего на сумму:</b> ${fmt(total)} (${rubToWords(total)}), ${vatPhrase}.</p>
+    <p style="margin-top:2px"><b>Срок изготовления:</b> до ${term} рабочих дней с момента внесения последних изменений в техническое задание.</p>
+    <div class="sign"><div class="col">Поставщик: Директор ______________ / Рафиков Р. М.<div class="ln">М.П.</div></div><div class="col">Покупатель: ______________<div class="ln">М.П.</div></div></div>
+  `;
+
+  // ---- WARRANTY (Приложение №2) ----
+  $('pageWarranty').innerHTML=`
+    <div style="text-align:right;font-size:11px">Приложение № 2<br>к договору поставки № ${or($('dNo').value,'____')} от ${ruDate($('dDate').value)}</div>
+    <h1 style="margin-top:10px">ГАРАНТИЙНЫЕ ОБЯЗАТЕЛЬСТВА И ПРАВИЛА ЭКСПЛУАТАЦИИ</h1>
+    <h2>1. Гарантийные сроки</h2>
+    <div class="cl">1.1. Лакокрасочное покрытие деревянных элементов — <b>${wWood} месяцев</b>.</div>
+    <div class="cl">1.2. Защитно-декоративное (порошковое) покрытие металлических элементов — <b>${wPaint} месяцев</b>.</div>
+    <div class="cl">1.3. Металлоконструкция изделия (сварные и болтовые соединения, несущая способность) — <b>${wConstr} месяцев</b>.</div>
+    <div class="cl">1.4. Гарантийный срок исчисляется с момента передачи Товара Покупателю по акту приёма-передачи.</div>
+    <h2>2. Условия сохранения гарантии</h2>
+    <div class="cl">2.1. Соблюдение правил монтажа и эксплуатации изделия; монтаж выполняется квалифицированным персоналом.</div>
+    <div class="cl">2.2. Периодический уход: очистка поверхностей неабразивными средствами, недопущение длительного контакта с агрессивными средами (соли, щёлочи, кислоты).</div>
+    <div class="cl">2.3. Деревянные элементы требуют периодической обработки защитными составами в соответствии с рекомендациями изготовителя.</div>
+    <h2>3. Гарантия не распространяется</h2>
+    <div class="cl">3.1. На повреждения вследствие некачественного монтажа, механических воздействий, небрежной эксплуатации или преднамеренного вредительства.</div>
+    <div class="cl">3.2. На дефекты от внешних воздействий (огонь, вода, соли, щёлочи, кислоты и пр.), а также форс-мажорных обстоятельств.</div>
+    <div class="cl">3.3. На изделия, подвергшиеся самовольной регулировке, ремонту, переустановке или переделке.</div>
+    <div class="cl">3.4. На естественный износ лакокрасочного покрытия при нарушении условий эксплуатации.</div>
+    <div class="sign"><div class="col">Поставщик: ______________ / Рафиков Р. М.<div class="ln">М.П.</div></div><div class="col">Покупатель: ______________<div class="ln">С правилами ознакомлен</div></div></div>
+  `;
+}
+
+// ---------- buttons ----------
+document.getElementById('btnPrint').onclick=()=>window.print();
+document.getElementById('btnReset').onclick=()=>{ if(!confirm('Очистить все поля и позиции?'))return; lines=[]; F.forEach(id=>{const e=$(id); if(e && !['dNo','dCity','cTerm','cAdv','wWood','wPaint','wConstr','dVat'].includes(id)) e.value='';}); renderCat(); renderSel(); renderDoc(); };
+
+// init: today's date
+(function(){ const t=new Date(); $('dDate').value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); })();
+renderCat(); renderSel(); renderDoc();
+</script>
+</body>
+</html>
