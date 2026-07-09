@@ -1860,12 +1860,20 @@ html[data-lite] .reveal{opacity:1!important;transform:none!important}
   font-size:13px;color:var(--tx);opacity:0;transition:opacity .35s,transform .35s;max-width:90vw;text-align:center}
 .lite-toast.on{opacity:1;transform:translate(-50%,0)}
 
-/* колесо заказа → статичный читаемый список (класс ставит JS при lite) */
-#flowWheel.fw-lite .fw-arc,#flowWheel.fw-lite .fw-cards,#flowWheel.fw-lite .fw-marker,#flowWheel.fw-lite .fw-ghost,#flowWheel.fw-lite .fw-sheets{display:none!important}
-#flowWheel.fw-lite .fw-sticky{position:static!important;height:auto!important;display:block;padding:0}
-#flowWheel.fw-lite .fw-track{height:auto!important;min-height:0!important}
-#flowWheel.fw-lite .fw-body{position:static!important;height:auto!important}
-#flowWheel.fw-lite .fw-step{position:static!important;opacity:1!important;transform:none!important;filter:none!important;display:block!important;visibility:visible!important;margin:0 0 26px;pointer-events:auto}
-#flowWheel.fw-lite .fw-head{position:static!important;transform:none!important}
+/* колесо заказа в lite → простой список шагов «полоской» (JS строит .fw-lite-steps) */
+#flowWheel.fw-lite{min-height:0!important}
+#flowWheel.fw-lite .fw-head{position:static!important;transform:none!important;opacity:1!important}
+.fw-lite-steps{list-style:none;margin:22px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.fw-lite-steps li{display:flex;gap:14px;align-items:flex-start;background:var(--srf);border:1px solid var(--line);border-radius:3px;padding:15px 16px;opacity:0;transform:translateY(10px);animation:fwLiteIn .38s ease forwards}
+.fw-lite-steps li:nth-child(2){animation-delay:.06s}
+.fw-lite-steps li:nth-child(3){animation-delay:.12s}
+.fw-lite-steps li:nth-child(4){animation-delay:.18s}
+.fw-lite-steps li:nth-child(5){animation-delay:.24s}
+.fw-lite-n{flex:0 0 auto;min-width:30px;font:600 22px/1 'Oswald',sans-serif;color:var(--amber)}
+.fw-lite-tx h4{font:600 15px 'Oswald',sans-serif;letter-spacing:.02em;text-transform:uppercase;color:#fff;margin:0 0 4px}
+.fw-lite-tx p{font-size:13px;color:var(--tx2);line-height:1.5;margin:0}
+@keyframes fwLiteIn{to{opacity:1;transform:none}}
+/* разрешаем эту лёгкую fade-анимацию, несмотря на общий глушитель анимаций в lite */
+html[data-lite] .fw-lite-steps li{animation-duration:.38s!important}
 /* портфолио на слабых: пропускаем отрисовку/декод вне экрана */
 html[data-lite] .pf-ph{content-visibility:auto;contain-intrinsic-size:auto 420px}

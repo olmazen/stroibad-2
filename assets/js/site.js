@@ -228,6 +228,23 @@
 
 /* ── утилита: вызов колбэка, когда элемент появляется во вьюпорте ── */
 window.__whenVisible = (function () {
+  // IntersectionObserver надёжнее на СЛАБЫХ устройствах: срабатывает вне основного потока,
+  // поэтому reveal не «застревает» невидимым, когда главный поток занят тяжёлой анимацией
+  // (из-за чего секции оставались пустыми — сквозь них проступал blueprint-фон).
+  if (typeof IntersectionObserver === 'function') {
+    var cbs = new WeakMap();
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          var cb = cbs.get(e.target);
+          io.unobserve(e.target); cbs.delete(e.target);
+          if (cb) cb(e.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -6% 0px' });
+    return function (el, cb) { cbs.set(el, cb); io.observe(el); };
+  }
+  // фолбэк для очень старых браузеров (scroll + rAF)
   var watched = [];
   var ticking = false;
   function check() {
@@ -251,7 +268,6 @@ window.__whenVisible = (function () {
   }
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', onScroll);
-  // первичные проверки после загрузки
   addEventListener('load', check);
   setTimeout(check, 60); setTimeout(check, 400); setTimeout(check, 1200);
   return function (el, cb, margin) {
@@ -1724,16 +1740,22 @@ window.__whenVisible = (function () {
     try {
       if (raf) { cancelAnimationFrame(raf); raf = null; }
       if (playingScene >= 0 && sceneOf[playingScene]) sceneOf[playingScene].stop();
-      if (track) track.style.height = '';
-      if (sticky) { sticky.style.height = ''; sticky.style.removeProperty('--th'); }
-      steps.forEach(function (s) {
-        s.removeAttribute('style'); s.classList.add('on');
-        s.style.setProperty('opacity', '1', 'important');
-        s.style.setProperty('transform', 'none', 'important');
-        s.style.setProperty('position', 'static', 'important');
-        s.style.setProperty('transition', 'none', 'important');
+      // схлопываем колесо и прячем всю анимационную машинерию
+      if (track) { track.style.setProperty('height', 'auto', 'important'); track.style.minHeight = '0'; }
+      if (sticky) { sticky.style.setProperty('position', 'static', 'important'); sticky.style.setProperty('height', 'auto', 'important'); sticky.style.removeProperty('--th'); }
+      ['.fw-arc', '.fw-cards', '.fw-marker', '.fw-ghost', '.fw-sheets', '.fw-body'].forEach(function (sel) {
+        var e = track && track.querySelector(sel); if (e) e.style.display = 'none';
       });
-      cards.forEach(function (c) { c.removeAttribute('style'); });
+      // вместо колеса — простой читаемый список шагов «полоской» из тех же данных
+      var ol = document.createElement('ol');
+      ol.className = 'fw-lite-steps';
+      ol.innerHTML = items.map(function (s) {
+        return '<li><span class="fw-lite-n">' + pad2(s.n) + '</span><div class="fw-lite-tx">' +
+          '<h4>' + s.t + '</h4>' + (s.d ? '<p>' + s.d + '</p>' : '') + '</div></li>';
+      }).join('');
+      var head = track && track.querySelector('.fw-head');
+      if (head && head.parentNode) head.parentNode.insertBefore(ol, head.nextSibling);
+      else (sticky || host).appendChild(ol);
       host.classList.add('fw-lite');
     } catch (e) {}
   }
