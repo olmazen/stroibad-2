@@ -76,6 +76,46 @@
     c.addEventListener('mouseleave', () => { if (activeLayer !== 0) return; stage.dataset.active = ''; showImage(0); });
   });
   if (resetBtn) resetBtn.addEventListener('click', () => setLayer(0));
+
+  /* Соединительные линии от плашек к деталям на фото (десктоп) */
+  const wrap = document.getElementById('tech2');
+  const svg  = document.getElementById('tech2Links');
+  if (wrap && svg){
+    const linkPath = svg.querySelector('.tech2-link');
+    const node = svg.querySelector('.tech2-node');
+    const plates = [...wrap.querySelectorAll('.layer')];
+    const ANCH = { 1:[0.50,0.44], 2:[0.60,0.80], 3:[0.30,0.56], 4:[0.85,0.24] }; // якоря деталей в кадре (доли)
+    const desktop = () => window.matchMedia('(min-width:901px)').matches;
+    function draw(p){
+      if (!desktop()) return;
+      const n = parseInt(p.dataset.layer);
+      const wr = wrap.getBoundingClientRect(), pr = p.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+      const fromRight = p.dataset.side === 'left';           // левые плашки тянут линию от правого края
+      const px = (fromRight ? pr.right : pr.left) - wr.left;
+      const py = pr.top + pr.height/2 - wr.top;
+      const a = ANCH[n] || [0.5,0.5];
+      const tx = sr.left + sr.width*a[0] - wr.left;
+      const ty = sr.top + sr.height*a[1] - wr.top;
+      const mx = (px + tx) / 2;
+      linkPath.setAttribute('d', `M ${px} ${py} C ${mx} ${py}, ${mx} ${ty}, ${tx} ${ty}`);
+      node.setAttribute('cx', tx); node.setAttribute('cy', ty);
+      const len = linkPath.getTotalLength();
+      linkPath.style.transition = 'none';
+      linkPath.style.strokeDasharray = len; linkPath.style.strokeDashoffset = len;
+      void linkPath.getBoundingClientRect();
+      linkPath.style.transition = 'stroke-dashoffset .55s cubic-bezier(.4,0,.2,1)';
+      linkPath.style.strokeDashoffset = '0';
+      svg.classList.add('on');
+    }
+    const hide = () => svg.classList.remove('on');
+    plates.forEach(p => {
+      p.addEventListener('mouseenter', () => draw(p));
+      p.addEventListener('mouseleave', hide);
+      p.addEventListener('focus', () => draw(p));
+      p.addEventListener('blur', hide);
+    });
+    let rt; window.addEventListener('resize', () => { hide(); clearTimeout(rt); });
+  }
 })();
 
 /* ===================== КАЛЬКУЛЯТОР ===================== */

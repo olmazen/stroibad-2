@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css?v=egoe48">
-<link rel="stylesheet" href="../assets/css/ograzhdeniya.css?v=ogr4">
+<link rel="stylesheet" href="../assets/css/ograzhdeniya.css?v=ogr5">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
 {"@type":"ListItem","position":1,"name":"Главная","item":"https://www.egoe-life.ru/"},
@@ -77,7 +77,19 @@
 <main class="ogr">
 
 <!-- ================= HERO ================= -->
-<section class="ogr-hero" id="top">
+<section class="ogr-hero ogr-hero--bg" id="top">
+  <div class="ogr-hero-bg" id="ogrTl" aria-hidden="true">
+    <img class="ogr-tl-img" src="uploads/timeline/06.webp" alt="" loading="lazy" decoding="async">
+    <img class="ogr-tl-img" src="uploads/timeline/08.webp" alt="" loading="lazy" decoding="async">
+    <img class="ogr-tl-img is-active" src="uploads/timeline/10.webp" alt="Металлическое ограждение с лазерной резкой днём" loading="eager" fetchpriority="high" decoding="async">
+    <img class="ogr-tl-img" src="uploads/timeline/14.webp" alt="" loading="lazy" decoding="async">
+    <img class="ogr-tl-img" src="uploads/timeline/18.webp" alt="" loading="lazy" decoding="async">
+    <img class="ogr-tl-img" src="uploads/timeline/20.webp" alt="Ограждение со скрытой LED-подсветкой в сумерках" loading="lazy" decoding="async">
+    <img class="ogr-tl-img" src="uploads/timeline/00.webp" alt="" loading="lazy" decoding="async">
+    <img class="ogr-tl-img" src="uploads/timeline/02.webp" alt="" loading="lazy" decoding="async">
+    <img class="ogr-tl-img" src="uploads/timeline/04.webp" alt="" loading="lazy" decoding="async">
+    <div class="ogr-hero-scrim"></div>
+  </div>
   <div class="container">
     <div class="ogr-hero-grid">
       <div class="ogr-hero-l">
@@ -102,21 +114,11 @@
         </div>
       </div>
 
-      <div class="ogr-stage">
-        <div class="ogr-tl" id="ogrTl" aria-label="Ограждение в течение суток: день, закат, ночная LED-подсветка">
-          <div class="ogr-tl-frame">
-            <div class="ogr-tl-imgs">
-              <img class="ogr-tl-img" src="uploads/timeline/06.webp" alt="Ограждение на рассвете" loading="lazy" decoding="async">
-              <img class="ogr-tl-img" src="uploads/timeline/08.webp" alt="Ограждение на восходе солнца" loading="lazy" decoding="async">
-              <img class="ogr-tl-img is-active" src="uploads/timeline/10.webp" alt="Ограждение днём — вид с улицы" loading="eager" fetchpriority="high" decoding="async">
-              <img class="ogr-tl-img" src="uploads/timeline/14.webp" alt="Ограждение в яркий день" loading="lazy" decoding="async">
-              <img class="ogr-tl-img" src="uploads/timeline/18.webp" alt="Ограждение на закате" loading="lazy" decoding="async">
-              <img class="ogr-tl-img" src="uploads/timeline/20.webp" alt="Ограждение со скрытой LED-подсветкой в сумерках" loading="lazy" decoding="async">
-              <img class="ogr-tl-img" src="uploads/timeline/00.webp" alt="Ограждение с подсветкой ночью" loading="lazy" decoding="async">
-              <img class="ogr-tl-img" src="uploads/timeline/02.webp" alt="Ограждение ночью, LED-подсветка" loading="lazy" decoding="async">
-              <img class="ogr-tl-img" src="uploads/timeline/04.webp" alt="Ограждение поздней ночью, полная луна" loading="lazy" decoding="async">
-            </div>
-            <div class="ogr-tl-overlay"><div class="ogr-tl-time" id="ogrTlTime">11:00</div><div class="ogr-tl-phase" id="ogrTlPhase">День</div></div>
+      <div class="ogr-hero-r">
+        <div class="ogr-tl-panel" aria-label="Ограждение в течение суток — переключатель времени">
+          <div class="ogr-tl-panel-h">
+            <span class="ogr-tl-time" id="ogrTlTime">11:00</span>
+            <span class="ogr-tl-phase" id="ogrTlPhase">День</span>
           </div>
           <div class="ogr-tl-scrub">
             <button class="ogr-tl-play" id="ogrTlPlay" type="button" aria-label="Прожить сутки">
@@ -128,8 +130,8 @@
               <div class="ogr-tl-ticks"><span>05:00</span><span>11:00</span><span>19:00</span><span>23:00</span><span>03:00</span></div>
             </div>
           </div>
+          <div class="ogr-tl-cap">Одно ограждение — целые сутки: приватность днём, скрытая LED-подсветка ночью. Двигайте ползунок.</div>
         </div>
-        <div class="ogr-plate-cap">Одно ограждение — целые сутки: приватность днём, LED-подсветка ночью. Двигайте ползунок.</div>
       </div>
     </div>
   </div>
@@ -161,55 +163,47 @@
         <div class="eyebrow">— Конструкция</div>
         <h2 class="section-title" style="margin-top:14px">Из чего состоит <em>ограждение</em></h2>
       </div>
-      <p class="lead-text">Четыре элемента, всё на болтах — никакой сварки на объекте. Наведите или нажмите на слой справа — увидите, из чего собрана секция. Гарантия 15 лет на металл, 5 — на электронику.</p>
+      <p class="lead-text">Четыре элемента, всё на болтах — никакой сварки на объекте. Наведите на деталь по бокам — увидим, из чего собрана секция и где она в ограждении. Гарантия 15 лет на металл, 5 — на электронику.</p>
     </div>
-    <div class="tech-layout">
-      <div class="stage" id="stage" data-active="">
-        <div class="stage-frame">
-          <div class="stage-img is-active" data-layer="0"><img src="uploads/00-base.webp" alt="Собранное ограждение серии FOREST" loading="lazy" decoding="async"></div>
-          <div class="stage-img" data-layer="1"><img src="uploads/01-decor.webp" alt="Декоративная вставка с лазерной резкой" loading="lazy" decoding="async"></div>
-          <div class="stage-img" data-layer="2"><img src="uploads/02-led.webp" alt="Скрытая LED-полоса" loading="lazy" decoding="async"></div>
-          <div class="stage-img" data-layer="3"><img src="uploads/03-laths.webp" alt="Вертикальные ламели" loading="lazy" decoding="async"></div>
-          <div class="stage-img" data-layer="4"><img src="uploads/04-post.webp" alt="Столб и каркас" loading="lazy" decoding="async"></div>
+    <div class="tech2" id="tech2">
+      <div class="tech2-stagewrap">
+        <div class="stage" id="stage" data-active="">
+          <div class="stage-frame">
+            <div class="stage-img is-active" data-layer="0"><img src="uploads/00-base.webp" alt="Собранное ограждение серии FOREST" loading="lazy" decoding="async"></div>
+            <div class="stage-img" data-layer="1"><img src="uploads/01-decor.webp" alt="Декоративная вставка с лазерной резкой" loading="lazy" decoding="async"></div>
+            <div class="stage-img" data-layer="2"><img src="uploads/02-led.webp" alt="Скрытая LED-полоса" loading="lazy" decoding="async"></div>
+            <div class="stage-img" data-layer="3"><img src="uploads/03-laths.webp" alt="Вертикальные ламели" loading="lazy" decoding="async"></div>
+            <div class="stage-img" data-layer="4"><img src="uploads/04-post.webp" alt="Столб и каркас" loading="lazy" decoding="async"></div>
+          </div>
+          <div class="stage-hint"><span class="pulse"></span>наведите на деталь</div>
+          <button class="stage-reset" id="stageReset" type="button">все слои</button>
+          <div class="stage-label" id="stageLabel" aria-live="polite"><span class="lbl-num" id="stageLabelNum">01</span><span class="lbl-text" id="stageLabelText">Декоративная вставка</span></div>
         </div>
-        <div class="stage-hint"><span class="pulse"></span>наведите на слой</div>
-        <button class="stage-reset" id="stageReset" type="button">все слои</button>
-        <div class="stage-label" id="stageLabel" aria-live="polite"><span class="lbl-num" id="stageLabelNum">01</span><span class="lbl-text" id="stageLabelText">Декоративная вставка</span></div>
+        <span class="stage-corner tl"></span><span class="stage-corner tr"></span><span class="stage-corner bl"></span><span class="stage-corner br"></span>
       </div>
       <div class="layers" id="techLayers">
-        <button class="layer" data-layer="1" type="button" aria-expanded="false">
+        <button class="layer" data-layer="1" data-side="left" type="button">
           <div class="num">01</div>
-          <div class="lbody"><div class="title">Декоративная вставка</div><div class="lmeta">Сталь 2–3 мм · лазерная резка</div></div>
-          <div class="arrow"><svg viewBox="0 0 24 24"><path d="M9 6L15 12L9 18"/></svg></div>
-          <div class="desc"><div class="desc-inner">Лицевая художественная панель с перфорацией по авторскому рисунку: лес, животные, флора, геометрия или ваш дизайн-код. Кромки обрабатываются до гладкости, затем — порошковая окраска Akzonobel / Tiger Drylak в любой RAL.
-            <div class="desc-specs"><div class="s">Толщина<span>2–3 мм</span></div><div class="s">Резка<span>лазер 0,1 мм</span></div><div class="s">Покрытие<span>Akzonobel</span></div></div>
-          </div></div>
+          <div class="lbody"><div class="title">Декоративная вставка</div><div class="lmeta">Сталь 2–3 мм · лазерная резка</div>
+            <div class="specs"><div class="s">Толщина<span>2–3 мм</span></div><div class="s">Резка<span>0,1 мм</span></div><div class="s">Покрытие<span>Akzonobel</span></div></div></div>
         </button>
-        <button class="layer" data-layer="2" type="button" aria-expanded="false">
-          <div class="num">02</div>
-          <div class="lbody"><div class="title">Скрытая LED-полоса</div><div class="lmeta">24V · IP65 · спрятана в секции</div></div>
-          <div class="arrow"><svg viewBox="0 0 24 24"><path d="M9 6L15 12L9 18"/></svg></div>
-          <div class="desc"><div class="desc-inner">Влагозащищённая светодиодная лента в алюминиевом профиле, спрятана внутри секции. Тёплый янтарь 2700K или дневной 4000K. Опционально — RGB и интеграция в умный дом (Home Assistant, HomeKit).
-            <div class="desc-specs"><div class="s">Напряжение<span>24V</span></div><div class="s">Защита<span>IP65</span></div><div class="s">Ресурс<span>50 000 ч</span></div></div>
-          </div></div>
-        </button>
-        <button class="layer" data-layer="3" type="button" aria-expanded="false">
+        <button class="layer" data-layer="3" data-side="left" type="button">
           <div class="num">03</div>
-          <div class="lbody"><div class="title">Вертикальные ламели</div><div class="lmeta">Ширина 40–180 мм</div></div>
-          <div class="arrow"><svg viewBox="0 0 24 24"><path d="M9 6L15 12L9 18"/></svg></div>
-          <div class="desc"><div class="desc-inner">Разноширокие планки за декоративной вставкой. Создают приватность, но пропускают воздух — ограждение не работает как парус в ветреную погоду. Ширина чередуется по ритму, задаёт характер секции.
-            <div class="desc-specs"><div class="s">Ширина<span>40–180 мм</span></div><div class="s">Ветр. нагрузка<span>×0,3</span></div><div class="s">Видимость<span>0%</span></div></div>
-          </div></div>
+          <div class="lbody"><div class="title">Вертикальные ламели</div><div class="lmeta">Приватность + воздух</div>
+            <div class="specs"><div class="s">Ширина<span>40–180 мм</span></div><div class="s">Ветер<span>×0,3</span></div><div class="s">Видимость<span>0%</span></div></div></div>
         </button>
-        <button class="layer" data-layer="4" type="button" aria-expanded="false">
+        <button class="layer" data-layer="2" data-side="right" type="button">
+          <div class="num">02</div>
+          <div class="lbody"><div class="title">Скрытая LED-полоса</div><div class="lmeta">24V · IP65 · в секции</div>
+            <div class="specs"><div class="s">Напряжение<span>24V</span></div><div class="s">Защита<span>IP65</span></div><div class="s">Ресурс<span>50 000 ч</span></div></div></div>
+        </button>
+        <button class="layer" data-layer="4" data-side="right" type="button">
           <div class="num">04</div>
-          <div class="lbody"><div class="title">Столб / каркас</div><div class="lmeta">140×140×4 мм</div></div>
-          <div class="arrow"><svg viewBox="0 0 24 24"><path d="M9 6L15 12L9 18"/></svg></div>
-          <div class="desc"><div class="desc-inner">Несущая стойка из стали с декоративной крышкой и фланцем, высота 2200 мм над землёй. Болтовое соединение с панелью — без сварки на объекте. Фундамент М300, заглубление 800–1000 мм.
-            <div class="desc-specs"><div class="s">Сечение<span>140×140 мм</span></div><div class="s">Высота<span>2200 мм</span></div><div class="s">Заглубление<span>800–1000 мм</span></div></div>
-          </div></div>
+          <div class="lbody"><div class="title">Столб / каркас</div><div class="lmeta">140×140×4 мм · без сварки</div>
+            <div class="specs"><div class="s">Сечение<span>140×140</span></div><div class="s">Высота<span>2200 мм</span></div><div class="s">Заглубл.<span>800–1000</span></div></div></div>
         </button>
       </div>
+      <svg class="tech2-links" id="tech2Links" aria-hidden="true"><path class="tech2-link"></path><circle class="tech2-node" r="4.5"></circle></svg>
     </div>
     <div class="spec-band">
       <div class="item"><div class="snum">2,5 м</div><div class="slbl">одна секция</div></div>
@@ -533,6 +527,6 @@
 </div></div>
 
 <script src="../assets/js/site.js?v=egoe48"></script>
-<script src="../assets/js/ograzhdeniya.js?v=ogr4"></script>
+<script src="../assets/js/ograzhdeniya.js?v=ogr5"></script>
 </body>
 </html>
