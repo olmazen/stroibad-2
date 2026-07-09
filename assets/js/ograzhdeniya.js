@@ -1,41 +1,81 @@
-/* EGOE · Ограждения — hero (день/ночь + 3D-параллакс) + живой калькулятор.
+/* EGOE · Ограждения — hero (скроллинг времени суток) + слоёный стенд + калькулятор.
    Логика калькулятора перенесена с лендинга FORRMA, генератор PDF убран:
    кнопки сметы ведут в общий лид-модал EGOE (openModal / submitLead из site.js). */
 (function(){
 'use strict';
 
-/* ===================== HERO: день / ночь ===================== */
+/* ===================== HERO: скроллинг времени суток ===================== */
 (function(){
-  const hero = document.querySelector('.ogr-hero');
-  const grp  = document.getElementById('ogrDayNight');
-  if (hero && grp){
-    grp.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
-      grp.querySelectorAll('button').forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-      hero.classList.toggle('is-night', b.dataset.mode === 'night');
-    }));
-  }
-  /* Мягкий параллакс-наклон линии ограждения за курсором (десктоп) */
-  const wrap  = document.querySelector('.ogr-fence3d');
-  const line  = document.querySelector('.ogr-fline');
+  const tl = document.getElementById('ogrTl');
+  if (!tl) return;
+  const hero   = document.querySelector('.ogr-hero');
+  const imgs   = [...tl.querySelectorAll('.ogr-tl-img')];
+  const range  = document.getElementById('ogrTlRange');
+  const timeEl = document.getElementById('ogrTlTime');
+  const phaseEl= document.getElementById('ogrTlPhase');
+  const playBtn= document.getElementById('ogrTlPlay');
+  const STEPS = [
+    {t:'05:00',p:'Рассвет',      tod:'night'},
+    {t:'08:00',p:'Восход',       tod:'dusk'},
+    {t:'11:00',p:'День',         tod:'day'},
+    {t:'14:00',p:'День',         tod:'day'},
+    {t:'19:00',p:'Закат',        tod:'dusk'},
+    {t:'21:00',p:'Подсветка',    tod:'dusk'},
+    {t:'23:00',p:'Ночь',         tod:'night'},
+    {t:'01:00',p:'Ночь',         tod:'night'},
+    {t:'03:00',p:'Глубокая ночь',tod:'night'},
+  ];
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (wrap && line && !reduce && window.matchMedia('(pointer:fine)').matches){
-    let raf = null;
-    wrap.addEventListener('pointermove', e => {
-      const r = wrap.getBoundingClientRect();
-      const nx = (e.clientX - r.left) / r.width  - .5;
-      const ny = (e.clientY - r.top)  / r.height - .5;
-      if (raf) cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        line.style.animationPlayState = 'paused';
-        line.style.transform = `rotateY(${-30 + nx*22}deg) rotateX(${3 - ny*10}deg)`;
-      });
-    });
-    wrap.addEventListener('pointerleave', () => {
-      line.style.transform = '';
-      line.style.animationPlayState = '';
-    });
+  imgs.forEach(im => { const pre = new Image(); pre.src = im.getAttribute('src'); }); // предзагрузка кадров суток — без пустых вспышек при кросс-фейде
+  let cur = 2, timer = null;
+  function set(i){
+    cur = (i + STEPS.length) % STEPS.length;
+    imgs.forEach((im,k) => im.classList.toggle('is-active', k === cur));
+    const s = STEPS[cur];
+    if (timeEl) timeEl.textContent = s.t;
+    if (phaseEl) phaseEl.textContent = s.p;
+    if (hero) hero.dataset.tod = s.tod;
+    if (range){ range.value = cur; range.style.setProperty('--fill', (cur/(STEPS.length-1)*100) + '%'); }
   }
+  function stop(){ if (timer){ clearInterval(timer); timer = null; } if (playBtn) playBtn.classList.remove('playing'); }
+  function play(){ if (timer) return; if (playBtn) playBtn.classList.add('playing'); timer = setInterval(() => set(cur+1), 2400); }
+  if (range) range.addEventListener('input', () => { stop(); set(parseInt(range.value)); });
+  if (playBtn) playBtn.addEventListener('click', () => { timer ? stop() : play(); });
+  set(2);
+  if (!reduce){
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ play(); io.disconnect(); } }), {threshold:0.35});
+    io.observe(tl);
+  }
+})();
+
+/* ===================== КОНСТРУКЦИЯ: слоёный стенд ===================== */
+(function(){
+  const stage  = document.getElementById('stage');
+  const layers = document.querySelectorAll('#techLayers .layer');
+  if (!stage || !layers.length) return;
+  const images   = stage.querySelectorAll('.stage-img');
+  const resetBtn = document.getElementById('stageReset');
+  const labelNum = document.getElementById('stageLabelNum');
+  const labelTxt = document.getElementById('stageLabelText');
+  let activeLayer = 0;
+  const NAMES = {};
+  layers.forEach(c => { NAMES[parseInt(c.dataset.layer)] = (c.querySelector('.title')||{}).textContent?.trim() || ''; });
+  function showImage(n){ images.forEach(im => im.classList.toggle('is-active', parseInt(im.dataset.layer) === n)); }
+  function renderLabel(n){ if (!labelNum || !labelTxt || n === 0) return; labelNum.textContent = String(n).padStart(2,'0'); labelTxt.textContent = NAMES[n] || ''; }
+  function setLayer(n){
+    if (n === activeLayer) n = 0;
+    activeLayer = n;
+    stage.dataset.active = n === 0 ? '' : String(n);
+    showImage(n);
+    layers.forEach(c => { const on = parseInt(c.dataset.layer) === n; c.classList.toggle('is-active', on); c.setAttribute('aria-expanded', String(on)); });
+    if (n !== 0) renderLabel(n);
+  }
+  layers.forEach(c => {
+    c.addEventListener('click', () => setLayer(parseInt(c.dataset.layer)));
+    c.addEventListener('mouseenter', () => { if (activeLayer !== 0) return; const n = parseInt(c.dataset.layer); stage.dataset.active = String(n); renderLabel(n); showImage(n); });
+    c.addEventListener('mouseleave', () => { if (activeLayer !== 0) return; stage.dataset.active = ''; showImage(0); });
+  });
+  if (resetBtn) resetBtn.addEventListener('click', () => setLayer(0));
 })();
 
 /* ===================== КАЛЬКУЛЯТОР ===================== */
