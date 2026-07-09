@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../../assets/css/style.css?v=egoe47">
+<link rel="stylesheet" href="../../../assets/css/style.css?v=egoe48">
 <style id="ad-accent">
 :root{--gold:#C99A3F;--gold-h:#E7C877;--gold-d:#A87F2F;--gold-glow:rgba(201,154,63,.30)}
 .ad-badge{display:inline-flex;align-items:center;gap:9px;font-family:'Oswald',sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#1c1305;background:linear-gradient(180deg,#E7C877,#C99A3F);padding:7px 14px;border-radius:2px;box-shadow:0 8px 20px var(--gold-glow);margin-bottom:14px}
@@ -336,6 +336,6 @@ function swapMain(el,src,label){var m=document.getElementById('mainImg');if(!m)r
 function fitDrawings(){document.querySelectorAll('.ad-draw-svg').forEach(function(svg){try{var b=svg.getBBox();if(b.width>0&&b.height>0){var p=Math.max(b.width,b.height)*0.05;svg.setAttribute('viewBox',(b.x-p)+' '+(b.y-p)+' '+(b.width+2*p)+' '+(b.height+2*p));}}catch(e){}});}
 if(document.readyState!=='loading')requestAnimationFrame(fitDrawings);else document.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(fitDrawings)});
 </script>
-<script src="../../../assets/js/site.js?v=egoe47"></script>
+<script src="../../../assets/js/site.js?v=egoe48"></script>
 </body>
 </html>

@@ -1147,20 +1147,23 @@ window.__whenVisible = (function () {
           '<div class="fw-ck"><i></i>Гарантия 24 месяца</div>' +
         '</div>' +
       '</div></div>' +
-      '<div class="fw-win fw-docwin"><div class="fw-win-bar"><i></i><i></i><i></i><b>договор-214.pdf</b><span>пакет для тендера</span></div>' +
-      '<div class="fw-win-body"><div class="fw-ct"><span class="ct-sweep" aria-hidden="true"></span>' +
-        '<b class="ct-h">Договор поставки № <em class="ct-type" data-type="214">&nbsp;</em></b>' +
-        '<span class="ct-sub">ООО «EGOE» · г. Балаково · с НДС 22%</span>' +
-        '<div class="ct-spec">' +
-          '<div class="ct-row ct-row-h"><span>Изделие</span><span>RAL</span><span>Кол</span><span>Сумма</span></div>' +
-          '<div class="ct-row" data-r="0"><span class="ct-it"><i class="ct-th"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp?i10" alt="" loading="lazy"></i>Лежак Art Déco A1-2661</span><span>6021</span><span>12</span><span>260 400 ₽</span></div>' +
-          '<div class="ct-row" data-r="1"><span class="ct-it"><i class="ct-th"><img src="assets/img/maf/skamejki/9467/main.webp" alt="" loading="lazy"></i>Скамейка A4-2641</span><span>7016</span><span>8</span><span>36 000 ₽</span></div>' +
-          '<div class="ct-row" data-r="2"><span class="ct-it"><i class="ct-th"><img src="assets/img/korziny/standart/STN03-treugolnik/main.webp" alt="" loading="lazy"></i>Корзина STN-03</span><span>9005</span><span>6</span><span>11 400 ₽</span></div>' +
+      '<div class="fw-win fw-docwin"><div class="fw-win-bar"><i></i><i></i><i></i><b>договор.pdf</b><span class="ctr2-pg">формируется…</span></div>' +
+      '<div class="fw-win-body"><div class="ctr2-track"><span class="ctr2-fill"></span></div>' +
+        '<div class="ctr2-stack">' +
+          '<div class="ctr2-page" data-p="0"><b class="ctr2-h">Договор поставки № 214</b>' +
+            '<u class="ctr2-l" style="width:96%"></u><u class="ctr2-l" style="width:90%"></u><u class="ctr2-l" style="width:82%"></u><u class="ctr2-l" style="width:88%"></u><u class="ctr2-l" style="width:64%"></u>' +
+            '<span class="ctr2-stamp">EGOE</span></div>' +
+          '<div class="ctr2-page" data-p="1"><b class="ctr2-h">Спецификация · Прил.&nbsp;№1</b>' +
+            '<span class="ctr2-row"><i class="ctr2-th"></i><u class="ctr2-l" style="width:72%"></u></span>' +
+            '<span class="ctr2-row"><i class="ctr2-th"></i><u class="ctr2-l" style="width:64%"></u></span>' +
+            '<span class="ctr2-row"><i class="ctr2-th"></i><u class="ctr2-l" style="width:56%"></u></span>' +
+            '<u class="ctr2-l ctr2-sum" style="width:78%"></u>' +
+            '<span class="ctr2-stamp">EGOE</span></div>' +
+          '<div class="ctr2-page" data-p="2"><b class="ctr2-h">Гарантия · Прил.&nbsp;№2</b>' +
+            '<u class="ctr2-l" style="width:92%"></u><u class="ctr2-l" style="width:80%"></u><u class="ctr2-l" style="width:86%"></u><u class="ctr2-l" style="width:70%"></u>' +
+            '<span class="ctr2-stamp">EGOE</span></div>' +
         '</div>' +
-        '<div class="ct-total"><span>Сумма прописью:</span><b class="ct-words"><em class="ct-type" data-type="Триста семь тысяч восемьсот рублей">&nbsp;</em></b><u class="ct-num">307 800 ₽</u></div>' +
-        '<div class="ct-sign"><div class="ct-s"><em>Поставщик · EGOE</em><svg viewBox="0 0 130 36"><path d="M8 26 C 20 6, 30 32, 44 18 S 64 8, 74 22 S 102 28, 122 10"/></svg></div>' +
-        '<span class="fw-stamp"><b>EGOE</b>завод · Балаково</span></div>' +
-      '</div></div></div></div>';
+      '</div></div></div>';
     if (k === 'draw') return '<div class="fw-bp fw-bp-stack folded">' +
       '<img class="fw-bp-under" src="assets/img/artdeco/lezhaki/i1-3451/drawing-white.svg" alt="" aria-hidden="true">' +
       '<span class="fw-bp-tag">EGOE · КМД</span>' +
@@ -1509,63 +1512,55 @@ window.__whenVisible = (function () {
     }
 
     if (kind === 'contract') {
-      var ctPage = root.querySelector('.fw-ct');
-      var cks    = root.querySelectorAll('.fw-ck');
-      var items  = root.querySelectorAll('.ctr-item');
-      var rows   = root.querySelectorAll('.ct-row[data-r]');
-      var types  = root.querySelectorAll('.ct-type');
-      var sign   = root.querySelector('.ct-s');
-      var stamp  = root.querySelector('.fw-stamp');
-      var cflow  = root.querySelector('.fw-flow2');
-      var cwin   = root.querySelector('.fw-win');
-      // typeVal пишет в .value; для <span> печатаем в data-val (CSS показывает через ::before при .typing)
-      function typeType(el, str, cps, done) {
-        var i = 0; el.classList.add('tw');
-        var iv = setInterval(function () {
-          el.setAttribute('data-val', str.slice(0, ++i));
-          if (i >= str.length) { clearInterval(iv); el.classList.remove('tw'); if (done) done(); }
-        }, cps);
-        timers.push(iv);
+      var cks   = root.querySelectorAll('.fw-ck');
+      var items = root.querySelectorAll('.ctr-item');
+      var pages = root.querySelectorAll('.ctr2-page');
+      var fill  = root.querySelector('.ctr2-fill');
+      var pgLbl = root.querySelector('.ctr2-pg');
+      var cflow = root.querySelector('.fw-flow2');
+      var cwin  = root.querySelector('.fw-win');
+      var NP = pages.length, allLines = 0;
+      pages.forEach(function (p) { allLines += p.querySelectorAll('.ctr2-l, .ctr2-row').length; });
+      function stackPos(active) {
+        pages.forEach(function (p, i) { var dd = i - active; p.style.zIndex = (NP - Math.abs(dd));
+          p.style.transform = dd < 0 ? 'translateY(-9px) scale(.965)' : dd > 0 ? 'translateY(' + (7 * dd) + 'px) scale(' + (1 - .03 * dd) + ')' : 'none';
+          p.style.opacity = (dd < 0 || dd > 2) ? 0 : 1; });
+      }
+      function reset() {
+        cks.forEach(function (c) { c.classList.remove('in'); });
+        items.forEach(function (it) { it.classList.remove('lit'); });
+        pages.forEach(function (p) { p.querySelectorAll('.ctr2-l, .ctr2-row').forEach(function (l) { l.classList.remove('in'); }); var s = p.querySelector('.ctr2-stamp'); if (s) s.classList.remove('on'); });
+        if (fill) fill.style.width = '0'; if (pgLbl) pgLbl.textContent = 'формируется…';
+        stackPos(0);
       }
       api.start = function () {
-        running = true;
-        cflow.classList.add('opened'); winShow(cwin, true);
+        running = true; cflow.classList.add('opened'); winShow(cwin, true);
         (function loop() {
-          if (!running) return;
-          ctPage.classList.remove('print', 'shake', 'typing');
-          cks.forEach(function (c) { c.classList.remove('in'); });
-          items.forEach(function (it) { it.classList.remove('lit'); });
-          rows.forEach(function (r) { r.classList.remove('in'); });
-          types.forEach(function (el) { el.classList.remove('tw'); el.removeAttribute('data-val'); });
-          sign.classList.remove('draw'); stamp.classList.remove('slam');
-          // 1) амбер-развёртка «печатает» лист + № договора типизируется
-          t(function () { ctPage.classList.add('print', 'typing'); }, 300);
-          t(function () { if (types[0]) typeType(types[0], '214', 90); }, 620);
-          // 2) чек-лист слева проявляется
-          cks.forEach(function (c, i) { t(function () { c.classList.add('in'); }, 700 + i * 320); });
-          // 3) позиция корзины подсвечивается → её строка спецификации влетает (с той же миниатюрой)
-          items.forEach(function (it, i) {
-            var row = rows[i];
-            t(function () { it.classList.add('lit'); }, 1350 + i * 560);
-            t(function () { if (row) row.classList.add('in'); }, 1560 + i * 560);
+          if (!running) return; reset();
+          var T = 320, drawn = 0;
+          // данные заказа слева подсвечиваются
+          items.forEach(function (it, i) { t(function () { if (running) it.classList.add('lit'); }, 420 + i * 220); });
+          cks.forEach(function (c, i) { t(function () { if (running) c.classList.add('in'); }, 760 + i * 260); });
+          // договор пишется по страницам — строки проявляются одна за другой
+          pages.forEach(function (p, pi) {
+            t(function () { if (!running) return; stackPos(pi); if (pgLbl) pgLbl.textContent = 'стр. ' + (pi + 1) + '/' + NP; }, T); T += 300;
+            [].slice.call(p.querySelectorAll('.ctr2-l, .ctr2-row')).forEach(function (l) {
+              t(function () { if (!running) return; l.classList.add('in'); drawn++; if (fill) fill.style.width = Math.round(drawn / allLines * 100) + '%'; }, T); T += 150;
+            });
+            t(function () { if (!running) return; var s = p.querySelector('.ctr2-stamp'); if (s) s.classList.add('on'); }, T); T += 360;
           });
-          // 4) сумма прописью печатается после последней строки
-          t(function () { if (types[1]) typeType(types[1], 'Триста семь тысяч восемьсот рублей', 26); }, 1350 + rows.length * 560 + 250);
-          // 5) подпись → печать + встряска, затем авто-переход на следующий шаг
-          t(function () { sign.classList.add('draw'); }, 1350 + rows.length * 560 + 1600);
-          t(function () { stamp.classList.add('slam'); ctPage.classList.add('shake'); ctPage.classList.remove('typing'); }, 1350 + rows.length * 560 + 2650);
-          t(advance, 1350 + rows.length * 560 + 4600);
+          t(function () { if (running && pgLbl) pgLbl.textContent = 'готово · 3 стр.'; }, T); T += 500;
+          t(advance, T + 1500);
         })();
       };
       api.stop = function () {
         running = false; timers.forEach(function (x) { clearTimeout(x); clearInterval(x); }); timers = [];
         cflow.classList.add('opened'); winShow(cwin, true);
-        ctPage.classList.remove('print', 'shake', 'typing');
         cks.forEach(function (c) { c.classList.add('in'); });
         items.forEach(function (it) { it.classList.add('lit'); });
-        rows.forEach(function (r) { r.classList.add('in'); });
-        types.forEach(function (el) { el.classList.remove('tw'); el.removeAttribute('data-val'); });
-        sign.classList.add('draw'); stamp.classList.add('slam');
+        stackPos(NP - 1);
+        pages.forEach(function (p) { p.querySelectorAll('.ctr2-l, .ctr2-row').forEach(function (l) { l.classList.add('in'); }); var s = p.querySelector('.ctr2-stamp'); if (s) s.classList.add('on'); });
+        if (fill) fill.style.width = '100%'; if (pgLbl) pgLbl.textContent = 'готово · 3 стр.';
       };
     }
 
