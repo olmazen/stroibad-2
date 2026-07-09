@@ -43,6 +43,15 @@ textarea{resize:vertical;min-height:46px;font-size:13px}
 input.err ~ .ferr{display:block}
 .paste{border:1px dashed var(--line2);padding:12px;margin-bottom:6px;background:var(--srf2)}
 .paste textarea{border:1px solid var(--line2);min-height:60px}
+.dz{border:1px dashed var(--line2);background:var(--srf2);padding:22px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;cursor:pointer;transition:border-color .2s,background .2s}
+.dz.drag{border-color:var(--amber);background:rgba(242,111,29,.07)}
+.dz-ico{width:32px;height:32px;color:var(--amber)}.dz-ico svg{width:100%;height:100%}
+.dz-t{font-size:13.5px;color:var(--tx2);line-height:1.4}.dz-t span{display:block;font-size:12px;color:var(--steel);margin-top:3px}
+.dz-status{font-size:12.5px;margin:8px 0 2px;line-height:1.4}
+.dz-status.ok{color:var(--ok)}.dz-status.bad{color:var(--bad)}.dz-status.load{color:var(--steel)}
+.alt{display:flex;gap:8px;margin:12px 0 4px}
+.alt-b{flex:1;background:transparent;border:1px solid var(--line);color:var(--steel);font-family:var(--fh);text-transform:uppercase;letter-spacing:.04em;font-size:11.5px;padding:9px 6px;cursor:pointer}
+.alt-b:hover,.alt-b.on{color:var(--tx);border-color:var(--line2)}
 .paste-b{display:flex;gap:10px;align-items:center;margin-top:8px}
 .btn2{background:#25303a;color:var(--tx);border:none;padding:9px 13px;font:inherit;font-size:13px;cursor:pointer;font-family:var(--fh);text-transform:uppercase;letter-spacing:.04em}
 .btn2:hover{background:#2f3d49}
@@ -102,12 +111,23 @@ input.err ~ .ferr{display:block}
         <button type="button" class="seg-b" data-mode="ip">ИП</button>
       </div>
 
-      <div class="paste">
-        <label class="f" style="margin-top:0">Вставьте карточку предприятия</label>
-        <textarea id="pasteBox" placeholder="Скопируйте блок реквизитов (ИНН, КПП, ОГРН, р/с, к/с, БИК…) — заполним поля автоматически"></textarea>
+      <div class="dz" id="dz">
+        <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.rtf" hidden>
+        <span class="dz-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4m0 0L8 8m4-4l4 4"/><path d="M4 15v4a1 1 0 001 1h14a1 1 0 001-1v-4"/></svg></span>
+        <div class="dz-t">Перетащите файл карточки предприятия<span>PDF или Word — считаем реквизиты автоматически</span></div>
+        <button type="button" class="btn2" id="dzPick">Выбрать файл</button>
+      </div>
+      <div class="dz-status" id="dzStatus"></div>
+      <div class="alt">
+        <button type="button" class="alt-b" id="togglePaste">Вставить текстом</button>
+        <button type="button" class="alt-b" id="toggleManual">Ввести вручную</button>
+      </div>
+      <div class="paste" id="pasteWrap" hidden>
+        <textarea id="pasteBox" placeholder="Скопируйте блок реквизитов (ИНН, КПП, ОГРН, р/с, к/с, БИК…) — распознаем автоматически"></textarea>
         <div class="paste-b"><button type="button" class="btn2" id="pasteBtn">Распознать</button><span class="pmsg" id="pmsg"></span></div>
       </div>
 
+      <div id="manualFields" hidden>
       <label class="f" id="lbName">Наименование</label><input id="bName" placeholder="ООО «Ромашка»">
       <div id="urOnly">
         <div class="two"><div><label class="f">В лице (должность)</label><input id="bPost" value="Генерального директора"></div><div><label class="f">ФИО (род. падеж)</label><input id="bSign" placeholder="Иванова И. И."></div></div>
@@ -127,6 +147,7 @@ input.err ~ .ferr{display:block}
       <label class="f">Расчётный счёт (20 цифр)</label><input id="bRs" inputmode="numeric"><span class="ferr" id="eRs">20 цифр</span>
       <div class="two"><div><label class="f">Корр. счёт (20)</label><input id="bKs" inputmode="numeric"><span class="ferr" id="eKs">20 цифр</span></div><div><label class="f">БИК (9)</label><input id="bBik" inputmode="numeric"><span class="ferr" id="eBik">9 цифр</span></div></div>
       <div class="two"><div><label class="f">Телефон</label><input id="bPhone" placeholder="+7"></div><div><label class="f">E-mail</label><input id="bEmail"></div></div>
+      </div>
 
       <div class="divider"></div>
       <div class="two"><div><label class="f" style="margin-top:0">Договор №</label><input id="dNo"></div><div><label class="f" style="margin-top:0">Город</label><input id="dCity" value="г. Балаково"></div></div>
@@ -178,26 +199,99 @@ function validate(){chk('bInn',buyerType==='ip'?[12]:[10]);chk('bKpp',[9]);chk('
 
 /* ---- paste parser ---- */
 const PAT={ogrnip:/ОГРНИП[\s:№]*(\d{15})/i,ogrn:/ОГРН(?!ИП)[\s:№]*(\d{13})/i,inn:/ИНН[\s:№]*(\d{12}|\d{10})(?!\d)/i,kpp:/КПП[\s:№]*(\d{9})(?!\d)/i,bik:/БИК[\s:№]*(\d{9})(?!\d)/i,rs:/(?:р[\/\\.\s]*с|расч[её]тный\s+сч[её]т|р\.?\s*сч)[\s:№.]*(\d{20})/i,ks:/(?:к[\/\\.\s]*с|корр?[.\s]*сч|корреспондентский\s+сч[её]т)[\s:№.]*(\d{20})/i};
-$('pasteBtn').onclick=()=>{
-  const raw=$('pasteBox').value;if(!raw.trim()){$('pmsg').textContent='';return;}
-  const text=raw.replace(/(\d)[\s ](?=\d)/g,'$1');
-  const g={};for(const k in PAT){const m=text.match(PAT[k]);if(m)g[k]=m[1];}
-  if(g.ogrnip||(g.inn&&g.inn.length===12))setType('ip');
-  else if(/(^|\s)(АО|ПАО|ЗАО)[\s«"]/i.test(text)&&!/ООО/i.test(text))setType('ao');
-  else setType('ooo');
+function setType(m){const b=document.querySelector('#seg .seg-b[data-mode="'+m+'"]');if(b)b.click();}
+function showFields(){$('manualFields').hidden=false;$('toggleManual').classList.add('on');}
+// умный разбор текста реквизитов → заполнение полей; возвращает число распознанных
+function fillFrom(raw){
+  const t=raw.replace(/­/g,'').replace(/(\d)[\s ](?=\d)/g,'$1').replace(/\s+/g,' ').trim();
+  const g={};for(const k in PAT){const m=t.match(PAT[k]);if(m)g[k]=m[1];}
+  const ik=t.match(/ИНН\s*\/?\s*КПП[\s:№]*(\d{10,12})\s*\/\s*(\d{9})/i);if(ik){g.inn=g.inn||ik[1];g.kpp=g.kpp||ik[2];}
+  // наименование: сначала по метке, иначе по полной/краткой форме (не путать с банком)
+  let name='',m;
+  if((m=t.match(/(?:Полное\s+наименование|Наименование\s+организации|Краткое\s+наименование|Наименование)\s*:?\s*([^]{3,90}?)\s*(?:Сокращ|ИНН|КПП|ОГРН|ОКПО|ОКВЭД|Юридическ|Фактическ|Почтов|Адрес|Банк|Р\/с|Телефон|$)/i))&&m[1].replace(/["»«\s]/g,'').length>=3)name=m[1].trim();
+  if(!name&&(m=t.match(/((?:Общество с ограниченной ответственностью|Акционерное общество|Публичное акционерное общество)\s*["«][^"»]{2,70}["»])/i)))name=m[1].trim();
+  if(!name&&(m=t.match(/(?:^|[^а-яёa-z])(ООО|АО|ПАО|ЗАО)\s*["«]([^"»]{2,70})["»]/i))&&!/банк/i.test(m[2]))name=m[1]+' «'+m[2]+'»';
+  if(!name&&(m=t.match(/(?:Индивидуальный\s+предприниматель|\bИП)\s+([А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+(?:\s+[А-ЯЁ][а-яё]+)?)/)))name=m[1].trim();
+  name=name.replace(/"([^"]*)"/g,'«$1»').replace(/\s+/g,' ').trim();
+  let type='ooo';
+  if(g.ogrnip||(g.inn&&g.inn.length===12)||/^\s*(ИП\b|Индивидуальн)/i.test(name))type='ip';
+  else if(/^\s*(АО\b|ПАО\b|ЗАО\b|Акционерное|Публичное)/i.test(name))type='ao';
+  setType(type);
   const map={inn:'bInn',kpp:'bKpp',ogrn:'bOgrn',ogrnip:'bOgrnip',rs:'bRs',ks:'bKs',bik:'bBik'};let n=0;
   for(const k in map)if(g[k]){$(map[k]).value=g[k];n++;}
-  const nm=text.match(/((?:ООО|АО|ПАО|ЗАО|Общество с ограниченной|Акционерное общество)[^\n,;]{0,80})/i);
-  if(nm&&buyerType!=='ip'){$('bName').value=nm[1].trim();n++;}
-  const bank=text.match(/(?:Банк|в\s+(?:ПАО|АО|ООО))[\s:]*([^\n,;]{4,70})/i);
-  if(bank&&/банк|сбербанк|втб|альфа|тинькоф|точка|райффайзен|агророс|открытие/i.test(bank[0])){$('bBank').value=bank[1].replace(/^Банк[\s:]*/i,'').trim();n++;}
-  const addr=text.match(/(?:Юридический\s+адрес|Адрес|Юр\.?\s*адрес)[\s:]*([^\n]{6,120})/i);
-  if(addr){$('bAddr').value=addr[1].trim();n++;}
+  if(name){if(type==='ip')name=name.replace(/^(?:Индивидуальный\s+предприниматель|ИП)\s+/i,'');$('bName').value=name;n++;}
+  const bank=t.match(/(?:Наименование\s+банка|Банк)\s*:?\s*(.{4,70}?)\s*(?:Р\/?с|Расч|К\/?с|Корр|БИК)/i);
+  if(bank&&/банк|сбербанк|втб|альфа|тинькоф|точка|райффайзен|агророс|открыти|совком|росбанк|псб|промсвяз|уралсиб|мкб|казначейств|уфк/i.test(bank[1])){$('bBank').value=bank[1].replace(/["«»]/g,'').replace(/,\s*$/,'').trim();n++;}
+  const addr=t.match(/(?:Юридический\s+адрес|Юр\.?\s*адрес|Почтовый\s+адрес|Место\s+нахождения|Адрес(?:\s+регистрации)?)\s*:?\s*(\d{6}[^]{5,110}?|[^]{8,110}?)\s*(?:ИНН|КПП|ОГРН|ОКПО|ОКВЭД|Телефон|E-?mail|Банк|Р\/с|Фактическ|Расч[её]тн|$)/i);
+  if(addr&&addr[1].trim().length>6){$('bAddr').value=addr[1].replace(/,\s*$/,'').trim();n++;}
+  validate();render();save();
+  return n;
+}
+$('pasteBtn').onclick=()=>{
+  const raw=$('pasteBox').value;if(!raw.trim()){$('pmsg').textContent='';return;}
+  const n=fillFrom(raw);showFields();
   $('pmsg').textContent=n?('Распознано полей: '+n):'Не распознано — заполните вручную';
   $('pmsg').style.color=n?'var(--ok)':'var(--bad)';
-  validate();render();save();
 };
-function setType(m){const b=document.querySelector('#seg .seg-b[data-mode="'+m+'"]');if(b)b.click();}
+
+/* ---- показать/скрыть блоки ---- */
+$('toggleManual').onclick=()=>{const m=$('manualFields');m.hidden=!m.hidden;$('toggleManual').classList.toggle('on',!m.hidden);};
+$('togglePaste').onclick=()=>{const p=$('pasteWrap');p.hidden=!p.hidden;$('togglePaste').classList.toggle('on',!p.hidden);if(!p.hidden)$('pasteBox').focus();};
+
+/* ---- загрузка файла карточки (drag&drop / выбор) ---- */
+$('dzPick').onclick=e=>{e.stopPropagation();$('fileInput').click();};
+$('dz').onclick=()=>$('fileInput').click();
+$('fileInput').onchange=e=>{const f=e.target.files[0];if(f)handleFile(f);};
+['dragover','dragenter'].forEach(ev=>$('dz').addEventListener(ev,e=>{e.preventDefault();$('dz').classList.add('drag');}));
+['dragleave','dragend','drop'].forEach(ev=>$('dz').addEventListener(ev,e=>{e.preventDefault();$('dz').classList.remove('drag');}));
+$('dz').addEventListener('drop',e=>{const f=e.dataTransfer&&e.dataTransfer.files[0];if(f)handleFile(f);});
+async function handleFile(file){
+  const st=$('dzStatus');st.className='dz-status load';st.textContent='Читаю «'+file.name+'»…';
+  try{
+    const name=file.name.toLowerCase();let text='';
+    if(name.endsWith('.docx'))text=await readDocx(file);
+    else if(name.endsWith('.pdf'))text=await readPdf(file);
+    else if(name.endsWith('.rtf'))text=stripRtf(await file.text());
+    else text=await file.text();
+    if(!text||text.replace(/\s/g,'').length<20){st.className='dz-status bad';st.textContent='Не удалось прочитать текст (возможно, это скан-изображение). Вставьте реквизиты текстом или вручную.';showFields();return;}
+    const n=fillFrom(text);showFields();
+    st.className='dz-status '+(n>=3?'ok':'bad');
+    st.textContent=(n>=3?'✓ ':'')+'Распознано полей: '+n+' из файла — проверьте и поправьте при необходимости.';
+  }catch(err){st.className='dz-status bad';st.textContent='Не удалось прочитать файл ('+((err&&err.message)||'ошибка')+'). Вставьте текстом или вручную.';showFields();}
+}
+/* DOCX: ZIP-чтение центрального каталога + инфляция (DecompressionStream) */
+async function inflateRaw(bytes){const ds=new DecompressionStream('deflate-raw');const s=new Blob([bytes]).stream().pipeThrough(ds);return new Uint8Array(await new Response(s).arrayBuffer());}
+async function readDocx(file){
+  const buf=new Uint8Array(await file.arrayBuffer()),dv=new DataView(buf.buffer);
+  let eo=-1;for(let i=buf.length-22;i>=0;i--){if(dv.getUint32(i,true)===0x06054b50){eo=i;break;}}
+  if(eo<0)throw new Error('не docx');
+  let cnt=dv.getUint16(eo+10,true),p=dv.getUint32(eo+16,true),tgt=null;
+  for(let i=0;i<cnt&&p+46<=buf.length;i++){
+    if(dv.getUint32(p,true)!==0x02014b50)break;
+    const method=dv.getUint16(p+10,true),csz=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),el=dv.getUint16(p+32,true),cl=dv.getUint16(p+34,true)|0,off=dv.getUint32(p+42,true);
+    const nm=new TextDecoder().decode(buf.subarray(p+46,p+46+nl));
+    if(nm==='word/document.xml'){tgt={method,csz,off};break;}
+    p+=46+nl+dv.getUint16(p+30,true)+dv.getUint16(p+32,true);
+  }
+  if(!tgt)throw new Error('нет document.xml');
+  const lnl=dv.getUint16(tgt.off+26,true),lel=dv.getUint16(tgt.off+28,true),ds=tgt.off+30+lnl+lel;
+  const comp=buf.subarray(ds,ds+tgt.csz);
+  const xmlB=tgt.method===8?await inflateRaw(comp):comp;
+  let x=new TextDecoder('utf-8').decode(xmlB);
+  x=x.replace(/<w:tab\/>/g,' ').replace(/<w:br\/>/g,'\n').replace(/<\/w:p>/g,'\n').replace(/<\/w:tr>/g,'\n').replace(/<[^>]+>/g,'');
+  return x.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
+}
+/* PDF: pdf.js подгружается лениво (корректная кириллица через ToUnicode) */
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('нет доступа к pdf.js'));document.head.appendChild(s);});}
+let pdfReady=null;
+function ensurePdf(){if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);if(!pdfReady)pdfReady=loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js').then(()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';return window.pdfjsLib;});return pdfReady;}
+async function readPdf(file){
+  const lib=await ensurePdf(),buf=new Uint8Array(await file.arrayBuffer());
+  const doc=await lib.getDocument({data:buf}).promise;let text='';
+  for(let i=1;i<=doc.numPages;i++){const pg=await doc.getPage(i),c=await pg.getTextContent();text+=c.items.map(it=>it.str).join(' ')+'\n';}
+  return text;
+}
+function stripRtf(s){if(!/^{\\rtf/.test(s))return s;return s.replace(/\\par[d]?/g,'\n').replace(/\\'([0-9a-f]{2})/gi,(_,h)=>{try{return new TextDecoder('windows-1251').decode(new Uint8Array([parseInt(h,16)]));}catch(e){return ' ';}}).replace(/[{}]/g,'').replace(/\\[a-z]+-?\d* ?/gi,' ');}
 
 /* ---- inputs → render ---- */
 ['bName','bPost','bSign','bBasis','bBasisIp','bInn','bKpp','bOgrn','bOgrnip','bAddr','bBank','bRs','bKs','bBik','bPhone','bEmail','dNo','dCity']
@@ -379,7 +473,7 @@ $('btnPrint').onclick=()=>window.print();
 /* ---- persistence ---- */
 const KEYS=['bName','bPost','bSign','bBasis','bBasisIp','bInn','bKpp','bOgrn','bOgrnip','bAddr','bBank','bRs','bKs','bBik','bPhone','bEmail'];
 function save(){try{const o={type:buyerType};KEYS.forEach(k=>o[k]=v(k));localStorage.setItem('dg_buyer_v2',JSON.stringify(o));}catch(e){}}
-function restore(){try{const o=JSON.parse(localStorage.getItem('dg_buyer_v2')||'null');if(!o)return;if(o.type&&o.type!=='ooo')setType(o.type);KEYS.forEach(k=>{if(o[k]&&$(k))$(k).value=o[k];});}catch(e){}}
+function restore(){try{const o=JSON.parse(localStorage.getItem('dg_buyer_v2')||'null');if(!o)return;if(o.type&&o.type!=='ooo')setType(o.type);let any=false;KEYS.forEach(k=>{if(o[k]&&$(k)){$(k).value=o[k];any=true;}});if(any)showFields();}catch(e){}}
 $('btnSave').onclick=()=>{save();$('btnSave').textContent='Сохранено ✓';setTimeout(()=>$('btnSave').textContent='Запомнить реквизиты',1400);};
 $('btnForget').onclick=()=>{try{localStorage.removeItem('dg_buyer_v2');}catch(e){}KEYS.forEach(k=>{if($(k))$(k).value='';});validate();render();};
 
