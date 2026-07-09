@@ -308,7 +308,34 @@
 
     /* УСЛОВИЯ */
     html += termsSheet(validDate);
+    /* СЕРТИФИКАТЫ — если в корзине есть корзины для кондиционеров */
+    if (hasKorziny(rows)) html += certSheet();
     return html;
+  }
+
+  function hasKorziny(rows) {
+    return rows.some(function (r) {
+      if (r.cat && r.cat.catKey === 'metallokonstrukcii/korziny-dlya-konditsionerov') return true;
+      if (/^(ART|STN)\d{1,3}$/i.test(r.id || '')) return true;
+      if (r.cat && /корзин/i.test(r.cat.category || '')) return true;
+      return false;
+    });
+  }
+  function certSheet() {
+    var docs = [
+      ['../assets/img/docs/korziny/sertifikat.webp', 'Сертификат соответствия', 'Система «Прибор-Эксперт» · № РОСС RU.НЕ06.Н25994 · действует до 14.07.2027'],
+      ['../assets/img/docs/korziny/protokol-1.webp', 'Протокол испытаний · лист 1', 'Лаборатория «Система качества» · № СК-24/07-0339 от 09.07.2024'],
+      ['../assets/img/docs/korziny/protokol-2.webp', 'Протокол испытаний · лист 2', 'Размеры, сталь 0,7 мм, кромки — все показатели «соответствует»']
+    ];
+    return '<section class="sheet kp-certs">' +
+      '<span class="bp-corner tl"></span><span class="bp-corner br"></span>' +
+      '<h2 class="kp-h">Сертификаты и испытания</h2>' +
+      '<p class="kp-certs-sub">Корзины для кондиционеров сертифицированы и прошли лабораторные испытания. Продукция соответствует ТУ 28.25.12-001-24405486-2024. Полный пакет документов предоставляется к поставке.</p>' +
+      '<div class="cert-sheet-grid">' +
+      docs.map(function (d) {
+        return '<figure class="cert-doc"><div class="cert-doc-img"><img src="' + d[0] + '" alt="' + esc(d[1]) + '" onerror="this.closest(\'.cert-doc\').style.display=\'none\'"></div><figcaption><b>' + esc(d[1]) + '</b><span>' + esc(d[2]) + '</span></figcaption></figure>';
+      }).join('') +
+      '</div></section>';
   }
 
   function ralHex(row) {

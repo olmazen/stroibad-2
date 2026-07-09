@@ -1077,35 +1077,6 @@ window.__whenVisible = (function () {
   render();
 })();
 
-/* ── переключатель «Завод vs Посредник» ── */
-(function () {
-  document.querySelectorAll('.versus').forEach(function (box) {
-    var btns = box.querySelectorAll('.vs-btn');
-    var slide = box.querySelector('.vs-slide');
-    if (!btns.length || !slide) return;
-
-    function place(btn) {
-      slide.style.left = btn.offsetLeft + 'px';
-      slide.style.width = btn.offsetWidth + 'px';
-    }
-    function setMode(mode, btn) {
-      box.dataset.mode = mode;
-      btns.forEach(function (b) { b.classList.toggle('on', b === btn); });
-      place(btn);
-    }
-    btns.forEach(function (b) {
-      b.addEventListener('click', function () { setMode(b.dataset.mode, b); });
-    });
-    // стартовое положение
-    var start = box.querySelector('.vs-btn.on') || btns[0];
-    requestAnimationFrame(function () { setMode(start.dataset.mode, start); });
-    addEventListener('resize', function () {
-      var cur = box.querySelector('.vs-btn.on');
-      if (cur) place(cur);
-    });
-  });
-})();
-
 /* ── главная: колесо заказа v3 ──
    ОСНОВНАЯ информация шага (номер + заголовок) закреплена НА колесе и уезжает
    вместе с его вращением; следующая подъезжает по дуге. Когда шаг встал в паз —
@@ -1164,21 +1135,31 @@ window.__whenVisible = (function () {
         '<div class="pdf-spec"><span>Серия</span><b>Art Déco · коллекция A</b></div><div class="pdf-spec"><span>Материал</span><b>сталь · термодерево</b></div><div class="pdf-spec"><span>Окраска</span><b>любой RAL</b></div></div>' +
       '</div><div class="fw-pgdots"><i class="on"></i><i></i><i></i></div></div></div></div>' +
       '<button class="fw-own" type="button" onclick="openModal()">Оставить свою заявку →</button>';
-    if (k === 'contract') return '<div class="fw-flow2">' +
-      '<div class="fw-att-zone"><div class="fw-checklist">' +
-      '<div class="fw-ck"><i></i>Работа по 44-ФЗ и 223-ФЗ</div>' +
-      '<div class="fw-ck"><i></i>НДС 20% включён</div>' +
-      '<div class="fw-ck"><i></i>Спецификация и КМД в приложении</div>' +
-      '<div class="fw-ck"><i></i>Гарантия 24 месяца</div>' +
+    if (k === 'contract') return '<div class="fw-flow2 fw-ctr">' +
+      '<div class="fw-att-zone"><div class="ctr-cart">' +
+        '<div class="ctr-cart-h"><b>Корзина</b><span>3 позиции · 26 ед.</span></div>' +
+        '<div class="ctr-item" data-row="0"><span class="ctr-th"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp?i10" alt="Лежак Art Déco A1-2661" loading="lazy"></span><div class="ctr-it-tx"><b>Лежак A1-2661</b><span>Art Déco · RAL 6021 · 12 шт</span></div><i class="ctr-dot"></i></div>' +
+        '<div class="ctr-item" data-row="1"><span class="ctr-th"><img src="assets/img/maf/skamejki/9467/main.webp" alt="Скамейка A4-2641" loading="lazy"></span><div class="ctr-it-tx"><b>Скамейка A4-2641</b><span>RAL 7016 · 8 шт</span></div><i class="ctr-dot"></i></div>' +
+        '<div class="ctr-item" data-row="2"><span class="ctr-th"><img src="assets/img/korziny/standart/STN03-treugolnik/main.webp" alt="Корзина STN-03" loading="lazy"></span><div class="ctr-it-tx"><b>Корзина STN-03</b><span>RAL 9005 · 6 шт</span></div><i class="ctr-dot"></i></div>' +
+        '<div class="fw-checklist">' +
+          '<div class="fw-ck"><i></i>Работа по 44-ФЗ и 223-ФЗ · НДС 22%</div>' +
+          '<div class="fw-ck"><i></i>Спецификация и КМД в приложении</div>' +
+          '<div class="fw-ck"><i></i>Гарантия 24 месяца</div>' +
+        '</div>' +
       '</div></div>' +
       '<div class="fw-win fw-docwin"><div class="fw-win-bar"><i></i><i></i><i></i><b>договор-214.pdf</b><span>пакет для тендера</span></div>' +
-      '<div class="fw-win-body"><div class="fw-ct">' +
-      '<b class="ct-h">Договор поставки № 214</b><span class="ct-sub">ООО «EGOE» · с НДС 20%</span>' +
-      '<div class="ct-par"><u style="width:96%"></u><u style="width:88%"></u><u style="width:64%"></u></div>' +
-      '<div class="ct-par"><u style="width:92%"></u><u style="width:97%"></u><u style="width:41%"></u></div>' +
-      '<div class="ct-par"><u style="width:85%"></u><u style="width:72%"></u></div>' +
-      '<div class="ct-sign"><div class="ct-s"><em>Поставщик · EGOE</em><svg viewBox="0 0 130 36"><path d="M8 26 C 20 6, 30 32, 44 18 S 64 8, 74 22 S 102 28, 122 10"/></svg></div>' +
-      '<span class="fw-stamp"><b>EGOE</b>завод · Балаково</span></div>' +
+      '<div class="fw-win-body"><div class="fw-ct"><span class="ct-sweep" aria-hidden="true"></span>' +
+        '<b class="ct-h">Договор поставки № <em class="ct-type" data-type="214">&nbsp;</em></b>' +
+        '<span class="ct-sub">ООО «EGOE» · г. Балаково · с НДС 22%</span>' +
+        '<div class="ct-spec">' +
+          '<div class="ct-row ct-row-h"><span>Изделие</span><span>RAL</span><span>Кол</span><span>Сумма</span></div>' +
+          '<div class="ct-row" data-r="0"><span class="ct-it"><i class="ct-th"><img src="assets/img/artdeco/lezhaki/a1-2661/card.webp?i10" alt="" loading="lazy"></i>Лежак Art Déco A1-2661</span><span>6021</span><span>12</span><span>260 400 ₽</span></div>' +
+          '<div class="ct-row" data-r="1"><span class="ct-it"><i class="ct-th"><img src="assets/img/maf/skamejki/9467/main.webp" alt="" loading="lazy"></i>Скамейка A4-2641</span><span>7016</span><span>8</span><span>36 000 ₽</span></div>' +
+          '<div class="ct-row" data-r="2"><span class="ct-it"><i class="ct-th"><img src="assets/img/korziny/standart/STN03-treugolnik/main.webp" alt="" loading="lazy"></i>Корзина STN-03</span><span>9005</span><span>6</span><span>11 400 ₽</span></div>' +
+        '</div>' +
+        '<div class="ct-total"><span>Сумма прописью:</span><b class="ct-words"><em class="ct-type" data-type="Триста семь тысяч восемьсот рублей">&nbsp;</em></b><u class="ct-num">307 800 ₽</u></div>' +
+        '<div class="ct-sign"><div class="ct-s"><em>Поставщик · EGOE</em><svg viewBox="0 0 130 36"><path d="M8 26 C 20 6, 30 32, 44 18 S 64 8, 74 22 S 102 28, 122 10"/></svg></div>' +
+        '<span class="fw-stamp"><b>EGOE</b>завод · Балаково</span></div>' +
       '</div></div></div></div>';
     if (k === 'draw') return '<div class="fw-bp fw-bp-stack folded">' +
       '<img class="fw-bp-under" src="assets/img/artdeco/lezhaki/i1-3451/drawing-white.svg" alt="" aria-hidden="true">' +
@@ -1447,10 +1428,10 @@ window.__whenVisible = (function () {
           var rr = reals();
           var m = catalog.classList.contains('is-mobile');
           var T = m
-            ? { lead: 420, fill0: 1650, fill1: 2200, dolly: 2850, add0: 3950, add1: 5100, cart: 6350, press: 6970, loop: 7770 }
-            : { lead: 420, fill0: 1750, fill1: 2300, dolly: 3000, add0: 4250, add1: 5450, cart: 6700, press: 7320, loop: 8120 };
-          // 1) плитки каталога появляются из центра кольцами (задержка = кольцо, чистый CSS) — с лид-ином, помедленнее
-          t(function () { if (!running) return; grid.classList.add('in'); }, T.lead);
+            ? { fill0: 650, fill1: 1100, dolly: 1950, add0: 2900, add1: 4000, cart: 5100, press: 5700, loop: 6300 }
+            : { fill0: 700, fill1: 1150, dolly: 2050, add0: 3050, add1: 4200, cart: 5300, press: 5900, loop: 6500 };
+          // 1) сетка каталога + две центральные карточки-скелетоны показываются СРАЗУ (кольца доезжают по CSS), без лид-задержки
+          grid.classList.add('in');
           // 2) две центральные карточки заполняются данными ПО ОЧЕРЕДИ
           t(function () { if (!running) return; if (rr[0]) rr[0].classList.add('filled'); }, T.fill0);
           t(function () { if (!running) return; if (rr[1]) rr[1].classList.add('filled'); }, T.fill1);
@@ -1528,29 +1509,64 @@ window.__whenVisible = (function () {
     }
 
     if (kind === 'contract') {
-      var pars = root.querySelectorAll('.ct-par');
-      var cks = root.querySelectorAll('.fw-ck');
-      var sign = root.querySelector('.ct-s');
-      var stamp = root.querySelector('.fw-stamp');
-      var page = root.querySelector('.fw-ct');
-      var cflow = root.querySelector('.fw-flow2');
-      var cwin = root.querySelector('.fw-win');
+      var ctPage = root.querySelector('.fw-ct');
+      var cks    = root.querySelectorAll('.fw-ck');
+      var items  = root.querySelectorAll('.ctr-item');
+      var rows   = root.querySelectorAll('.ct-row[data-r]');
+      var types  = root.querySelectorAll('.ct-type');
+      var sign   = root.querySelector('.ct-s');
+      var stamp  = root.querySelector('.fw-stamp');
+      var cflow  = root.querySelector('.fw-flow2');
+      var cwin   = root.querySelector('.fw-win');
+      // typeVal пишет в .value; для <span> печатаем в data-val (CSS показывает через ::before при .typing)
+      function typeType(el, str, cps, done) {
+        var i = 0; el.classList.add('tw');
+        var iv = setInterval(function () {
+          el.setAttribute('data-val', str.slice(0, ++i));
+          if (i >= str.length) { clearInterval(iv); el.classList.remove('tw'); if (done) done(); }
+        }, cps);
+        timers.push(iv);
+      }
       api.start = function () {
         running = true;
         cflow.classList.add('opened'); winShow(cwin, true);
         (function loop() {
           if (!running) return;
-          pars.forEach(function (p) { p.classList.remove('in'); });
+          ctPage.classList.remove('print', 'shake', 'typing');
           cks.forEach(function (c) { c.classList.remove('in'); });
-          sign.classList.remove('draw'); stamp.classList.remove('slam'); page.classList.remove('shake');
-          pars.forEach(function (p, i) { t(function () { p.classList.add('in'); }, 420 + i * 620); });
-          cks.forEach(function (c, i) { t(function () { c.classList.add('in'); }, 560 + i * 620); });
-          t(function () { sign.classList.add('draw'); }, 420 + pars.length * 620 + 300);
-          t(function () { stamp.classList.add('slam'); page.classList.add('shake'); }, 420 + pars.length * 620 + 1350);
-          t(advance, 420 + pars.length * 620 + 4600);
+          items.forEach(function (it) { it.classList.remove('lit'); });
+          rows.forEach(function (r) { r.classList.remove('in'); });
+          types.forEach(function (el) { el.classList.remove('tw'); el.removeAttribute('data-val'); });
+          sign.classList.remove('draw'); stamp.classList.remove('slam');
+          // 1) амбер-развёртка «печатает» лист + № договора типизируется
+          t(function () { ctPage.classList.add('print', 'typing'); }, 300);
+          t(function () { if (types[0]) typeType(types[0], '214', 90); }, 620);
+          // 2) чек-лист слева проявляется
+          cks.forEach(function (c, i) { t(function () { c.classList.add('in'); }, 700 + i * 320); });
+          // 3) позиция корзины подсвечивается → её строка спецификации влетает (с той же миниатюрой)
+          items.forEach(function (it, i) {
+            var row = rows[i];
+            t(function () { it.classList.add('lit'); }, 1350 + i * 560);
+            t(function () { if (row) row.classList.add('in'); }, 1560 + i * 560);
+          });
+          // 4) сумма прописью печатается после последней строки
+          t(function () { if (types[1]) typeType(types[1], 'Триста семь тысяч восемьсот рублей', 26); }, 1350 + rows.length * 560 + 250);
+          // 5) подпись → печать + встряска, затем авто-переход на следующий шаг
+          t(function () { sign.classList.add('draw'); }, 1350 + rows.length * 560 + 1600);
+          t(function () { stamp.classList.add('slam'); ctPage.classList.add('shake'); ctPage.classList.remove('typing'); }, 1350 + rows.length * 560 + 2650);
+          t(advance, 1350 + rows.length * 560 + 4600);
         })();
       };
-      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; cflow.classList.add('opened'); winShow(cwin, true); pars.forEach(function (p) { p.classList.add('in'); }); cks.forEach(function (c) { c.classList.add('in'); }); sign.classList.add('draw'); stamp.classList.add('slam'); page.classList.remove('shake'); };
+      api.stop = function () {
+        running = false; timers.forEach(function (x) { clearTimeout(x); clearInterval(x); }); timers = [];
+        cflow.classList.add('opened'); winShow(cwin, true);
+        ctPage.classList.remove('print', 'shake', 'typing');
+        cks.forEach(function (c) { c.classList.add('in'); });
+        items.forEach(function (it) { it.classList.add('lit'); });
+        rows.forEach(function (r) { r.classList.add('in'); });
+        types.forEach(function (el) { el.classList.remove('tw'); el.removeAttribute('data-val'); });
+        sign.classList.add('draw'); stamp.classList.add('slam');
+      };
     }
 
     if (kind === 'draw') {
@@ -1708,4 +1724,20 @@ window.__whenVisible = (function () {
     bar.classList.remove('show');
     setTimeout(function () { if (bar.parentNode) bar.remove(); }, 500);
   });
+})();
+
+/* ── лайтбокс просмотра сертификатов/документов (страница корзин, о компании) ── */
+(function () {
+  var cards = document.querySelectorAll('.cert-card[href]');
+  if (!cards.length) return;
+  var lb = document.createElement('div');
+  lb.className = 'cert-lb';
+  lb.innerHTML = '<button class="cert-lb-x" type="button" aria-label="Закрыть">×</button><img alt="Документ"><span class="cert-lb-hint">Клик вне документа или Esc — закрыть</span>';
+  document.body.appendChild(lb);
+  var img = lb.querySelector('img');
+  function open(src) { img.src = src; lb.classList.add('on'); document.documentElement.style.overflow = 'hidden'; }
+  function close() { lb.classList.remove('on'); document.documentElement.style.overflow = ''; setTimeout(function () { if (!lb.classList.contains('on')) img.removeAttribute('src'); }, 280); }
+  cards.forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); open(a.getAttribute('href')); }); });
+  lb.addEventListener('click', function (e) { if (e.target === lb || e.target.classList.contains('cert-lb-x')) close(); });
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && lb.classList.contains('on')) close(); });
 })();

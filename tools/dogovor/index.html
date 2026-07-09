@@ -30,6 +30,9 @@ textarea{resize:vertical;min-height:44px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .hint{font-size:11px;color:var(--mut);margin:6px 0 0}
+.seg{display:flex;gap:4px;background:#0e1217;border:1px solid var(--line);border-radius:8px;padding:3px;margin:4px 0 10px}
+.seg-b{flex:1;border:none;background:none;color:var(--mut);font:inherit;font-size:12.5px;padding:8px;border-radius:6px;cursor:pointer;transition:.15s}
+.seg-b.on{background:var(--amber);color:#fff;font-weight:700}
 .seller{font-size:12px;color:var(--mut);line-height:1.55}
 .seller b{color:var(--ink)}
 /* nomenclature picker */
@@ -106,21 +109,37 @@ textarea{resize:vertical;min-height:44px}
       <label class="f">Город</label><input id="dCity" value="г. Балаково">
       <label class="f">НДС</label>
       <select id="dVat">
+        <option value="vat22">В том числе НДС 22%</option>
         <option value="usn">НДС не облагается (УСН)</option>
-        <option value="vat20">В том числе НДС 20%</option>
       </select>
     </div></details>
 
     <details class="grp" open><summary>Покупатель</summary><div class="body">
-      <label class="f">Наименование</label><input id="bName" placeholder="ООО СЗ «Вымпел»">
-      <label class="f">В лице (должность, ФИО)</label><input id="bSign" placeholder="генерального директора Барышевой М. В.">
-      <label class="f">Действует на основании</label><input id="bBasis" value="Устава">
-      <div class="row"><div><label class="f">ИНН</label><input id="bInn"></div><div><label class="f">КПП</label><input id="bKpp"></div></div>
-      <label class="f">ОГРН</label><input id="bOgrn">
-      <label class="f">Юридический адрес</label><textarea id="bAddr"></textarea>
-      <label class="f">Р/с</label><input id="bRs">
-      <label class="f">Банк</label><input id="bBank">
-      <div class="row"><div><label class="f">К/с</label><input id="bKs"></div><div><label class="f">БИК</label><input id="bBik"></div></div>
+      <div class="seg" id="bTypeSeg">
+        <button type="button" class="seg-b on" data-mode="fiz">Частное лицо</button>
+        <button type="button" class="seg-b" data-mode="ur">Организация</button>
+      </div>
+
+      <div id="buyerFiz">
+        <label class="f">Фамилия Имя Отчество</label><input id="fName" placeholder="Иванов Иван Иванович">
+        <div class="row"><div><label class="f">Паспорт: серия</label><input id="fPsSer" placeholder="63 05" inputmode="numeric"></div><div><label class="f">номер</label><input id="fPsNum" placeholder="123456" inputmode="numeric"></div></div>
+        <label class="f">Кем выдан</label><textarea id="fPsBy" placeholder="ГУ МВД России по Саратовской области"></textarea>
+        <div class="row"><div><label class="f">Дата выдачи</label><input id="fPsDate" type="date"></div><div><label class="f">Код подразделения</label><input id="fPsCode" placeholder="640-001"></div></div>
+        <label class="f">Адрес регистрации</label><textarea id="fAddr" placeholder="г. Балаково, ул. …, д. …, кв. …"></textarea>
+        <div class="row"><div><label class="f">Телефон</label><input id="fPhone" placeholder="+7"></div><div><label class="f">E-mail</label><input id="fEmail" placeholder="mail@…"></div></div>
+      </div>
+
+      <div id="buyerUr" style="display:none">
+        <label class="f">Наименование</label><input id="bName" placeholder="ООО СЗ «Вымпел»">
+        <label class="f">В лице (должность, ФИО)</label><input id="bSign" placeholder="генерального директора Барышевой М. В.">
+        <label class="f">Действует на основании</label><input id="bBasis" value="Устава">
+        <div class="row"><div><label class="f">ИНН</label><input id="bInn"></div><div><label class="f">КПП</label><input id="bKpp"></div></div>
+        <label class="f">ОГРН</label><input id="bOgrn">
+        <label class="f">Юридический адрес</label><textarea id="bAddr"></textarea>
+        <label class="f">Р/с</label><input id="bRs">
+        <label class="f">Банк</label><input id="bBank">
+        <div class="row"><div><label class="f">К/с</label><input id="bKs"></div><div><label class="f">БИК</label><input id="bBik"></div></div>
+      </div>
     </div></details>
 
     <details class="grp" open><summary>Номенклатура (корзины)</summary><div class="body">
@@ -250,18 +269,57 @@ document.getElementById('addCustom').onclick=()=>{ lines.push({id:uid++,kind:'cu
 
 // ---------- gather inputs ----------
 const $=id=>document.getElementById(id);
-const F=['dNo','dDate','dCity','dVat','bName','bSign','bBasis','bInn','bKpp','bOgrn','bAddr','bRs','bBank','bKs','bBik','cTerm','cAdv','wWood','wPaint','wConstr'];
+const F=['dNo','dDate','dCity','dVat','bName','bSign','bBasis','bInn','bKpp','bOgrn','bAddr','bRs','bBank','bKs','bBik','cTerm','cAdv','wWood','wPaint','wConstr',
+  'fName','fPsSer','fPsNum','fPsBy','fPsDate','fPsCode','fAddr','fPhone','fEmail'];
 F.forEach(id=>{ const e=$(id); if(e) e.addEventListener('input',renderDoc); });
+
+// buyer type: 'fiz' (частное лицо) | 'ur' (организация)
+let buyerMode='fiz';
+document.querySelectorAll('#bTypeSeg .seg-b').forEach(b=>b.onclick=()=>{
+  buyerMode=b.dataset.mode;
+  document.querySelectorAll('#bTypeSeg .seg-b').forEach(x=>x.classList.toggle('on',x===b));
+  $('buyerFiz').style.display = buyerMode==='fiz'?'':'none';
+  $('buyerUr').style.display  = buyerMode==='ur'?'':'none';
+  renderDoc();
+});
 
 function ruDate(v){ if(!v) return '«___» __________ 20__ г.'; const [y,m,d]=v.split('-'); const mn=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']; return '«'+d+'» '+mn[+m-1]+' '+y+' г.'; }
 function or(v,ph){ return (v&&v.trim())?v:'<span style="color:#b00">'+ph+'</span>'; }
+function val(id){ const e=$(id); return e?e.value.trim():''; }
+// склонение окончаний по полу (по отчеству)
+function fem(fio){ return /(вна|чна|ична)\s*$/i.test((fio||'').trim()); }
+// «Покупатель» — часть преамбулы
+function buyerPreamble(){
+  if(buyerMode==='ur'){
+    return `<b>${or(val('bName'),'Наименование покупателя')}</b>, именуемое в дальнейшем «Покупатель», в лице ${or(val('bSign'),'должность, ФИО')}, действующего на основании ${val('bBasis')||'Устава'}`;
+  }
+  const f=fem(val('fName'));
+  const ps=[val('fPsSer'),val('fPsNum')].filter(Boolean).join(' ');
+  let s=`${f?'гражданка':'гражданин'} Российской Федерации <b>${or(val('fName'),'Фамилия Имя Отчество')}</b>`;
+  if(ps||val('fPsBy')) s+=`, паспорт ${ps||'__ __ ______'}${val('fPsBy')?', выдан '+val('fPsBy'):''}${val('fPsDate')?' '+ruDate(val('fPsDate')).replace(' г.',' г.'):''}${val('fPsCode')?', код подразделения '+val('fPsCode'):''}`;
+  if(val('fAddr')) s+=`, зарегистрирован${f?'ная':'ный'} по адресу: ${val('fAddr')}`;
+  s+=`, именуем${f?'ая':'ый'} в дальнейшем «Покупатель»`;
+  return s;
+}
+// реквизиты покупателя (правая колонка блока 10)
+function buyerRequisites(){
+  if(buyerMode==='ur'){
+    return `${or(val('bName'),'Наименование')}<br>ИНН ${val('bInn')||'—'} / КПП ${val('bKpp')||'—'}<br>ОГРН ${val('bOgrn')||'—'}<br>${(val('bAddr')||'Юридический адрес').replace(/\n/g,'<br>')}<br>Р/с ${val('bRs')||'—'}<br>${val('bBank')||'Банк'}<br>К/с ${val('bKs')||'—'}<br>БИК ${val('bBik')||'—'}`;
+  }
+  const ps=[val('fPsSer'),val('fPsNum')].filter(Boolean).join(' ');
+  return `${or(val('fName'),'Ф. И. О.')}<br>Паспорт ${ps||'—'}${val('fPsCode')?', к/п '+val('fPsCode'):''}<br>${val('fPsBy')?'выдан '+val('fPsBy')+(val('fPsDate')?' '+ruDate(val('fPsDate')):'')+'<br>':''}Адрес: ${(val('fAddr')||'—').replace(/\n/g,'<br>')}<br>Тел.: ${val('fPhone')||'—'}${val('fEmail')?'<br>E-mail: '+val('fEmail'):''}`;
+}
+function buyerShortName(){
+  if(buyerMode==='ur'){ const s=val('bSign'); return s? s.split(' ').slice(-2).join(' ') : ''; }
+  const n=val('fName').split(/\s+/); return n.length>=2? (n[0]+' '+n.slice(1).map(w=>w[0]?w[0]+'.':'').join(' ')) : val('fName');
+}
 
 // ---------- build document ----------
 function renderDoc(){
   const total = lines.reduce((s,l)=>s+l.qty*l.price,0);
   $('pillTotal').textContent=fmt(total)+' ₽';
-  const vat = $('dVat').value==='vat20';
-  const vatPhrase = vat ? 'в том числе НДС 20%' : 'НДС не облагается в связи с применением Поставщиком упрощённой системы налогообложения';
+  const vatMode = $('dVat').value;
+  const vatPhrase = vatMode==='vat22' ? 'в том числе НДС 22%' : 'НДС не облагается в связи с применением Поставщиком упрощённой системы налогообложения';
   const adv = Math.min(100,Math.max(0,+$('cAdv').value||0));
   const advSum = Math.round(total*adv/100), restSum = total-advSum;
   const term=$('cTerm').value||'45';
@@ -271,7 +329,7 @@ function renderDoc(){
   $('pageContract').innerHTML = `
     <h1>ДОГОВОР ПОСТАВКИ № ${or($('dNo').value,'____')}</h1>
     <div class="meta"><span>${$('dCity').value||'г. Балаково'}</span><span>${ruDate($('dDate').value)}</span></div>
-    <p><b>Общество с ограниченной ответственностью «Фабрика «САМШИТ»</b>, именуемое в дальнейшем «Поставщик», в лице директора Рафикова Рината Мубиновича, действующего на основании Устава, с одной стороны, и <b>${or($('bName').value,'Наименование покупателя')}</b>, именуемое в дальнейшем «Покупатель», в лице ${or($('bSign').value,'должность, ФИО')}, действующего на основании ${$('bBasis').value||'Устава'}, с другой стороны, заключили настоящий договор о нижеследующем:</p>
+    <p><b>Общество с ограниченной ответственностью «Фабрика «САМШИТ»</b>, именуемое в дальнейшем «Поставщик», в лице директора Рафикова Рината Мубиновича, действующего на основании Устава, с одной стороны, и ${buyerPreamble()}, с другой стороны, заключили настоящий договор о нижеследующем:</p>
     <h2>1. ПРЕДМЕТ ДОГОВОРА</h2>
     <div class="cl">1.1. Поставщик обязуется изготовить и передать в собственность Покупателя, а Покупатель обязуется принять и оплатить Товар в ассортименте, количестве и по цене согласно спецификации (Приложение № 1), являющейся неотъемлемой частью настоящего договора.</div>
     <div class="cl">1.2. В состав спецификации включены маркировки изделий по проектной документации объекта.</div>
@@ -309,9 +367,9 @@ function renderDoc(){
     <h2>10. РЕКВИЗИТЫ И ПОДПИСИ СТОРОН</h2>
     <div class="req">
       <div><h3>ПОСТАВЩИК</h3>ООО «Фабрика «САМШИТ»<br>ИНН 6439086125 / КПП 643901001<br>ОГРН 1146439002863<br>413801, Саратовская обл., Балаковский р-н, с. Натальино, тупик Безымянный, д. 1<br>Р/с 40702810600000008505<br>АО «Банк «Агророс», г. Саратов<br>К/с 30101810600000000772<br>БИК 046311772<br>тел. 8 (8453) 655-777</div>
-      <div><h3>ПОКУПАТЕЛЬ</h3>${or($('bName').value,'Наименование')}<br>ИНН ${or($('bInn').value,'—')} / КПП ${$('bKpp').value||'—'}<br>ОГРН ${$('bOgrn').value||'—'}<br>${($('bAddr').value||'Юридический адрес').replace(/\n/g,'<br>')}<br>Р/с ${$('bRs').value||'—'}<br>${$('bBank').value||'Банк'}<br>К/с ${$('bKs').value||'—'}<br>БИК ${$('bBik').value||'—'}</div>
+      <div><h3>ПОКУПАТЕЛЬ</h3>${buyerRequisites()}</div>
     </div>
-    <div class="sign"><div class="col">Директор ______________ / Рафиков Р. М.<div class="ln">М.П.</div></div><div class="col">______________ / ${or($('bSign').value ? $('bSign').value.split(' ').slice(-2).join(' ') : '','Ф. И. О.')}<div class="ln">М.П.</div></div></div>
+    <div class="sign"><div class="col">Директор ______________ / Рафиков Р. М.<div class="ln">М.П.</div></div><div class="col">______________ / ${or(buyerShortName(),'Ф. И. О.')}<div class="ln">${buyerMode==='ur'?'М.П.':'подпись'}</div></div></div>
   `;
 
   // ---- SPEC (Приложение №1) ----
@@ -367,7 +425,7 @@ function renderDoc(){
 
 // ---------- buttons ----------
 document.getElementById('btnPrint').onclick=()=>window.print();
-document.getElementById('btnReset').onclick=()=>{ if(!confirm('Очистить все поля и позиции?'))return; lines=[]; F.forEach(id=>{const e=$(id); if(e && !['dNo','dCity','cTerm','cAdv','wWood','wPaint','wConstr','dVat'].includes(id)) e.value='';}); renderCat(); renderSel(); renderDoc(); };
+document.getElementById('btnReset').onclick=()=>{ if(!confirm('Очистить все поля и позиции?'))return; lines=[]; F.forEach(id=>{const e=$(id); if(e && !['dNo','dCity','cTerm','cAdv','wWood','wPaint','wConstr','dVat'].includes(id)) e.value='';}); buyerMode='fiz'; document.querySelectorAll('#bTypeSeg .seg-b').forEach(x=>x.classList.toggle('on',x.dataset.mode==='fiz')); $('buyerFiz').style.display=''; $('buyerUr').style.display='none'; renderCat(); renderSel(); renderDoc(); };
 
 // init: today's date
 (function(){ const t=new Date(); $('dDate').value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'); })();

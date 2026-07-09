@@ -268,3 +268,13 @@ tr.stx.st-in{opacity:1;transition:opacity .5s ease}
 @media screen and (max-width:820px){
   .kp-doc{padding:12px 0} /* масштаб под ширину делает fitNarrow() в kp.js — без обрезки на любом экране */
 }
+
+/* ── СЕРТИФИКАТЫ (лист КП для корзин) ── */
+.kp-certs-sub{font-size:10.5pt;color:var(--steel);margin:0 0 16px;line-height:1.4}
+.cert-sheet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;break-inside:avoid}
+.cert-doc{margin:0;border:1px solid var(--line);border-radius:2px;overflow:hidden;background:#fff;break-inside:avoid}
+.cert-doc-img{background:var(--plate);padding:8px;display:flex;justify-content:center}
+.cert-doc-img img{width:100%;height:auto;display:block;border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.cert-doc figcaption{padding:9px 11px 12px;border-top:1px solid var(--line)}
+.cert-doc figcaption b{display:block;font-family:var(--f-head);text-transform:uppercase;letter-spacing:.03em;font-size:10pt;color:var(--ink);margin-bottom:3px}
+.cert-doc figcaption span{font-size:8.4pt;color:var(--steel);line-height:1.35;display:block}
