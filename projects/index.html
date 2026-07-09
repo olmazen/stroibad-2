@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Портфолио — реализованные объекты EGOE | ЖК Dolce Vita</title>
-<meta name="description" content="Портфолио EGOE: реализованный жилой комплекс Dolce Vita — фасадные экраны, балконы и благоустройство двора. Фото объекта.">
+<title>Портфолио — реализованные объекты EGOE</title>
+<meta name="description" content="Портфолио EGOE: реализованные объекты EGOE: фасадные экраны, балконы и благоустройство двора. Фото объекта.">
 <link rel="canonical" href="https://www.egoe-life.ru/projects/">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:site_name" content="EGOE">
-<meta property="og:title" content="Портфолио EGOE — ЖК Dolce Vita">
+<meta property="og:title" content="Портфолио EGOE">
 <meta property="og:description" content="Реализованный объект EGOE: фасады, балконы и благоустройство двора жилого комплекса.">
 <meta property="og:url" content="https://www.egoe-life.ru/projects/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,43 +23,20 @@
 {"@type":"ListItem","position":2,"name":"Портфолио","item":"https://www.egoe-life.ru/projects/"}]}
 </script>
 
+
 <style id="pf-css">
-.pf-wrap{--pf-tx:#c7ccd2}
-.pf-hero{position:relative;height:76vh;min-height:480px;overflow:hidden;display:flex;align-items:flex-end}
-.pf-hero-bg{position:absolute;inset:-14% 0;background:#0b0b0e center 40%/cover no-repeat;will-change:transform}
-.pf-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,11,14,.45),rgba(9,11,14,.12) 42%,rgba(9,11,14,.94));z-index:1}
-.pf-hero-in{position:relative;z-index:2;width:100%;padding-bottom:clamp(34px,5vw,66px)}
-.pf-eye{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.24em;font-size:12px;color:var(--amber);margin-bottom:14px}
-.pf-hero h1{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;font-size:clamp(44px,8vw,104px);line-height:.92;color:#fff;margin:0;letter-spacing:.01em}
-.pf-hero .pf-sub{color:var(--pf-tx);max-width:660px;margin-top:16px;font-size:clamp(15px,1.2vw,18px);line-height:1.6}
-.pf-hero-meta{display:flex;gap:12px 30px;flex-wrap:wrap;margin-top:24px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:12.5px;color:#9aa1a9}
-.pf-hero-meta b{color:#fff;font-weight:600}
-.pf-sec-eye{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.2em;font-size:11.5px;color:var(--amber);display:flex;align-items:center;gap:12px;margin-bottom:20px}
-.pf-sec-eye::before{content:"";width:26px;height:2px;background:var(--amber)}
-.pf-sec-eye span{color:var(--steel);letter-spacing:.08em}
-/* РЯД (долче вита) */
-.pf-strip{padding:clamp(44px,5vw,74px) 0 clamp(30px,3vw,44px)}
-.pf-row{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
-.pf-row::-webkit-scrollbar{height:8px}.pf-row::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
-.pf-row .pf-ph{flex:0 0 auto;width:clamp(228px,25vw,318px);aspect-ratio:3/4;scroll-snap-align:start}
-/* СЕТКА (двор) + параллакс-фон */
-.pf-gal{position:relative;overflow:hidden;padding:clamp(52px,6vw,96px) 0 clamp(40px,5vw,80px)}
-.pf-gal-bg{position:absolute;inset:-18% 0;background:#0b0b0e center/cover no-repeat;opacity:.14;filter:grayscale(.35) contrast(1.05);will-change:transform;z-index:0}
-.pf-gal::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--bg) 0,rgba(9,11,14,.72) 22%,rgba(9,11,14,.72) 78%,var(--bg));z-index:1}
-.pf-gal .container{position:relative;z-index:2}
-.pf-grid{columns:3;column-gap:14px}
-.pf-grid .pf-ph{break-inside:avoid;margin:0 0 14px;width:100%}
-.pf-ph{position:relative;display:block;overflow:hidden;border:1px solid var(--line);background:#10141a;cursor:zoom-in;border-radius:2px}
-.pf-ph::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);opacity:0;transition:.3s}
-.pf-ph img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.2,.7,.2,1),filter .4s}
-.pf-ph:hover img{transform:scale(1.055);filter:brightness(1.05)}
-.pf-ph:hover::after{opacity:1}
-.pf-ph::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:.4s;z-index:3}
-.pf-ph:hover::before{transform:scaleX(1)}
-.pf-outro{text-align:center;padding:clamp(40px,5vw,72px) 0 clamp(56px,7vw,90px)}
-.pf-outro h2{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:clamp(24px,3vw,38px);color:#fff;margin:0 0 12px}
-.pf-outro p{color:var(--pf-tx);max-width:560px;margin:0 auto 24px}
-/* ЛАЙТБОКС */
+.pf-hero{position:relative;height:46vh;min-height:320px;overflow:hidden;display:flex;align-items:flex-end}
+.pf-hero-bg{position:absolute;inset:-16% 0;background:#0b0b0e center 42%/cover no-repeat;will-change:transform}
+.pf-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,11,14,.5),rgba(9,11,14,.15) 45%,rgba(9,11,14,.92));z-index:1}
+.pf-hero-in{position:relative;z-index:2;width:100%;padding-bottom:clamp(26px,3.5vw,44px)}
+.pf-hero h1{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;font-size:clamp(40px,6.5vw,88px);line-height:.94;color:#fff;margin:0;letter-spacing:.02em}
+.pf-hero .pf-sub{color:#c7ccd2;margin-top:12px;font-size:clamp(14px,1.1vw,17px)}
+.pf-gal{padding:clamp(30px,4vw,56px) 0 clamp(50px,6vw,90px)}
+.pf-grid{columns:3;column-gap:26px}
+.pf-grid .pf-ph{break-inside:avoid;margin:0 0 26px;width:100%}
+.pf-ph{position:relative;display:block;overflow:hidden;background:#10141a;cursor:zoom-in;border-radius:2px}
+.pf-ph img{width:100%;height:auto;display:block;transition:transform .6s cubic-bezier(.2,.7,.2,1),filter .4s}
+.pf-ph:hover img{transform:scale(1.045);filter:brightness(1.05)}
 .pf-lb{position:fixed;inset:0;z-index:140;background:rgba(6,7,9,.95);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .25s}
 .pf-lb.on{display:flex;opacity:1}
 .pf-lb img{max-width:92vw;max-height:88vh;object-fit:contain;box-shadow:0 30px 80px rgba(0,0,0,.6)}
@@ -69,8 +46,8 @@
 .pf-lb-prev{left:20px;top:50%;transform:translateY(-50%)}
 .pf-lb-next{right:20px;top:50%;transform:translateY(-50%)}
 .pf-lb-cnt{position:absolute;bottom:22px;left:0;right:0;text-align:center;color:#9aa1a9;font-family:'Oswald',sans-serif;letter-spacing:.1em;font-size:13px}
-@media(max-width:1024px){.pf-grid{columns:2}}
-@media(max-width:640px){.pf-grid{columns:1}.pf-hero{height:66vh}.pf-lb-btn{width:44px;height:44px}.pf-lb-prev{left:8px}.pf-lb-next{right:8px}}
+@media(max-width:1024px){.pf-grid{columns:2;column-gap:20px}.pf-grid .pf-ph{margin-bottom:20px}}
+@media(max-width:640px){.pf-grid{columns:1}.pf-hero{height:40vh}.pf-lb-btn{width:44px;height:44px}.pf-lb-prev{left:8px}.pf-lb-next{right:8px}}
 </style>
 </head>
 <body>
@@ -113,34 +90,17 @@
 <section class="pf-hero">
   <div class="pf-hero-bg" data-par="0.2" style="background-image:url('../assets/img/portfolio/obj-10.webp')"></div>
   <div class="container pf-hero-in">
-    <nav class="crumbs" style="margin-bottom:18px"><a href="../index.html">Главная</a> / <span>Портфолио</span></nav>
-    <div class="pf-eye">Портфолио · реализованный объект</div>
-    <h1>Dolce&nbsp;Vita</h1>
-    <p class="pf-sub">Жилой комплекс: фасадные экраны и балконные ограждения, входные группы и полное благоустройство двора — скамьи, лежаки, качели, урны и малые формы производства EGOE.</p>
-    <div class="pf-hero-meta"><span><b>Фасады</b> · экраны и балконы</span><span><b>Двор</b> · МАФ и благоустройство</span><span><b>Единый RAL</b> на объект</span></div>
-  </div>
-</section>
-
-<section class="pf-strip">
-  <div class="container">
-    <div class="pf-sec-eye">Фасады и балконы <span>· детали объекта</span></div>
-    <div class="pf-row"><a class="pf-ph " href="../assets/img/portfolio/dv-01.webp" data-full="../assets/img/portfolio/dv-01.webp"><img src="../assets/img/portfolio/dv-01.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/dv-02.webp" data-full="../assets/img/portfolio/dv-02.webp"><img src="../assets/img/portfolio/dv-02.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/dv-03.webp" data-full="../assets/img/portfolio/dv-03.webp"><img src="../assets/img/portfolio/dv-03.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/dv-04.webp" data-full="../assets/img/portfolio/dv-04.webp"><img src="../assets/img/portfolio/dv-04.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/dv-05.webp" data-full="../assets/img/portfolio/dv-05.webp"><img src="../assets/img/portfolio/dv-05.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/dv-06.webp" data-full="../assets/img/portfolio/dv-06.webp"><img src="../assets/img/portfolio/dv-06.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/dv-07.webp" data-full="../assets/img/portfolio/dv-07.webp"><img src="../assets/img/portfolio/dv-07.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/dv-08.webp" data-full="../assets/img/portfolio/dv-08.webp"><img src="../assets/img/portfolio/dv-08.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/dv-09.webp" data-full="../assets/img/portfolio/dv-09.webp"><img src="../assets/img/portfolio/dv-09.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a></div>
+    <nav class="crumbs" style="margin-bottom:16px"><a href="../index.html">Главная</a> / <span>Портфолио</span></nav>
+    <h1>Портфолио</h1>
+    <p class="pf-sub">Наши изделия на сданных объектах.</p>
   </div>
 </section>
 
 <section class="pf-gal">
-  <div class="pf-gal-bg" data-par="0.16" style="background-image:url('../assets/img/portfolio/obj-14.webp')"></div>
   <div class="container">
-    <div class="pf-sec-eye">Благоустройство и двор <span>· общий вид</span></div>
-    <div class="pf-grid"><a class="pf-ph " href="../assets/img/portfolio/obj-01.webp" data-full="../assets/img/portfolio/obj-01.webp"><img src="../assets/img/portfolio/obj-01.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-02.webp" data-full="../assets/img/portfolio/obj-02.webp"><img src="../assets/img/portfolio/obj-02.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-03.webp" data-full="../assets/img/portfolio/obj-03.webp"><img src="../assets/img/portfolio/obj-03.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-04.webp" data-full="../assets/img/portfolio/obj-04.webp"><img src="../assets/img/portfolio/obj-04.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-05.webp" data-full="../assets/img/portfolio/obj-05.webp"><img src="../assets/img/portfolio/obj-05.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-06.webp" data-full="../assets/img/portfolio/obj-06.webp"><img src="../assets/img/portfolio/obj-06.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-07.webp" data-full="../assets/img/portfolio/obj-07.webp"><img src="../assets/img/portfolio/obj-07.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-08.webp" data-full="../assets/img/portfolio/obj-08.webp"><img src="../assets/img/portfolio/obj-08.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-09.webp" data-full="../assets/img/portfolio/obj-09.webp"><img src="../assets/img/portfolio/obj-09.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-10.webp" data-full="../assets/img/portfolio/obj-10.webp"><img src="../assets/img/portfolio/obj-10.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-11.webp" data-full="../assets/img/portfolio/obj-11.webp"><img src="../assets/img/portfolio/obj-11.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-12.webp" data-full="../assets/img/portfolio/obj-12.webp"><img src="../assets/img/portfolio/obj-12.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-13.webp" data-full="../assets/img/portfolio/obj-13.webp"><img src="../assets/img/portfolio/obj-13.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-14.webp" data-full="../assets/img/portfolio/obj-14.webp"><img src="../assets/img/portfolio/obj-14.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-15.webp" data-full="../assets/img/portfolio/obj-15.webp"><img src="../assets/img/portfolio/obj-15.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-16.webp" data-full="../assets/img/portfolio/obj-16.webp"><img src="../assets/img/portfolio/obj-16.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-17.webp" data-full="../assets/img/portfolio/obj-17.webp"><img src="../assets/img/portfolio/obj-17.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-18.webp" data-full="../assets/img/portfolio/obj-18.webp"><img src="../assets/img/portfolio/obj-18.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-19.webp" data-full="../assets/img/portfolio/obj-19.webp"><img src="../assets/img/portfolio/obj-19.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-20.webp" data-full="../assets/img/portfolio/obj-20.webp"><img src="../assets/img/portfolio/obj-20.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-21.webp" data-full="../assets/img/portfolio/obj-21.webp"><img src="../assets/img/portfolio/obj-21.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-22.webp" data-full="../assets/img/portfolio/obj-22.webp"><img src="../assets/img/portfolio/obj-22.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-23.webp" data-full="../assets/img/portfolio/obj-23.webp"><img src="../assets/img/portfolio/obj-23.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a><a class="pf-ph " href="../assets/img/portfolio/obj-24.webp" data-full="../assets/img/portfolio/obj-24.webp"><img src="../assets/img/portfolio/obj-24.webp" alt="ЖК Dolce Vita — объект EGOE" loading="lazy"></a></div>
+    <div class="pf-grid"><a class="pf-ph" href="../assets/img/portfolio/obj-02.webp" data-full="../assets/img/portfolio/obj-02.webp"><img src="../assets/img/portfolio/obj-02.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-03.webp" data-full="../assets/img/portfolio/obj-03.webp"><img src="../assets/img/portfolio/obj-03.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/dv-01.webp" data-full="../assets/img/portfolio/dv-01.webp"><img src="../assets/img/portfolio/dv-01.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-04.webp" data-full="../assets/img/portfolio/obj-04.webp"><img src="../assets/img/portfolio/obj-04.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-05.webp" data-full="../assets/img/portfolio/obj-05.webp"><img src="../assets/img/portfolio/obj-05.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-06.webp" data-full="../assets/img/portfolio/obj-06.webp"><img src="../assets/img/portfolio/obj-06.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/dv-02.webp" data-full="../assets/img/portfolio/dv-02.webp"><img src="../assets/img/portfolio/dv-02.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-07.webp" data-full="../assets/img/portfolio/obj-07.webp"><img src="../assets/img/portfolio/obj-07.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-08.webp" data-full="../assets/img/portfolio/obj-08.webp"><img src="../assets/img/portfolio/obj-08.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/dv-03.webp" data-full="../assets/img/portfolio/dv-03.webp"><img src="../assets/img/portfolio/dv-03.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-09.webp" data-full="../assets/img/portfolio/obj-09.webp"><img src="../assets/img/portfolio/obj-09.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-10.webp" data-full="../assets/img/portfolio/obj-10.webp"><img src="../assets/img/portfolio/obj-10.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-11.webp" data-full="../assets/img/portfolio/obj-11.webp"><img src="../assets/img/portfolio/obj-11.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/dv-04.webp" data-full="../assets/img/portfolio/dv-04.webp"><img src="../assets/img/portfolio/dv-04.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-12.webp" data-full="../assets/img/portfolio/obj-12.webp"><img src="../assets/img/portfolio/obj-12.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-13.webp" data-full="../assets/img/portfolio/obj-13.webp"><img src="../assets/img/portfolio/obj-13.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-14.webp" data-full="../assets/img/portfolio/obj-14.webp"><img src="../assets/img/portfolio/obj-14.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/dv-05.webp" data-full="../assets/img/portfolio/dv-05.webp"><img src="../assets/img/portfolio/dv-05.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-15.webp" data-full="../assets/img/portfolio/obj-15.webp"><img src="../assets/img/portfolio/obj-15.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-16.webp" data-full="../assets/img/portfolio/obj-16.webp"><img src="../assets/img/portfolio/obj-16.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/dv-06.webp" data-full="../assets/img/portfolio/dv-06.webp"><img src="../assets/img/portfolio/dv-06.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-17.webp" data-full="../assets/img/portfolio/obj-17.webp"><img src="../assets/img/portfolio/obj-17.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-18.webp" data-full="../assets/img/portfolio/obj-18.webp"><img src="../assets/img/portfolio/obj-18.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-19.webp" data-full="../assets/img/portfolio/obj-19.webp"><img src="../assets/img/portfolio/obj-19.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/dv-07.webp" data-full="../assets/img/portfolio/dv-07.webp"><img src="../assets/img/portfolio/dv-07.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-20.webp" data-full="../assets/img/portfolio/obj-20.webp"><img src="../assets/img/portfolio/obj-20.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-21.webp" data-full="../assets/img/portfolio/obj-21.webp"><img src="../assets/img/portfolio/obj-21.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-22.webp" data-full="../assets/img/portfolio/obj-22.webp"><img src="../assets/img/portfolio/obj-22.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/dv-08.webp" data-full="../assets/img/portfolio/dv-08.webp"><img src="../assets/img/portfolio/dv-08.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-23.webp" data-full="../assets/img/portfolio/obj-23.webp"><img src="../assets/img/portfolio/obj-23.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/obj-24.webp" data-full="../assets/img/portfolio/obj-24.webp"><img src="../assets/img/portfolio/obj-24.webp" alt="Объект EGOE" loading="lazy"></a><a class="pf-ph" href="../assets/img/portfolio/dv-09.webp" data-full="../assets/img/portfolio/dv-09.webp"><img src="../assets/img/portfolio/dv-09.webp" alt="Объект EGOE" loading="lazy"></a></div>
   </div>
 </section>
-
-<section class="pf-outro"><div class="container">
-  <h2>Хотите такой же объект?</h2>
-  <p>Пришлите проект благоустройства или ТЗ — соберём комплект под ваш ЖК в едином стиле и посчитаем смету.</p>
-  <button class="btn btn-primary" onclick="openModal()">Обсудить объект</button>
-</div></section>
 
 </main>
 <footer><div class="container">
