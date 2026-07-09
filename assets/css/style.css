@@ -1518,6 +1518,17 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .dcard:hover .dcard-go{gap:12px}
 @media(max-width:900px){.dirs2{grid-template-columns:1fr;gap:12px}.dcard{aspect-ratio:4/5}.dcard-bp .bp-fence{width:min(66%,300px)}}
 @media(max-width:520px){.dcard{aspect-ratio:3/4}}
+/* bento: большой флагман слева + 3 карточки в столбце справа */
+.dirs-bento{grid-template-columns:1.5fr 1fr;grid-template-rows:repeat(3,minmax(0,1fr));aspect-ratio:16/9}
+.dirs-bento .dcard{aspect-ratio:auto}
+.dirs-bento .d-hero{grid-column:1;grid-row:1/4}
+.dirs-bento .d-sm{grid-column:2}
+.dirs-bento .d-sm .dcard-cap{padding:15px 17px}
+.dirs-bento .d-sm h3{font-size:clamp(15px,1.15vw,19px);margin:0 0 6px}
+.dirs-bento .d-sm .dcard-eye{margin-bottom:5px;font-size:10px}
+.dirs-bento .d-sm .dcard-n{font-size:13px;top:11px;right:13px}
+.dirs-bento .d-sm .dcard-bp .bp-fence{width:min(58%,210px)}
+@media(max-width:900px){.dirs-bento{grid-template-columns:1fr;grid-template-rows:none;aspect-ratio:auto}.dirs-bento .dcard{aspect-ratio:4/5}.dirs-bento .d-hero,.dirs-bento .d-sm{grid-column:auto;grid-row:auto}.dirs-bento .d-sm h3{font-size:clamp(20px,1.7vw,26px)}}
 /* блок «Преимущества» компактнее: статы = тонкая полоса, преимущества плотнее — меньше монотонных прямоугольников */
 .stats{grid-template-columns:repeat(4,1fr)!important;gap:0;background:transparent;margin-top:24px}
 .stat{padding:16px 20px;border-right:1px solid var(--line)}
