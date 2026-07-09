@@ -1736,3 +1736,184 @@ window.__whenVisible = (function () {
   lb.addEventListener('click', function (e) { if (e.target === lb || e.target.classList.contains('cert-lb-x')) close(); });
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && lb.classList.contains('on')) close(); });
 })();
+
+/* ══════════════════════════════════════════════════════════════════════
+   EGOE lite-режим — авто-упрощение сайта ТОЛЬКО для телефонов.
+   Принцип «fail-open»: по умолчанию всегда ПОЛНАЯ версия. Понижаем лишь
+   при явном доказательстве слабости (медленная сеть ИЛИ устойчивый джанк).
+   Отсутствующий/капнутый сигнал = НЕ повод понижать (защита мощных телефонов).
+   ═══════════════════════════════════════════════════════════════════════ */
+(function () {
+  var doc = document.documentElement;
+
+  /* 1) Только телефоны. ПК, ноуты и планшеты не трогаем. */
+  var coarse = matchMedia('(pointer: coarse)').matches && matchMedia('(hover: none)').matches;
+  var minDim = Math.min(screen.width || 9999, screen.height || 9999);
+  if (!coarse || minDim > 560 || innerWidth > 900) return;
+
+  /* 2) Уважаем выбор пользователя: вручную вернул полную — в этой сессии не лезем.
+        Флаг дублируем в памяти, чтобы он пережил ошибку записи в sessionStorage (приватный режим). */
+  var OPTOUT = 'egoe_lite_optout', userOptedOut = false;
+  function optedOut(){ if (userOptedOut) return true; try { return sessionStorage.getItem(OPTOUT) === '1'; } catch (e) { return false; } }
+
+  var STATE = null;              /* null | 'net' | 'perf' */
+  var bar = null, barDismissed = false;
+  var perfLocked = false;        /* после авто-возврата из perf по perf больше не понижаем сами */
+  var netCooldownUntil = 0;      /* анти-мигание для сети */
+  var probeUrl = null;           /* крупный ресурс для активного пере-замера скорости */
+
+  /* ── сеть: дешёвый строгий сигнал (Chromium/Android). null = неизвестно (iOS/3g). ── */
+  function fastNetSignal(){
+    var c = navigator.connection;
+    if (!c) return null;
+    if (c.saveData === true) return 'weak';                 /* пользователь сам просил экономию */
+    if (c.effectiveType === '2g' || c.effectiveType === 'slow-2g') return 'weak';
+    if (c.effectiveType === '4g') return 'ok';
+    return null;                                            /* 3g → меряем реально */
+  }
+
+  /* Оценка скорости по УЖЕ загруженным крупным ресурсам (буфер растёт при подгрузке картинок). */
+  function bufferNetWeak(){
+    try {
+      var res = performance.getEntriesByType('resource'), sp = [], big = null, bigSz = 0;
+      for (var i = 0; i < res.length; i++){
+        var e = res[i];
+        if ((e.initiatorType === 'img' || e.initiatorType === 'css') && e.transferSize > 20000 && e.duration > 0){
+          sp.push((e.transferSize * 8 / 1e6) / (e.duration / 1000));
+          if (e.transferSize > bigSz){ bigSz = e.transferSize; big = e.name; }
+        }
+      }
+      if (big) probeUrl = big;
+      if (sp.length < 4) return false;                       /* мало данных → не судим (fail-open) */
+      sp.sort(function (a, b){ return a - b; });
+      return sp[Math.floor(sp.length / 2)] < 1.0;            /* медиана < ~1 Мбит/с = слабо */
+    } catch (e) { return false; }
+  }
+
+  /* Активный замер скорости: тянем ~64КБ реального ресурса с cache-bust. cb(Мбит/с | null). */
+  function activeNetProbe(cb){
+    var url = probeUrl;
+    if (!url){ var im = document.images; for (var i = 0; i < im.length; i++){ if (im[i].currentSrc && im[i].naturalWidth > 0){ url = im[i].currentSrc; break; } } }
+    if (!url) return cb(null);
+    var t0 = performance.now();
+    fetch(url + (url.indexOf('?') > -1 ? '&' : '?') + 'nt=' + t0, { cache: 'no-store', headers: { 'Range': 'bytes=0-65535' } })
+      .then(function (r){ return r && (r.ok || r.status === 206) ? r.blob() : null; })
+      .then(function (b){
+        var sec = (performance.now() - t0) / 1000;
+        if (!b || b.size < 8000 || sec <= 0) return cb(null);   /* мелко/мгновенно → недостоверно */
+        cb((b.size * 8 / 1e6) / sec);
+      }).catch(function (){ cb(null); });
+  }
+
+  /* ── FPS-проба: меряем ВРЕМЯ кадра (median + доля кадров >33мс). Порог АБСОЛЮТНЫЙ,
+        не зависит от частоты экрана — иначе 120Гц-айфон держался бы к более строгой планке. ── */
+  function fpsProbe(cb){
+    if (document.visibilityState !== 'visible') return cb(null);
+    var deltas = [], start = 0, last = 0, warmEnd = 0;
+    function tick(now){
+      var dt = now - last; last = now;
+      if (now > warmEnd && dt > 0 && dt < 250) deltas.push(dt);   /* после разогрева, без столлов резюме/GC */
+      if (now - start < 2600) return requestAnimationFrame(tick);
+      if (document.visibilityState !== 'visible' || deltas.length < 24) return cb(null);  /* мало данных → fail-open */
+      deltas.sort(function (a, b){ return a - b; });
+      var median = deltas[deltas.length >> 1], slow = 0;
+      for (var i = 0; i < deltas.length; i++){ if (deltas[i] > 33) slow++; }   /* >33мс = кадр ниже 30fps */
+      cb({ medianMs: median, slowRatio: slow / deltas.length });
+    }
+    requestAnimationFrame(function (t){ start = last = t; warmEnd = t + 500; requestAnimationFrame(tick); });
+  }
+  function janky(r){ return r.medianMs > 22 || r.slowRatio > 0.30; }   /* медиана ниже ~45fps ИЛИ >30% кадров ниже 30fps */
+
+  /* «Не тянет» подтверждаем ДВУМЯ близкими окнами (иначе одиночный столл не в счёт). */
+  function evalPerf(){
+    if (STATE || optedOut() || perfLocked) return;
+    fpsProbe(function (r){
+      if (!r || !janky(r)) return;                        /* недостоверно/плавно → выходим */
+      setTimeout(function (){
+        if (STATE || optedOut() || perfLocked) return;
+        fpsProbe(function (r2){ if (r2 && janky(r2)) enterLite('perf'); });
+      }, 2500);
+    });
+  }
+
+  /* ── вход/выход. Все упрощения делает CSS через [data-lite] — JS их не трогает,
+        поэтому выход чисто восстанавливает полную версию. ── */
+  function enterLite(reason){
+    if (STATE || optedOut()) return;
+    STATE = reason;
+    if (reason === 'net') netCooldownUntil = performance.now() + 60000;
+    doc.setAttribute('data-lite', reason);
+    showBar(reason);
+  }
+  function exitLite(manual){
+    STATE = null;
+    doc.removeAttribute('data-lite');
+    if (bar) bar.classList.remove('on');
+    if (manual){ userOptedOut = true; try { sessionStorage.setItem(OPTOUT, '1'); } catch (e) {} }
+  }
+
+  /* ── плашка снизу ── */
+  function showBar(reason){
+    if (barDismissed) return;
+    if (!bar){
+      bar = document.createElement('div');
+      bar.className = 'lite-bar';
+      bar.innerHTML = '<span class="lite-ic" aria-hidden="true"></span>' +
+        '<span class="lite-tx"></span>' +
+        '<button class="lite-back" type="button">Вернуть полную</button>' +
+        '<button class="lite-x" type="button" aria-label="Скрыть уведомление">×</button>';
+      document.body.appendChild(bar);
+      bar.querySelector('.lite-back').addEventListener('click', function (){ exitLite(true); });
+      bar.querySelector('.lite-x').addEventListener('click', function (){ barDismissed = true; bar.classList.remove('on'); });
+    }
+    bar.querySelector('.lite-tx').textContent = reason === 'net'
+      ? 'Медленное соединение — включили лёгкую версию, чтобы сайт грузился быстрее.'
+      : 'Телефон не справляется с анимацией — включили лёгкую версию.';
+    var ck = document.querySelector('.cookie-bar.show');
+    bar.style.bottom = (ck ? ck.offsetHeight + 10 : 0) + 'px';
+    requestAnimationFrame(function (){ bar.classList.add('on'); });
+  }
+
+  function toast(msg){
+    var t = document.createElement('div');
+    t.className = 'lite-toast'; t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(function (){ t.classList.add('on'); });
+    setTimeout(function (){ t.classList.remove('on'); setTimeout(function (){ if (t.parentNode) t.remove(); }, 400); }, 3500);
+  }
+  function recoverNet(){ exitLite(false); netCooldownUntil = performance.now() + 60000; toast('Соединение восстановилось — вернули полную версию.'); }
+
+  /* ── периодическая перепроверка (вдруг просадка кратковременная) ── */
+  setInterval(function (){
+    if (optedOut()) return;
+    if (STATE === 'net'){
+      if (performance.now() < netCooldownUntil) return;
+      var fs = fastNetSignal();
+      if (fs === 'weak') return;                          /* всё ещё слабо */
+      if (fs === 'ok'){ recoverNet(); return; }           /* явно 4g → возвращаем */
+      activeNetProbe(function (mbps){ if (mbps != null && mbps > 2.5) recoverNet(); });  /* гистерезис: нужно уверенно быстро */
+    } else if (STATE === 'perf'){
+      fpsProbe(function (r){                               /* возвращаем только при уверенно ровной картине (~60fps+) */
+        if (r && r.medianMs <= 16 && r.slowRatio < 0.08){
+          exitLite(false); perfLocked = true; toast('Стало плавно — вернули полную версию.');
+        }
+      });
+    } else {
+      var f = fastNetSignal();
+      if (f === 'weak'){ enterLite('net'); return; }
+      if (f === null && bufferNetWeak()){ enterLite('net'); return; }   /* iOS/3g: пере-читаем буфер */
+      evalPerf();
+    }
+  }, 25000);
+
+  /* ── старт: сперва проверка сети, затем FPS после «устаканивания» страницы ── */
+  function boot(){
+    if (optedOut()) return;
+    var f = fastNetSignal();
+    if (f === 'weak'){ enterLite('net'); return; }
+    if (f === null && bufferNetWeak()){ enterLite('net'); return; }     /* iOS/3g: замер по загрузке */
+    setTimeout(evalPerf, 1200);
+  }
+  if (document.readyState === 'complete') boot();
+  else addEventListener('load', boot);
+})();

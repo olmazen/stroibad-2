@@ -1834,3 +1834,28 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .filedrop-txt b{color:#fff;font-weight:600}
 .filedrop-txt small{display:block;color:var(--steel);font-size:11px;margin-top:3px}
 .filedrop-x{color:var(--amber);cursor:pointer;text-decoration:underline}
+
+/* ══ LITE-режим: авто-упрощение для слабых телефонов/сетей (ставится JS-ом на <html>) ══ */
+html[data-lite] body{background-attachment:scroll!important}
+html[data-lite] *,html[data-lite] *::before,html[data-lite] *::after{
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  animation-duration:.001ms!important;animation-iteration-count:1!important;
+  transition-duration:.1s!important;will-change:auto!important;scroll-behavior:auto!important}
+html[data-lite] .scroll-progress{display:none!important}
+html[data-lite] [class*="parallax"],html[data-lite] [data-parallax]{transform:none!important;background-attachment:scroll!important}
+html[data-lite] .reveal{opacity:1!important;transform:none!important}
+
+/* плашка «включена лёгкая версия» */
+.lite-bar{position:fixed;left:0;right:0;bottom:0;z-index:460;display:flex;align-items:center;gap:10px;
+  padding:10px 14px;background:rgba(15,18,23,.98);border-top:1px solid var(--amber);
+  transform:translateY(120%);transition:transform .4s cubic-bezier(.22,.85,.25,1);font-size:13px;color:var(--tx)}
+.lite-bar.on{transform:translateY(0)}
+.lite-bar .lite-ic{flex:0 0 auto;width:8px;height:8px;border-radius:50%;background:var(--amber)}
+.lite-bar .lite-tx{flex:1 1 auto;line-height:1.35}
+.lite-bar .lite-back{flex:0 0 auto;background:var(--amber);color:#0E1114;border:0;border-radius:2px;
+  font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:11px;letter-spacing:.06em;padding:8px 12px;cursor:pointer}
+.lite-bar .lite-x{flex:0 0 auto;background:none;border:0;color:var(--steel);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
+.lite-toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);z-index:470;
+  background:rgba(15,18,23,.98);border:1px solid var(--line-2);border-radius:8px;padding:10px 16px;
+  font-size:13px;color:var(--tx);opacity:0;transition:opacity .35s,transform .35s;max-width:90vw;text-align:center}
+.lite-toast.on{opacity:1;transform:translate(-50%,0)}
