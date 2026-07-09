@@ -15,11 +15,11 @@
       hero.classList.toggle('is-night', b.dataset.mode === 'night');
     }));
   }
-  /* Мягкий параллакс-наклон панели за курсором (десктоп) */
-  const wrap  = document.querySelector('.ogr-plate-wrap');
-  const plate = document.querySelector('.ogr-plate');
+  /* Мягкий параллакс-наклон линии ограждения за курсором (десктоп) */
+  const wrap  = document.querySelector('.ogr-fence3d');
+  const line  = document.querySelector('.ogr-fline');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (wrap && plate && !reduce && window.matchMedia('(pointer:fine)').matches){
+  if (wrap && line && !reduce && window.matchMedia('(pointer:fine)').matches){
     let raf = null;
     wrap.addEventListener('pointermove', e => {
       const r = wrap.getBoundingClientRect();
@@ -27,13 +27,13 @@
       const ny = (e.clientY - r.top)  / r.height - .5;
       if (raf) cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        plate.style.animationPlayState = 'paused';
-        plate.style.transform = `rotateY(${nx*34}deg) rotateX(${-ny*16}deg)`;
+        line.style.animationPlayState = 'paused';
+        line.style.transform = `rotateY(${-30 + nx*22}deg) rotateX(${3 - ny*10}deg)`;
       });
     });
     wrap.addEventListener('pointerleave', () => {
-      plate.style.transform = '';
-      plate.style.animationPlayState = '';
+      line.style.transform = '';
+      line.style.animationPlayState = '';
     });
   }
 })();

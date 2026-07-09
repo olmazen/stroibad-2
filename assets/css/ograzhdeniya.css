@@ -37,7 +37,7 @@
 .ogr-hero-grid{
   display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
   gap:40px;align-items:center;
-  min-height:clamp(560px,82vh,860px);padding:96px 0 72px;
+  min-height:clamp(520px,76vh,800px);padding:64px 0 52px;
 }
 .ogr-crumbs{font-size:13px;color:var(--text-dim);margin-bottom:26px}
 .ogr-crumbs a{color:var(--text-dim)}
@@ -257,8 +257,78 @@
 .calc-actions{display:flex;gap:12px;flex-wrap:wrap}
 .calc-actions .btn{flex:1;justify-content:center;min-width:180px}
 
+/* ===================== HERO: 3D-ЛИНИЯ ОГРАЖДЕНИЯ ===================== */
+.ogr-fence3d{position:relative;width:100%;height:clamp(340px,50vh,540px);perspective:1250px;perspective-origin:60% 44%}
+.ogr-fline{position:absolute;left:0;right:0;top:2%;bottom:9%;display:flex;align-items:flex-end;justify-content:center;gap:2px;transform-style:preserve-3d;transform:rotateY(-30deg) rotateX(3deg);animation:ogr-sway 15s ease-in-out infinite;will-change:transform}
+@keyframes ogr-sway{0%,100%{transform:rotateY(-33deg) rotateX(3deg)}50%{transform:rotateY(-23deg) rotateX(2deg)}}
+.ogr-fpost{position:relative;flex:0 0 auto;width:12px;height:94%;margin:0 -1px;border-radius:2px 2px 0 0;background:linear-gradient(90deg,#1b2126,#333b43 48%,#12161a);box-shadow:0 30px 44px -20px rgba(0,0,0,.85);z-index:2}
+.ogr-fpost::before{content:'';position:absolute;top:-7px;left:-3px;right:-3px;height:7px;border-radius:2px;background:linear-gradient(90deg,#242b31,#3d454d,#1b2126)}
+.ogr-fseg{position:relative;flex:0 0 auto;width:clamp(42px,6vw,70px);height:80%;border-radius:2px;overflow:hidden;background:#0b0e11;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 26px 40px -22px rgba(0,0,0,.8)}
+.ogr-fseg .seg-back{position:absolute;inset:0;background:linear-gradient(180deg,#12161b,#0b0e11);transition:background .8s var(--ease)}
+.ogr-fseg .seg-face{position:absolute;inset:0}
+.ogr-fseg.decor .seg-face{background:linear-gradient(135deg,#2b3138,#171b20 55%,#20262c);-webkit-mask:url(../../ograzhdeniya/uploads/forest-a-viz.svg) center/cover no-repeat;mask:url(../../ograzhdeniya/uploads/forest-a-viz.svg) center/cover no-repeat}
+.ogr-fseg.plain .seg-face{background:repeating-linear-gradient(90deg,#242b31 0 6px,#30373f 6px 9px,transparent 9px 13px)}
+.ogr-fseg::after{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#2a3138,#3a424a,#20262c);z-index:3}
+.ogr-hero.is-night .ogr-fseg .seg-back{background:linear-gradient(180deg,rgba(255,182,112,.55),rgba(242,111,29,.30) 58%,rgba(120,62,22,.16))}
+.ogr-hero.is-night .ogr-fseg.decor .seg-face{filter:brightness(.7)}
+.ogr-hero.is-night .ogr-fseg{box-shadow:inset 0 0 0 1px rgba(255,182,112,.14),0 0 22px -4px rgba(242,111,29,.45),0 26px 40px -22px rgba(0,0,0,.8)}
+.ogr-fbase{position:absolute;left:6%;right:6%;bottom:6%;height:46px;background:radial-gradient(ellipse 70% 130% at 50% 0,rgba(0,0,0,.55),transparent 72%);pointer-events:none;transition:background .8s var(--ease)}
+.ogr-hero.is-night .ogr-fbase{background:radial-gradient(ellipse 82% 150% at 50% 0,rgba(255,172,92,.4),rgba(242,111,29,.14) 45%,transparent 76%)}
+
+/* ===================== ПОРТИРОВАННЫЕ ИНФО-СЕКЦИИ ===================== */
+.ogr .info{padding:84px 0}
+.ogr .info h3,.ogr .info h4{text-transform:none}
+.ogr .specs{display:flex;flex-wrap:wrap;gap:8px}
+.ogr .specs .s{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mute);border:1px solid var(--line);border-radius:3px;padding:6px 9px;display:flex;gap:6px;align-items:baseline}
+.ogr .specs .s span{color:var(--amber-bright)}
+
+.ogr .layer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:44px}
+@media(max-width:820px){.ogr .layer-grid{grid-template-columns:1fr}}
+.ogr .layer-card{background:var(--bg-deep);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.ogr .layer-card>img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;border-bottom:1px solid var(--line)}
+.ogr .lc-body{padding:22px}
+.ogr .lc-num{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--amber)}
+.ogr .lc-body h3{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:25px;color:#fff;margin:8px 0 4px;line-height:1.1}
+.ogr .lc-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--text-dim);text-transform:uppercase;margin-bottom:12px}
+.ogr .lc-body p{font-size:14px;color:var(--text-dim);line-height:1.6;margin-bottom:14px}
+.ogr .spec-band{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:52px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:30px 0}
+@media(max-width:700px){.ogr .spec-band{grid-template-columns:repeat(2,1fr);gap:26px}}
+.ogr .spec-band .item{text-align:center}
+.ogr .spec-band .snum{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2rem,4vw,3rem);color:var(--amber-bright);line-height:1}
+.ogr .spec-band .slbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-top:8px}
+
+.ogr .pillars-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:44px}
+@media(max-width:820px){.ogr .pillars-grid{grid-template-columns:1fr}}
+.ogr .pillar{display:flex;flex-direction:column;background:var(--bg-deep);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ogr .pillar-img{aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--line)}
+.ogr .pillar-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease)}
+.ogr .pillar:hover .pillar-img img{transform:scale(1.04)}
+.ogr .pillar-body{padding:24px;flex:1}
+.ogr .pillar .ic{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+.ogr .pillar-body h3{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:25px;color:#fff;margin:10px 0 8px;line-height:1.1}
+.ogr .pillar-body p{font-size:14.5px;color:var(--text-dim);line-height:1.65;margin-bottom:14px}
+
+.ogr .seasons-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:40px}
+@media(max-width:820px){.ogr .seasons-grid{grid-template-columns:repeat(2,1fr)}}
+.ogr .season{position:relative;aspect-ratio:3/4;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+.ogr .season img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .7s var(--ease)}
+.ogr .season:hover img{transform:scale(1.05)}
+.ogr .season .s-name{position:absolute;left:12px;bottom:10px;font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.7);z-index:2}
+.ogr .season .s-temp{position:absolute;right:10px;top:10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:#fff;background:rgba(10,13,16,.55);border:1px solid rgba(255,255,255,.22);border-radius:100px;padding:4px 9px;z-index:2}
+.ogr .season::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(8,10,13,.72));pointer-events:none;z-index:1}
+
+.ogr .eng-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
+@media(max-width:820px){.ogr .eng-grid{grid-template-columns:1fr}}
+.ogr .eng-card{background:var(--bg-deep);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ogr .eng-card>img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-bottom:1px solid var(--line)}
+.ogr .ec-body{padding:22px}
+.ogr .ec-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.ogr .eng-card h4{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:22px;color:#fff;margin:8px 0 8px;line-height:1.1}
+.ogr .eng-card p{font-size:14px;color:var(--text-dim);line-height:1.6}
+
 @media(prefers-reduced-motion:reduce){
-  .ogr-plate{animation:none;transform:rotateY(-14deg) rotateX(3deg)}
+  .ogr-fline{animation:none;transform:rotateY(-28deg) rotateX(3deg)}
   .ogr-marquee-track{animation:none}
   .led-dot{animation:none}
+  .ogr .pillar:hover .pillar-img img,.ogr .season:hover img{transform:none}
 }
