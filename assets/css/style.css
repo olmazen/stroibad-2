@@ -1877,3 +1877,23 @@ html[data-lite] .reveal{opacity:1!important;transform:none!important}
 html[data-lite] .fw-lite-steps li{animation-duration:.38s!important}
 /* портфолио на слабых: пропускаем отрисовку/декод вне экрана */
 html[data-lite] .pf-ph{content-visibility:auto;contain-intrinsic-size:auto 420px}
+
+/* ==AD3D shared== */
+body .ad-plate{min-height:640px;border-radius:3px 3px 0 0}
+@media(max-width:760px){body .ad-plate{min-height:360px}}
+.ad-viewtoggle{display:flex;margin:0;border:1px solid rgba(201,154,63,.28);border-top:0;border-radius:0 0 3px 3px;overflow:hidden}
+.ad-viewtoggle button{flex:1;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#9fb8dc;background:#0b1a2e;border:0;padding:14px 10px;cursor:pointer;transition:background .2s,color .2s}
+.ad-viewtoggle button:hover{color:#dbe6f5}
+.ad-viewtoggle button+button{border-left:1px solid rgba(201,154,63,.28)}
+.ad-viewtoggle button.on{background:linear-gradient(180deg,#E7C877,#C99A3F);color:#1c1305;font-weight:600}
+.ad-3d{position:absolute;inset:0;z-index:1;opacity:0;visibility:hidden;transition:opacity .55s ease;pointer-events:none}
+.ad-3d.show{opacity:1;visibility:visible;pointer-events:auto}
+.ad-3d canvas{position:absolute;inset:0;width:100%!important;height:100%!important;touch-action:none;cursor:grab}
+.ad-3d canvas:active{cursor:grabbing}
+.ad-plate.is3d .ad-draw-holder{opacity:0;pointer-events:none}
+.ad-3d-load,.ad-3d-hint{position:absolute;left:0;right:0;text-align:center;font-family:'Oswald',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9fb8dc;pointer-events:none;z-index:2}
+.ad-3d-load{top:50%;transform:translateY(-50%);font-size:12px;opacity:.75}
+.ad-3d.ready .ad-3d-load{display:none}
+.ad-3d-hint{bottom:18px;font-size:10.5px;opacity:0;transform:translateY(10px);transition:opacity .6s .15s,transform .6s .15s}
+.ad-3d-hint i{font-style:normal;color:var(--gold-h);margin-right:6px}
+.ad-3d.ready .ad-3d-hint{opacity:.85;transform:none}
