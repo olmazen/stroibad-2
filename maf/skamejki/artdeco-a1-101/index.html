@@ -19,6 +19,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../../assets/css/style.css?v=egoe48">
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
 <style id="ad-accent">
 :root{--gold:#C99A3F;--gold-h:#E7C877;--gold-d:#A87F2F;--gold-glow:rgba(201,154,63,.30)}
 .ad-badge{display:inline-flex;align-items:center;gap:9px;font-family:'Oswald',sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#1c1305;background:linear-gradient(180deg,#E7C877,#C99A3F);padding:7px 14px;border-radius:2px;box-shadow:0 8px 20px var(--gold-glow);margin-bottom:14px}
@@ -54,6 +57,21 @@
 .ad-dimrow li:first-child .v{color:var(--gold-h)}
 .ad-draft{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:rgba(201,154,63,.08);border:1px dashed rgba(201,154,63,.4);border-radius:2px;padding:7px 13px;margin-top:16px}
 @media(max-width:760px){.ad-plate{min-height:280px;padding:22px 14px}.ad-plate .ad-draw-holder{width:98%}.ad-plate-hint{display:none}.ad-dimrow{grid-template-columns:repeat(2,1fr)}.ad-dimrow .v{font-size:16px}}
+.ad-viewtoggle{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:4;display:inline-flex;background:rgba(8,20,34,.72);border:1px solid rgba(201,154,63,.32);border-radius:4px;overflow:hidden;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+.ad-viewtoggle button{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9fb8dc;background:none;border:0;padding:9px 18px;cursor:pointer;transition:background .2s,color .2s}
+.ad-viewtoggle button.on{background:linear-gradient(180deg,#E7C877,#C99A3F);color:#1c1305;font-weight:600}
+.ad-3d{position:absolute;inset:0;z-index:1;opacity:0;visibility:hidden;transition:opacity .55s ease;pointer-events:none}
+.ad-3d.show{opacity:1;visibility:visible;pointer-events:auto}
+.ad-3d canvas{position:absolute;inset:0;width:100%!important;height:100%!important;touch-action:none;cursor:grab}
+.ad-3d canvas:active{cursor:grabbing}
+.ad-plate.is3d .ad-draw-holder{opacity:0;pointer-events:none}
+.ad-3d-load,.ad-3d-hint{position:absolute;left:0;right:0;text-align:center;font-family:'Oswald',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9fb8dc;pointer-events:none;z-index:2}
+.ad-3d-load{top:50%;transform:translateY(-50%);font-size:12px;opacity:.75}
+.ad-3d.ready .ad-3d-load{display:none}
+.ad-3d-hint{bottom:56px;font-size:10.5px;opacity:0;transform:translateY(10px);transition:opacity .6s .15s,transform .6s .15s}
+.ad-3d-hint i{font-style:normal;color:var(--gold-h);margin-right:6px}
+.ad-3d.ready .ad-3d-hint{opacity:.85;transform:none}
+@media(max-width:760px){.ad-viewtoggle button{padding:8px 14px}.ad-3d-hint{bottom:50px}}
 </style>
 </head>
 <body>
@@ -679,6 +697,8 @@
     </g>
   </g>
 </svg></div>
+    <div class="ad-3d" aria-hidden="true"><div class="ad-3d-load">Загрузка 3D-модели…</div><div class="ad-3d-hint"><i>&#8635;</i>потяни — вращать · колесо — зум</div></div>
+    <div class="ad-viewtoggle"><button class="on" data-view="draw" type="button">Чертёж</button><button data-view="3d" type="button">3D-модель</button></div>
   </div>
   <ul class="ad-dimrow"><li><span class="k">Габариты</span><span class="v">670 × 725 × 835 мм</span></li><li><span class="k">Масса</span><span class="v">37 кг</span></li><li><span class="k">Нагрузка</span><span class="v">200 кг</span></li><li><span class="k">Материал</span><span class="v">Сталь</span></li><li><span class="k">Покрытие</span><span class="v">Любой RAL</span></li><li><span class="k">Артикул</span><span class="v">A1-101</span></li></ul>
 </div></section>
@@ -716,6 +736,71 @@ function swapMain(el,src,label){var m=document.getElementById('mainImg');if(!m)r
 /* подгоняем чертёж под его содержимое, чтобы он заполнял рамку (мелкие МАФ не «уезжали» вверх) */
 function fitDrawings(){document.querySelectorAll('.ad-draw-svg').forEach(function(svg){try{var b=svg.getBBox();if(b.width>0&&b.height>0){var p=Math.max(b.width,b.height)*0.05;svg.setAttribute('viewBox',(b.x-p)+' '+(b.y-p)+' '+(b.width+2*p)+' '+(b.height+2*p));}}catch(e){}});}
 if(document.readyState!=='loading')requestAnimationFrame(fitDrawings);else document.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(fitDrawings)});
+</script>
+<script>
+(function(){
+  var plate=document.querySelector('.ad-plate'); if(!plate) return;
+  var toggle=plate.querySelector('.ad-viewtoggle'), v3d=plate.querySelector('.ad-3d');
+  var GLB='../../../assets/models/a1101-web.glb';
+  var inited=false, api=null;
+  toggle.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    toggle.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+    if(b.dataset.view==='3d'){
+      plate.classList.add('is3d'); v3d.setAttribute('aria-hidden','false');
+      requestAnimationFrame(function(){v3d.classList.add('show');});
+      if(!inited){inited=true; boot();} else if(api){api.resume();}
+    } else {
+      plate.classList.remove('is3d'); v3d.classList.remove('show'); v3d.setAttribute('aria-hidden','true');
+      if(api){api.pause();}
+    }
+  });
+  async function boot(){
+    try{
+      var THREE=await import('three');
+      var OC=(await import('three/addons/controls/OrbitControls.js')).OrbitControls;
+      var GL=(await import('three/addons/loaders/GLTFLoader.js')).GLTFLoader;
+      var DL=(await import('three/addons/loaders/DRACOLoader.js')).DRACOLoader;
+      var LS2=(await import('three/addons/lines/LineSegments2.js')).LineSegments2;
+      var LSG=(await import('three/addons/lines/LineSegmentsGeometry.js')).LineSegmentsGeometry;
+      var LM=(await import('three/addons/lines/LineMaterial.js')).LineMaterial;
+      build(THREE,OC,GL,DL,LS2,LSG,LM);
+    }catch(err){console.error('3D load',err); var l=v3d.querySelector('.ad-3d-load'); if(l)l.textContent='3D недоступно';}
+  }
+  function build(THREE,OC,GL,DL,LS2,LSG,LM){
+    var canvas=document.createElement('canvas'); v3d.insertBefore(canvas,v3d.firstChild);
+    var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    var scene=new THREE.Scene();
+    var cam=new THREE.OrthographicCamera(-1,1,1,-1,-20000,20000);
+    var controls=new OC(cam,canvas); controls.enableDamping=true; controls.enablePan=false; controls.rotateSpeed=0.9;
+    var running=false, raf=null, lines=null, D=1, W=1, H=1;
+    function fit(){ var a=W/H, f=D*0.72; cam.left=-f*a; cam.right=f*a; cam.top=f; cam.bottom=-f; cam.updateProjectionMatrix(); }
+    function resize(){ W=plate.clientWidth; H=plate.clientHeight; renderer.setSize(W,H,false); if(lines)lines.material.resolution.set(W,H); fit(); }
+    function loop(){ if(!running) return; raf=requestAnimationFrame(loop); controls.update(); renderer.render(scene,cam); }
+    api={pause:function(){running=false; if(raf)cancelAnimationFrame(raf); raf=null;},
+         resume:function(){ if(!running){running=true; loop();} }};
+    var draco=new DL(); draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+    var loader=new GL(); loader.setDRACOLoader(draco);
+    loader.load(GLB,function(g){
+      var geos=[]; g.scene.updateWorldMatrix(true,true);
+      g.scene.traverse(function(o){ if(o.isMesh){ var q=o.geometry.clone(); q.applyMatrix4(o.matrixWorld); geos.push(q);} });
+      var geo=geos[0];
+      geo.computeBoundingBox(); var c=geo.boundingBox.getCenter(new THREE.Vector3()); geo.translate(-c.x,-c.y,-c.z);
+      var size=geo.boundingBox.getSize(new THREE.Vector3()); D=Math.max(size.x,size.y,size.z);
+      var fill=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x0c2136,transparent:true,opacity:0.9,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}));
+      scene.add(fill);
+      var lsg=new LSG().fromEdgesGeometry(new THREE.EdgesGeometry(geo,9));
+      var lm=new LM({color:0xEDEFF1,linewidth:1.7}); lm.resolution.set(W||1,H||1);
+      lines=new LS2(lsg,lm); scene.add(lines);
+      cam.position.set(-D*2,D*1.6,D*2.3); controls.target.set(0,0,0);
+      resize();
+      v3d.classList.add('ready');
+      running=true; loop();
+    });
+    addEventListener('resize',resize); resize();
+  }
+})();
 </script>
 <script src="../../../assets/js/site.js?v=egoe48"></script>
 </body>
