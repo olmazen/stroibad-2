@@ -35,7 +35,7 @@
 .ad-tint .ph-label{background:linear-gradient(180deg,rgba(201,154,63,.9),rgba(168,127,47,.9));color:#1c1305}
 .ad-key{color:var(--gold-h)!important;font-weight:700}
 .ad-plate-hint{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--steel);align-self:flex-end;padding-bottom:8px}
-.ad-plate{position:relative;background:radial-gradient(130% 100% at 50% 32%,#1b3a63 0%,#0e2340 45%,#081422 100%);border:1px solid rgba(201,154,63,.28);border-radius:3px;padding:34px 28px;min-height:500px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 0 90px rgba(0,0,0,.45),0 24px 60px -30px rgba(0,0,0,.8)}
+.ad-plate{position:relative;background:radial-gradient(130% 100% at 50% 32%,#1b3a63 0%,#0e2340 45%,#081422 100%);border:1px solid rgba(201,154,63,.28);border-radius:3px 3px 0 0;padding:34px 28px;min-height:640px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:inset 0 0 90px rgba(0,0,0,.45),0 24px 60px -30px rgba(0,0,0,.8)}
 .ad-plate::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(150,185,230,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(150,185,230,.09) 1px,transparent 1px);background-size:40px 40px;-webkit-mask-image:radial-gradient(130% 105% at 50% 45%,#000 52%,transparent 92%);mask-image:radial-gradient(130% 105% at 50% 45%,#000 52%,transparent 92%)}
 .ad-plate-glow{position:absolute;left:50%;top:46%;width:64%;height:40%;transform:translate(-50%,-50%);background:radial-gradient(closest-side,rgba(120,170,235,.28),transparent 78%);filter:blur(8px);z-index:0}
 .ad-plate .ad-draw-holder{position:relative;z-index:1;width:min(900px,96%);display:flex;align-items:center;justify-content:center}
@@ -56,9 +56,11 @@
 .ad-dimrow .v{font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;color:#fff;line-height:1}
 .ad-dimrow li:first-child .v{color:var(--gold-h)}
 .ad-draft{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:rgba(201,154,63,.08);border:1px dashed rgba(201,154,63,.4);border-radius:2px;padding:7px 13px;margin-top:16px}
-@media(max-width:760px){.ad-plate{min-height:280px;padding:22px 14px}.ad-plate .ad-draw-holder{width:98%}.ad-plate-hint{display:none}.ad-dimrow{grid-template-columns:repeat(2,1fr)}.ad-dimrow .v{font-size:16px}}
-.ad-viewtoggle{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:4;display:inline-flex;background:rgba(8,20,34,.72);border:1px solid rgba(201,154,63,.32);border-radius:4px;overflow:hidden;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
-.ad-viewtoggle button{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9fb8dc;background:none;border:0;padding:9px 18px;cursor:pointer;transition:background .2s,color .2s}
+@media(max-width:760px){.ad-plate{min-height:360px;padding:22px 14px}.ad-plate .ad-draw-holder{width:98%}.ad-plate-hint{display:none}.ad-dimrow{grid-template-columns:repeat(2,1fr)}.ad-dimrow .v{font-size:16px}}
+.ad-viewtoggle{display:flex;margin:0;border:1px solid rgba(201,154,63,.28);border-top:0;border-radius:0 0 3px 3px;overflow:hidden}
+.ad-viewtoggle button{flex:1;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#9fb8dc;background:#0b1a2e;border:0;padding:14px 10px;cursor:pointer;transition:background .2s,color .2s}
+.ad-viewtoggle button:hover{color:#dbe6f5}
+.ad-viewtoggle button+button{border-left:1px solid rgba(201,154,63,.28)}
 .ad-viewtoggle button.on{background:linear-gradient(180deg,#E7C877,#C99A3F);color:#1c1305;font-weight:600}
 .ad-3d{position:absolute;inset:0;z-index:1;opacity:0;visibility:hidden;transition:opacity .55s ease;pointer-events:none}
 .ad-3d.show{opacity:1;visibility:visible;pointer-events:auto}
@@ -68,10 +70,10 @@
 .ad-3d-load,.ad-3d-hint{position:absolute;left:0;right:0;text-align:center;font-family:'Oswald',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9fb8dc;pointer-events:none;z-index:2}
 .ad-3d-load{top:50%;transform:translateY(-50%);font-size:12px;opacity:.75}
 .ad-3d.ready .ad-3d-load{display:none}
-.ad-3d-hint{bottom:56px;font-size:10.5px;opacity:0;transform:translateY(10px);transition:opacity .6s .15s,transform .6s .15s}
+.ad-3d-hint{bottom:18px;font-size:10.5px;opacity:0;transform:translateY(10px);transition:opacity .6s .15s,transform .6s .15s}
 .ad-3d-hint i{font-style:normal;color:var(--gold-h);margin-right:6px}
 .ad-3d.ready .ad-3d-hint{opacity:.85;transform:none}
-@media(max-width:760px){.ad-viewtoggle button{padding:8px 14px}.ad-3d-hint{bottom:50px}}
+@media(max-width:760px){.ad-viewtoggle button{padding:8px 14px}.ad-3d-hint{bottom:14px}}
 </style>
 </head>
 <body>
@@ -698,8 +700,8 @@
   </g>
 </svg></div>
     <div class="ad-3d" aria-hidden="true"><div class="ad-3d-load">Загрузка 3D-модели…</div><div class="ad-3d-hint"><i>&#8635;</i>потяни — вращать · колесо — зум</div></div>
-    <div class="ad-viewtoggle"><button class="on" data-view="draw" type="button">Чертёж</button><button data-view="3d" type="button">3D-модель</button></div>
   </div>
+  <div class="ad-viewtoggle"><button class="on" data-view="draw" type="button">Чертёж</button><button data-view="3d" type="button">3D-модель</button></div>
   <ul class="ad-dimrow"><li><span class="k">Габариты</span><span class="v">670 × 725 × 835 мм</span></li><li><span class="k">Масса</span><span class="v">37 кг</span></li><li><span class="k">Нагрузка</span><span class="v">200 кг</span></li><li><span class="k">Материал</span><span class="v">Сталь</span></li><li><span class="k">Покрытие</span><span class="v">Любой RAL</span></li><li><span class="k">Артикул</span><span class="v">A1-101</span></li></ul>
 </div></section>
 <section style="padding-top:0"><div class="container"><div class="split">
@@ -740,7 +742,7 @@ if(document.readyState!=='loading')requestAnimationFrame(fitDrawings);else docum
 <script>
 (function(){
   var plate=document.querySelector('.ad-plate'); if(!plate) return;
-  var toggle=plate.querySelector('.ad-viewtoggle'), v3d=plate.querySelector('.ad-3d');
+  var toggle=document.querySelector('.ad-viewtoggle'), v3d=plate.querySelector('.ad-3d');
   var GLB='../../../assets/models/a1101-web.glb';
   var inited=false, api=null;
   toggle.addEventListener('click',function(e){
