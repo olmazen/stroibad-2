@@ -1407,7 +1407,7 @@ window.__whenVisible = (function () {
     }
     function curTo(cur, el, ms, dx, dy) {
       var r = el.getBoundingClientRect(), p = cur.offsetParent.getBoundingClientRect();
-      cur.style.transitionDuration = ms + 'ms';
+      cur.style.setProperty('--cms', ms + 'ms');   // длительность только для left/top — press-скейл остаётся быстрым
       cur.style.left = (r.left - p.left + r.width * (dx == null ? 0.5 : dx)) + 'px';
       cur.style.top = (r.top - p.top + r.height * (dy == null ? 0.6 : dy)) + 'px';
     }
@@ -1532,8 +1532,8 @@ window.__whenVisible = (function () {
           var rr = reals();
           var m = catalog.classList.contains('is-mobile');
           var T = m
-            ? { addShow: 280, fillA: 430, fillB: 610, add0: 720, click: 1360, ppOpen: 1700, swap: 2320, swap2: 3080, swap3: 3820, scroll: 4300, d3d: 4720, cta: 6120, toCart: 6740, cartPress: 7020, loop: 7220 }
-            : { addShow: 320, fillA: 480, fillB: 680, add0: 800, click: 1440, ppOpen: 1800, swap: 2440, swap2: 3220, swap3: 3980, scroll: 4460, d3d: 4900, cta: 6360, toCart: 6980, cartPress: 7280, loop: 7500 };
+            ? { addShow: 280, fillA: 430, fillB: 610, add0: 720, click: 1360, ppOpen: 1700, swap: 2320, swap2: 3080, swap3: 3820, scroll: 4300, d3d: 5100, cta: 13940, toCart: 14560, cartPress: 14840, loop: 15040 }
+            : { addShow: 320, fillA: 480, fillB: 680, add0: 800, click: 1440, ppOpen: 1800, swap: 2440, swap2: 3220, swap3: 3980, scroll: 4460, d3d: 5260, cta: 14100, toCart: 14720, cartPress: 15020, loop: 15240 };
           // 1) каталог радиально доезжает вокруг пары карточек-скелетонов
           grid.classList.add('in');
           // 2) камера мягко приближается к паре → фото АККУРАТНО проявляются (как было ранее)
@@ -1557,9 +1557,18 @@ window.__whenVisible = (function () {
           t(function () { if (!running) return; if (thumbs[3]) curTo(ccur, thumbs[3], 520, 0.5, 0.5); }, T.swap3 - 240);
           t(function () { if (!running) return; ccur.classList.add('press'); selectThumb(3); }, T.swap3);
           t(function () { if (!running) return; ccur.classList.remove('press'); }, T.swap3 + 200);
-          // 5) листает ниже → КРУТИТ реальный 3D (мышь-курсор реально вращает и приближает объект)
+          // 5) листает ниже → 3D-акт (~8.4 c, тайминги = SEGS в fw3d.js; d3d — ПОСЛЕ доезда панели .75s):
+          //    900 загрузка · 2600 драг№1 (1050) · 4030 драг№2 (1150) · 5480 наезд к детали (1350) · 6830 осмотр (800)
+          //    вертикаль драгов согласована с OrbitControls: курсор вниз → камера выше (ph меньше), влево → th растёт
           t(function () { if (!running) return; if (pp) pp.classList.add('scrolled'); }, T.scroll);
-          t(function () { if (!running) return; if (stage3d) curTo(ccur, stage3d, 600, 0.5, 0.45); if (pp) pp.classList.add('spin3d'); if (viewer) { viewer.resume(); viewer.spin(); } }, T.d3d);
+          t(function () { if (!running) return; if (stage3d) curTo(ccur, stage3d, 600, 0.5, 0.45); if (viewer) viewer.play(); else if (pp) pp.classList.add('spin3d'); }, T.d3d);
+          t(function () { if (!running) return; ccur.classList.add('press'); if (stage3d) curTo(ccur, stage3d, 1050, 0.28, 0.52); }, T.d3d + 2600);   // драг №1: тянет влево-вниз
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.d3d + 3650);
+          t(function () { if (!running) return; ccur.classList.add('press'); if (stage3d) curTo(ccur, stage3d, 1150, 0.74, 0.44); }, T.d3d + 4030);   // драг №2: обратно вправо-вверх
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.d3d + 5180);
+          t(function () { if (!running) return; if (stage3d) curTo(ccur, stage3d, 1350, 0.58, 0.34); }, T.d3d + 5480);                                 // подводит взгляд к детали
+          t(function () { if (!running) return; ccur.classList.add('press'); if (stage3d) curTo(ccur, stage3d, 800, 0.50, 0.35); }, T.d3d + 6830);    // рассматривает вблизи (влево = th растёт)
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.d3d + 7630);
           // 6) добавляет Art Déco В КОРЗИНУ прямо со страницы товара
           t(function () { if (!running) return; if (cta) curTo(ccur, cta, 560, 0.5, 0.5); }, T.cta - 320);
           t(function () { if (!running) return; ccur.classList.add('press'); if (cta) { cta.classList.add('added'); cta.textContent = 'Добавлено ✓'; } setCnt(2); }, T.cta);
@@ -1567,7 +1576,9 @@ window.__whenVisible = (function () {
           // 7) идёт к корзине → нажатие → СРАЗУ на шаг 2, без промедления
           t(function () { if (!running) return; curTo(ccur, cart, 520, 0.3, 0.16); }, T.toCart);
           t(function () { if (!running) return; ccur.classList.add('press'); cart.classList.add('press'); }, T.cartPress);
-          t(function () { if (!running) return; advance(); }, T.loop);
+          t(function () { if (!running) return; ccur.classList.remove('press'); cart.classList.remove('press'); advance(); }, T.loop);
+          // страховка: если авто-переход не увёл со слайда (пользователь удержал скролл) — демо начинается заново
+          t(function () { if (!running) return; loop(); }, T.loop + 3200);
         })();
       };
       api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; if (viewer) { viewer.pause(); viewer.reset(); } finalState(); };

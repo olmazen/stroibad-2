@@ -387,6 +387,8 @@ svg.drawn .bp-fade{opacity:1}
 /* ============ section hero (внутренние) ============ */
 .shero{position:relative;background:var(--bg);color:#fff;overflow:hidden;border-bottom:1px solid var(--line);min-height:calc(100vh - 104px);display:flex;align-items:flex-end}
 .shero-bg{position:absolute;inset:0;z-index:0}
+.shero-bg picture,.shero-bg img{display:block;width:100%;height:100%}
+.shero-bg img{object-fit:cover;object-position:center}
 .shero-bg .ph{position:absolute;inset:0;height:100%;border:none;background-color:#10141A}
 .shero-bg .ph::before,.shero-bg .ph::after{display:none}
 .shero::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(95deg,rgba(12,14,18,.96) 0%,rgba(12,14,18,.85) 38%,rgba(12,14,18,.45) 78%,rgba(12,14,18,.3) 100%)}
@@ -1168,7 +1170,7 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-flow2{display:grid;grid-template-columns:minmax(240px,320px) minmax(340px,1fr);gap:30px;align-items:start}
 .fw-att-zone{position:relative;padding-top:6px}
 /* курсор */
-.fw-cur{position:absolute;left:8%;top:105%;z-index:20;opacity:0;transition:left .6s cubic-bezier(.3,.7,.3,1),top .6s cubic-bezier(.3,.7,.3,1),opacity .3s,transform .12s;pointer-events:none;transform-origin:4px 3px}
+.fw-cur{position:absolute;left:8%;top:105%;z-index:20;opacity:0;transition:left var(--cms,.6s) cubic-bezier(.3,.7,.3,1),top var(--cms,.6s) cubic-bezier(.3,.7,.3,1),opacity .3s,transform .12s;pointer-events:none;transform-origin:4px 3px}
 .fw-cur.show{opacity:1}
 .fw-cur.press{transform:scale(.78)}
 .fw-cur svg{width:22px;height:22px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
@@ -1782,7 +1784,13 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-pp-3d-bar{display:flex;align-items:baseline;justify-content:space-between;padding:8px 12px;border-bottom:1px solid rgba(201,164,95,.2)}
 .fw-pp-3d-bar b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:11px;color:#fff}
 .fw-pp-3d-bar span{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:9px;color:#8fb0dc}
-.fw-pp-3d-stage{position:relative;height:clamp(168px,29vh,252px);display:flex;align-items:center;justify-content:center;padding:10px 14px;perspective:1000px}
+.fw-pp-3d-stage{position:relative;height:clamp(196px,32vh,272px);display:flex;align-items:center;justify-content:center;padding:10px 14px;perspective:1000px}
+/* «1 секунда загрузки»: подпись + полоска над чертежом, пока готовится живой 3D */
+.fw-pp-3d-stage.ld::before{content:"Загрузка 3D";position:absolute;left:0;right:0;bottom:22px;z-index:3;text-align:center;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:8px;color:#d8b979}
+.fw-pp-3d-stage.ld::after{content:"";position:absolute;left:30%;right:30%;bottom:14px;height:2px;z-index:3;background:linear-gradient(90deg,#d8b979,#f2c66d);transform-origin:left;transform:scaleX(0);animation:fwLdBar .88s cubic-bezier(.35,.15,.35,1) forwards}
+@keyframes fwLdBar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+/* fallback: FW3D не смог загрузить модель — чертёж-заглушка мягко покачивается */
+.fw-pp-3d-stage.fw3d-fb .fw-pp-3dimg{animation:fwSpin3d 3.6s ease-in-out infinite alternate}
 .fw-pp-3dimg{width:auto;height:100%;max-width:96%;object-fit:contain;filter:drop-shadow(0 18px 30px rgba(0,0,0,.55));transition:transform 1s cubic-bezier(.3,.7,.3,1),opacity .5s ease}
 .fw-pp.spin3d .fw-pp-3dimg{animation:fwSpin3d 3.6s ease-in-out infinite alternate}
 @keyframes fwSpin3d{from{transform:rotateY(-15deg) rotateX(3deg)}to{transform:rotateY(15deg) rotateX(-2deg)}}
@@ -1793,8 +1801,8 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-pp-3d-stage.has3d .fw-pp-3dimg{opacity:0;animation:none!important}
 .fw-pp-3dhint{position:absolute;left:0;right:0;bottom:6px;z-index:3;text-align:center;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:8px;color:#9db8dd;opacity:0;transition:opacity .5s ease;pointer-events:none}
 .fw-pp-3d-stage.has3d .fw-pp-3dhint{opacity:.85}
-@media(max-width:900px){.fw-pp-top{flex-direction:column}.fw-pp-hero{flex:none;aspect-ratio:16/10}.fw-pp-title{font-size:16px}.fw-pp-3d-stage{height:clamp(120px,20vh,168px)}.fw-pp.scrolled .fw-pp-scroll{transform:translateY(-44%)}}
-@media(prefers-reduced-motion:reduce){.fw-pp,.fw-pp-scroll,.fw-pp-3dimg,.fw-pp-heroimg{transition:none}.fw-pp.spin3d .fw-pp-3dimg{animation:none}}
+@media(max-width:900px){.fw-pp-top{flex-direction:column}.fw-pp-hero{flex:none;aspect-ratio:16/10}.fw-pp-title{font-size:16px}.fw-pp-3d-stage{height:clamp(150px,23vh,190px)}.fw-pp.scrolled .fw-pp-scroll{transform:translateY(-44%)}}
+@media(prefers-reduced-motion:reduce){.fw-pp,.fw-pp-scroll,.fw-pp-3dimg,.fw-pp-heroimg{transition:none}.fw-pp.spin3d .fw-pp-3dimg,.fw-pp-3d-stage.fw3d-fb .fw-pp-3dimg{animation:none}}
 @media(max-width:900px){
   .fw-catcart{top:4px;right:4px;padding:6px 11px 6px 9px}
   .fw-real .fw-cap b{font-size:11px}
