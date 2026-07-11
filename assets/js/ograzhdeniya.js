@@ -26,7 +26,8 @@
     {t:'03:00',p:'Глубокая ночь',tod:'night'},
   ];
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  imgs.forEach(im => { const pre = new Image(); pre.src = im.getAttribute('src'); }); // предзагрузка кадров суток — без пустых вспышек при кросс-фейде
+  const lite = document.documentElement.hasAttribute('data-lite');
+  if(!lite) imgs.forEach(im => { const pre = new Image(); pre.src = im.getAttribute('src'); }); // предзагрузка кадров суток (кроме lite)
   let cur = 2, timer = null;
   function set(i){
     cur = (i + STEPS.length) % STEPS.length;
@@ -42,7 +43,7 @@
   if (range) range.addEventListener('input', () => { stop(); set(parseInt(range.value)); });
   if (playBtn) playBtn.addEventListener('click', () => { timer ? stop() : play(); });
   set(2);
-  if (!reduce){
+  if (!reduce && !lite){
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ play(); io.disconnect(); } }), {threshold:0.35});
     io.observe(tl);
   }
@@ -450,4 +451,26 @@ updateCalc();
   window.addEventListener('pointercancel', up);
   // при переходе на мобилку — сбросить смещение
   window.addEventListener('resize', function(){ if(mobile() && (tx||ty)){ tx=ty=0; panel.style.transform=''; } });
+})();
+
+
+/* ── галерея отзывов: fade-in + лайтбокс (как в портфолио) ── */
+(function(){
+  var items=[].slice.call(document.querySelectorAll('.pf-ph'));
+  if(!items.length) return;
+  items.forEach(function(a){ var img=a.querySelector('img'); if(!img)return; var done=function(){a.classList.add('loaded');}; if(img.complete&&img.naturalWidth)done(); else{img.addEventListener('load',done);img.addEventListener('error',done);} });
+  var srcs=items.map(function(a){return a.dataset.full||a.getAttribute('href');}), idx=0;
+  var lb=document.createElement('div'); lb.className='pf-lb';
+  lb.innerHTML='<button class="pf-lb-btn pf-lb-x" aria-label="Закрыть">×</button><button class="pf-lb-btn pf-lb-prev" aria-label="Назад">‹</button><img alt=""><button class="pf-lb-btn pf-lb-next" aria-label="Вперёд">›</button><div class="pf-lb-cnt"></div>';
+  document.body.appendChild(lb);
+  var limg=lb.querySelector('img'), cnt=lb.querySelector('.pf-lb-cnt');
+  function show(i){idx=(i+srcs.length)%srcs.length;limg.src=srcs[idx];cnt.textContent=(idx+1)+' / '+srcs.length;}
+  function open(i){show(i);lb.classList.add('on');document.body.style.overflow='hidden';}
+  function close(){lb.classList.remove('on');document.body.style.overflow='';}
+  items.forEach(function(a,i){a.addEventListener('click',function(e){e.preventDefault();open(i);});});
+  lb.querySelector('.pf-lb-x').addEventListener('click',close);
+  lb.querySelector('.pf-lb-prev').addEventListener('click',function(e){e.stopPropagation();show(idx-1);});
+  lb.querySelector('.pf-lb-next').addEventListener('click',function(e){e.stopPropagation();show(idx+1);});
+  lb.addEventListener('click',function(e){if(e.target===lb)close();});
+  document.addEventListener('keydown',function(e){if(!lb.classList.contains('on'))return;if(e.key==='Escape')close();else if(e.key==='ArrowLeft')show(idx-1);else if(e.key==='ArrowRight')show(idx+1);});
 })();
