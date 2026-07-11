@@ -1966,10 +1966,10 @@ body .ad-dimrow .v{font-family:'Oswald',sans-serif;font-size:17px;font-weight:60
 body .ad-dimrow li:first-child .v{color:var(--gold-h,#E7C877);font-size:18px}
 @media(max-width:600px){body .ad-dimrow li,body .ad-dimrow li:first-child{flex:1 1 42%}}
 
-/* ==card fade== */
-.ph.has-img:not(.loaded){background:#141920!important;animation:phPulse 1.5s ease-in-out infinite}
+/* ==card fade== (kz-swap исключён: у Art Déco карточек своя смена белый↔ховер) */
+.ph.has-img:not(.kz-swap):not(.loaded){background:#141920!important;animation:phPulse 1.5s ease-in-out infinite}
 @keyframes phPulse{0%,100%{background:#141920}50%{background:#1c232c}}
-.ph.has-img img{opacity:0;transition:opacity .55s ease,transform .45s ease,filter .45s ease}
-.ph.has-img.loaded img{opacity:1}
+.ph.has-img:not(.kz-swap) img{opacity:0;transition:opacity .55s ease,transform .45s ease,filter .45s ease}
+.ph.has-img:not(.kz-swap).loaded img{opacity:1}
 .ph.has-img.loaded{animation:none}
-@media(prefers-reduced-motion:reduce){.ph.has-img:not(.loaded){animation:none}.ph.has-img img{transition:opacity .2s ease}}
+@media(prefers-reduced-motion:reduce){.ph.has-img:not(.kz-swap):not(.loaded){animation:none}.ph.has-img:not(.kz-swap) img{transition:opacity .2s ease}}
