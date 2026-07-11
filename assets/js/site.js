@@ -1134,22 +1134,30 @@ window.__whenVisible = (function () {
         '<div class="fw-cam"><div class="fw-cgrid"></div></div>' +
         '<div class="fw-pp" aria-hidden="true"><div class="fw-pp-scroll">' +
           '<div class="fw-pp-top">' +
-            '<div class="fw-pp-hero"><img class="fw-pp-heroimg" src="' + A + 'hero.webp?i15" alt="Скамейка A1-101 Art Déco"><span class="fw-pp-3dbadge">A1-101 · 3D-визуализация</span></div>' +
+            '<div class="fw-pp-gallery">' +
+              '<div class="fw-pp-hero"><img class="fw-pp-heroimg" src="' + A + 'hero.webp?i15" alt="Скамейка A1-101 Art Déco"><span class="fw-pp-hlabel">A1-101 · карточка</span></div>' +
+              '<div class="fw-pp-thumbs">' +
+                '<span class="fw-pp-th on" data-cap="A1-101 · карточка"><img src="' + A + 'hero.webp?i15" alt="Скамейка A1-101 — карточка"><i>карточка</i></span>' +
+                '<span class="fw-pp-th" data-cap="A1-101 · на объекте"><img src="' + A + 'life1.webp" alt="Скамейка A1-101 — на объекте"><i>на объекте</i></span>' +
+                '<span class="fw-pp-th" data-cap="A1-101 · фасад"><img src="' + A + 'facade1.webp?i15" alt="Скамейка A1-101 — фасад"><i>фасад</i></span>' +
+                '<span class="fw-pp-th" data-cap="A1-101 · в среде"><img src="' + A + 'life2.webp" alt="Скамейка A1-101 — в среде"><i>в среде</i></span>' +
+              '</div>' +
+            '</div>' +
             '<div class="fw-pp-info">' +
               '<em class="fw-pp-tag">Art Déco · коллекция A</em>' +
               '<b class="fw-pp-title">Скамейка A1-101</b>' +
+              '<span class="fw-pp-art">Артикул A1-101 · сталь · порошок RAL</span>' +
               '<span class="fw-pp-price">от 44 500 ₽</span>' +
-              '<div class="fw-pp-thumbs">' +
-                '<span class="fw-pp-th on"><img src="' + A + 'hero.webp?i15" alt=""></span>' +
-                '<span class="fw-pp-th"><img src="' + A + 'facade1.webp?i15" alt=""></span>' +
-                '<span class="fw-pp-th"><img src="' + A + 'facade2.webp?i15" alt=""></span>' +
-                '<span class="fw-pp-th"><img src="' + A + 'facade3.webp?i15" alt=""></span>' +
-              '</div>' +
+              '<span class="fw-pp-note">точная цена — по цвету RAL, комплектации и партии</span>' +
+              '<div class="fw-pp-ral"><span class="on" style="background:#383E42"></span><span style="background:#0A0A0C"></span><span style="background:#8d8577"></span><span style="background:#114232"></span></div>' +
               '<span class="fw-pp-cta">В корзину</span>' +
             '</div>' +
           '</div>' +
-          '<div class="fw-pp-3d"><div class="fw-pp-3d-bar"><b>3D-визуализация · чертёж</b><span>интерактив ⇄</span></div>' +
-            '<div class="fw-pp-3d-stage"><img class="fw-pp-3dimg" src="' + A + 'drawing-line.svg" alt="3D-чертёж A1-101"></div></div>' +
+          '<div class="fw-pp-3d"><div class="fw-pp-3d-bar"><b>3D-визуализация · чертёж</b><span>тяните ⇄ вращайте</span></div>' +
+            '<div class="fw-pp-3d-stage" data-glb="assets/models/a1101-web.glb">' +
+              '<img class="fw-pp-3dimg" src="' + A + 'drawing-line.svg" alt="3D-чертёж A1-101">' +
+              '<span class="fw-pp-3dhint">живой 3D · тяните, чтобы вращать</span>' +
+            '</div></div>' +
         '</div></div>' +
         cur + '</div>';
     }
@@ -1445,7 +1453,15 @@ window.__whenVisible = (function () {
       var heroImg = root.querySelector('.fw-pp-heroimg');
       var thumbs = root.querySelectorAll('.fw-pp-th');
       var stage3d = root.querySelector('.fw-pp-3d-stage');
+      var hlabel = root.querySelector('.fw-pp-hlabel');
       var heroSrc = heroImg ? heroImg.getAttribute('src') : '';
+      var hlabelSrc = hlabel ? hlabel.textContent : '';
+      var viewer = null;   // живой Three.js-объект (ленивая загрузка при первом запуске сцены)
+      function ensureViewer() {
+        if (viewer || !stage3d || !window.FW3D) return;
+        var glb = stage3d.getAttribute('data-glb'); if (!glb) return;
+        viewer = window.FW3D.mount(stage3d, glb);
+      }
       function setCnt(n) {
         if (cnt) { cnt.textContent = String(n); cnt.classList.remove('bump'); void cnt.offsetWidth; cnt.classList.add('bump'); }
         cart.classList.toggle('has', n > 0);
@@ -1453,8 +1469,10 @@ window.__whenVisible = (function () {
       function selectThumb(i) {
         var th = thumbs[i]; if (!th || !heroImg) return;
         var src = th.querySelector('img').getAttribute('src');
+        var cap = th.getAttribute('data-cap');
         heroImg.classList.add('swapping');
-        t(function () { heroImg.src = src; heroImg.classList.remove('swapping'); }, 150);
+        // смена фото не «супер-быстрая»: даём кадру мягко раствориться и проявиться
+        t(function () { heroImg.src = src; if (hlabel && cap) hlabel.textContent = cap; heroImg.classList.remove('swapping'); }, 300);
         thumbs.forEach(function (x, j) { x.classList.toggle('on', j === i); });
       }
       var cta = root.querySelector('.fw-pp-cta');
@@ -1471,30 +1489,34 @@ window.__whenVisible = (function () {
       function resetChoose() {
         grid.classList.remove('in');
         cam.classList.remove('dolly', 'will'); cam.style.transformOrigin = ''; cam.style.transform = '';
-        reals().forEach(function (el) { el.classList.add('filled'); el.classList.remove('tapped'); var ad = el.querySelector('.fw-add'); if (ad) ad.classList.remove('on'); });
+        // фото НЕ проявлены: карточки-скелетоны стоят, снимки аккуратно появятся на подъезде камеры
+        reals().forEach(function (el) { el.classList.remove('filled', 'tapped'); var ad = el.querySelector('.fw-add'); if (ad) ad.classList.remove('on'); });
         if (cnt) cnt.textContent = '0';
         cart.classList.remove('has', 'press');
         ccur.classList.remove('show', 'press', 'big');
         catalog.classList.remove('to-pp');
         if (pp) pp.classList.remove('open', 'scrolled', 'spin3d');
         if (heroImg) { heroImg.classList.remove('swapping'); if (heroSrc) heroImg.src = heroSrc; }
+        if (hlabel && hlabelSrc) hlabel.textContent = hlabelSrc;
         thumbs.forEach(function (x, j) { x.classList.toggle('on', j === 0); });
         if (cta) { cta.classList.remove('added'); cta.textContent = 'В корзину'; }
+        if (viewer) { viewer.pause(); viewer.reset(); }
       }
-      function finalState() {   // покой: видна пара товаров, каталог ещё НЕ разъехался (на старте доезжает вокруг)
+      function finalState() {   // покой: видна пара карточек-скелетонов; фото проявятся при подъезде камеры
         grid.classList.remove('in');
-        cam.classList.remove('dolly', 'will'); cam.style.transformOrigin = '';
-        reals().forEach(function (el) { el.classList.add('filled'); el.classList.remove('tapped'); var ad = el.querySelector('.fw-add'); if (ad) ad.classList.remove('on'); });
+        cam.classList.remove('dolly', 'will'); cam.style.transformOrigin = ''; cam.style.transform = '';
+        reals().forEach(function (el) { el.classList.remove('filled', 'tapped'); var ad = el.querySelector('.fw-add'); if (ad) ad.classList.remove('on'); });
         if (cnt) cnt.textContent = '0';
         cart.classList.remove('has', 'press');
         ccur.classList.remove('show', 'press', 'big');
         catalog.classList.remove('to-pp');
         if (pp) pp.classList.remove('open', 'scrolled', 'spin3d');
+        if (viewer) { viewer.pause(); viewer.reset(); }
       }
       var lastMob = mq.matches;
       buildGrid();
       finalState();   // сцена НЕ пустая до старта: сразу видна пара товаров
-      if (reduced) grid.classList.add('in');   // без анимации — сразу весь каталог
+      if (reduced) { grid.classList.add('in'); reals().forEach(function (el) { el.classList.add('filled'); }); }   // без анимации — сразу весь каталог с фото
       // пересобираем сетку при смене брейкпоинта (resize/поворот) — window.resize надёжнее matchMedia change
       function onRz() { var m = mq.matches; if (m !== lastMob) { lastMob = m; buildGrid(); if (!running) finalState(); } }
       addEventListener('resize', onRz);
@@ -1503,30 +1525,41 @@ window.__whenVisible = (function () {
       cart.addEventListener('click', function () { scrollToStep(1); });
       api.start = function () {
         running = true;
+        ensureViewer();   // ленивая загрузка Three.js только сейчас, когда колесо доехало и играет
         (function loop() {
           if (!running) return;
           resetChoose();
           var rr = reals();
           var m = catalog.classList.contains('is-mobile');
           var T = m
-            ? { addShow: 280, add0: 560, click: 1230, ppOpen: 1560, swap: 2180, scroll: 2900, d3d: 3330, cta: 4600, toCart: 5220, cartPress: 5520, loop: 5700 }
-            : { addShow: 320, add0: 620, click: 1320, ppOpen: 1660, swap: 2300, scroll: 3060, d3d: 3500, cta: 4820, toCart: 5430, cartPress: 5740, loop: 5930 };
-          // 1) каталог радиально доезжает вокруг стоящей пары
+            ? { addShow: 280, fillA: 430, fillB: 610, add0: 720, click: 1360, ppOpen: 1700, swap: 2320, swap2: 3080, swap3: 3820, scroll: 4300, d3d: 4720, cta: 6120, toCart: 6740, cartPress: 7020, loop: 7220 }
+            : { addShow: 320, fillA: 480, fillB: 680, add0: 800, click: 1440, ppOpen: 1800, swap: 2440, swap2: 3220, swap3: 3980, scroll: 4460, d3d: 4900, cta: 6360, toCart: 6980, cartPress: 7280, loop: 7500 };
+          // 1) каталог радиально доезжает вокруг пары карточек-скелетонов
           grid.classList.add('in');
-          // 2) крупный курсор добавляет ТОЛЬКО «Стандарт» (камера едет за курсором)
-          t(function () { if (!running) return; ccur.classList.add('show', 'big'); if (rr[0]) { curTo(ccur, rr[0].querySelector('.fw-add'), 440, 0.5, 0.5); camFollow(rr[0]); } }, T.addShow);
+          // 2) камера мягко приближается к паре → фото АККУРАТНО проявляются (как было ранее)
+          t(function () { if (!running) return; if (rr[0]) camFollow(rr[0]); if (cam) cam.classList.add('will'); }, T.addShow - 120);
+          t(function () { if (!running) return; if (rr[0]) rr[0].classList.add('filled'); }, T.fillA);
+          t(function () { if (!running) return; if (rr[1]) rr[1].classList.add('filled'); }, T.fillB);
+          // крупный курсор добавляет ТОЛЬКО «Стандарт» (камера едет за курсором)
+          t(function () { if (!running) return; ccur.classList.add('show', 'big'); if (rr[0]) curTo(ccur, rr[0].querySelector('.fw-add'), 440, 0.5, 0.5); }, T.addShow);
           t(function () { if (!running) return; ccur.classList.add('press'); if (rr[0]) rr[0].querySelector('.fw-add').classList.add('on'); setCnt(1); }, T.add0);
           // 3) Art Déco НЕ добавляем — курсор жмёт саму карточку → страница товара «перестраивается»
-          t(function () { if (!running) return; ccur.classList.remove('press'); if (rr[1]) { curTo(ccur, rr[1], 480, 0.5, 0.42); camFollow(rr[1]); } }, T.add0 + 240);
+          t(function () { if (!running) return; ccur.classList.remove('press'); if (rr[1]) { curTo(ccur, rr[1], 480, 0.5, 0.42); camFollow(rr[1]); } }, T.add0 + 260);
           t(function () { if (!running) return; ccur.classList.add('press'); if (rr[1]) rr[1].classList.add('tapped'); }, T.click);
           t(function () { if (!running) return; ccur.classList.remove('press'); if (rr[1]) rr[1].classList.remove('tapped'); cam.style.transform = ''; catalog.classList.add('to-pp'); if (pp) pp.classList.add('open'); }, T.ppOpen);
-          // 4) на странице: смотрит ещё одно фото (смена hero)
+          // 4) на странице товара НЕ спеша смотрит несколько фото (плавная, не супер-быстрая смена)
           t(function () { if (!running) return; if (thumbs[1]) curTo(ccur, thumbs[1], 520, 0.5, 0.5); }, T.ppOpen + 460);
           t(function () { if (!running) return; ccur.classList.add('press'); selectThumb(1); }, T.swap);
-          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.swap + 180);
-          // 5) листает ниже → КРУТИТ 3D (хорошо читается)
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.swap + 200);
+          t(function () { if (!running) return; if (thumbs[2]) curTo(ccur, thumbs[2], 520, 0.5, 0.5); }, T.swap2 - 240);
+          t(function () { if (!running) return; ccur.classList.add('press'); selectThumb(2); }, T.swap2);
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.swap2 + 200);
+          t(function () { if (!running) return; if (thumbs[3]) curTo(ccur, thumbs[3], 520, 0.5, 0.5); }, T.swap3 - 240);
+          t(function () { if (!running) return; ccur.classList.add('press'); selectThumb(3); }, T.swap3);
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.swap3 + 200);
+          // 5) листает ниже → КРУТИТ реальный 3D (мышь-курсор реально вращает и приближает объект)
           t(function () { if (!running) return; if (pp) pp.classList.add('scrolled'); }, T.scroll);
-          t(function () { if (!running) return; if (stage3d) curTo(ccur, stage3d, 600, 0.5, 0.45); if (pp) pp.classList.add('spin3d'); }, T.d3d);
+          t(function () { if (!running) return; if (stage3d) curTo(ccur, stage3d, 600, 0.5, 0.45); if (pp) pp.classList.add('spin3d'); if (viewer) { viewer.resume(); viewer.spin(); } }, T.d3d);
           // 6) добавляет Art Déco В КОРЗИНУ прямо со страницы товара
           t(function () { if (!running) return; if (cta) curTo(ccur, cta, 560, 0.5, 0.5); }, T.cta - 320);
           t(function () { if (!running) return; ccur.classList.add('press'); if (cta) { cta.classList.add('added'); cta.textContent = 'Добавлено ✓'; } setCnt(2); }, T.cta);
@@ -1537,7 +1570,7 @@ window.__whenVisible = (function () {
           t(function () { if (!running) return; advance(); }, T.loop);
         })();
       };
-      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; finalState(); };
+      api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; if (viewer) { viewer.pause(); viewer.reset(); } finalState(); };
     }
 
     if (kind === 'quote') {
