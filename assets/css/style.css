@@ -1745,6 +1745,41 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-catcart-cnt{font-family:'Oswald',sans-serif;font-size:13px;line-height:1;min-width:13px;text-align:center;color:var(--amber)}
 .fw-catcart-cnt.bump{animation:catBump .3s cubic-bezier(.2,1.4,.4,1)}
 @keyframes catBump{0%{transform:scale(1)}42%{transform:scale(1.45)}100%{transform:scale(1)}}
+/* центральная пара стоит ВСЕГДА (видна до анимации), не гаснет с сеткой; клик-нажатие карточки */
+.fw-real{opacity:1;transform:none}
+.fw-real.tapped{transform:scale(.94);transition:transform .14s cubic-bezier(.3,.7,.3,1)}
+/* крупный курсор (демо) */
+.fw-cur.big svg{width:34px;height:34px}
+/* ── упрощённая страница товара (Art Déco) внутри сцены выбора ── */
+.fw-catalog.to-pp .fw-cam{opacity:.28;transform:scale(.96);transition:opacity .45s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.fw-pp{position:absolute;inset:0;z-index:8;background:var(--bg);opacity:0;visibility:hidden;transform:scale(1.03);transition:opacity .45s ease,transform .5s cubic-bezier(.2,.85,.25,1),visibility .45s;overflow:hidden}
+.fw-pp.open{opacity:1;visibility:visible;transform:none}
+.fw-pp-scroll{position:absolute;left:0;right:0;top:0;padding:clamp(12px,2.4vw,20px);transition:transform .75s cubic-bezier(.5,.05,.3,1)}
+.fw-pp.scrolled .fw-pp-scroll{transform:translateY(-40%)}
+.fw-pp-top{display:flex;gap:clamp(10px,1.6vw,16px);align-items:stretch}
+.fw-pp-hero{flex:1.55;aspect-ratio:4/3;background:#0e1319;border:1px solid var(--line);border-radius:6px;overflow:hidden;position:relative}
+.fw-pp-heroimg{width:100%;height:100%;object-fit:cover;transition:opacity .18s ease}
+.fw-pp-heroimg.swapping{opacity:0}
+.fw-pp-3dbadge{position:absolute;left:8px;bottom:8px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:9px;background:rgba(201,164,95,.92);color:#1a1206;padding:3px 8px;border-radius:3px}
+.fw-pp-info{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.fw-pp-tag{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:9px;color:#d8b979}
+.fw-pp-title{font-family:'Oswald',sans-serif;font-size:clamp(15px,1.8vw,21px);text-transform:uppercase;color:#fff;line-height:1.04}
+.fw-pp-price{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;color:#d8b979}
+.fw-pp-thumbs{display:flex;gap:6px;margin-top:2px}
+.fw-pp-th{flex:1;aspect-ratio:4/3;border:1px solid var(--line);border-radius:3px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.fw-pp-th.on{border-color:#d8b979}
+.fw-pp-th img{width:100%;height:100%;object-fit:cover;display:block}
+.fw-pp-cta{margin-top:auto;align-self:flex-start;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;font-size:11px;background:linear-gradient(180deg,#E7C877,#C99A3F);color:#1c1305;padding:8px 14px;border-radius:3px}
+.fw-pp-3d{margin-top:clamp(12px,2vw,18px);border:1px solid rgba(201,164,95,.28);border-radius:6px;overflow:hidden;background:radial-gradient(130% 100% at 50% 30%,#12233b 0%,#0a1526 80%)}
+.fw-pp-3d-bar{display:flex;align-items:baseline;justify-content:space-between;padding:8px 12px;border-bottom:1px solid rgba(201,164,95,.2)}
+.fw-pp-3d-bar b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:11px;color:#fff}
+.fw-pp-3d-bar span{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:9px;color:#8fb0dc}
+.fw-pp-3d-stage{height:clamp(168px,29vh,252px);display:flex;align-items:center;justify-content:center;padding:10px 14px;perspective:1000px}
+.fw-pp-3dimg{width:auto;height:100%;max-width:96%;object-fit:contain;filter:drop-shadow(0 18px 30px rgba(0,0,0,.55));transition:transform 1s cubic-bezier(.3,.7,.3,1)}
+.fw-pp.spin3d .fw-pp-3dimg{animation:fwSpin3d 3.6s ease-in-out infinite alternate}
+@keyframes fwSpin3d{from{transform:rotateY(-15deg) rotateX(3deg)}to{transform:rotateY(15deg) rotateX(-2deg)}}
+@media(max-width:900px){.fw-pp-top{flex-direction:column}.fw-pp-hero{flex:none;aspect-ratio:16/10}.fw-pp-title{font-size:16px}.fw-pp-3d-stage{height:clamp(120px,20vh,168px)}.fw-pp.scrolled .fw-pp-scroll{transform:translateY(-44%)}}
+@media(prefers-reduced-motion:reduce){.fw-pp,.fw-pp-scroll,.fw-pp-3dimg,.fw-pp-heroimg{transition:none}.fw-pp.spin3d .fw-pp-3dimg{animation:none}}
 @media(max-width:900px){
   .fw-catcart{top:4px;right:4px;padding:6px 11px 6px 9px}
   .fw-real .fw-cap b{font-size:11px}
@@ -1915,3 +1950,11 @@ body .ad-dimrow .k{font-family:'Oswald',sans-serif;font-size:10.5px;letter-spaci
 body .ad-dimrow .v{font-family:'Oswald',sans-serif;font-size:17px;font-weight:600;color:#fff;line-height:1.1}
 body .ad-dimrow li:first-child .v{color:var(--gold-h,#E7C877);font-size:18px}
 @media(max-width:600px){body .ad-dimrow li,body .ad-dimrow li:first-child{flex:1 1 42%}}
+
+/* ==card fade== */
+.ph.has-img:not(.loaded){background:#141920!important;animation:phPulse 1.5s ease-in-out infinite}
+@keyframes phPulse{0%,100%{background:#141920}50%{background:#1c232c}}
+.ph.has-img img{opacity:0;transition:opacity .55s ease,transform .45s ease,filter .45s ease}
+.ph.has-img.loaded img{opacity:1}
+.ph.has-img.loaded{animation:none}
+@media(prefers-reduced-motion:reduce){.ph.has-img:not(.loaded){animation:none}.ph.has-img img{transition:opacity .2s ease}}
