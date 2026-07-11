@@ -413,3 +413,41 @@ window.addEventListener('resize', () => { clearTimeout(_rto); _rto = setTimeout(
 
 updateCalc();
 })();
+
+
+/* ── перетаскивание плашки времени по hero (десктоп) ── */
+(function(){
+  var panel = document.querySelector('.ogr-tl-panel');
+  var handle = panel && panel.querySelector('.ogr-tl-panel-h');
+  var hero = document.querySelector('.ogr-hero--bg');
+  if(!panel || !handle || !hero) return;
+  var tx=0, ty=0, sx=0, sy=0, ox=0, oy=0, dragging=false;
+  function mobile(){ return window.matchMedia('(max-width:960px)').matches; }
+  function down(e){
+    if(mobile()) return;
+    if(e.target.closest('.ogr-tl-range,.ogr-tl-play')) return; // не мешаем ползунку/кнопке
+    dragging=true; panel.classList.add('is-dragging');
+    sx=e.clientX; sy=e.clientY; ox=tx; oy=ty;
+    try{ panel.setPointerCapture(e.pointerId); }catch(_){}
+    e.preventDefault();
+  }
+  function move(e){
+    if(!dragging) return;
+    var nx=ox+(e.clientX-sx), ny=oy+(e.clientY-sy);
+    var hr=hero.getBoundingClientRect(), pr=panel.getBoundingClientRect();
+    var baseL=pr.left-tx, baseT=pr.top-ty; // позиция без transform
+    var minX=hr.left+10-baseL, maxX=hr.right-10-(baseL+pr.width);
+    var minY=hr.top+10-baseT, maxY=hr.bottom-10-(baseT+pr.height);
+    if(maxX<minX) maxX=minX; if(maxY<minY) maxY=minY;
+    nx=Math.max(minX,Math.min(maxX,nx)); ny=Math.max(minY,Math.min(maxY,ny));
+    tx=nx; ty=ny; panel.style.transform='translate('+nx.toFixed(0)+'px,'+ny.toFixed(0)+'px)';
+    e.preventDefault();
+  }
+  function up(){ if(!dragging) return; dragging=false; panel.classList.remove('is-dragging'); }
+  handle.addEventListener('pointerdown', down);
+  window.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', up);
+  window.addEventListener('pointercancel', up);
+  // при переходе на мобилку — сбросить смещение
+  window.addEventListener('resize', function(){ if(mobile() && (tx||ty)){ tx=ty=0; panel.style.transform=''; } });
+})();
