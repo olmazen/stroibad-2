@@ -1145,7 +1145,7 @@ window.__whenVisible = (function () {
                 '<span class="fw-pp-th"><img src="' + A + 'facade2.webp?i15" alt=""></span>' +
                 '<span class="fw-pp-th"><img src="' + A + 'facade3.webp?i15" alt=""></span>' +
               '</div>' +
-              '<span class="fw-pp-cta">В корзину · добавлено</span>' +
+              '<span class="fw-pp-cta">В корзину</span>' +
             '</div>' +
           '</div>' +
           '<div class="fw-pp-3d"><div class="fw-pp-3d-bar"><b>3D-визуализация · чертёж</b><span>интерактив ⇄</span></div>' +
@@ -1457,10 +1457,20 @@ window.__whenVisible = (function () {
         t(function () { heroImg.src = src; heroImg.classList.remove('swapping'); }, 150);
         thumbs.forEach(function (x, j) { x.classList.toggle('on', j === i); });
       }
+      var cta = root.querySelector('.fw-pp-cta');
+      // «камера» плавно следует за курсором: параллакс-сдвиг + лёгкий наклон к цели
+      function camFollow(el) {
+        if (!el || !cam) return;
+        var cr = catalog.getBoundingClientRect(), er = el.getBoundingClientRect();
+        if (!cr.width) return;
+        var cx = (er.left + er.width / 2 - cr.left) / cr.width - 0.5;
+        var cy = (er.top + er.height / 2 - cr.top) / cr.height - 0.5;
+        cam.style.transform = 'perspective(1000px) translate(' + (-cx * 66).toFixed(1) + 'px,' + (-cy * 46).toFixed(1) + 'px) rotateY(' + (cx * 10).toFixed(1) + 'deg) rotateX(' + (-cy * 8).toFixed(1) + 'deg) scale(1.07)';
+      }
       // центральная пара стоит ВСЕГДА (её видно сразу, до анимации); каталог радиально доезжает вокруг неё
       function resetChoose() {
         grid.classList.remove('in');
-        cam.classList.remove('dolly', 'will'); cam.style.transformOrigin = '';
+        cam.classList.remove('dolly', 'will'); cam.style.transformOrigin = ''; cam.style.transform = '';
         reals().forEach(function (el) { el.classList.add('filled'); el.classList.remove('tapped'); var ad = el.querySelector('.fw-add'); if (ad) ad.classList.remove('on'); });
         if (cnt) cnt.textContent = '0';
         cart.classList.remove('has', 'press');
@@ -1469,6 +1479,7 @@ window.__whenVisible = (function () {
         if (pp) pp.classList.remove('open', 'scrolled', 'spin3d');
         if (heroImg) { heroImg.classList.remove('swapping'); if (heroSrc) heroImg.src = heroSrc; }
         thumbs.forEach(function (x, j) { x.classList.toggle('on', j === 0); });
+        if (cta) { cta.classList.remove('added'); cta.textContent = 'В корзину'; }
       }
       function finalState() {   // покой: видна пара товаров, каталог ещё НЕ разъехался (на старте доезжает вокруг)
         grid.classList.remove('in');
@@ -1498,29 +1509,31 @@ window.__whenVisible = (function () {
           var rr = reals();
           var m = catalog.classList.contains('is-mobile');
           var T = m
-            ? { addShow: 260, add0: 520, add1: 1120, click: 1880, ppOpen: 2180, swap: 3050, scroll: 3980, d3d: 4680, end: 6250, loop: 6600 }
-            : { addShow: 300, add0: 560, add1: 1180, click: 1960, ppOpen: 2280, swap: 3220, scroll: 4180, d3d: 4900, end: 6550, loop: 6900 };
-          // 1) каталог радиально доезжает вокруг уже стоящей центральной пары
+            ? { addShow: 280, add0: 560, click: 1230, ppOpen: 1560, swap: 2180, scroll: 2900, d3d: 3330, cta: 4600, toCart: 5220, cartPress: 5520, loop: 5700 }
+            : { addShow: 320, add0: 620, click: 1320, ppOpen: 1660, swap: 2300, scroll: 3060, d3d: 3500, cta: 4820, toCart: 5430, cartPress: 5740, loop: 5930 };
+          // 1) каталог радиально доезжает вокруг стоящей пары
           grid.classList.add('in');
-          // 2) крупный курсор быстро добавляет ОБА центральных товара (не дожидаясь краёв)
-          t(function () { if (!running) return; ccur.classList.add('show', 'big'); if (rr[0]) curTo(ccur, rr[0].querySelector('.fw-add'), 420, 0.5, 0.5); }, T.addShow);
+          // 2) крупный курсор добавляет ТОЛЬКО «Стандарт» (камера едет за курсором)
+          t(function () { if (!running) return; ccur.classList.add('show', 'big'); if (rr[0]) { curTo(ccur, rr[0].querySelector('.fw-add'), 440, 0.5, 0.5); camFollow(rr[0]); } }, T.addShow);
           t(function () { if (!running) return; ccur.classList.add('press'); if (rr[0]) rr[0].querySelector('.fw-add').classList.add('on'); setCnt(1); }, T.add0);
-          t(function () { if (!running) return; ccur.classList.remove('press'); if (rr[1]) curTo(ccur, rr[1].querySelector('.fw-add'), 400, 0.5, 0.5); }, T.add0 + 250);
-          t(function () { if (!running) return; ccur.classList.add('press'); if (rr[1]) rr[1].querySelector('.fw-add').classList.add('on'); setCnt(2); }, T.add1);
-          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.add1 + 180);
-          // 3) клик по самой карточке Art Déco → упрощённая страница товара «перестраивается»
-          t(function () { if (!running) return; if (rr[1]) curTo(ccur, rr[1], 460, 0.5, 0.42); }, T.add1 + 420);
+          // 3) Art Déco НЕ добавляем — курсор жмёт саму карточку → страница товара «перестраивается»
+          t(function () { if (!running) return; ccur.classList.remove('press'); if (rr[1]) { curTo(ccur, rr[1], 480, 0.5, 0.42); camFollow(rr[1]); } }, T.add0 + 240);
           t(function () { if (!running) return; ccur.classList.add('press'); if (rr[1]) rr[1].classList.add('tapped'); }, T.click);
-          t(function () { if (!running) return; ccur.classList.remove('press'); if (rr[1]) rr[1].classList.remove('tapped'); catalog.classList.add('to-pp'); if (pp) pp.classList.add('open'); }, T.ppOpen);
-          // 4) курсор быстро смотрит ещё одно фото (клик по миниатюре → hero меняется)
-          t(function () { if (!running) return; if (thumbs[1]) curTo(ccur, thumbs[1], 520, 0.5, 0.5); }, T.ppOpen + 520);
+          t(function () { if (!running) return; ccur.classList.remove('press'); if (rr[1]) rr[1].classList.remove('tapped'); cam.style.transform = ''; catalog.classList.add('to-pp'); if (pp) pp.classList.add('open'); }, T.ppOpen);
+          // 4) на странице: смотрит ещё одно фото (смена hero)
+          t(function () { if (!running) return; if (thumbs[1]) curTo(ccur, thumbs[1], 520, 0.5, 0.5); }, T.ppOpen + 460);
           t(function () { if (!running) return; ccur.classList.add('press'); selectThumb(1); }, T.swap);
           t(function () { if (!running) return; ccur.classList.remove('press'); }, T.swap + 180);
-          // 5) листает ниже → крупный, хорошо видимый 3D-рендер
+          // 5) листает ниже → КРУТИТ 3D (хорошо читается)
           t(function () { if (!running) return; if (pp) pp.classList.add('scrolled'); }, T.scroll);
-          t(function () { if (!running) return; if (stage3d) curTo(ccur, stage3d, 620, 0.5, 0.45); if (pp) pp.classList.add('spin3d'); }, T.d3d);
-          // 6) авто-переход на шаг 2
-          t(function () { if (!running) return; ccur.classList.remove('show'); }, T.end);
+          t(function () { if (!running) return; if (stage3d) curTo(ccur, stage3d, 600, 0.5, 0.45); if (pp) pp.classList.add('spin3d'); }, T.d3d);
+          // 6) добавляет Art Déco В КОРЗИНУ прямо со страницы товара
+          t(function () { if (!running) return; if (cta) curTo(ccur, cta, 560, 0.5, 0.5); }, T.cta - 320);
+          t(function () { if (!running) return; ccur.classList.add('press'); if (cta) { cta.classList.add('added'); cta.textContent = 'Добавлено ✓'; } setCnt(2); }, T.cta);
+          t(function () { if (!running) return; ccur.classList.remove('press'); }, T.cta + 170);
+          // 7) идёт к корзине → нажатие → СРАЗУ на шаг 2, без промедления
+          t(function () { if (!running) return; curTo(ccur, cart, 520, 0.3, 0.16); }, T.toCart);
+          t(function () { if (!running) return; ccur.classList.add('press'); cart.classList.add('press'); }, T.cartPress);
           t(function () { if (!running) return; advance(); }, T.loop);
         })();
       };
