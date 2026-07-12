@@ -37,7 +37,7 @@
     return out;
   }
   function sendLead(fields, tag) {
-    var payload = { _subject: 'Заявка с сайта EGOE — ' + (tag || 'форма'), _source: location.href };
+    var payload = { _subject: 'Заявка с сайта EGOE — ' + (tag || 'форма') };
     Object.keys(fields).forEach(function (k) { payload[k] = fields[k]; });
     var C = window.LEAD_CFG || {};
     if (C.email) {
@@ -849,7 +849,8 @@ window.__whenVisible = (function () {
     var base = C.siteBase || (location.origin + '/');
 
     function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
-    function autoNum() { var d = new Date(); return 'КП-' + d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2); }
+    // № КП уникален по дате+времени (до секунды) — не путается между заявками и устройствами
+    function autoNum() { var d = new Date(), p = function (n) { return ('0' + n).slice(-2); }; return 'КП-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()); }
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
     function money(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
 
@@ -1129,9 +1130,15 @@ window.__whenVisible = (function () {
 
       // лид: отправляем на e-mail/Telegram + дублируем локально как резерв
       try {
-        var items = C.read();
-        var itemsTxt = (items || []).map(function (it) { return (it.name || it.id) + ' × ' + (it.qty || 1); }).join('; ');
-        if (window.__sendLead) window.__sendLead({ 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': itemsTxt, '№ КП': head.number }, 'КП');
+        var items = C.read(), grand = 0, anyReq = false;
+        var fmt = function (n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); };
+        var itemsTxt = (items || []).map(function (it) {
+          var u = it.price > 0 ? it.price : (it.priceFrom || 0), q = it.qty || 1;
+          if (u > 0) grand += u * q; else anyReq = true;
+          return (it.name || it.id) + (it.ral ? ' (' + it.ral + ')' : '') + ' × ' + q + (u > 0 ? ' = ' + fmt(u * q) + ' ₽' : ' — по запросу');
+        }).join('; ');
+        var totalTxt = grand > 0 ? (anyReq ? '≈ ' + fmt(grand) + ' ₽ (часть по запросу)' : fmt(grand) + ' ₽') : 'по запросу';
+        if (window.__sendLead) window.__sendLead({ 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': itemsTxt, 'Итого': totalTxt, '№ КП': head.number }, 'КП');
       } catch (e3) {}
       try {
         var leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
