@@ -47,7 +47,10 @@
       }).catch(function () {});
     }
     if (C.tgRelay) {
-      fetch(C.tgRelay, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(function () {});
+      // text/plain = «простой» CORS-запрос → браузер НЕ шлёт preflight OPTIONS,
+      // который Apps Script не умеет (иначе POST блокируется и в Telegram ничего не приходит).
+      // Тело остаётся JSON-строкой — на стороне скрипта JSON.parse(e.postData.contents) её читает.
+      fetch(C.tgRelay, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) }).catch(function () {});
     }
   }
   window.__sendLead = sendLead;   // переиспользуется КП-генератором

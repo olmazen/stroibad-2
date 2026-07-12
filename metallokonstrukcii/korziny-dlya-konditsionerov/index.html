@@ -84,6 +84,12 @@
 .kz-card .mc-b{padding:20px 22px 22px;display:flex;flex-direction:column;flex:1}
 .kz-card .ph.r-43{aspect-ratio:4/3}
 .artdeco .kz-card .kz-card-in{background:linear-gradient(180deg,#151A20,#0D1116)}
+/* Первый экран: реальная сетка каталожных фото Art Deco, без сгенерированных изделий. */
+.shero-korziny-grid{background:#0b0f13}
+.shero-korziny-grid .shero-bg{background:#11161b}
+.shero-korziny-grid .shero-bg img{object-position:center;filter:contrast(1.02) saturate(.86)}
+.shero-korziny-grid::after{background:linear-gradient(90deg,rgba(7,9,11,.98) 0%,rgba(7,9,11,.91) 33%,rgba(7,9,11,.53) 62%,rgba(7,9,11,.18) 100%),linear-gradient(0deg,rgba(5,7,9,.46),transparent 44%)}
+@media(max-width:720px){.shero-korziny-grid::after{background:linear-gradient(180deg,rgba(7,9,11,.86),rgba(7,9,11,.74) 55%,rgba(7,9,11,.92))}.shero-korziny-grid .shero-bg img{object-position:70% center}}
 /* content above section ambiance */
 .kz-showcase>.container,.kz-showcase .reveal,.kzc .container{position:relative;z-index:2}
 /* ============ Art Deco — авторская серия (awards) ============ */
@@ -278,14 +284,14 @@
 </div></header>
 <main>
 
-<div class="shero">
+<div class="shero shero-korziny-grid">
   <div class="shero-bg">
     <picture>
       <source media="(max-width:720px)" srcset="../../assets/img/korziny/hero/ac-basket-catalog-mobile.webp">
-      <img src="../../assets/img/korziny/hero/ac-basket-catalog-wide.webp" alt="Дизайнерская корзина для кондиционера на фасаде EGOE" loading="eager" fetchpriority="high">
+      <img src="../../assets/img/korziny/hero/art-deco-model-grid.webp" alt="Девять серийных моделей дизайнерских корзин для кондиционеров EGOE" loading="eager" fetchpriority="high">
     </picture>
   </div>
-  <span class="shero-corner">Корзины для кондиционеров · фон: фасад ЖК</span>
+  <span class="shero-corner">Art Deco · 9 моделей в витрине</span>
   <div class="container"><div class="shero-inner">
     <nav class="crumbs"><a href="../../index.html">Главная</a> / <a href="../../metallokonstrukcii/index.html">Металлоконструкции</a> / <span>Корзины для кондиционеров</span></nav>
     <div class="eyebrow">Фасадные изделия · изготовление</div>
@@ -825,6 +831,6 @@
 })();
 </script>
 <script id="kz-depth">(function(){var s=document.getElementById('kz-artdeco');if(!s)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var t=false;function a(){t=false;var r=s.getBoundingClientRect();var vh=innerHeight||800;var c=r.top+r.height/2;var on=r.top<vh*0.4&&r.bottom>vh*0.6;s.classList.toggle('is-depth',on);}addEventListener('scroll',function(){if(!t){t=true;requestAnimationFrame(a);}},{passive:true});addEventListener('resize',a);a();})();</script>
-<script src="../../assets/js/site.js?v=egoe55"></script>
+<script src="../../assets/js/site.js?v=egoe56"></script>
 </body>
 </html>
