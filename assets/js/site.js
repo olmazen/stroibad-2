@@ -17,9 +17,44 @@
     if (e.key === 'Escape') window.closeModal();
   });
 
-  // отправка любой формы-заявки -> показываем «спасибо»
-  // (на боевом сайте сюда подключается e-mail / CRM)
+  // ── КОНФИГ ЛИДОВ ─────────────────────────────────────────────────────────
+  // e-mail: FormSubmit (активируется письмом-подтверждением на ПЕРВЫЙ сабмит).
+  // tgRelay: URL релея Google Apps Script для Telegram — токен бота живёт В СКРИПТЕ,
+  //          НЕ в этом файле и НЕ в публичном репозитории. Пусто = канал выключен.
+  window.LEAD_CFG = window.LEAD_CFG || { email: 'zakaz@egoe-life.ru', tgRelay: '' };
+
+  // собрать пары «подпись поля → значение» из любой формы (у полей нет name — берём label/placeholder)
+  function leadFields(form) {
+    var out = {}, n = 0;
+    form.querySelectorAll('input, textarea, select').forEach(function (el) {
+      var t = (el.type || '').toLowerCase();
+      if (t === 'hidden' || t === 'submit' || t === 'button' || t === 'file') return;
+      var wrap = el.closest('.field'), lab = wrap && wrap.querySelector('label');
+      var key = (lab && lab.textContent.trim()) || el.getAttribute('placeholder') || el.getAttribute('aria-label') || ('Поле ' + (++n));
+      var val = (t === 'checkbox') ? (el.checked ? 'да' : '') : (el.value || '').trim();
+      if (val) out[key] = val;
+    });
+    return out;
+  }
+  function sendLead(fields, tag) {
+    var payload = { _subject: 'Заявка с сайта EGOE — ' + (tag || 'форма'), _source: location.href };
+    Object.keys(fields).forEach(function (k) { payload[k] = fields[k]; });
+    var C = window.LEAD_CFG || {};
+    if (C.email) {
+      fetch('https://formsubmit.co/ajax/' + encodeURIComponent(C.email), {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(function () {});
+    }
+    if (C.tgRelay) {
+      fetch(C.tgRelay, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(function () {});
+    }
+  }
+  window.__sendLead = sendLead;   // переиспользуется КП-генератором
+
+  // отправка любой формы-заявки -> e-mail + Telegram, затем «спасибо»
   window.submitLead = function (form) {
+    try { sendLead(leadFields(form), 'форма'); } catch (e) {}
     var box = form.querySelector('.form-result') || form.parentNode.querySelector('.form-result');
     form.style.display = 'none';
     if (box) box.style.display = 'block';
@@ -1089,12 +1124,17 @@ window.__whenVisible = (function () {
       var head = { name: name, phone: phone, email: email, addressee: company || name, object: '', number: autoNum(), date: today() };
       try { localStorage.setItem(HEAD_KEY, JSON.stringify(head)); } catch (e2) {}
 
-      // фиксируем лид локально (сервер заберёт позже; TODO: POST на send-spec.php + письмо с КП)
+      // лид: отправляем на e-mail/Telegram + дублируем локально как резерв
+      try {
+        var items = C.read();
+        var itemsTxt = (items || []).map(function (it) { return (it.name || it.id) + ' × ' + (it.qty || 1); }).join('; ');
+        if (window.__sendLead) window.__sendLead({ 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': itemsTxt, '№ КП': head.number }, 'КП');
+      } catch (e3) {}
       try {
         var leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
         leads.push({ ts: Date.now(), name: name, phone: phone, email: email, company: company, items: C.read() });
         localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
-      } catch (e3) {}
+      } catch (e4) {}
 
       openDrawer();
       if (okBox) okBox.style.display = 'block';
