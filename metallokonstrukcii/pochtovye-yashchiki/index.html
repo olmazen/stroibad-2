@@ -39,6 +39,30 @@
 {"@type":"Question","name":"Делаете декоративные почтовые ящики с рисунком?","acceptedAnswer":{"@type":"Answer","text":"Да. Нижняя панель блока вырезается лазером по авторскому узору (та же технология, что на наших ограждениях). Фасады — латунь, золото или любой RAL. Премиальный вид входной группы."}},
 {"@type":"Question","name":"Можно поставить постамат в подъезд вместо ящиков?","acceptedAnswer":{"@type":"Answer","text":"Да, изготавливаем металлические корпуса постаматов и антивандальные локеры для подъездов и ЖК — от механических ячеек до электронных под ключ. Подберём решение под входную группу, расскажем про монтаж и согласование с жильцами."}}]}
 </script>
+<style>
+/* Блок «наша фишка» — full-bleed фото + сильная подача */
+.fishka{position:relative;background:linear-gradient(180deg,#0E1114,#0A0C0F);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
+.fishka-grid{display:grid;grid-template-columns:1.02fr .98fr;align-items:stretch;min-height:520px}
+.fishka-photo{position:relative;overflow:hidden;background:#0a0c0f}
+.fishka-photo img{width:100%;height:100%;object-fit:cover;display:block;min-height:360px;transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
+.fishka:hover .fishka-photo img{transform:scale(1.04)}
+.fishka-photo::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 55%,rgba(14,17,20,.92))}
+.fishka-body{padding:clamp(32px,4.2vw,68px);display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+.fishka-eyebrow{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.fishka-eyebrow::before{content:'';width:30px;height:1px;background:var(--amber);box-shadow:0 0 10px var(--amber)}
+.fishka-body h2{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:clamp(28px,3.3vw,46px);line-height:1.03;color:#fff;margin:0 0 18px;letter-spacing:.005em}
+.fishka-body h2 em{font-style:normal;color:var(--amber)}
+.fishka-lead{color:var(--tx2);font-size:16px;line-height:1.65;max-width:470px;margin-bottom:30px}
+.fishka-stats{display:flex;gap:34px;margin-bottom:32px;flex-wrap:wrap}
+.fishka-stat .n{font-family:'Oswald',sans-serif;font-weight:600;font-size:30px;color:#fff;line-height:1}
+.fishka-stat .l{font-size:12px;letter-spacing:.04em;color:var(--steel);margin-top:6px;text-transform:uppercase}
+.fishka-cta{display:flex;gap:12px;flex-wrap:wrap}
+@media(max-width:900px){
+  .fishka-grid{grid-template-columns:1fr}
+  .fishka-photo::after{background:linear-gradient(180deg,transparent 50%,rgba(14,17,20,.9))}
+  .fishka-photo img{min-height:300px}
+}
+</style>
 </head>
 <body>
 <div class="topbar"><div class="container">
@@ -119,21 +143,21 @@
   </div>
 </section>
 
-<section class="tint">
-  <div class="container">
-    <div class="split">
-      <div class="ph reveal" style="aspect-ratio:3/4"><span class="ph-label">Фото: декоративный ящик с лазерной панелью</span></div>
-      <div class="reveal" style="--d:.08s">
-        <div class="dim"><span class="tick"></span>Наша фишка</div>
-        <h2 style="margin:18px 0 14px;font-size:clamp(24px,3vw,36px)">Не просто ящики — <span style="color:var(--amber)">лицо подъезда</span></h2>
-        <p style="color:var(--tx2);font-size:16px;max-width:480px;line-height:1.65">Нижняя панель блока вырезается лазером по узору — тот же почерк, что на наших ограждениях. Латунь, золото или любой RAL. Премиальная входная группа, которой нет у типовых ящиков — застройщику это добавляет ценности проекту.</p>
-        <ul class="devlist" style="margin-top:18px">
-          <li><span><b>Лазер 0,1 мм.</b> Любой узор, орнамент или логотип ЖК на панели.</span></li>
-          <li><span><b>Латунь / золото / RAL.</b> Фасады под интерьер входной группы.</span></li>
-          <li><span><b>Антивандал 1,2 мм.</b> Усиленные дверцы, скрытые петли, единый ключ.</span></li>
-          <li><span><b>Единый стиль двора.</b> В один почерк с ограждениями и МАФ.</span></li>
-        </ul>
-        <a class="btn btn-primary" style="margin-top:22px" href="pochtovyj-yaschik/index.html">Смотреть почтовый ящик →</a>
+<section class="fishka reveal">
+  <div class="fishka-grid">
+    <div class="fishka-photo"><img src="../../assets/img/catalog/pochta.webp" alt="Декоративный почтовый ящик в подъезд — латунные секции и чёрная стальная панель с лазерной резкой" loading="lazy"></div>
+    <div class="fishka-body">
+      <div class="fishka-eyebrow">Декор · наша фишка</div>
+      <h2>Ящик, который держит <em>лицо подъезда</em></h2>
+      <p class="fishka-lead">Нижняя панель вырезается лазером по узору — тот же почерк, что на наших ограждениях. Латунь, золото или любой RAL. Премиальная входная группа, которой нет у типовых ящиков: застройщику — плюс к ценности проекта, жильцу — приятно возвращаться домой.</p>
+      <div class="fishka-stats">
+        <div class="fishka-stat"><div class="n">0,1 мм</div><div class="l">лазерная резка</div></div>
+        <div class="fishka-stat"><div class="n">1,2 мм</div><div class="l">антивандал</div></div>
+        <div class="fishka-stat"><div class="n">RAL</div><div class="l">латунь / золото</div></div>
+      </div>
+      <div class="fishka-cta">
+        <a class="btn btn-primary" href="pochtovyj-yaschik/index.html">Смотреть ящик →</a>
+        <button class="btn" onclick="openModal()">Свой узор / лого ЖК</button>
       </div>
     </div>
   </div>
@@ -160,14 +184,14 @@
 
 <section class="tint">
   <div class="container">
-    <div class="split">
+    <div class="split" style="align-items:start">
       <div>
         <div class="reveal"><div class="dim"><span class="tick"></span>С этим заказывают</div></div>
         <div class="sec-head reveal" style="margin-top:20px"><div><h2>В одном стиле</h2></div></div>
         <div class="tiles3 reveal" style="grid-template-columns:1fr 1fr 1fr">
-          <a class="tile" href="../../metallokonstrukcii/korziny-dlya-konditsionerov/index.html"><div class="ph r-43"><span class="ph-label">Корзины для кондиционеров</span></div><h3>Корзины для кондиционеров</h3><p>На фасад, по размерам.</p></a>
-          <a class="tile" href="../../metallokonstrukcii/konteynernye-ploshchadki/index.html"><div class="ph r-43"><span class="ph-label">Контейнерные площадки</span></div><h3>Контейнерные площадки</h3><p>Для ТКО.</p></a>
-          <a class="tile" href="../../maf/index.html"><div class="ph r-43"><span class="ph-label">МАФ</span></div><h3>МАФ</h3><p>Благоустройство двора.</p></a>
+          <a class="tile" style="overflow:hidden" href="../../metallokonstrukcii/korziny-dlya-konditsionerov/index.html"><div class="ph has-img r-43" style="margin:-24px -24px 16px"><img src="../../assets/img/korziny/hero/ac-basket-catalog-card.webp" alt="Корзины для кондиционеров на фасад" loading="lazy"></div><h3>Корзины для кондиционеров</h3><p>На фасад, по размерам.</p></a>
+          <a class="tile" style="overflow:hidden" href="../../metallokonstrukcii/konteynernye-ploshchadki/index.html"><div class="ph has-img r-43" style="margin:-24px -24px 16px"><img src="../../assets/img/metallokonstrukcii/konteynernye-ploshchadki/13885/main.webp" alt="Контейнерные площадки для ТКО" loading="lazy"></div><h3>Контейнерные площадки</h3><p>Для ТКО.</p></a>
+          <a class="tile" style="overflow:hidden" href="../../maf/urny/index.html"><div class="ph has-img r-43" style="margin:-24px -24px 16px"><img src="../../assets/img/maf/urny/16301/main.webp" alt="Урны уличные для двора" loading="lazy"></div><h3>Урны</h3><p>Уличные, для двора.</p></a>
         </div>
       </div>
       <div>
