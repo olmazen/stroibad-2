@@ -39,7 +39,7 @@
     if (range){ range.value = cur; range.style.setProperty('--fill', (cur/(STEPS.length-1)*100) + '%'); }
   }
   function stop(){ if (timer){ clearInterval(timer); timer = null; } if (playBtn) playBtn.classList.remove('playing'); }
-  function play(){ if (timer) return; if (playBtn) playBtn.classList.add('playing'); timer = setInterval(() => set(cur+1), 2400); }
+  function play(){ if (timer) return; if (playBtn) playBtn.classList.add('playing'); timer = setInterval(() => set(cur+1), 3200); }
   if (range) range.addEventListener('input', () => { stop(); set(parseInt(range.value)); });
   if (playBtn) playBtn.addEventListener('click', () => { timer ? stop() : play(); });
   set(2);
