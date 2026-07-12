@@ -40,27 +40,36 @@
 {"@type":"Question","name":"Можно поставить постамат в подъезд вместо ящиков?","acceptedAnswer":{"@type":"Answer","text":"Да, изготавливаем металлические корпуса постаматов и антивандальные локеры для подъездов и ЖК — от механических ячеек до электронных под ключ. Подберём решение под входную группу, расскажем про монтаж и согласование с жильцами."}}]}
 </script>
 <style>
-/* Блок «наша фишка» — full-bleed фото + сильная подача */
-.fishka{position:relative;background:linear-gradient(180deg,#0E1114,#0A0C0F);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
-.fishka-grid{display:grid;grid-template-columns:1.02fr .98fr;align-items:stretch;min-height:520px}
-.fishka-photo{position:relative;overflow:hidden;background:#0a0c0f}
-.fishka-photo img{width:100%;height:100%;object-fit:cover;display:block;min-height:360px;transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
-.fishka:hover .fishka-photo img{transform:scale(1.04)}
-.fishka-photo::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 55%,rgba(14,17,20,.92))}
-.fishka-body{padding:clamp(32px,4.2vw,68px);display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
-.fishka-eyebrow{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:18px;display:flex;align-items:center;gap:12px}
-.fishka-eyebrow::before{content:'';width:30px;height:1px;background:var(--amber);box-shadow:0 0 10px var(--amber)}
-.fishka-body h2{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:clamp(28px,3.3vw,46px);line-height:1.03;color:#fff;margin:0 0 18px;letter-spacing:.005em}
-.fishka-body h2 em{font-style:normal;color:var(--amber)}
-.fishka-lead{color:var(--tx2);font-size:16px;line-height:1.65;max-width:470px;margin-bottom:30px}
-.fishka-stats{display:flex;gap:34px;margin-bottom:32px;flex-wrap:wrap}
-.fishka-stat .n{font-family:'Oswald',sans-serif;font-weight:600;font-size:30px;color:#fff;line-height:1}
-.fishka-stat .l{font-size:12px;letter-spacing:.04em;color:var(--steel);margin-top:6px;text-transform:uppercase}
-.fishka-cta{display:flex;gap:12px;flex-wrap:wrap}
-@media(max-width:900px){
-  .fishka-grid{grid-template-columns:1fr}
-  .fishka-photo::after{background:linear-gradient(180deg,transparent 50%,rgba(14,17,20,.9))}
-  .fishka-photo img{min-height:300px}
+/* Блок «декор · наша фишка» — текст + мозаика из 3 фото */
+.decor2{background:#0B0E12;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(52px,6vw,96px) 0}
+.decor2-grid{display:grid;grid-template-columns:.86fr 1.14fr;gap:clamp(32px,4.5vw,68px);align-items:center}
+@media(max-width:900px){.decor2-grid{grid-template-columns:1fr;gap:30px}}
+.decor2-eyebrow{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.decor2-eyebrow::before{content:'';width:30px;height:1px;background:var(--amber);box-shadow:0 0 10px var(--amber)}
+.decor2-txt h2{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:clamp(26px,3.1vw,42px);line-height:1.05;color:#fff;margin:0 0 18px}
+.decor2-txt h2 em{font-style:normal;color:var(--amber)}
+.decor2-txt .lead{color:var(--tx2);font-size:16px;line-height:1.65;margin-bottom:26px;max-width:440px}
+.decor2-feats{display:flex;flex-direction:column;gap:14px;margin-bottom:30px}
+.decor2-feat{display:flex;gap:13px;align-items:flex-start;font-size:14.5px;line-height:1.55;color:var(--tx2)}
+.decor2-feat .fi{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1px solid rgba(242,111,29,.5);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px}
+.decor2-feat b{color:#fff;font-weight:600}
+.decor2-cta{display:flex;gap:12px;flex-wrap:wrap}
+.decor2-media{display:grid;grid-template-columns:1.15fr .85fr;gap:12px}
+.decor2-cell{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#0a0c0f;display:block}
+.decor2-cell.a{grid-column:1;grid-row:1 / span 2}
+.decor2-cell.b{grid-column:2;grid-row:1;aspect-ratio:1/1}
+.decor2-cell.c{grid-column:2;grid-row:2;aspect-ratio:1/1}
+.decor2-cell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .9s cubic-bezier(.16,1,.3,1)}
+.decor2-cell:hover img{transform:scale(1.06)}
+.decor2-cell .cap{position:absolute;left:12px;bottom:12px;z-index:2;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:rgba(10,12,15,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.16);border-radius:100px;padding:5px 11px}
+.decor2-cell.empty{display:flex;align-items:center;justify-content:center;min-height:150px}
+.decor2-cell.empty::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:24px 24px}
+.decor2-cell.empty .plabel{position:relative;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel);text-align:center;padding:0 14px}
+@media(max-width:560px){
+  .decor2-media{grid-template-columns:1fr 1fr}
+  .decor2-cell.a{grid-column:1 / -1;grid-row:auto;aspect-ratio:4/3}
+  .decor2-cell.b{grid-column:1;grid-row:auto}
+  .decor2-cell.c{grid-column:2;grid-row:auto}
 }
 </style>
 </head>
@@ -143,21 +152,27 @@
   </div>
 </section>
 
-<section class="fishka reveal">
-  <div class="fishka-grid">
-    <div class="fishka-photo"><img src="../../assets/img/catalog/pochta.webp" alt="Декоративный почтовый ящик в подъезд — латунные секции и чёрная стальная панель с лазерной резкой" loading="lazy"></div>
-    <div class="fishka-body">
-      <div class="fishka-eyebrow">Декор · наша фишка</div>
-      <h2>Ящик, который держит <em>лицо подъезда</em></h2>
-      <p class="fishka-lead">Нижняя панель вырезается лазером по узору — тот же почерк, что на наших ограждениях. Латунь, золото или любой RAL. Премиальная входная группа, которой нет у типовых ящиков: застройщику — плюс к ценности проекта, жильцу — приятно возвращаться домой.</p>
-      <div class="fishka-stats">
-        <div class="fishka-stat"><div class="n">0,1 мм</div><div class="l">лазерная резка</div></div>
-        <div class="fishka-stat"><div class="n">1,2 мм</div><div class="l">антивандал</div></div>
-        <div class="fishka-stat"><div class="n">RAL</div><div class="l">латунь / золото</div></div>
+<section class="decor2">
+  <div class="container">
+    <div class="decor2-grid">
+      <div class="decor2-txt reveal">
+        <div class="decor2-eyebrow">Декор · наша фишка</div>
+        <h2>Лазерный узор — <em>подпись</em> вашего дома</h2>
+        <p class="lead">Нижняя панель блока вырезается лазером по авторскому рисунку — тот же почерк, что на наших ограждениях. Типовой ящик становится частью дизайна входной группы.</p>
+        <div class="decor2-feats">
+          <div class="decor2-feat"><span class="fi">✦</span><span><b>Любой узор или лого ЖК.</b> Лазер 0,1 мм — от растительных мотивов до вашего фирменного паттерна.</span></div>
+          <div class="decor2-feat"><span class="fi">✦</span><span><b>Латунь, золото или любой RAL.</b> Фасады под интерьер подъезда и лобби.</span></div>
+          <div class="decor2-feat"><span class="fi">✦</span><span><b>Единый почерк двора.</b> В одном стиле с ограждениями и МАФ EGOE.</span></div>
+        </div>
+        <div class="decor2-cta">
+          <a class="btn btn-primary" href="pochtovyj-yaschik/index.html">Смотреть ящик →</a>
+          <button class="btn" onclick="openModal()">Заказать свой узор</button>
+        </div>
       </div>
-      <div class="fishka-cta">
-        <a class="btn btn-primary" href="pochtovyj-yaschik/index.html">Смотреть ящик →</a>
-        <button class="btn" onclick="openModal()">Свой узор / лого ЖК</button>
+      <div class="decor2-media reveal" style="--d:.08s">
+        <a class="decor2-cell a" href="pochtovyj-yaschik/index.html"><img src="../../assets/img/catalog/pochta.webp" alt="Декоративный почтовый ящик с лазерной панелью в подъезде" loading="lazy"><span class="cap">Блок в подъезде</span></a>
+        <div class="decor2-cell b empty"><span class="plabel">Кадр: узор крупно</span></div>
+        <div class="decor2-cell c empty"><span class="plabel">Кадр: латунь + деталь</span></div>
       </div>
     </div>
   </div>
