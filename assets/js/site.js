@@ -1387,10 +1387,10 @@ window.__whenVisible = (function () {
       BASE = 0; CARD_R = R + 28;
       marker.className = 'fw-marker';
       marker.style.left = (EDGE + 6) + 'px'; marker.style.top = CY + 'px';
-      marker.style.display = 'none';   // на ПК роль указателя берёт на себя шайба-хаб в центре дуги
+      marker.style.display = '';       // треугольник-указатель на месте, у обода дуги
       sticky.style.setProperty('--fwleft', (EDGE + 330) + 'px');
       sticky.style.setProperty('--fwbot', '90px');
-      if (apBtn) { apBtn.style.left = EDGE + 'px'; apBtn.style.top = CY + 'px'; }   // шайба автоплея — в центре полукруга (на выступе дуги)
+      if (apBtn) { apBtn.style.left = Math.max(55, Math.min(Math.round(EDGE * 0.52), EDGE - 79)) + 'px'; apBtn.style.top = CY + 'px'; }   // шайба автоплея — ВНУТРИ полукруга (в тёмной чаше дуги, гарантированный зазор от рисок)
     }
     svg.setAttribute('width', W); svg.setAttribute('height', H);
     ring.setAttribute('cx', CX); ring.setAttribute('cy', CY); ring.setAttribute('r', R);
