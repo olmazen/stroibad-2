@@ -438,7 +438,7 @@ function swapMain(el,src,label){var m=document.getElementById('mainImg');if(!m)r
 function fitDrawings(){document.querySelectorAll('.ad-draw-svg').forEach(function(svg){try{var b=svg.getBBox();if(b.width>0&&b.height>0){var p=Math.max(b.width,b.height)*0.05;svg.setAttribute('viewBox',(b.x-p)+' '+(b.y-p)+' '+(b.width+2*p)+' '+(b.height+2*p));}}catch(e){}});}
 if(document.readyState!=='loading')requestAnimationFrame(fitDrawings);else document.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(fitDrawings)});
 </script>
-<script src="../../../assets/js/site.js?v=egoe58"></script>
+<script src="../../../assets/js/site.js?v=egoe59"></script>
 <script src="../../../assets/js/ad3d.js?v=egoe54"></script>
 </body>
 </html>
