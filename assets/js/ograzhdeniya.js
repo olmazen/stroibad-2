@@ -28,20 +28,32 @@
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const lite = document.documentElement.hasAttribute('data-lite');
   if(!lite) imgs.forEach(im => { const pre = new Image(); pre.src = im.getAttribute('src'); }); // предзагрузка кадров суток (кроме lite)
-  let cur = 2, timer = null;
-  function set(i){
-    cur = (i + STEPS.length) % STEPS.length;
+  let cur = 2, rafId = null, pos = 2;
+  function applyTime(i){                       /* меняем только кадр/время/фазу — не ползунок */
+    cur = ((i % STEPS.length) + STEPS.length) % STEPS.length;
     imgs.forEach((im,k) => im.classList.toggle('is-active', k === cur));
     const s = STEPS[cur];
     if (timeEl) timeEl.textContent = s.t;
     if (phaseEl) phaseEl.textContent = s.p;
     if (hero) hero.dataset.tod = s.tod;
-    if (range){ range.value = cur; range.style.setProperty('--fill', (cur/(STEPS.length-1)*100) + '%'); }
   }
-  function stop(){ if (timer){ clearInterval(timer); timer = null; } if (playBtn) playBtn.classList.remove('playing'); }
-  function play(){ if (timer) return; if (playBtn) playBtn.classList.add('playing'); timer = setInterval(() => set(cur+1), 3200); }
-  if (range) range.addEventListener('input', () => { stop(); set(parseInt(range.value)); });
-  if (playBtn) playBtn.addEventListener('click', () => { timer ? stop() : play(); });
+  function fill(v){ if (range) range.style.setProperty('--fill', (v/(STEPS.length-1)*100) + '%'); }
+  function set(i){ applyTime(i); pos = cur; if (range) range.value = cur; fill(cur); }
+  function stop(){ if (rafId){ cancelAnimationFrame(rafId); rafId = null; } if (playBtn) playBtn.classList.remove('playing'); }
+  function play(){                              /* ползунок плавно ползёт (rAF), кадр меняется на целом шаге */
+    if (rafId) return; if (playBtn) playBtn.classList.add('playing');
+    let last = performance.now(); const STEP_MS = 3200;
+    (function tick(now){
+      pos += Math.min(now - last, 120) / STEP_MS; last = now;  /* кламп dt — без прыжка после возврата на вкладку */
+      if (pos > STEPS.length - 1) pos = 0;       /* новый день */
+      if (range) range.value = pos; fill(pos);
+      const idx = Math.round(pos) % STEPS.length;
+      if (idx !== cur) applyTime(idx);
+      rafId = requestAnimationFrame(tick);
+    })(performance.now());
+  }
+  if (range){ range.step = 'any'; range.addEventListener('input', () => { stop(); pos = parseFloat(range.value); fill(pos); applyTime(Math.round(pos)); }); }
+  if (playBtn) playBtn.addEventListener('click', () => { rafId ? stop() : play(); });
   set(2);
   if (!reduce && !lite){
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ play(); io.disconnect(); } }), {threshold:0.35});

@@ -405,9 +405,9 @@
 .ogr-hero--bg .ogr-tl-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 46%;opacity:0;transition:opacity 1.7s ease-in-out;will-change:opacity}
 .ogr-hero--bg .ogr-tl-img.is-active{opacity:1}
 .ogr-hero-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;background:
-  linear-gradient(90deg,rgba(8,10,13,.95) 0%,rgba(8,10,13,.85) 24%,rgba(8,10,13,.5) 48%,rgba(8,10,13,.22) 68%,rgba(8,10,13,.45) 100%),
-  linear-gradient(0deg,rgba(8,10,13,.72) 0%,rgba(8,10,13,0) 42%),
-  linear-gradient(180deg,rgba(8,10,13,.55) 0%,rgba(8,10,13,0) 22%)}
+  linear-gradient(90deg,rgba(8,10,13,.9) 0%,rgba(8,10,13,.66) 22%,rgba(8,10,13,.28) 46%,rgba(8,10,13,.04) 66%,rgba(8,10,13,0) 100%),
+  linear-gradient(0deg,rgba(8,10,13,.42) 0%,rgba(8,10,13,0) 36%),
+  linear-gradient(180deg,rgba(8,10,13,.3) 0%,rgba(8,10,13,0) 18%)}
 .ogr-hero--bg>.container{position:relative;z-index:2}
 .ogr-hero--bg .ogr-hero-grid{min-height:clamp(430px,52vh,540px);padding:34px 0 32px;align-items:center}
 .ogr-hero--bg .ogr-hero-r{display:flex;justify-content:flex-end;align-items:center}
