@@ -1080,6 +1080,20 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-ticks line.near{stroke:var(--amber)}
 .fw-marker{position:absolute;width:0;height:0;border:8px solid transparent;border-left:11px solid var(--amber);transform:translateY(-50%);filter:drop-shadow(0 0 8px var(--glow));pointer-events:none;z-index:4}
 .fw-marker.down{border:8px solid transparent;border-top:11px solid var(--amber);transform:translate(-50%,0)}
+/* автоплей-шайба на дуге + кольцо прогресса сцены (сцены разные по длительности — таймер «как в рекламе») */
+.fw-autoplay{position:absolute;z-index:6;width:46px;height:46px;padding:0;border:0;border-radius:50%;background:rgba(14,17,20,.72);cursor:pointer;pointer-events:auto;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 6px 20px rgba(0,0,0,.42),inset 0 0 0 1px rgba(255,255,255,.08);transform:translate(-50%,-50%);transition:box-shadow .25s,background .25s,opacity .3s}
+.fw-autoplay:hover{background:rgba(20,24,28,.86);box-shadow:0 8px 26px rgba(0,0,0,.5),inset 0 0 0 1px rgba(242,111,29,.42)}
+.fw-autoplay:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.fw-ap-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.fw-ap-trk{fill:none;stroke:rgba(255,255,255,.14);stroke-width:2.4}
+.fw-ap-prg{fill:none;stroke:var(--amber);stroke-width:3.2;stroke-linecap:round;filter:drop-shadow(0 0 4px var(--glow))}
+.fw-ap-ico{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.fw-ap-ico svg{width:18px;height:18px;fill:#fff}
+.fw-ap-ico .ic-play{display:none;margin-left:2px}
+.fw-autoplay:not(.on) .ic-pause{display:none}
+.fw-autoplay:not(.on) .ic-play{display:block}
+.fw-autoplay:not(.on) .fw-ap-prg{opacity:.3}
+@media(max-width:900px){.fw-autoplay{width:40px;height:40px}.fw-ap-ico svg{width:16px;height:16px}}
 /* карточки шагов на колесе */
 .fw-cards{position:absolute;inset:0;z-index:3;pointer-events:none}
 .fw-card{position:absolute;left:0;top:0;cursor:pointer;pointer-events:auto;will-change:transform,opacity,filter;transform-origin:left center}
@@ -1801,7 +1815,7 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-pp-3d-stage.has3d .fw-pp-3dimg{opacity:0;animation:none!important}
 .fw-pp-3dhint{position:absolute;left:0;right:0;bottom:6px;z-index:3;text-align:center;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:8px;color:#9db8dd;opacity:0;transition:opacity .5s ease;pointer-events:none}
 .fw-pp-3d-stage.has3d .fw-pp-3dhint{opacity:.85}
-@media(max-width:900px){.fw-pp-top{flex-direction:column}.fw-pp-hero{flex:none;aspect-ratio:16/10}.fw-pp-title{font-size:16px}.fw-pp-3d-stage{height:clamp(150px,23vh,190px)}.fw-pp.scrolled .fw-pp-scroll{transform:translateY(-44%)}}
+@media(max-width:900px){.fw-pp-top{flex-direction:column}.fw-pp-hero{flex:none;aspect-ratio:16/10}.fw-pp-title{font-size:16px}.fw-pp-3d-stage{height:clamp(170px,27vh,224px)}.fw-pp.scrolled .fw-pp-scroll{transform:translateY(-52%)}}
 @media(prefers-reduced-motion:reduce){.fw-pp,.fw-pp-scroll,.fw-pp-3dimg,.fw-pp-heroimg{transition:none}.fw-pp.spin3d .fw-pp-3dimg,.fw-pp-3d-stage.fw3d-fb .fw-pp-3dimg{animation:none}}
 @media(max-width:900px){
   .fw-catcart{top:4px;right:4px;padding:6px 11px 6px 9px}

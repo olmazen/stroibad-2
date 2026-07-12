@@ -36,9 +36,17 @@
     });
     return out;
   }
+  // номер к единому виду +7XXXXXXXXXX (клиент мог ввести с пробелами/тире/через 8) → кликабелен в Telegram
+  function normPhone(v) {
+    var dg = String(v == null ? '' : v).replace(/\D/g, '');
+    if (dg.length === 11 && (dg[0] === '8' || dg[0] === '7')) dg = '7' + dg.slice(1);
+    else if (dg.length === 10) dg = '7' + dg;
+    return dg.length === 11 ? '+' + dg : String(v == null ? '' : v);
+  }
   function sendLead(fields, tag) {
     var payload = { _subject: 'Заявка с сайта EGOE — ' + (tag || 'форма') };
     Object.keys(fields).forEach(function (k) { payload[k] = fields[k]; });
+    Object.keys(payload).forEach(function (k) { if (/тел|phone/i.test(k)) payload[k] = normPhone(payload[k]); });
     var C = window.LEAD_CFG || {};
     if (C.email) {
       fetch('https://formsubmit.co/ajax/' + encodeURIComponent(C.email), {
@@ -1135,10 +1143,10 @@ window.__whenVisible = (function () {
         var itemsTxt = (items || []).map(function (it) {
           var u = it.price > 0 ? it.price : (it.priceFrom || 0), q = it.qty || 1;
           if (u > 0) grand += u * q; else anyReq = true;
-          return (it.name || it.id) + (it.ral ? ' (' + it.ral + ')' : '') + ' × ' + q + (u > 0 ? ' = ' + fmt(u * q) + ' ₽' : ' — по запросу');
-        }).join('; ');
+          return '• ' + (it.name || it.id) + (it.ral ? ' (' + it.ral + ')' : '') + ' — ' + q + ' шт' + (u > 0 ? ' × ' + fmt(u) + ' = ' + fmt(u * q) + ' ₽' : ' · по запросу');
+        }).join('\n');
         var totalTxt = grand > 0 ? (anyReq ? '≈ ' + fmt(grand) + ' ₽ (часть по запросу)' : fmt(grand) + ' ₽') : 'по запросу';
-        if (window.__sendLead) window.__sendLead({ 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': itemsTxt, 'Итого': totalTxt, '№ КП': head.number }, 'КП');
+        if (window.__sendLead) window.__sendLead({ 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': '\n' + itemsTxt, 'Итого': totalTxt, '№ КП': head.number }, 'КП');
       } catch (e3) {}
       try {
         var leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
@@ -1370,6 +1378,7 @@ window.__whenVisible = (function () {
       marker.style.left = CX + 'px'; marker.style.top = (crest - 24) + 'px';
       // карточка стоит на 46px выше crest и сама ~60px высотой → низ контента держим выше её верха
       sticky.style.setProperty('--fwbot', (H - crest + 104) + 'px');
+      if (apBtn) { apBtn.style.left = CX + 'px'; apBtn.style.top = (crest + 22) + 'px'; }   // шайба автоплея на диске под гребнем
     } else {
       EDGE = Math.round(Math.max(150, Math.min(0.15 * W, 225)));
       R = Math.round(Math.max(H * 0.78, 540));
@@ -1379,6 +1388,7 @@ window.__whenVisible = (function () {
       marker.style.left = (EDGE + 6) + 'px'; marker.style.top = CY + 'px';
       sticky.style.setProperty('--fwleft', (EDGE + 330) + 'px');
       sticky.style.setProperty('--fwbot', '90px');
+      if (apBtn) { apBtn.style.left = EDGE + 'px'; apBtn.style.top = Math.round(CY + 96) + 'px'; }   // шайба автоплея на дуге, ниже указателя
     }
     svg.setAttribute('width', W); svg.setAttribute('height', H);
     ring.setAttribute('cx', CX); ring.setAttribute('cy', CY); ring.setAttribute('r', R);
@@ -1443,8 +1453,9 @@ window.__whenVisible = (function () {
   /* ── демо-сцены шагов: печать, курсор, PDF, штамп ── */
   function makeScene(root, kind, idx) {
     var timers = [], running = false;
-    // авто-переход на следующий шаг после проигрыша демо (гид-облёт: 0→1→2→3→4); на последнем шаге стоп
-    function advance() { if (running && idx != null && idx < N - 1) scrollToStep(idx + 1); }
+    // авто-переход на следующий шаг после проигрыша демо (гид-облёт: 0→1→2→3→4); на последнем шаге стоп.
+    // Переход отрабатывает ТОЛЬКО при включённом автоплее (autoplayOn) — иначе шаг листает пользователь сам.
+    function advance() { if (running && autoplayOn && idx != null && idx < N - 1) scrollToStep(idx + 1); }
     function t(fn, ms) { timers.push(setTimeout(fn, ms)); }
     function every(fn, ms) { timers.push(setInterval(fn, ms)); }
     function typeVal(inp, str, cps, done) {
@@ -1461,7 +1472,7 @@ window.__whenVisible = (function () {
       cur.style.left = (r.left - p.left + r.width * (dx == null ? 0.5 : dx)) + 'px';
       cur.style.top = (r.top - p.top + r.height * (dy == null ? 0.6 : dy)) + 'px';
     }
-    var api = { start: function () {}, stop: function () {} };
+    var api = { start: function () {}, stop: function () {}, dur: 0 };   // dur = длительность сцены (мс) для кольца автоплея
 
     if (kind === 'choose') {
       var catalog = root.querySelector('.fw-catalog');
@@ -1584,6 +1595,7 @@ window.__whenVisible = (function () {
           var T = m
             ? { addShow: 280, fillA: 430, fillB: 610, add0: 720, click: 1360, ppOpen: 1700, swap: 2320, swap2: 3080, swap3: 3820, scroll: 4300, d3d: 5100, cta: 13940, toCart: 14560, cartPress: 14840, loop: 15040 }
             : { addShow: 320, fillA: 480, fillB: 680, add0: 800, click: 1440, ppOpen: 1800, swap: 2440, swap2: 3220, swap3: 3980, scroll: 4460, d3d: 5260, cta: 14100, toCart: 14720, cartPress: 15020, loop: 15240 };
+          api.dur = T.loop;   // длительность сцены выбора для кольца автоплея
           // 1) каталог радиально доезжает вокруг пары карточек-скелетонов
           grid.classList.add('in');
           // 2) камера мягко приближается к паре → фото АККУРАТНО проявляются (как было ранее)
@@ -1674,6 +1686,7 @@ window.__whenVisible = (function () {
           t(function () { qflow.classList.add('opened'); winShow(win, true); }, 6300);
           t(function () { showPg(1); }, 8500);
           t(function () { showPg(2); }, 10700);
+          api.dur = 13400;
           t(advance, 13400);
         })();
       };
@@ -1726,6 +1739,7 @@ window.__whenVisible = (function () {
             t(function () { if (!running) return; var s = p.querySelector('.ctr2-stamp'); if (s) s.classList.add('on'); }, T); T += 360;
           });
           t(function () { if (running && pgLbl) pgLbl.textContent = 'готово · 3 стр.'; }, T); T += 500;
+          api.dur = T + 1500;
           t(advance, T + 1500);
         })();
       };
@@ -1766,7 +1780,8 @@ window.__whenVisible = (function () {
           pchips.forEach(function (c, j) { c.classList.toggle('on', j === i); c.classList.toggle('done', j < i); });
         }, 1100);
         pchips.forEach(function (c, j) { c.classList.toggle('on', j === 0); });
-        t(advance, pchips.length * 1100 + 1400);   // прошлись по операциям → переход на «Отгрузку»
+        api.dur = pchips.length * 1100 + 1400;
+        t(advance, api.dur);   // прошлись по операциям → переход на «Отгрузку»
       };
       api.stop = function () { running = false; timers.forEach(clearTimeout); timers = []; ph.classList.remove('play'); pchips.forEach(function (c) { c.classList.remove('on', 'done'); }); };
     }
@@ -1793,6 +1808,7 @@ window.__whenVisible = (function () {
           t(function () { stage(1); }, 1300);
           t(function () { stage(2); }, 2700);
           t(function () { stage(3); }, 4100);
+          api.dur = 6400;
           t(advance, 6400);   // последний шаг: advance() на idx=N-1 ничего не делает → демо замирает на «Доставлено»
         })();
       };
@@ -1805,13 +1821,58 @@ window.__whenVisible = (function () {
   steps.forEach(function (s, i) { var k = items[i].k; if (k) sceneOf[i] = makeScene(s, k, i); });
   var playingScene = -1;
   var inView = false;   // колесо реально закреплено во вьюпорте (иначе демо/авто-переход НЕ запускаем — иначе страница уедет с hero)
+
+  /* ── Автоплей: шайба ▶/⏸ на дуге + кольцо прогресса текущей сцены (сцены разные по длительности,
+        кольцо синхронно с авто-переходом — «реклама, которую нельзя пролистнуть»). Включён по умолчанию. ── */
+  var autoplayOn = !reduced;
+  var apBtn = document.createElement('button');
+  apBtn.type = 'button';
+  apBtn.className = 'fw-autoplay' + (autoplayOn ? ' on' : '');
+  apBtn.setAttribute('aria-label', 'Автопоказ шагов заказа');
+  apBtn.setAttribute('aria-pressed', autoplayOn ? 'true' : 'false');
+  apBtn.innerHTML =
+    '<svg class="fw-ap-ring" viewBox="0 0 44 44" aria-hidden="true"><circle class="fw-ap-trk" cx="22" cy="22" r="19"/>' +
+      '<circle class="fw-ap-prg" cx="22" cy="22" r="19"/></svg>' +
+    '<span class="fw-ap-ico" aria-hidden="true">' +
+      '<svg class="ic-pause" viewBox="0 0 24 24"><rect x="7" y="5" width="3.6" height="14" rx="1.1"/><rect x="13.4" y="5" width="3.6" height="14" rx="1.1"/></svg>' +
+      '<svg class="ic-play" viewBox="0 0 24 24"><path d="M8 5.2v13.6L19 12z"/></svg></span>';
+  if (reduced) apBtn.style.display = 'none';
+  sticky.appendChild(apBtn);
+  var apPrg = apBtn.querySelector('.fw-ap-prg');
+  var AP_CIRC = 2 * Math.PI * 19;
+  apPrg.style.strokeDasharray = AP_CIRC.toFixed(2);
+  apPrg.style.strokeDashoffset = AP_CIRC.toFixed(2);
+  function setProg(f) { f = f < 0 ? 0 : f > 1 ? 1 : f; apPrg.style.strokeDashoffset = (AP_CIRC * (1 - f)).toFixed(2); }
+  var apRAF = null, apStartAt = 0, apDur = 0;
+  function apCancel() { if (apRAF) { cancelAnimationFrame(apRAF); apRAF = null; } }
+  function apTick(now) {
+    apRAF = null;
+    if (!autoplayOn || playingScene < 0 || !apDur) return;
+    var f = (now - apStartAt) / apDur;
+    setProg(f);
+    if (f < 1) apRAF = requestAnimationFrame(apTick);
+  }
+  // старт кольца с начала сцены (apStartAt — реальное время старта сцены, синхронно с её setTimeout-переходом)
+  function apBegin(dur) {
+    apCancel(); apDur = dur || 0; apStartAt = performance.now(); setProg(0);
+    if (autoplayOn && apDur) apRAF = requestAnimationFrame(apTick);
+  }
+  apBtn.addEventListener('click', function () {
+    autoplayOn = !autoplayOn;
+    apBtn.classList.toggle('on', autoplayOn);
+    apBtn.setAttribute('aria-pressed', autoplayOn ? 'true' : 'false');
+    if (autoplayOn) { apCancel(); apRAF = requestAnimationFrame(apTick); }   // возобновляем от реального времени сцены
+    else apCancel();                                                          // пауза: кольцо и авто-переход замирают
+  });
+
   function updateScene() {
     if (liteOff) return;                          /* lite: демо-сцены шагов выключены */
     var want = (sticky.classList.contains('settle') && inView) ? active : -1;
     if (want === playingScene) return;
     if (playingScene >= 0 && sceneOf[playingScene]) sceneOf[playingScene].stop();
     playingScene = want;
-    if (want >= 0 && sceneOf[want] && !reduced) sceneOf[want].start();
+    apCancel(); setProg(0);
+    if (want >= 0 && sceneOf[want] && !reduced) { sceneOf[want].start(); apBegin(sceneOf[want].dur); }
   }
 
   function setActive(i) {
@@ -1887,6 +1948,7 @@ window.__whenVisible = (function () {
     liteOff = true;
     try {
       if (raf) { cancelAnimationFrame(raf); raf = null; }
+      apCancel(); if (apBtn) apBtn.style.display = 'none';
       if (playingScene >= 0 && sceneOf[playingScene]) sceneOf[playingScene].stop();
       // схлопываем колесо и прячем всю анимационную машинерию
       if (track) { track.style.setProperty('height', 'auto', 'important'); track.style.minHeight = '0'; }
