@@ -21,7 +21,7 @@
   // e-mail: FormSubmit (активируется письмом-подтверждением на ПЕРВЫЙ сабмит).
   // tgRelay: URL релея Google Apps Script для Telegram — токен бота живёт В СКРИПТЕ,
   //          НЕ в этом файле и НЕ в публичном репозитории. Пусто = канал выключен.
-  window.LEAD_CFG = window.LEAD_CFG || { email: 'zakaz@egoe-life.ru', tgRelay: '' };
+  window.LEAD_CFG = window.LEAD_CFG || { email: 'zakaz@egoe-life.ru', tgRelay: 'https://script.google.com/macros/s/AKfycbxMbr93kMCDZ3lNAkr6MBfHX7N8y4NHiRXE49MGKj3TfqmivVI1pIU8Ir5uGrcyX4lafQ/exec' };
 
   // собрать пары «подпись поля → значение» из любой формы (у полей нет name — берём label/placeholder)
   function leadFields(form) {
