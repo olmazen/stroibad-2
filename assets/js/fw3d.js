@@ -31,7 +31,7 @@
     { dur: 380, tremor: 1 },
     { dur: 1150, th: -68, ph: 7, ease: 'hu', tremor: 1 },
     { dur: 300, tremor: 1 },
-    { dur: 1350, zoom: 1.58, tx: 1, th: 10, ph: 3, ease: 'io' },
+    { dur: 1350, zoom: 1.4, tx: 1, th: 10, ph: 3, ease: 'io' },
     { dur: 800, th: 9, ease: 'io', tremor: 1 },
     { dur: 800, zoom: 1.0, tx: 0, th: -14, ease: 'io' }
   ];
@@ -118,10 +118,13 @@
     controls.enableZoom = false;   /* колесо мыши не перехватываем — иначе ловушка при прокрутке страницы */
     controls.rotateSpeed = 0.85; controls.enabled = false;
 
-    /* кадрирование: по высоте объекта и его «худшему» горизонтальному повороту — целиком в кадре при zoom ≤ 1 */
+    /* кадрирование по ОПИСАННОЙ СФЕРЕ: объект целиком в кадре при ЛЮБОМ повороте/наклоне/треморе.
+       r = радиус сферы (учитывает и высоту, и диагональ основания). Даём воздух со всех сторон —
+       раньше вертикаль считалась как halfY·1.9 и высокий объект (726 мм) впритык подрезался на мобиле. */
     function fit() {
       var a = W / H || 1;
-      var f = Math.max(halfY * 1.9, (halfDiag / a) * 1.18, 0.001);
+      var r = Math.sqrt(halfDiag * halfDiag + halfY * halfY) || 0.7;
+      var f = Math.max(r, r / a) * 1.22;   // ~18% воздуха даже в самом «широком» ракурсе → ничего не режется
       cam.left = -f * a; cam.right = f * a; cam.top = f; cam.bottom = -f; cam.updateProjectionMatrix();
     }
     function resize() { W = stage.clientWidth || 1; H = stage.clientHeight || 1; renderer.setSize(W, H, false); edgeMats.forEach(function (lm) { lm.resolution.set(W, H); }); fit(); }

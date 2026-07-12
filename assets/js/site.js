@@ -1379,7 +1379,7 @@ window.__whenVisible = (function () {
       marker.style.display = '';       // на мобиле указатель нужен (шайба стоит ниже, на диске)
       // карточка стоит на 46px выше crest и сама ~60px высотой → низ контента держим выше её верха
       sticky.style.setProperty('--fwbot', (H - crest + 104) + 'px');
-      if (apBtn) { apBtn.style.left = CX + 'px'; apBtn.style.top = (crest + 24) + 'px'; }   // шайба автоплея на диске под гребнем
+      if (apBtn) { apBtn.style.left = CX + 'px'; apBtn.style.top = Math.min(crest + 94, H - 58) + 'px'; }   // шайба автоплея — НИЖЕ, глубже в диск (дальше от указателя/рисок)
     } else {
       EDGE = Math.round(Math.max(150, Math.min(0.15 * W, 225)));
       R = Math.round(Math.max(H * 0.78, 540));

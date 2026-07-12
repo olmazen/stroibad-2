@@ -1819,7 +1819,7 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-pp-3d-stage.has3d .fw-pp-3dimg{opacity:0;animation:none!important}
 .fw-pp-3dhint{position:absolute;left:0;right:0;bottom:6px;z-index:3;text-align:center;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:8px;color:#9db8dd;opacity:0;transition:opacity .5s ease;pointer-events:none}
 .fw-pp-3d-stage.has3d .fw-pp-3dhint{opacity:.85}
-@media(max-width:900px){.fw-pp-top{flex-direction:column}.fw-pp-hero{flex:none;aspect-ratio:16/10}.fw-pp-title{font-size:16px}.fw-pp-3d-stage{height:clamp(170px,27vh,224px)}.fw-pp.scrolled .fw-pp-scroll{transform:translateY(-52%)}}
+@media(max-width:900px){.fw-pp-top{flex-direction:column}.fw-pp-hero{flex:none;aspect-ratio:16/10}.fw-pp-title{font-size:16px}.fw-pp-3d-stage{height:clamp(206px,31vh,256px)}.fw-pp.scrolled .fw-pp-scroll{transform:translateY(-55%)}}
 @media(prefers-reduced-motion:reduce){.fw-pp,.fw-pp-scroll,.fw-pp-3dimg,.fw-pp-heroimg{transition:none}.fw-pp.spin3d .fw-pp-3dimg,.fw-pp-3d-stage.fw3d-fb .fw-pp-3dimg{animation:none}}
 @media(max-width:900px){
   .fw-catcart{top:4px;right:4px;padding:6px 11px 6px 9px}
