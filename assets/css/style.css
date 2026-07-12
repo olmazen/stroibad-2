@@ -1081,8 +1081,8 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-marker{position:absolute;width:0;height:0;border:8px solid transparent;border-left:11px solid var(--amber);transform:translateY(-50%);filter:drop-shadow(0 0 8px var(--glow));pointer-events:none;z-index:4}
 .fw-marker.down{border:8px solid transparent;border-top:11px solid var(--amber);transform:translate(-50%,0)}
 /* автоплей-шайба на дуге + кольцо прогресса сцены (сцены разные по длительности — таймер «как в рекламе») */
-.fw-autoplay{position:absolute;z-index:6;width:46px;height:46px;padding:0;border:0;border-radius:50%;background:rgba(14,17,20,.72);cursor:pointer;pointer-events:auto;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 6px 20px rgba(0,0,0,.42),inset 0 0 0 1px rgba(255,255,255,.08);transform:translate(-50%,-50%);transition:box-shadow .25s,background .25s,opacity .3s}
-.fw-autoplay:hover{background:rgba(20,24,28,.86);box-shadow:0 8px 26px rgba(0,0,0,.5),inset 0 0 0 1px rgba(242,111,29,.42)}
+.fw-autoplay{position:absolute;z-index:6;width:50px;height:50px;padding:0;border:0;border-radius:50%;background:rgba(12,15,18,.92);cursor:pointer;pointer-events:auto;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);box-shadow:0 8px 24px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.09);transform:translate(-50%,-50%);transition:box-shadow .25s,background .25s,opacity .3s}
+.fw-autoplay:hover{background:rgba(20,24,28,.95);box-shadow:0 10px 30px rgba(0,0,0,.55),inset 0 0 0 1px rgba(242,111,29,.5)}
 .fw-autoplay:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 .fw-ap-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
 .fw-ap-trk{fill:none;stroke:rgba(255,255,255,.14);stroke-width:2.4}
@@ -1093,7 +1093,11 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-autoplay:not(.on) .ic-pause{display:none}
 .fw-autoplay:not(.on) .ic-play{display:block}
 .fw-autoplay:not(.on) .fw-ap-prg{opacity:.3}
-@media(max-width:900px){.fw-autoplay{width:40px;height:40px}.fw-ap-ico svg{width:16px;height:16px}}
+/* подпись под шайбой — чтобы люди понимали, что это автопоказ шагов */
+.fw-ap-label{position:absolute;left:50%;top:calc(100% + 9px);transform:translateX(-50%);white-space:nowrap;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:10px;line-height:1;color:var(--steel-l);transition:color .25s}
+.fw-autoplay.on .fw-ap-label{color:var(--amber)}
+.fw-autoplay:hover .fw-ap-label{color:#fff}
+@media(max-width:900px){.fw-autoplay{width:44px;height:44px}.fw-ap-ico svg{width:16px;height:16px}.fw-ap-label{font-size:9px;letter-spacing:.12em;top:calc(100% + 7px)}}
 /* карточки шагов на колесе */
 .fw-cards{position:absolute;inset:0;z-index:3;pointer-events:none}
 .fw-card{position:absolute;left:0;top:0;cursor:pointer;pointer-events:auto;will-change:transform,opacity,filter;transform-origin:left center}
