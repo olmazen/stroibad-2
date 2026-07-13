@@ -40,6 +40,14 @@
   ]
 }
 </script>
+<style>
+.hero-r .hero-photo{position:absolute;inset:0;display:block;overflow:hidden}
+.hero-r .hero-photo img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
+.hero-r .hero-photo:hover img{transform:scale(1.05)}
+.hero-r .hero-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,14,18,.55),transparent 32%),linear-gradient(0deg,rgba(11,14,18,.4),transparent 42%);pointer-events:none}
+.hero-photo-tag{position:absolute;left:16px;bottom:16px;z-index:2;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:rgba(10,12,15,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.16);border-radius:100px;padding:6px 12px}
+@media(max-width:900px){.hero-grid .hero-r{display:block !important;position:relative;height:56vw;max-height:430px;min-height:230px;border-left:0;border-top:1px solid var(--line)}}
+</style>
 </head>
 <body>
 
@@ -109,59 +117,10 @@
         <span class="scrollcue">Листайте <i></i></span>
       </div>
       <div class="hero-r">
-        <div class="bp-wrap">
-          <span class="bp-corner tl">EGOE · ЧЕРТЁЖ СК-01</span>
-          <span class="bp-corner bl">ПАРКОВАЯ СО СПИНКОЙ</span>
-          <span class="bp-corner br">МАСШТАБ 1:10</span>
-          <svg id="bpHero" data-draw viewBox="0 128 640 392" role="img" aria-label="Чертёж парковой скамейки со спинкой">
-            <!-- земля -->
-            <line class="bp-thin" x1="46" y1="452" x2="594" y2="452"></line>
-            <line class="bp-thin" x1="80" y1="466" x2="94" y2="452"></line>
-            <line class="bp-thin" x1="150" y1="466" x2="164" y2="452"></line>
-            <line class="bp-thin" x1="220" y1="466" x2="234" y2="452"></line>
-            <line class="bp-thin" x1="290" y1="466" x2="304" y2="452"></line>
-            <line class="bp-thin" x1="360" y1="466" x2="374" y2="452"></line>
-            <line class="bp-thin" x1="430" y1="466" x2="444" y2="452"></line>
-            <line class="bp-thin" x1="500" y1="466" x2="514" y2="452"></line>
-            <!-- ноги -->
-            <line class="bp-steel" x1="150" y1="452" x2="150" y2="336"></line>
-            <line class="bp-steel" x1="490" y1="452" x2="490" y2="336"></line>
-            <rect class="bp-thin" x="132" y="444" width="36" height="8"></rect>
-            <rect class="bp-thin" x="472" y="444" width="36" height="8"></rect>
-            <!-- стойки спинки -->
-            <line class="bp-steel" x1="150" y1="336" x2="150" y2="206"></line>
-            <line class="bp-steel" x1="490" y1="336" x2="490" y2="206"></line>
-            <!-- царга под сиденьем -->
-            <line class="bp-thin" x1="150" y1="352" x2="490" y2="352"></line>
-            <!-- сиденье (дерево) -->
-            <rect class="bp-wood" x="108" y="316" width="424" height="20" rx="2"></rect>
-            <!-- спинка (дерево, 2 ламели) -->
-            <rect class="bp-wood" x="108" y="202" width="424" height="18" rx="2"></rect>
-            <rect class="bp-wood" x="108" y="236" width="424" height="18" rx="2"></rect>
-            <!-- размер: ширина -->
-            <line class="bp-dim" x1="108" y1="486" x2="532" y2="486"></line>
-            <line class="bp-dim" x1="108" y1="478" x2="108" y2="494"></line>
-            <line class="bp-dim" x1="532" y1="478" x2="532" y2="494"></line>
-            <text class="bp-txt a bp-fade" x="320" y="510" text-anchor="middle">2 000 ММ</text>
-            <!-- размер: высота -->
-            <line class="bp-dim" x1="66" y1="202" x2="66" y2="452"></line>
-            <line class="bp-dim" x1="58" y1="202" x2="74" y2="202"></line>
-            <line class="bp-dim" x1="58" y1="452" x2="74" y2="452"></line>
-            <text class="bp-txt a bp-fade" x="54" y="330" text-anchor="middle" transform="rotate(-90 54 330)">850 ММ</text>
-            <!-- выноска: дерево -->
-            <polyline class="bp-thin" points="420,210 462,158 478,158"></polyline>
-            <text class="bp-txt bp-fade" x="484" y="162">ХВ. ПОРОДА</text>
-            <!-- выноска: металл -->
-            <polyline class="bp-thin" points="492,394 524,372 540,372"></polyline>
-            <text class="bp-txt bp-fade" x="546" y="376">СТАЛЬ 40×40</text>
-            <!-- крест-визир -->
-            <g class="bp-pulse">
-              <circle class="bp-dim" cx="320" cy="326" r="11" fill="none"></circle>
-              <line class="bp-dim" x1="320" y1="306" x2="320" y2="346"></line>
-              <line class="bp-dim" x1="300" y1="326" x2="340" y2="326"></line>
-            </g>
-          </svg>
-        </div>
+        <a class="hero-photo" href="projects/index.html" aria-label="Портфолио объектов EGOE">
+          <img src="assets/img/hero/facade-jk.webp" srcset="assets/img/hero/facade-jk-sm.webp 900w, assets/img/hero/facade-jk.webp 1600w" sizes="(max-width:900px) 100vw, 52vw" alt="Фасад ЖК: фасадные корзины для кондиционеров и круглая скамья с лазерной резкой — EGOE" loading="eager">
+          <span class="hero-photo-tag">Объект · корзины + скамья EGOE</span>
+        </a>
       </div>
     </div>
   </div>
