@@ -144,6 +144,54 @@
   </div>
 </section>
 
+<style>
+.prodlive{padding:clamp(50px,6vw,90px) 0}
+.prodlive-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:32px}
+.pl-cell{position:relative;display:block;overflow:hidden;border-radius:12px;border:1px solid var(--line);background:#0a0c0f;aspect-ratio:4/3}
+.pl-cell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1s cubic-bezier(.16,1,.3,1)}
+.pl-cell:hover img{transform:scale(1.06)}
+.pl-cell::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,10,13,.74),rgba(8,10,13,.05) 48%,transparent);pointer-events:none}
+.pl-cap{position:absolute;left:15px;right:15px;bottom:13px;z-index:2}
+.pl-cap b{display:block;font-family:'Oswald',sans-serif;font-size:15px;text-transform:uppercase;letter-spacing:.02em;color:#fff;line-height:1.1}
+.pl-cap span{font-size:11.5px;color:var(--tx2)}
+.pl-tag{position:absolute;top:12px;left:12px;z-index:2;font-family:'Oswald',sans-serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#1c1305;background:var(--amber);padding:4px 10px;border-radius:100px}
+@media(max-width:900px){.prodlive-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.prodlive-grid{grid-template-columns:1fr}}
+</style>
+<section class="prodlive">
+  <div class="container">
+    <div class="reveal"><div class="dim"><span class="tick"></span>Производство · вживую</div></div>
+    <div class="sec-head reveal" style="margin-top:20px"><div><h2>С нашей площадки — на ваш объект</h2></div><p class="lead-wide">Реальные кадры из цеха и с отгрузки: малые формы, лазерные панели, сборка и логистика — всё своими руками, на одной площадке.</p></div>
+    <div class="prodlive-grid">
+      <a class="pl-cell" href="../maf/index.html">
+        <img src="../assets/img/proizvodstvo/cube.webp" srcset="../assets/img/proizvodstvo/cube-sm.webp 539w, ../assets/img/proizvodstvo/cube.webp 896w" sizes="(max-width:900px) 50vw, 33vw" alt="Куб-беседка EGOE — стальная рама и деревянные ламели" loading="lazy">
+        <span class="pl-tag">флагман</span>
+        <span class="pl-cap"><b>Куб-беседка</b><span>стальная рама + массив дерева</span></span>
+      </a>
+      <a class="pl-cell" href="../maf/skamejki/index.html">
+        <img src="../assets/img/proizvodstvo/bench.webp" srcset="../assets/img/proizvodstvo/bench-sm.webp 539w, ../assets/img/proizvodstvo/bench.webp 896w" sizes="(max-width:900px) 50vw, 33vw" alt="Скамья с деревянным сиденьем и стальной рамой в цехе EGOE" loading="lazy">
+        <span class="pl-cap"><b>Цех: металл + дерево</b><span>сварка, гибка, деревообработка</span></span>
+      </a>
+      <a class="pl-cell" href="../ograzhdeniya/index.html">
+        <img src="../assets/img/proizvodstvo/panels.webp" srcset="../assets/img/proizvodstvo/panels-sm.webp 720w, ../assets/img/proizvodstvo/panels.webp 1240w" sizes="(max-width:900px) 50vw, 33vw" alt="Ажурные панели лазерной резки на складе EGOE" loading="lazy">
+        <span class="pl-cap"><b>Лазерная резка</b><span>ажурные панели, серия</span></span>
+      </a>
+      <a class="pl-cell" href="../maf/skamejki/index.html">
+        <img src="../assets/img/proizvodstvo/benchclean.webp" srcset="../assets/img/proizvodstvo/benchclean-sm.webp 720w, ../assets/img/proizvodstvo/benchclean.webp 1152w" sizes="(max-width:900px) 50vw, 33vw" alt="Готовая парковая скамья EGOE — стальная рама и лазерная панель" loading="lazy">
+        <span class="pl-cap"><b>Готовое изделие</b><span>парковая скамья со спинкой</span></span>
+      </a>
+      <a class="pl-cell" href="../dostavka/index.html">
+        <img src="../assets/img/proizvodstvo/truck.webp" srcset="../assets/img/proizvodstvo/truck-sm.webp 720w, ../assets/img/proizvodstvo/truck.webp 1240w" sizes="(max-width:900px) 50vw, 33vw" alt="Панели EGOE загружены в фуру — отгрузка по России" loading="lazy">
+        <span class="pl-cap"><b>Отгрузка по России</b><span>упаковка и логистика</span></span>
+      </a>
+      <a class="pl-cell" href="../projects/index.html">
+        <img src="../assets/img/proizvodstvo/cube2.webp" srcset="../assets/img/proizvodstvo/cube2-sm.webp 539w, ../assets/img/proizvodstvo/cube2.webp 896w" sizes="(max-width:900px) 50vw, 33vw" alt="Куб-беседка EGOE на площадке перед отгрузкой" loading="lazy">
+        <span class="pl-cap"><b>Сборка на площадке</b><span>контроль перед отгрузкой</span></span>
+      </a>
+    </div>
+  </div>
+</section>
+
 <section class="dev">
   <div class="container">
     <div class="reveal"><div class="dim on-dark"><span class="tick"></span>04 — Основатель</div></div>
