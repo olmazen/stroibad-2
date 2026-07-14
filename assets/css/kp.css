@@ -144,7 +144,11 @@ table{border-collapse:collapse;width:100%}
 .kp-product .prod-grid{display:grid;grid-template-columns:55fr 45fr;gap:16px;margin-top:16px}
 .kp-product .prod-visual{}
 .kp-product .prod-visual .photo-box,.kp-product .prod-visual .ph{height:70mm}
-.kp-product.no-draw .prod-visual .photo-box,.kp-product.no-draw .prod-visual .ph{height:92mm}
+.kp-product.no-draw .prod-visual .photo-box,.kp-product.no-draw .prod-visual .ph{height:66mm}
+/* Стандарт: второе фото — изделие на белом фоне (стек под главным, как чертёж у Арт-Деко) */
+.kp-white{position:relative;margin-top:10px;height:50mm;overflow:hidden;background:#fff;border:1px solid var(--line)}
+.kp-white img{width:100%;height:100%;object-fit:contain;padding:7px;display:block}
+.kp-white.noimg{display:none}
 .kp-thumbs{display:flex;gap:6px;margin-top:6px}
 .kp-thumbs .photo-box{flex:1;height:26mm}
 .kp-drawing{position:relative;margin-top:10px;border:1px solid var(--line);background:#fff;padding:8px}
@@ -253,7 +257,7 @@ tr.stx.st-in{opacity:1;transition:opacity .5s ease}
   .kp-cover,.kp-product,.kp-terms{break-after:page;page-break-after:always}
   .sheet:last-child{break-after:auto;page-break-after:auto}
   .kp-product{break-inside:avoid;page-break-inside:avoid}
-  .kp-drawing,.spec-list,.ral-row,.price-plate,.photo-box,.kp-totals{break-inside:avoid}
+  .kp-drawing,.kp-white,.spec-list,.ral-row,.price-plate,.photo-box,.kp-totals{break-inside:avoid}
   table tr{break-inside:avoid}
   thead{display:table-header-group}
   p{orphans:3;widows:3}

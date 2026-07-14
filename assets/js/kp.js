@@ -369,11 +369,12 @@
       var dm = dims(cat);
       if (dm.any) visual += '<div class="kp-dimline"></div><div class="kp-dim">' + dimText(dm) + '</div>';
     } else {
-      var thumbs = imgs.filter(function (im) { return im.kind !== 'main'; }).slice(0, 3);
-      if (thumbs.length) {
-        visual += '<div class="kp-thumbs">' + thumbs.map(function (im) {
-          return '<div class="photo-box"><img src="../' + esc(im.path) + '" alt="" loading="eager" onerror="this.closest(\'.photo-box\').classList.add(\'noimg\');this.remove()"></div>';
-        }).join('') + '</div>';
+      // Стандарт: под главным фото — студийное фото изделия на белом фоне (второй визуал, как чертёж у Арт-Деко)
+      var whiteImg = imgs.filter(function (im) { return im.kind === 'white'; })[0]
+        || imgs.filter(function (im) { return im.kind !== 'main'; })[0];
+      if (whiteImg && whiteImg.path) {
+        visual += '<div class="kp-white"><img src="../' + esc(whiteImg.path) + '" alt="' + esc(r.name) + ' — фото на белом фоне" loading="eager" ' +
+          'onerror="this.closest(\'.kp-white\').classList.add(\'noimg\');this.remove()"></div>';
       }
     }
     visual += '</div>';
