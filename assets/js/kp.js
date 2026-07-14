@@ -503,6 +503,55 @@
   window.addEventListener('resize', fitNarrow);
   setTimeout(fitNarrow, 700); // страховка после дозагрузки чертежей
 
+  /* ===== скачивание готового PDF-ФАЙЛА (клиентский рендер, без диалога печати) ===== */
   var pb = document.getElementById('kpPrintBtn');
-  if (pb) pb.addEventListener('click', function () { window.print(); });
+  var _libP = null;
+  function ensureLibs() {
+    if (_libP) return _libP;
+    _libP = new Promise(function (resolve, reject) {
+      var srcs = [];
+      if (!window.html2canvas) srcs.push('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+      if (!(window.jspdf && window.jspdf.jsPDF)) srcs.push('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+      var left = srcs.length; if (!left) return resolve();
+      srcs.forEach(function (src) {
+        var s = document.createElement('script'); s.src = src;
+        s.onload = function () { if (--left === 0) resolve(); };
+        s.onerror = function () { reject(new Error('lib')); };
+        document.head.appendChild(s);
+      });
+    });
+    return _libP;
+  }
+  var _dling = false;
+  function setDlBusy(on) { if (pb) { pb.disabled = on; pb.textContent = on ? 'Собираем PDF…' : 'Скачать PDF'; } }
+  function downloadPDF() {
+    if (_dling) return; _dling = true; setDlBusy(true);
+    finishStreamNow();
+    var d = document.querySelector('.kp-doc');
+    var saved = d ? { t: d.style.transform, w: d.style.width, h: d.style.height } : null;
+    if (d) { d.style.transform = 'none'; d.style.width = SHEET_W + 'px'; d.style.height = ''; }   // снимаем мобильный масштаб — рендерим в полный A4
+    function done() { if (d && saved) { d.style.transform = saved.t; d.style.width = saved.w; d.style.height = saved.h; } fitNarrow(); _dling = false; setDlBusy(false); }
+    function fail() { done(); try { window.print(); } catch (e) {} }   // запасной путь — обычная печать
+    ensureLibs().then(function () { return (document.fonts && document.fonts.ready) || Promise.resolve(); }).then(function () {
+      var JsPDF = window.jspdf.jsPDF;
+      var sheets = [].slice.call(doc.querySelectorAll('.sheet'));
+      if (!sheets.length) return fail();
+      var pdf = new JsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+      var i = 0;
+      (function next() {
+        if (i >= sheets.length) { pdf.save(((head && head.number) || 'КП-EGOE') + '.pdf'); done(); return; }
+        html2canvas(sheets[i], { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false }).then(function (cv) {
+          if (i > 0) pdf.addPage();
+          pdf.addImage(cv.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+          i++; next();
+        }).catch(fail);
+      })();
+    }).catch(fail);
+  }
+  window.__kpDownload = downloadPDF;
+  if (pb) pb.addEventListener('click', downloadPDF);
+  var pbPrint = document.getElementById('kpPrintOnly');
+  if (pbPrint) pbPrint.addEventListener('click', function () { window.print(); });
+  // команда «скачать» из корзинной шторки (КП открыт в iframe)
+  window.addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.kpDownload) downloadPDF(); });
 })();

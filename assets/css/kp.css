@@ -48,6 +48,10 @@ table{border-collapse:collapse;width:100%}
   font-family:var(--f-head);text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-size:13px;
   padding:9px 18px;transition:background .15s}
 .kp-tb-print:hover{background:var(--amber-h,#ff8534)}
+.kp-tb-print[disabled]{opacity:.6;cursor:progress}
+.kp-tb-print2{background:transparent;color:#c9ccd1;border:1px solid rgba(255,255,255,.22);border-radius:2px;cursor:pointer;
+  font-family:var(--f-head);text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-size:13px;padding:9px 16px;transition:border-color .15s,color .15s}
+.kp-tb-print2:hover{border-color:var(--amber);color:#fff}
 
 /* ---------- Каркас документа ---------- */
 .kp-doc{}

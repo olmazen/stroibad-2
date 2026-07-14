@@ -1114,7 +1114,8 @@ window.__whenVisible = (function () {
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
     var pdfBtn = document.getElementById('kpdPdf');
     if (pdfBtn) pdfBtn.addEventListener('click', function () {
-      try { dFrame.contentWindow.focus(); dFrame.contentWindow.print(); } catch (e) { window.open(new URL('kp/index.html', base).href, '_blank'); }
+      // КП открыт в iframe → командуем ему собрать и СКАЧАТЬ PDF-файл (не диалог печати)
+      try { dFrame.contentWindow.postMessage({ kpDownload: true }, location.origin); } catch (e) { window.open(new URL('kp/index.html', base).href, '_blank'); }
     });
     var reopen = document.getElementById('kpReopen');
     if (reopen) reopen.addEventListener('click', function (e) { e.preventDefault(); openDrawer(); });
