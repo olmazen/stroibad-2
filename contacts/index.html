@@ -30,18 +30,21 @@
 </script>
 <style>
 /* Карты Яндекс (офис/производство) с переключателем */
-.ymaps{position:relative;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:#0b0e11;margin-top:8px}
+.ymaps{position:relative;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;background:#0b0e11;margin-top:8px}
 .ymap-frame{position:relative;width:100%;aspect-ratio:2/1;display:none}
 .ymap-frame.is-active{display:block}
 .ymap-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
-.ymap-att{position:absolute;top:10px;left:12px;z-index:2}
-.ymap-att a{color:#eef0f2;font:600 11px/1.2 'Oswald',sans-serif;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;background:rgba(14,17,20,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);padding:5px 11px;border-radius:100px}
+/* атрибуция — рубленый тег с янтарной насечкой */
+.ymap-att{position:absolute;top:12px;left:12px;z-index:2}
+.ymap-att a{display:inline-block;color:#eef0f2;font:600 11px/1.2 'Oswald',sans-serif;letter-spacing:.07em;text-transform:uppercase;text-decoration:none;background:rgba(14,17,20,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid var(--line-2);border-left:2px solid var(--amber);padding:6px 12px;border-radius:var(--r);transition:border-color .2s,color .2s}
 .ymap-att a:hover{color:#fff;border-color:var(--amber)}
-.ymap-toggle{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;display:flex;background:rgba(14,17,20,.8);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.16);border-radius:100px;padding:5px;box-shadow:0 16px 34px -12px rgba(0,0,0,.7)}
-.ymap-toggle button{font-family:'Oswald',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--tx2);padding:9px 20px;border-radius:100px;display:flex;flex-direction:column;align-items:center;line-height:1.14;transition:background .2s,color .2s;text-transform:uppercase}
-.ymap-toggle button b{font-size:13px;font-weight:600;color:#fff;letter-spacing:.04em}
-.ymap-toggle button span{font-size:9.5px;letter-spacing:.14em;color:var(--steel);margin-top:2px}
-.ymap-toggle button.active{background:var(--amber)}
+/* переключатель — рубленый сегментированный контрол со скошенными углами */
+.ymap-toggle{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;display:flex;gap:4px;background:rgba(14,17,20,.82);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line-2);border-radius:var(--r);padding:4px;box-shadow:0 18px 40px -14px rgba(0,0,0,.78)}
+.ymap-toggle button{font-family:'Oswald',sans-serif;cursor:pointer;border:0;background:transparent;color:var(--tx2);padding:9px 20px;border-radius:0;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);display:flex;flex-direction:column;align-items:center;line-height:1.14;text-transform:uppercase;transition:background .2s}
+.ymap-toggle button b{font-size:13px;font-weight:600;color:#fff;letter-spacing:.05em;transition:color .2s}
+.ymap-toggle button span{font-size:9px;letter-spacing:.16em;color:var(--steel);margin-top:3px;transition:color .2s}
+.ymap-toggle button:hover b{color:var(--amber-h)}
+.ymap-toggle button.active{background:var(--amber);filter:drop-shadow(0 6px 12px var(--glow))}
 .ymap-toggle button.active b,.ymap-toggle button.active span{color:#0e1114}
 @media(max-width:640px){
   .ymap-frame{aspect-ratio:auto;height:380px}
