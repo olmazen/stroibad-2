@@ -28,6 +28,27 @@
 "address":{"@type":"PostalAddress","addressLocality":"Балаково","addressRegion":"Саратовская область","addressCountry":"RU"},
 "openingHours":"Mo-Fr 09:00-18:00","url":"https://www.egoe-life.ru/contacts/"}
 </script>
+<style>
+/* Карты Яндекс (офис/производство) с переключателем */
+.ymaps{position:relative;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:#0b0e11;margin-top:8px}
+.ymap-frame{position:relative;width:100%;aspect-ratio:2/1;display:none}
+.ymap-frame.is-active{display:block}
+.ymap-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.ymap-att{position:absolute;top:10px;left:12px;z-index:2}
+.ymap-att a{color:#eef0f2;font:600 11px/1.2 'Oswald',sans-serif;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;background:rgba(14,17,20,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);padding:5px 11px;border-radius:100px}
+.ymap-att a:hover{color:#fff;border-color:var(--amber)}
+.ymap-toggle{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;display:flex;background:rgba(14,17,20,.8);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.16);border-radius:100px;padding:5px;box-shadow:0 16px 34px -12px rgba(0,0,0,.7)}
+.ymap-toggle button{font-family:'Oswald',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--tx2);padding:9px 20px;border-radius:100px;display:flex;flex-direction:column;align-items:center;line-height:1.14;transition:background .2s,color .2s;text-transform:uppercase}
+.ymap-toggle button b{font-size:13px;font-weight:600;color:#fff;letter-spacing:.04em}
+.ymap-toggle button span{font-size:9.5px;letter-spacing:.14em;color:var(--steel);margin-top:2px}
+.ymap-toggle button.active{background:var(--amber)}
+.ymap-toggle button.active b,.ymap-toggle button.active span{color:#0e1114}
+@media(max-width:640px){
+  .ymap-frame{aspect-ratio:auto;height:380px}
+  .ymap-toggle{bottom:14px}
+  .ymap-toggle button{padding:8px 15px}
+}
+</style>
 </head>
 <body>
 <div class="topbar"><div class="container">
@@ -115,7 +136,20 @@
         <div class="s">Встречи по предварительной договорённости</div>
       </div>
     </div>
-    <div class="ph r-21 reveal" style="--d:.1s"><span class="ph-tag">карта</span><span class="ph-label">Карта: производство Балаково / офис Москва</span></div>
+    <div class="ymaps reveal" style="--d:.1s" id="ymaps">
+      <div class="ymap-frame is-active" data-map="office">
+        <div class="ymap-att"><a href="https://yandex.ru/maps/org/samshit/20936061409/?utm_medium=mapframe&utm_source=maps" target="_blank" rel="noopener">Офис · Москва — на Яндекс.Картах</a></div>
+        <iframe src="https://yandex.ru/map-widget/v1/?ll=37.718555%2C55.759770&mode=poi&poi%5Bpoint%5D=37.718028%2C55.761106&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D20936061409&z=14.55" width="560" height="400" allowfullscreen="true" loading="lazy" title="Офис — Москва"></iframe>
+      </div>
+      <div class="ymap-frame" data-map="prod">
+        <div class="ymap-att"><a href="https://yandex.ru/maps/org/samshit/1109481463/?utm_medium=mapframe&utm_source=maps" target="_blank" rel="noopener">Производство · Балаково — на Яндекс.Картах</a></div>
+        <iframe src="https://yandex.ru/map-widget/v1/?ll=47.901006%2C52.056258&mode=poi&poi%5Bpoint%5D=47.900707%2C52.065335&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D1109481463&z=14.53" width="560" height="400" allowfullscreen="true" loading="lazy" title="Производство — Балаково"></iframe>
+      </div>
+      <div class="ymap-toggle" role="tablist" aria-label="Переключение карты">
+        <button type="button" class="active" data-map="office" aria-selected="true"><b>Офис</b><span>Москва</span></button>
+        <button type="button" data-map="prod" aria-selected="false"><b>Производство</b><span>Балаково</span></button>
+      </div>
+    </div>
     <div class="foot-msgr reveal" style="margin-top:24px;--d:.15s"><a href="https://wa.me/79272295828" target="_blank" rel="noopener">WhatsApp</a><a href="#">Telegram</a><a href="#">MAX</a></div>
   </div>
 </section>
@@ -203,5 +237,17 @@
 </div></div>
 
 <script src="../assets/js/site.js?v=egoe59"></script>
+<script>
+(function(){
+  var box=document.getElementById('ymaps'); if(!box) return;
+  var btns=box.querySelectorAll('.ymap-toggle button');
+  var frames=box.querySelectorAll('.ymap-frame');
+  btns.forEach(function(b){ b.addEventListener('click', function(){
+    var m=b.dataset.map;
+    btns.forEach(function(x){ var on=x===b; x.classList.toggle('active',on); x.setAttribute('aria-selected',on); });
+    frames.forEach(function(f){ f.classList.toggle('is-active', f.dataset.map===m); });
+  }); });
+})();
+</script>
 </body>
 </html>
