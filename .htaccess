@@ -1,0 +1,38 @@
+# EGOE — egoe-life.ru (canonical: www + https)
+# Работает, если хостинг обслуживает Apache (в т.ч. Apache за nginx в ISPmanager).
+# На чистом nginx этот файл игнорируется — тогда включите те же редиректы тумблерами в панели.
+
+Options -Indexes
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 1) HTTP -> HTTPS
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # 2) не-www -> www (canonical у сайта — www.egoe-life.ru)
+  RewriteCond %{HTTP_HOST} ^egoe-life\.ru$ [NC]
+  RewriteRule ^ https://www.egoe-life.ru%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Сжатие
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/xml application/javascript application/json image/svg+xml
+</IfModule>
+
+# Кэш статики
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp            "access plus 1 year"
+  ExpiresByType image/svg+xml         "access plus 1 year"
+  ExpiresByType image/jpeg            "access plus 1 year"
+  ExpiresByType image/png             "access plus 1 year"
+  ExpiresByType text/css              "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/html             "access plus 1 hour"
+</IfModule>
+
+# Кодировка
+AddDefaultCharset UTF-8
