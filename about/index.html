@@ -17,6 +17,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css?v=egoe54">
+<style>
+/* галерея «завод изнутри» — masonry из реальных фото с площадки */
+.zavod-gallery{columns:3;column-gap:14px;margin-top:8px}
+.zavod-gallery .zg-item{break-inside:avoid;margin:0 0 14px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--srf);line-height:0}
+.zavod-gallery .zg-item img{display:block;width:100%;height:auto;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.zavod-gallery .zg-item:hover img{transform:scale(1.035)}
+@media(max-width:900px){.zavod-gallery{columns:2;column-gap:10px}.zavod-gallery .zg-item{margin-bottom:10px}}
+@media(max-width:520px){.zavod-gallery{columns:1}}
+</style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
 {"@type":"ListItem","position":1,"name":"Главная","item":"https://www.egoe-life.ru/"},
@@ -98,7 +107,7 @@
     <div class="reveal"><div class="dim"><span class="tick"></span>02 — Два цеха</div></div>
     <div class="sec-head reveal" style="margin-top:20px"><div><h2>Металл и дерево — под одной крышей</h2></div><p class="lead-wide">Поэтому скамейка, урна и ограждение для вашего объекта выходят с одной площадки — в одном качестве и в один срок.</p></div>
     <div class="ab-shop">
-      <div class="ab-shop-ph ph has-img reveal"><img src="../assets/img/proizvodstvo/metal.webp" srcset="../assets/img/proizvodstvo/metal-sm.webp 720w, ../assets/img/proizvodstvo/metal.webp 1024w" sizes="(max-width:900px) 100vw, 46vw" alt="Цех металлообработки EGOE — лазерная резка ажурных панелей" loading="lazy"><span class="ph-tag">цех металла</span><span class="ph-label">Лазерная резка · серия панелей</span></div>
+      <div class="ab-shop-ph ph has-img reveal"><img src="../assets/img/proizvodstvo/metal.webp?v2" srcset="../assets/img/proizvodstvo/metal-sm.webp?v2 720w, ../assets/img/proizvodstvo/metal.webp?v2 1024w" sizes="(max-width:900px) 100vw, 46vw" alt="Цех металла EGOE — гибка листа на листогибе с ЧПУ" loading="lazy"><span class="ph-tag">цех металла</span><span class="ph-label">Гибка · листогиб с ЧПУ</span></div>
       <div class="reveal" style="--d:.1s">
         <div class="type-head"><h3>Цех металла</h3><span class="type-tag ad">основной</span></div>
         <ul class="ab-shop-facts">
@@ -110,7 +119,7 @@
       </div>
     </div>
     <div class="ab-shop rev">
-      <div class="ab-shop-ph ph has-img reveal"><img src="../assets/img/proizvodstvo/wood.webp" srcset="../assets/img/proizvodstvo/wood-sm.webp 720w, ../assets/img/proizvodstvo/wood.webp 896w" sizes="(max-width:900px) 100vw, 46vw" alt="Цех деревообработки EGOE — массив и ламели для МАФ" loading="lazy"><span class="ph-tag">цех дерева</span><span class="ph-label">Массив и ламели для МАФ</span></div>
+      <div class="ab-shop-ph ph has-img reveal"><img src="../assets/img/proizvodstvo/wood.webp?v2" srcset="../assets/img/proizvodstvo/wood-sm.webp?v2 720w, ../assets/img/proizvodstvo/wood.webp?v2 896w" sizes="(max-width:900px) 100vw, 46vw" alt="Цех деревообработки EGOE — обработка массива на станке с ЧПУ" loading="lazy"><span class="ph-tag">цех дерева</span><span class="ph-label">Массив · ЧПУ-центр</span></div>
       <div class="reveal" style="--d:.1s">
         <div class="type-head"><h3>Цех дерева</h3><span class="type-tag std">свой, не субподряд</span></div>
         <ul class="ab-shop-facts">
@@ -120,6 +129,23 @@
           <li><b>Назначение</b><span>ламели и элементы МАФ, настилы</span></li>
         </ul>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ЗАВОД ИЗНУТРИ — просто фото с площадки (не кейсы) -->
+<section>
+  <div class="container">
+    <div class="reveal"><div class="dim"><span class="tick"></span>Завод · изнутри</div></div>
+    <div class="sec-head reveal" style="margin-top:20px;margin-bottom:26px"><div><h2>Как это выглядит на площадке</h2></div><p class="lead-wide">Реальные кадры с производства: раскрой и гибка металла, сварка, окраска и деревообработка — всё под одной крышей.</p></div>
+    <div class="zavod-gallery reveal">
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z1.webp" alt="Сварка металлоконструкций на заводе EGOE" loading="lazy"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z2.webp" alt="Обработка изделия на станке с ЧПУ — завод EGOE" loading="lazy"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z3.webp" alt="Порошковая окраска — конвейерная линия завода EGOE" loading="lazy"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z4.webp" alt="Цех деревообработки — заготовка массива, завод EGOE" loading="lazy"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z5.webp" alt="Раскрой металлопрофиля на заводе EGOE" loading="lazy"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z6.webp" alt="Склад пиломатериала — завод EGOE" loading="lazy"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z7.webp" alt="Оператор у пульта станка — завод EGOE" loading="lazy"></figure>
     </div>
   </div>
 </section>
@@ -144,43 +170,23 @@
 
 <section>
   <div class="container">
-    <div class="reveal"><div class="dim"><span class="tick"></span>04 — Кейс</div></div>
-    <div class="sec-head reveal" style="margin-top:20px;margin-bottom:30px"><div><h2>Благоустройство ЖК под ключ</h2></div><p class="lead-wide">Свежий проект полного цикла: фасад, двор и парковые зоны — всё с одной площадки, в едином стиле.</p></div>
-    <a class="dir-hero reveal" href="../projects/index.html" style="margin-bottom:1px">
-      <div class="ph has-img dir-hero-ph"><img src="../assets/img/proizvodstvo/case-lead.webp" srcset="../assets/img/proizvodstvo/case-lead-sm.webp 900w, ../assets/img/proizvodstvo/case-lead.webp 1600w" sizes="(max-width:900px) 100vw, 92vw" alt="Парковые скамьи EGOE у арки-беседки — благоустройство двора ЖК" loading="lazy"><span class="ph-label">Двор ЖК · парковые скамьи и зона отдыха</span></div>
-      <div class="dir-hero-b">
-        <span class="dir-num">01</span>
-        <div class="dir-hero-l"><div class="eyebrow">Кейс · полный цикл</div><h3>Фасад, двор и арт-объект — с одного завода</h3></div>
-        <div class="dir-hero-r"><p>Укомплектовали ЖК целиком: корзины для кондиционеров на весь фасад в едином RAL, парковые зоны со скамьями, урнами и велопарковками — и дизайнерская куб-беседка как акцент двора.</p><span class="dir-link">Смотреть проекты →</span></div>
-      </div>
-    </a>
+    <div class="reveal"><div class="dim"><span class="tick"></span>04 — Работы</div></div>
+    <div class="sec-head reveal" style="margin-top:20px;margin-bottom:30px"><div><h2>Изделия EGOE на объектах</h2></div><p class="lead-wide">Часть наших работ: фасадные корзины, скамьи, перголы и ажурные экраны — всё изготовлено на собственном заводе.</p></div>
     <div class="tiles3 reveal" style="--d:.08s">
-      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/proizvodstvo/korziny.webp" srcset="../assets/img/proizvodstvo/korziny-sm.webp 720w, ../assets/img/proizvodstvo/korziny.webp 1240w" sizes="(max-width:900px) 100vw, 32vw" alt="Корзины для кондиционеров — EGOE, благоустройство двора ЖК" loading="lazy"><span class="ph-label">Корзины на фасаде</span></div><div class="tile-cap">Фасад</div><h3>Корзины для кондиционеров</h3><p>Вся серия под размер блоков, в цвет фасада.</p></div>
-      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/proizvodstvo/case-round.webp" srcset="../assets/img/proizvodstvo/case-round-sm.webp 720w, ../assets/img/proizvodstvo/case-round.webp 1240w" sizes="(max-width:900px) 100vw, 32vw" alt="Скамьи вокруг озеленения — EGOE, благоустройство двора ЖК" loading="lazy"><span class="ph-label">Круглая скамья у дерева</span></div><div class="tile-cap">Двор</div><h3>Скамьи вокруг озеленения</h3><p>Лазерный ажур на бортах, массив на сиденье — в цвет фасада.</p></div>
-      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/proizvodstvo/case-bench.webp" srcset="../assets/img/proizvodstvo/case-bench-sm.webp 720w, ../assets/img/proizvodstvo/case-bench.webp 1240w" sizes="(max-width:900px) 100vw, 32vw" alt="Скамьи серией — EGOE, благоустройство двора ЖК" loading="lazy"><span class="ph-label">Парковая скамья</span></div><div class="tile-cap">Зона отдыха</div><h3>Скамьи серией</h3><p>Стальная рама и деревянные ламели, торцы с лазерным узором.</p></div>
-      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/proizvodstvo/case-leaf.webp" srcset="../assets/img/proizvodstvo/case-leaf-sm.webp 720w, ../assets/img/proizvodstvo/case-leaf.webp 1240w" sizes="(max-width:900px) 100vw, 32vw" alt="Скамьи с ажурным торцом — EGOE, благоустройство двора ЖК" loading="lazy"><span class="ph-label">Дизайнерская скамья</span></div><div class="tile-cap">Двор</div><h3>Скамьи с ажурным торцом</h3><p>Индивидуальный рисунок реза под концепцию двора.</p></div>
-      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/proizvodstvo/case-zone.webp" srcset="../assets/img/proizvodstvo/case-zone-sm.webp 720w, ../assets/img/proizvodstvo/case-zone.webp 1240w" sizes="(max-width:900px) 100vw, 32vw" alt="Комплекс благоустройства — EGOE, благоустройство двора ЖК" loading="lazy"><span class="ph-label">Зона отдыха у беседки</span></div><div class="tile-cap">Двор</div><h3>Комплекс благоустройства</h3><p>Скамьи, урны и озеленение — единой линейкой с одной площадки.</p></div>
-      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/proizvodstvo/art.webp" srcset="../assets/img/proizvodstvo/art-sm.webp 720w, ../assets/img/proizvodstvo/art.webp 896w" sizes="(max-width:900px) 100vw, 32vw" alt="Куб-беседка — EGOE, благоустройство двора ЖК" loading="lazy"><span class="ph-label">Куб-беседка</span></div><div class="tile-cap">Арт-объект</div><h3>Куб-беседка</h3><p>Дизайнерская беседка-куб: стальная рама и деревянная спинка — акцент двора.</p></div>
+      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/portfolio/thumbs/dv-01.webp" alt="Фасадные корзины для кондиционеров с лазерным узором — EGOE" loading="lazy"><span class="ph-label">Корзины на фасаде</span></div><div class="tile-cap">Фасад</div><h3>Корзины для кондиционеров</h3><p>Вся серия под размер блоков, в цвет фасада по RAL.</p></div>
+      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/portfolio/thumbs/obj-20.webp" alt="Ажурные фасадные экраны серией — EGOE" loading="lazy"><span class="ph-label">Фасадные экраны</span></div><div class="tile-cap">Фасад</div><h3>Фасадные экраны серией</h3><p>Лазерный рисунок по всей плоскости, единый RAL.</p></div>
+      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/portfolio/thumbs/obj-16.webp" alt="Круглая скамья вокруг озеленения — EGOE" loading="lazy"><span class="ph-label">Круглая скамья</span></div><div class="tile-cap">МАФ</div><h3>Скамья у озеленения</h3><p>Ажур на бортах, массив на сиденье.</p></div>
+      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/portfolio/thumbs/obj-18.webp" alt="Пергола со скамьёй-качелями — EGOE" loading="lazy"><span class="ph-label">Пергола со скамьёй</span></div><div class="tile-cap">МАФ</div><h3>Пергола и зона отдыха</h3><p>Стальная рама и деревянные ламели.</p></div>
+      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/portfolio/thumbs/obj-10.webp" alt="Комплекс благоустройства — перголы, площадки, вазоны — EGOE" loading="lazy"><span class="ph-label">Комплекс благоустройства</span></div><div class="tile-cap">Благоустройство</div><h3>Комплекс двора</h3><p>Перголы, площадки и вазоны — единой линейкой.</p></div>
+      <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/portfolio/thumbs/obj-12.webp" alt="Ажурные экраны и перила с лазерным рисунком — EGOE" loading="lazy"><span class="ph-label">Ажурные экраны и перила</span></div><div class="tile-cap">Ограждения</div><h3>Экраны и перила</h3><p>Индивидуальный рисунок реза под объект.</p></div>
     </div>
-  </div>
-</section>
-
-<section class="tint">
-  <div class="container">
-    <div class="reveal"><div class="dim"><span class="tick"></span>05 — Кому производим</div></div>
-    <div class="sec-head reveal" style="margin-top:20px"><div><h2>B2B: застройщики, УК, подрядчики</h2></div><p class="lead-wide">Работаем по 44-ФЗ и с НДС: тендеры, закупки, полный пакет документов и паспорта изделий.</p></div>
-    <div class="ab-aud reveal">
-      <div class="ab-aud-i"><span class="ab-aud-n">01</span><div class="ab-aud-tx"><h3>Застройщики и ГК</h3><p>Комплектация ЖК целиком: фасад, двор, благоустройство — одной сметой.</p></div></div>
-      <div class="ab-aud-i"><span class="ab-aud-n">02</span><div class="ab-aud-tx"><h3>УК и ТСЖ</h3><p>Почтовые ящики, контейнерные площадки, ремонтные партии под двор.</p></div></div>
-      <div class="ab-aud-i"><span class="ab-aud-n">03</span><div class="ab-aud-tx"><h3>Подрядчики благоустройства</h3><p>МАФ и ограждения серией под проект, поставка партиями по графику.</p></div></div>
-    </div>
-    <div class="ab-logos reveal"><span>ГК «ВОЛГА»</span><span>СТРОЙИНВЕСТ</span><span>ПИК-РЕГИОН</span><span>ДОМ-СТРОЙ</span><span>УК «ЦЕНТР»</span></div>
+    <p style="margin-top:20px"><a class="dir-link" href="../projects/index.html">Все работы в портфолио →</a></p>
   </div>
 </section>
 
 <section>
   <div class="container">
-    <div class="reveal"><div class="dim"><span class="tick"></span>06 — Документы и качество</div></div>
+    <div class="reveal"><div class="dim"><span class="tick"></span>05 — Документы и качество</div></div>
     <div class="sec-head reveal" style="margin-top:20px"><div><h2>Сертификаты и протоколы испытаний</h2></div><p class="lead-wide">Продукция сертифицирована и прошла лабораторные испытания. Корзины для кондиционеров серий «Стандарт» и «Art&nbsp;Déco» соответствуют ТУ&nbsp;28.25.12-001-24405486-2024. К каждой поставке прикладываем полный пакет документов.</p></div>
     <div class="cert-grid reveal">
       <a class="cert-card" href="../assets/img/docs/korziny/sertifikat.webp?i1" target="_blank" rel="noopener">
@@ -203,7 +209,7 @@
   <div class="container">
     <div class="split">
       <div>
-        <div class="reveal"><div class="dim"><span class="tick"></span>07 — Реквизиты</div></div>
+        <div class="reveal"><div class="dim"><span class="tick"></span>06 — Реквизиты</div></div>
         <div class="sec-head reveal" style="margin-top:20px"><div><h2>Реквизиты</h2></div></div>
         <div class="reqs reveal"><table>
           <tr><td>Наименование</td><td>ООО «Фабрика «САМШИТ» (ТМ&nbsp;EGOE)</td></tr>
@@ -216,7 +222,7 @@
         </table></div>
       </div>
       <div>
-        <div class="reveal"><div class="dim"><span class="tick"></span>08 — Куда дальше</div></div>
+        <div class="reveal"><div class="dim"><span class="tick"></span>07 — Куда дальше</div></div>
         <div class="sec-head reveal" style="margin-top:20px"><div><h2>Познакомиться ближе</h2></div></div>
         <ul class="devlist reveal">
           <li><span><b>Каталог.</b> <a href="../maf/index.html" style="color:var(--amber)">МАФ и благоустройство →</a></span></li>
