@@ -1,0 +1,77 @@
+name: Deploy to Webnames (manual)
+
+# This workflow never runs on push. Start it only when a production deployment
+# has been explicitly requested.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only show the planned changes; do not upload files"
+        required: true
+        default: true
+        type: boolean
+
+run-name: "Webnames: ${{ github.ref_name }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: webnames-egoe-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy static site
+    # Production always comes from the reviewed default branch.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: webnames-production
+    steps:
+      - name: Check out production source
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Deploy over FTP or FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          # Connection details are repository variables; the password is the
+          # only credential and stays in a GitHub Actions secret.
+          server: ${{ vars.WEBNAMES_FTP_HOST }}
+          username: ${{ vars.WEBNAMES_FTP_USERNAME }}
+          password: ${{ secrets.WEBNAMES_FTP_PASSWORD }}
+          protocol: ${{ vars.WEBNAMES_FTP_PROTOCOL }}
+          port: ${{ vars.WEBNAMES_FTP_PORT }}
+          security: strict
+
+          # The dedicated FTP user is jailed to /www/egoe-life.ru.
+          local-dir: ./
+          server-dir: ./
+
+          # Existing server files are never wiped wholesale. Files are removed
+          # only when this workflow previously deployed them and they are later
+          # removed from the selected Git ref.
+          dangerous-clean-slate: false
+          dry-run: ${{ inputs.dry_run }}
+          log-level: standard
+          timeout: 60000
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/.claude/**
+            **/node_modules/**
+            **/.DS_Store
+            **/Thumbs.db
+            **/.env
+            **/.env.*
+            **/*.log
+            **/*.md
+            .gitignore
+            tools/*.mjs
+            CNAME
+            .nojekyll
