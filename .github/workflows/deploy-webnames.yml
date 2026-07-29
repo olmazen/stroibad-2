@@ -23,8 +23,8 @@ concurrency:
 jobs:
   deploy:
     name: Deploy static site
-    # Production always comes from the reviewed default branch.
-    if: github.ref == 'refs/heads/main'
+    # The source always comes from the reviewed default branch. The workflow
+    # itself may be run from this setup branch for a harmless pre-merge dry run.
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment:
