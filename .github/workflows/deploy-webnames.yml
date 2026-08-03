@@ -46,7 +46,9 @@ jobs:
           password: ${{ secrets.WEBNAMES_FTP_PASSWORD }}
           protocol: ${{ vars.WEBNAMES_FTP_PROTOCOL }}
           port: ${{ vars.WEBNAMES_FTP_PORT }}
-          security: strict
+          # Webnames presents a self-signed FTPS certificate. The transport
+          # remains encrypted, but its certificate is not CA-verified.
+          security: loose
 
           # The dedicated FTP user is jailed to /www/egoe-life.ru.
           local-dir: ./
