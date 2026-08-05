@@ -12,7 +12,7 @@
   var liveRegion = document.querySelector('.sr-live');
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var coarsePointer = window.matchMedia('(hover: none), (pointer: coarse)');
-  var state = { variant: 1, device: 'desktop' };
+  var state = { variant: 2, device: 'desktop' };
   var transitionTimer = 0;
   var entranceTimer = 0;
   var ambientTimer = 0;
@@ -21,14 +21,14 @@
 
   var variantMeta = {
     1: {
-      kicker: 'ОБЪЕКТ КАК ДОКАЗАТЕЛЬСТВО',
-      title: 'Живой объект + подписи к изделиям',
-      description: 'Фото становится интерфейсом: световые метки показывают изделия EGOE прямо в архитектуре объекта.'
+      kicker: 'ПЯТЬ ПОДРЯДЧИКОВ → ОДИН ЗАВОД',
+      title: 'Пять подрядчиков по металлу больше не нужны',
+      description: 'Одна смета, один договор и один график отгрузок для фасада, входа и двора.'
     },
     2: {
-      kicker: 'СМЫСЛ ВМЕСТО КАТАЛОГА',
-      title: 'Одна система. Один ответственный.',
-      description: 'Монументальная типографика превращает главный бизнес-смысл в центральный образ первого экрана.'
+      kicker: 'КОМПЛЕКТАЦИЯ ЗАСТРОЙЩИКОВ',
+      title: 'Весь металл для жилого комплекса — с одного завода',
+      description: 'Фасад, вход и двор: одна смета, единый RAL и поставка партиями под график стройки.'
     },
     3: {
       kicker: 'КАРТА КОМПЛЕКТАЦИИ',
@@ -41,9 +41,9 @@
       description: 'Последовательность операций показывает реальный путь изделия от материала до партии на объект.'
     },
     5: {
-      kicker: 'ВХОД ЧЕРЕЗ ЗАДАЧУ',
-      title: 'Выбор зоны ведёт прямо в решение',
-      description: 'Интерактивный экран одновременно объясняет ассортимент и направляет пользователя в нужную категорию.'
+      kicker: 'СЕРИИ И НЕСТАНДАРТ ДЛЯ ЖК',
+      title: 'Изготовим по чертежам — проект не нужно подгонять под каталог',
+      description: 'Проектные размеры, рисунок и RAL реализуем в собственных цехах металла и дерева.'
     }
   };
 
@@ -80,7 +80,7 @@
 
   function clampVariant(value) {
     var number = parseInt(value, 10);
-    return number >= 1 && number <= 5 ? number : 1;
+    return number >= 1 && number <= 5 ? number : 2;
   }
 
   function parseLocation() {
@@ -357,16 +357,7 @@
   function startAmbient() {
     clearAmbient();
     if (reducedMotion.matches || document.hidden) return;
-    if (state.variant === 1) {
-      ambientTimer = window.setInterval(function () {
-        var selector = state.device === 'mobile' ? '.concept-1 .m1-pin' : '.concept-1 .object-pin';
-        var items = Array.prototype.slice.call(document.querySelectorAll(selector));
-        var activeIndex = items.findIndex(function (item) { return item.classList.contains('is-active'); });
-        var next = items[(activeIndex + 1) % items.length];
-        if (!next) return;
-        if (state.device === 'mobile') selectMobileObjectPin(next, true); else selectObjectPin(next, true);
-      }, 5600);
-    } else if (state.variant === 3) {
+    if (state.variant === 3) {
       ambientTimer = window.setInterval(function () {
         var scope = document.querySelector(state.device === 'mobile' ? '.m3-screen[data-map-scope]' : '.v3-desktop[data-map-scope]');
         if (!scope) return;
@@ -374,13 +365,6 @@
         var current = keys.indexOf(scope.dataset.activeZone || 'facade');
         selectZone(scope, keys[(current + 1) % keys.length], true);
       }, 4700);
-    } else if (state.variant === 5 && state.device === 'mobile') {
-      ambientTimer = window.setInterval(function () {
-        var cards = Array.prototype.slice.call(document.querySelectorAll('.concept-5 .m5-card'));
-        var current = cards.findIndex(function (card) { return card.classList.contains('is-active'); });
-        var next = cards[(current + 1) % cards.length];
-        if (next) selectMobileCategory(next, true);
-      }, 4400);
     }
   }
 
@@ -512,12 +496,6 @@
       if (/^[1-5]$/.test(event.key)) {
         event.preventDefault();
         setVariant(Number(event.key), { userInitiated: true });
-      } else if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        stepVariant(1, true);
-      } else if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        stepVariant(-1, true);
       } else if (event.key.toLowerCase() === 'd') {
         setDevice('desktop', { userInitiated: true });
       } else if (event.key.toLowerCase() === 'm') {
@@ -526,19 +504,6 @@
     });
 
     if (stage) {
-      var touchStart = null;
-      stage.addEventListener('pointerdown', function (event) {
-        if (event.pointerType !== 'touch' || event.target.closest('a,button')) return;
-        touchStart = { x: event.clientX, y: event.clientY };
-      }, { passive: true });
-      stage.addEventListener('pointerup', function (event) {
-        if (!touchStart || event.pointerType !== 'touch') return;
-        var deltaX = event.clientX - touchStart.x;
-        var deltaY = event.clientY - touchStart.y;
-        touchStart = null;
-        if (Math.abs(deltaX) < 54 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
-        stepVariant(deltaX < 0 ? 1 : -1, true);
-      }, { passive: true });
       stage.addEventListener('pointermove', function (event) {
         if (event.pointerType === 'touch') return;
         var rect = stage.getBoundingClientRect();
