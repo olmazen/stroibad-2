@@ -12,9 +12,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css?v=egoe55">
-<link rel="stylesheet" href="hero-variants.css?v=2">
+<link rel="stylesheet" href="hero-variants.css?v=4">
 </head>
-<body class="hero-lab-page is-loading" data-device="desktop" data-variant="1">
+<body class="hero-lab-page is-loading" data-device="desktop" data-variant="2">
 <a class="lab-skip" href="#showroom-stage">Перейти к макету</a>
 
 <div class="showroom-ambient" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -26,11 +26,11 @@
   </a>
 
   <nav class="lab-nav" role="tablist" aria-label="Выбрать концепцию первого экрана">
-    <button class="variant-tab is-active" id="variant-tab-1" type="button" role="tab" aria-selected="true" aria-controls="variant-1" data-variant="1"><i>01</i><span>Объект</span></button>
-    <button class="variant-tab" id="variant-tab-2" type="button" role="tab" aria-selected="false" aria-controls="variant-2" data-variant="2"><i>02</i><span>Одна система</span></button>
+    <button class="variant-tab" id="variant-tab-1" type="button" role="tab" aria-selected="false" aria-controls="variant-1" data-variant="1"><i>01</i><span>5 → 1</span></button>
+    <button class="variant-tab is-active" id="variant-tab-2" type="button" role="tab" aria-selected="true" aria-controls="variant-2" data-variant="2"><i>02</i><span>Один завод</span></button>
     <button class="variant-tab" id="variant-tab-3" type="button" role="tab" aria-selected="false" aria-controls="variant-3" data-variant="3"><i>03</i><span>Карта ЖК</span></button>
     <button class="variant-tab" id="variant-tab-4" type="button" role="tab" aria-selected="false" aria-controls="variant-4" data-variant="4"><i>04</i><span>Производство</span></button>
-    <button class="variant-tab" id="variant-tab-5" type="button" role="tab" aria-selected="false" aria-controls="variant-5" data-variant="5"><i>05</i><span>Выбор зоны</span></button>
+    <button class="variant-tab" id="variant-tab-5" type="button" role="tab" aria-selected="false" aria-controls="variant-5" data-variant="5"><i>05</i><span>По чертежам</span></button>
   </nav>
 
   <div class="device-switch" role="group" aria-label="Режим просмотра">
@@ -38,14 +38,13 @@
     <button class="device-button" type="button" data-device-button="mobile" aria-pressed="false" aria-label="Показать mobile-версию"><i class="device-icon device-icon-mobile"></i><span>Mobile</span></button>
   </div>
 
-  <button class="copy-link" type="button" data-copy-link aria-label="Скопировать ссылку на выбранный вариант"><i></i><span>Ссылка</span></button>
 </header>
 
 <main class="showroom" id="showroom">
   <div class="showroom-stage" id="showroom-stage" tabindex="-1">
     <div class="stage-pointer-light" aria-hidden="true"></div>
   <!-- ВАРИАНТ 1 -->
-  <section class="concept concept-1 is-active" id="variant-1" role="tabpanel" aria-labelledby="variant-tab-1" aria-hidden="false" data-variant-panel="1">
+  <section class="concept concept-1" id="variant-1" role="tabpanel" aria-labelledby="variant-tab-1" aria-hidden="true" data-variant-panel="1">
     <div class="concept-meta">
       <div class="concept-no">01</div>
       <div>
@@ -57,61 +56,57 @@
 
     <div class="preview-pair">
       <article class="desktop-preview" aria-label="Десктопная версия варианта 1">
-        <div class="demo-head demo-head-over">
+        <div class="demo-head">
           <a class="demo-logo" href="../"><span class="logo-mark"></span><span><b>EGOE</b><small>СОЗДАЁМ ПРОСТРАНСТВА</small></span></a>
           <nav><a href="../metallokonstrukcii/">Каталог</a><a href="../about/">Производство</a><a href="../projects/">Проекты</a><a href="../contacts/">Контакты</a></nav>
-          <a class="demo-head-cta" href="../contacts/">Расчёт проекта</a>
+          <a class="demo-head-cta" href="../contacts/">Получить смету</a>
         </div>
-        <div class="v1-desktop">
-          <img class="v1-photo" src="../assets/img/hero/facade-jk.webp" alt="Фасад жилого комплекса с корзинами и благоустройством EGOE" fetchpriority="high" decoding="async">
-          <div class="v1-photo-wash"></div>
-          <div class="v1-title">
-            <span class="hero-kicker"><i></i> КОМПЛЕКТАЦИЯ ЖИЛЫХ КОМПЛЕКСОВ</span>
-            <h3>Комплектуем ЖК —<br><em>от фасада до двора</em></h3>
+        <div class="v1-desktop w1-stage">
+          <div class="w1-glow" aria-hidden="true"></div>
+          <div class="w1-mark" aria-hidden="true"><b>5</b><i>→</i><b>1</b></div>
+          <div class="w1-windows" aria-hidden="true">
+            <figure class="w1-window w1-a"><img src="../assets/img/korziny/hero/ac-basket-catalog-wide.webp" alt=""><figcaption><i>01</i><span>КОРЗИНЫ И ЭКРАНЫ</span></figcaption></figure>
+            <figure class="w1-window w1-b"><img src="../assets/img/portfolio/obj-14.webp" alt=""><figcaption><i>02</i><span>ВХОДНЫЕ ГРУППЫ</span></figcaption></figure>
+            <figure class="w1-window w1-c"><img src="../assets/img/portfolio/obj-13.webp" alt=""><figcaption><i>03</i><span>ОГРАЖДЕНИЯ</span></figcaption></figure>
+            <figure class="w1-window w1-d"><img src="../assets/img/portfolio/obj-10.webp" alt=""><figcaption><i>04</i><span>ДВОР И МАФ</span></figcaption></figure>
+            <figure class="w1-window w1-e"><img src="../assets/img/proizvodstvo/zavod/z1.webp" alt=""><figcaption><i>05</i><span>НЕСТАНДАРТ</span></figcaption></figure>
           </div>
-          <button class="object-pin pin-baskets is-active" type="button" data-object-note="Фасадные корзины" data-object-copy="Производим под геометрию фасада, размер блока и выбранный RAL."><i>01</i><span>Фасадные корзины</span></button>
-          <button class="object-pin pin-bench" type="button" data-object-note="Благоустройство" data-object-copy="Скамьи и другие элементы двора сводятся с фасадом в одну визуальную систему."><i>02</i><span>Благоустройство</span></button>
-          <div class="v1-note" aria-live="polite">
-            <span>В СОСТАВЕ ОБЪЕКТА</span>
-            <b data-object-note-title>Фасадные корзины</b>
-            <p data-object-note-copy>Производим под геометрию фасада, размер блока и выбранный RAL.</p>
+          <div class="w1-copy">
+            <span class="hero-kicker"><i></i> ДЛЯ СНАБЖЕНИЯ И КОМПЛЕКТАЦИИ ЖК</span>
+            <h3><span>Пять подрядчиков</span><span>по металлу —</span><em>больше не нужны.</em></h3>
+            <p>EGOE производит фасадные изделия, ограждения, входные группы и МАФ. Снабжению — одна смета, один договор и один график отгрузок.</p>
+            <div class="w1-actions"><a class="lab-primary" href="../contacts/">Получить смету на весь объект</a><a class="lab-link" href="../zastrojshchikam/">Что входит в комплектацию</a></div>
           </div>
-          <div class="v1-actions">
-            <a class="lab-primary" href="../contacts/">Рассчитать объект <span>↗</span></a>
-            <a class="lab-link" href="../projects/">Смотреть проекты</a>
-          </div>
-          <div class="v1-proof"><span>01 · ЕДИНЫЙ RAL</span><span>02 · ОДНА СПЕЦИФИКАЦИЯ</span><span>03 · ПОСТАВКА ПАРТИЯМИ</span></div>
-          <div class="orange-aura aura-one" aria-hidden="true"></div>
+          <div class="w1-proof"><span>1 СМЕТА</span><i></i><span>1 ДОГОВОР</span><i></i><span>ЕДИНЫЙ RAL</span><i></i><span>ПОСТАВКА ПАРТИЯМИ</span></div>
         </div>
       </article>
 
       <article class="phone-preview phone-v1" aria-label="Мобильная версия варианта 1">
-        <div class="phone-screen m1-screen">
-          <img src="../assets/img/hero/facade-jk-sm.webp" alt="Фасад жилого комплекса EGOE" decoding="async">
-          <div class="m1-gradient"></div>
-          <div class="mobile-head mobile-head-clear">
+        <div class="phone-screen m1-screen mw1-screen">
+          <div class="mobile-head">
             <a class="mobile-logo" href="../"><span class="logo-mark"></span><b>EGOE</b></a>
             <a class="mobile-menu" href="../metallokonstrukcii/" aria-label="Открыть каталог"><span></span><span></span></a>
           </div>
-          <div class="m1-copy">
-            <span>ОБЪЕКТ · ФАСАД + ДВОР</span>
-            <h3>Комплектуем ЖК<br><em>как одну систему</em></h3>
+          <div class="mw1-windows" aria-hidden="true">
+            <figure><img src="../assets/img/korziny/hero/ac-basket-catalog-mobile.webp" alt=""><span>ФАСАД</span></figure>
+            <figure><img src="../assets/img/portfolio/obj-14.webp" alt=""><span>ВХОД</span></figure>
+            <figure><img src="../assets/img/portfolio/obj-10.webp" alt=""><span>ДВОР</span></figure>
+            <figure><img src="../assets/img/proizvodstvo/zavod/z1.webp" alt=""><span>ЦЕХ</span></figure>
           </div>
-          <button class="m1-pin m1-pin-a is-active" type="button" data-mobile-object="Корзины под фасад и RAL проекта"><i>01</i></button>
-          <button class="m1-pin m1-pin-b" type="button" data-mobile-object="Благоустройство в общей геометрии"><i>02</i></button>
-          <div class="m1-sheet">
-            <div class="m1-sheet-handle"></div>
-            <span>01 / СОСТАВ ОБЪЕКТА</span>
-            <b data-mobile-object-copy>Корзины под фасад и RAL проекта</b>
-            <a href="../contacts/">Рассчитать похожий объект <i>↗</i></a>
+          <div class="mw1-copy">
+            <span>ВЕСЬ МЕТАЛЛ ЖК · ОДИН ЗАВОД</span>
+            <h3>Пять<br>подрядчиков<br><em>больше не нужны.</em></h3>
+            <p>Фасад, входные группы и двор — в одном договоре и графике поставок.</p>
           </div>
+          <div class="mw1-proof"><span>1 СМЕТА</span><span>ЕДИНЫЙ RAL</span><span>ПО ЭТАПАМ</span></div>
+          <a class="mw1-cta" href="../contacts/">Получить смету <span>↗</span></a>
         </div>
       </article>
     </div>
   </section>
 
   <!-- ВАРИАНТ 2 -->
-  <section class="concept concept-2" id="variant-2" role="tabpanel" aria-labelledby="variant-tab-2" aria-hidden="true" data-variant-panel="2">
+  <section class="concept concept-2 is-active" id="variant-2" role="tabpanel" aria-labelledby="variant-tab-2" aria-hidden="false" data-variant-panel="2">
     <div class="concept-meta">
       <div class="concept-no">02</div>
       <div>
@@ -131,16 +126,17 @@
         <div class="v2-desktop">
           <div class="v2-one" aria-hidden="true">1</div>
           <div class="v2-glow" aria-hidden="true"></div>
-          <div class="v2-kicker"><i></i> КОМПЛЕКТАЦИЯ ЖК МЕТАЛЛОИЗДЕЛИЯМИ <i></i></div>
-          <h3><span>Одна смета.</span><span>Один RAL.</span><em>Один ответственный.</em></h3>
+          <div class="v2-kicker"><i></i> ЗАВОД EGOE · КОМПЛЕКТАЦИЯ ЗАСТРОЙЩИКОВ <i></i></div>
+          <h3><span>Весь металл</span><span>для жилого комплекса —</span><em>с одного завода.</em></h3>
           <div class="v2-film" aria-hidden="true">
             <figure><img src="../assets/img/portfolio/dv-05.webp" alt="" loading="lazy" decoding="async"></figure>
             <figure><img src="../assets/img/portfolio/obj-14.webp" alt="" loading="lazy" decoding="async"></figure>
             <figure><img src="../assets/img/proizvodstvo/zavod/z1.webp" alt="" loading="lazy" decoding="async"></figure>
           </div>
-          <p>Сводим заметные металлоизделия жилого комплекса в единый комплект — от расчёта до отгрузки.</p>
-          <div class="v2-actions"><a class="lab-primary" href="../contacts/">Собрать комплектацию</a><a class="lab-link" href="../zastrojshchikam/">Что входит</a></div>
-          <div class="v2-index"><span>ФАСАД</span><i></i><span>ВХОД</span><i></i><span>ДВОР</span><i></i><span>НЕСТАНДАРТ</span></div>
+          <div class="v2-mini-windows" aria-hidden="true"><figure class="v2-mini-a"><img src="../assets/img/portfolio/obj-13.webp" alt=""><span>ОГРАЖДЕНИЯ</span></figure><figure class="v2-mini-b"><img src="../assets/img/korziny/hero/ac-basket-catalog-wide.webp" alt=""><span>ФАСАД</span></figure></div>
+          <p>Фасадные корзины и экраны, ограждения, входные группы, МАФ и площадки ТКО. Одна смета, единый RAL, отгрузки партиями под график стройки.</p>
+          <div class="v2-actions"><a class="lab-primary" href="../contacts/">Рассчитать комплектацию ЖК</a><a class="lab-link" href="../projects/">Посмотреть объекты</a></div>
+          <div class="v2-index"><span>С 2012 ГОДА</span><i></i><span>800+ ОБЪЕКТОВ</span><i></i><span>3 200 М² ПРОИЗВОДСТВА</span><i></i><span>44-ФЗ · НДС</span></div>
         </div>
       </article>
 
@@ -153,14 +149,14 @@
           <div class="m2-one" aria-hidden="true">1</div>
           <div class="m2-orbit orbit-a">ОДНА СМЕТА</div>
           <div class="m2-orbit orbit-b">ЕДИНЫЙ RAL</div>
-          <div class="m2-orbit orbit-c">ОДИН ГРАФИК</div>
+          <div class="m2-orbit orbit-c">ПОСТАВКА ПО ЭТАПАМ</div>
           <div class="m2-copy">
-            <span>КОМПЛЕКТАЦИЯ ЖК</span>
-            <h3>Один<br><em>ответственный</em></h3>
-            <p>Фасад, входные зоны и двор в одном комплекте.</p>
+            <span>ЗАВОД EGOE · ДЛЯ ЗАСТРОЙЩИКОВ</span>
+            <h3>Весь металл<br>для ЖК —<br><em>с одного завода.</em></h3>
+            <p>Фасад, вход и двор — одна смета, единый RAL, поставка по этапам.</p>
           </div>
-          <div class="m2-film"><img src="../assets/img/portfolio/obj-14.webp" alt="Реализованный объект EGOE" loading="lazy" decoding="async"><img src="../assets/img/portfolio/dv-05.webp" alt="Фасадные изделия EGOE" loading="lazy" decoding="async"></div>
-          <a class="m2-cta" href="../contacts/">Собрать комплектацию <span>↗</span></a>
+          <div class="m2-film"><img src="../assets/img/portfolio/obj-14.webp" alt="Реализованный объект EGOE" loading="lazy" decoding="async"><img src="../assets/img/portfolio/dv-05.webp" alt="Фасадные изделия EGOE" loading="lazy" decoding="async"><img src="../assets/img/proizvodstvo/zavod/z1.webp" alt="Производство EGOE" loading="lazy" decoding="async"></div>
+          <a class="m2-cta" href="../contacts/">Рассчитать комплектацию <span>↗</span></a>
         </div>
       </article>
     </div>
@@ -179,7 +175,7 @@
 
     <div class="preview-pair">
       <article class="desktop-preview" aria-label="Десктопная версия варианта 3">
-        <div class="demo-head demo-head-over">
+        <div class="demo-head">
           <a class="demo-logo" href="../"><span class="logo-mark"></span><span><b>EGOE</b><small>СОЗДАЁМ ПРОСТРАНСТВА</small></span></a>
           <nav><a href="../metallokonstrukcii/">Каталог</a><a href="../projects/">Проекты</a><a href="../about/">Производство</a><a href="../contacts/">Контакты</a></nav>
           <a class="demo-head-cta" href="../contacts/">Расчёт проекта</a>
@@ -311,82 +307,56 @@
         <div class="demo-head demo-head-over">
           <a class="demo-logo" href="../"><span class="logo-mark"></span><span><b>EGOE</b><small>СОЗДАЁМ ПРОСТРАНСТВА</small></span></a>
           <nav><a href="../metallokonstrukcii/">Каталог</a><a href="../zastrojshchikam/">Решения</a><a href="../projects/">Проекты</a><a href="../contacts/">Контакты</a></nav>
-          <a class="demo-head-cta" href="../contacts/">Обсудить объект</a>
+          <a class="demo-head-cta" href="../contacts/">Рассчитать по чертежам</a>
         </div>
-        <div class="v5-desktop">
-          <div class="v5-title"><span><i></i> ВЫБЕРИТЕ ЗОНУ ОБЪЕКТА</span><h3>С чего начинается<br><em>ваша комплектация?</em></h3></div>
-          <div class="v5-grid">
-            <a class="v5-tile tile-facade" href="../metallokonstrukcii/korziny-dlya-konditsionerov/">
-              <img src="../assets/img/korziny/hero/ac-basket-catalog-wide.webp" alt="Фасадные корзины EGOE" loading="lazy" decoding="async">
-              <span class="v5-num">01</span><div><b>Фасад</b><p>Корзины и экраны</p><i>↗</i></div>
-            </a>
-            <a class="v5-tile tile-entry" href="../metallokonstrukcii/pochtovye-yashchiki/">
-              <img src="../assets/img/portfolio/obj-14.webp" alt="Входная зона жилого комплекса" loading="lazy" decoding="async">
-              <span class="v5-num">02</span><div><b>Вход</b><p>Ящики и ограждения</p><i>↗</i></div>
-            </a>
-            <a class="v5-tile tile-yard" href="../maf/">
-              <img src="../assets/img/portfolio/obj-10.webp" alt="Благоустроенный двор жилого комплекса" loading="lazy" decoding="async">
-              <span class="v5-num">03</span><div><b>Двор</b><p>МАФ и навесы</p><i>↗</i></div>
-            </a>
-            <a class="v5-tile tile-custom" href="../metallokonstrukcii/">
-              <img src="../assets/img/proizvodstvo/zavod/z1.webp" alt="Нестандартное производство металлоизделий" loading="lazy" decoding="async">
-              <span class="v5-num">04</span><div><b>Нестандарт</b><p>Изготовление по чертежам</p><i>↗</i></div>
-            </a>
+        <div class="v5-desktop w5-stage">
+          <div class="w5-glow" aria-hidden="true"></div>
+          <div class="w5-blueprint" aria-hidden="true">КМД</div>
+          <div class="w5-windows" aria-hidden="true">
+            <figure class="w5-window w5-a"><img src="../assets/img/proizvodstvo/metal.webp" alt=""><figcaption><i>01</i><span>ЛАЗЕРНАЯ РЕЗКА</span></figcaption></figure>
+            <figure class="w5-window w5-b"><img src="../assets/img/proizvodstvo/zavod/z1.webp" alt=""><figcaption><i>02</i><span>СВАРКА</span></figcaption></figure>
+            <figure class="w5-window w5-c"><img src="../assets/img/proizvodstvo/zavod/z4.webp" alt=""><figcaption><i>03</i><span>ОКРАСКА RAL</span></figcaption></figure>
+            <figure class="w5-window w5-d"><img src="../assets/img/proizvodstvo/wood.webp" alt=""><figcaption><i>04</i><span>СВОЙ ЦЕХ ДЕРЕВА</span></figcaption></figure>
+            <figure class="w5-window w5-e"><img src="../assets/img/portfolio/obj-13.webp" alt=""><figcaption><i>05</i><span>ГОТОВЫЙ ОБЪЕКТ</span></figcaption></figure>
           </div>
-          <div class="v5-core"><span class="logo-mark"></span><b>EGOE</b><small>ОДИН КОМПЛЕКТ</small></div>
-          <div class="v5-glow" aria-hidden="true"></div>
+          <div class="w5-copy">
+            <span class="hero-kicker"><i></i> СЕРИИ И НЕСТАНДАРТ ДЛЯ ЖК</span>
+            <h3><span>Не подгоняйте проект</span><span>под готовые размеры.</span><em>Изготовим по чертежам.</em></h3>
+            <p>Проектные размеры, рисунок, цвет RAL, закладные и крепёж согласуем под объект. Металл и дерево обрабатываем в собственных цехах EGOE.</p>
+            <div class="w5-actions"><a class="lab-primary" href="../contacts/">Рассчитать по чертежам</a><a class="lab-link" href="../about/">Посмотреть производство</a></div>
+          </div>
+          <div class="w5-proof"><span>ЛАЗЕР ДО 20 ММ</span><i></i><span>ГИБКА ЧПУ ДО 3 М</span><i></i><span>ПОРОШКОВАЯ ОКРАСКА RAL</span><i></i><span>СВОЙ ЦЕХ ДЕРЕВА</span></div>
         </div>
       </article>
 
       <article class="phone-preview phone-v5" aria-label="Мобильная версия варианта 5">
-        <div class="phone-screen m5-screen">
+        <div class="phone-screen m5-screen mw5-screen">
           <div class="mobile-head">
             <a class="mobile-logo" href="../"><span class="logo-mark"></span><b>EGOE</b></a>
-            <span class="m5-counter">01 / 04</span>
+            <a class="mobile-menu" href="../metallokonstrukcii/" aria-label="Открыть каталог"><span></span><span></span></a>
           </div>
-          <div class="m5-title"><span>НАЧНИТЕ С ЗОНЫ</span><h3>Что нужно<br><em>для объекта?</em></h3></div>
-          <div class="m5-deck" data-category-deck>
-            <a class="m5-card is-active" href="../metallokonstrukcii/korziny-dlya-konditsionerov/" data-category-card>
-              <img src="../assets/img/korziny/hero/ac-basket-catalog-mobile.webp" alt="Фасадные корзины" loading="lazy" decoding="async">
-              <span>01</span><div><b>Фасад</b><small>Корзины и экраны</small></div><i>↗</i>
-            </a>
-            <a class="m5-card" href="../metallokonstrukcii/pochtovye-yashchiki/" data-category-card>
-              <img src="../assets/img/portfolio/obj-14.webp" alt="Входная зона" loading="lazy" decoding="async">
-              <span>02</span><div><b>Вход</b><small>Ящики и ограждения</small></div><i>↗</i>
-            </a>
-            <a class="m5-card" href="../maf/" data-category-card>
-              <img src="../assets/img/portfolio/obj-10.webp" alt="Благоустройство двора" loading="lazy" decoding="async">
-              <span>03</span><div><b>Двор</b><small>МАФ и навесы</small></div><i>↗</i>
-            </a>
-            <a class="m5-card" href="../metallokonstrukcii/" data-category-card>
-              <img src="../assets/img/proizvodstvo/zavod/z1.webp" alt="Производство по чертежам" loading="lazy" decoding="async">
-              <span>04</span><div><b>Нестандарт</b><small>По вашим чертежам</small></div><i>↗</i>
-            </a>
+          <div class="mw5-copy">
+            <span>СЕРИИ И НЕСТАНДАРТ · EGOE</span>
+            <h3>Не подгоняйте<br>проект под<br><em>готовые размеры.</em></h3>
+            <p>Изготовим металлоизделия по чертежам — в проектном RAL и собственных цехах.</p>
           </div>
-          <p class="m5-hint">Нажмите на карточку, чтобы раскрыть направление</p>
+          <div class="mw5-windows" aria-hidden="true">
+            <figure><img src="../assets/img/proizvodstvo/metal.webp" alt=""><span>01 · ЛАЗЕР</span></figure>
+            <figure><img src="../assets/img/proizvodstvo/zavod/z1.webp" alt=""><span>02 · СВАРКА</span></figure>
+            <figure><img src="../assets/img/proizvodstvo/zavod/z4.webp" alt=""><span>03 · RAL</span></figure>
+            <figure><img src="../assets/img/proizvodstvo/wood.webp" alt=""><span>04 · ДЕРЕВО</span></figure>
+          </div>
+          <div class="mw5-proof"><span>20 ММ</span><span>ЧПУ 3 М</span><span>СВОИ ЦЕХА</span></div>
+          <a class="mw5-cta" href="../contacts/">Рассчитать по чертежам <span>↗</span></a>
         </div>
       </article>
     </div>
   </section>
   </div>
 
-  <button class="stage-arrow stage-arrow-prev" type="button" data-step="-1" aria-label="Предыдущая концепция"><i></i></button>
-  <button class="stage-arrow stage-arrow-next" type="button" data-step="1" aria-label="Следующая концепция"><i></i></button>
-
-  <footer class="showroom-caption" aria-label="Описание выбранной концепции">
-    <div class="caption-index"><b data-caption-number>01</b><i></i><span>05</span></div>
-    <div class="caption-title">
-      <span data-caption-kicker>ОБЪЕКТ КАК ДОКАЗАТЕЛЬСТВО</span>
-      <strong data-caption-title>Живой объект + подписи к изделиям</strong>
-    </div>
-    <p data-caption-description>Фото становится интерфейсом: световые метки показывают изделия EGOE прямо в архитектуре объекта.</p>
-    <div class="caption-shortcuts" aria-hidden="true"><span><kbd>←</kbd><kbd>→</kbd> варианты</span><span><kbd>D</kbd><kbd>M</kbd> режим</span></div>
-    <div class="caption-progress" aria-hidden="true"><i></i></div>
-  </footer>
-
   <div class="sr-live" aria-live="polite" aria-atomic="true"></div>
 </main>
 
-<script src="hero-variants.js?v=2"></script>
+<script src="hero-variants.js?v=4"></script>
 </body>
 </html>
