@@ -556,7 +556,7 @@ body.gallery-lock{overflow:hidden}
 .gallery-lightbox__close{position:absolute;right:24px;top:20px;width:44px;height:44px;font-size:26px;line-height:1;z-index:2}
 .gallery-lightbox__btn:hover,.gallery-lightbox__close:hover{background:var(--amber);border-color:var(--amber)}
 .gallery-lightbox__btn:active,.gallery-lightbox__close:active{transform:translateY(1px)}
-.pp-info h1{font-size:30px;margin-bottom:6px}
+.pp-title{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;line-height:1.08;color:#fff;font-size:30px;margin-bottom:6px}
 .pp-art{color:var(--steel);font-size:13px;margin-bottom:18px;letter-spacing:.04em}
 .pp-price{display:flex;align-items:baseline;gap:14px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0;margin-bottom:22px}
 .pp-price .big{font-family:'Oswald',sans-serif;font-weight:700;font-size:34px;color:#fff}
@@ -636,15 +636,6 @@ footer{background:#0A0C0F;color:#9AA0A7;padding:0 0 26px}
 .foot-msgr a{border:1px solid var(--line-2);padding:7px 13px;border-radius:var(--r);font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em;transition:border-color .2s,color .2s,transform .2s}
 .foot-msgr a:hover{border-color:var(--amber);color:var(--amber-h);transform:translateY(-2px)}
 .foot-bot{display:flex;justify-content:space-between;padding-top:22px;font-size:13px;flex-wrap:wrap;gap:12px;color:#6E757C}
-
-/* ============ модалка ============ */
-.modal-wrap{position:fixed;inset:0;background:rgba(5,7,9,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-wrap.on{display:flex}
-.modal{background:var(--srf);max-width:520px;width:100%;border-radius:var(--r);max-height:90vh;overflow:auto;border:1px solid var(--line-2);box-shadow:0 40px 100px rgba(0,0,0,.7);animation:modalIn .3s cubic-bezier(.2,.9,.3,1.2)}
-@keyframes modalIn{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}
-.modal .formpanel{border-radius:0;border:none}
-.modal-x{position:absolute;top:14px;right:16px;color:#fff;font-size:26px;cursor:pointer;z-index:5;line-height:1;transition:transform .25s,color .2s}
-.modal-x:hover{transform:rotate(90deg);color:var(--amber)}
 
 /* ============ производство: кейс и основатель ============ */
 .tile-cap{font-family:'Oswald',sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
@@ -740,7 +731,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
   .container{padding:0 18px}
   /* карточка товара компактнее: без дублей заголовка/бейджа/артикула (они уже в .page-head), цена в столбик */
   .prodpage{gap:20px}
-  .pp-info>.ad-badge,.pp-info>h1,.pp-info>.pp-art{display:none}
+  .pp-info>.ad-badge,.pp-info>.pp-title,.pp-info>.pp-art{display:none}
   .pp-price{flex-direction:column;align-items:flex-start;gap:5px;padding:14px 0;margin-bottom:16px}
   .pp-price .note{font-size:12.5px}
   .opt-row{margin-bottom:14px}
@@ -1921,21 +1912,6 @@ html[data-lite] .scroll-progress{display:none!important}
 html[data-lite] [class*="parallax"],html[data-lite] [data-parallax]{transform:none!important;background-attachment:scroll!important}
 html[data-lite] .reveal{opacity:1!important;transform:none!important}
 
-/* плашка «включена лёгкая версия» */
-.lite-bar{position:fixed;left:0;right:0;bottom:0;z-index:460;display:flex;align-items:center;gap:10px;
-  padding:10px 14px;background:rgba(15,18,23,.98);border-top:1px solid var(--amber);
-  transform:translateY(120%);transition:transform .4s cubic-bezier(.22,.85,.25,1);font-size:13px;color:var(--tx)}
-.lite-bar.on{transform:translateY(0)}
-.lite-bar .lite-ic{flex:0 0 auto;width:8px;height:8px;border-radius:50%;background:var(--amber)}
-.lite-bar .lite-tx{flex:1 1 auto;line-height:1.35}
-.lite-bar .lite-back{flex:0 0 auto;background:var(--amber);color:#0E1114;border:0;border-radius:2px;
-  font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:11px;letter-spacing:.06em;padding:8px 12px;cursor:pointer}
-.lite-bar .lite-x{flex:0 0 auto;background:none;border:0;color:var(--steel);font-size:20px;line-height:1;cursor:pointer;padding:0 4px}
-.lite-toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);z-index:470;
-  background:rgba(15,18,23,.98);border:1px solid var(--line-2);border-radius:8px;padding:10px 16px;
-  font-size:13px;color:var(--tx);opacity:0;transition:opacity .35s,transform .35s;max-width:90vw;text-align:center}
-.lite-toast.on{opacity:1;transform:translate(-50%,0)}
-
 /* колесо заказа в lite → простой список шагов «полоской» (JS строит .fw-lite-steps) */
 #flowWheel.fw-lite{min-height:0!important}
 #flowWheel.fw-lite .fw-head{position:static!important;transform:none!important;opacity:1!important}
@@ -1999,3 +1975,75 @@ body .ad-dimrow li:first-child .v{color:var(--gold-h,#E7C877);font-size:18px}
 .ph.has-img:not(.kz-swap).loaded img{opacity:1}
 .ph.has-img.loaded{animation:none}
 @media(prefers-reduced-motion:reduce){.ph.has-img:not(.kz-swap):not(.loaded){animation:none}.ph.has-img:not(.kz-swap) img{transition:opacity .2s ease}}
+
+/* ============ общий каталог ============ */
+.catalog-page .catalog-hero{min-height:560px}
+.catalog-page .catalog-hero .shero-bg img{object-position:center 44%;filter:brightness(1.08)}
+.catalog-page .catalog-hero::after{background:linear-gradient(90deg,rgba(10,13,16,.98) 0%,rgba(10,13,16,.88) 38%,rgba(10,13,16,.45) 72%,rgba(10,13,16,.22) 100%)}
+.catalog-section{padding:88px 0}
+.catalog-section-alt{background:#0A0D10;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.catalog-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:34px}
+.catalog-section-head .sec-num{display:block;margin-bottom:12px}
+.catalog-section-head .eyebrow{margin-bottom:12px}
+.catalog-section-head h2{font-size:clamp(30px,4vw,48px);line-height:1.05}
+.catalog-all{flex:0 0 auto;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--amber);padding:10px 0;border-bottom:1px solid rgba(242,111,29,.45);transition:color .2s,border-color .2s}
+.catalog-all:hover{color:var(--amber-h);border-color:var(--amber)}
+.catalog-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+.catalog-card{grid-column:span 2}
+.catalog-card .ph{aspect-ratio:4/3}
+.catalog-card .ph.has-img img{filter:brightness(1.04)}
+.catalog-card .ph.has-img .ph-label{padding-top:58px}
+.catalog-chip{position:absolute;top:14px;left:14px;z-index:4;background:rgba(10,13,16,.82);border:1px solid rgba(255,255,255,.24);color:#fff;padding:6px 9px;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.09em;text-transform:uppercase;box-shadow:0 6px 18px rgba(0,0,0,.32)}
+.catalog-placeholder{background-color:#10151A;background-image:linear-gradient(rgba(242,111,29,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(242,111,29,.07) 1px,transparent 1px);background-size:24px 24px;align-items:center;justify-content:center}
+.catalog-placeholder::before,.catalog-placeholder::after{border-color:rgba(242,111,29,.45)}
+.catalog-motif{width:44%;max-height:58%;fill:none;stroke:#B9C0C7;stroke-width:2;vector-effect:non-scaling-stroke;opacity:.8;transition:transform .45s,opacity .45s}
+.catalog-motif .accent{stroke:var(--amber)}
+.catalog-motif-wide{width:55%}
+.catalog-card:hover .catalog-motif{transform:translateY(-4px) scale(1.035);opacity:1}
+.catalog-placeholder .ph-label{position:absolute;left:0;right:0;bottom:0;width:100%;color:#fff;text-align:left;padding:42px 16px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.7))}
+.catalog-card-wide{grid-column:1/-1;display:grid;grid-template-columns:minmax(280px,.82fr) minmax(0,1.18fr)}
+.catalog-card-wide .ph{aspect-ratio:16/10;border-right:1px solid var(--line);border-bottom:0}
+.catalog-card-wide .dir-body{justify-content:center;padding:clamp(28px,4vw,54px)}
+.catalog-card-wide .dir-body h3{font-size:clamp(25px,3vw,38px)}
+.catalog-card-half{grid-column:span 3}
+.catalog-custom{padding:72px 0 92px}
+.catalog-custom-panel{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.55fr);align-items:center;gap:48px;padding:clamp(32px,5vw,68px);border:1px solid rgba(242,111,29,.36);background:radial-gradient(650px 360px at 92% 12%,rgba(242,111,29,.14),transparent 62%),#11161B;position:relative;overflow:hidden}
+.catalog-custom-panel::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.catalog-custom-panel>*{position:relative;z-index:1}
+.catalog-custom-panel .sec-num{display:block;margin-bottom:14px}
+.catalog-custom-panel .eyebrow{margin-bottom:12px}
+.catalog-custom-panel h2{font-size:clamp(30px,4vw,50px);line-height:1.05;margin-bottom:18px;color:#fff}
+.catalog-custom-panel h2 em{font-style:normal;color:var(--amber)}
+.catalog-custom-panel p{max-width:680px;color:var(--tx2);font-size:17px;line-height:1.6}
+.catalog-custom-actions{display:flex;flex-direction:column;gap:12px}
+.catalog-custom-actions .btn{width:100%;text-align:center;justify-content:center}
+
+/* МАФ: слегка высветляем только фото, не подписи и затемняющие слои поверх них. */
+.maf-page main .ph.has-img:not(.contain) img,
+.maf-page main .shero-bg img,
+.maf-page main .dir-rv img,
+.maf-page main .kz-stage-img,
+.maf-page main .ad-feat-frame img{filter:brightness(1.07)}
+
+@media(max-width:980px){
+  .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .catalog-card,.catalog-card-half{grid-column:auto}
+  .catalog-card-wide{grid-column:1/-1}
+  .catalog-custom-panel{grid-template-columns:1fr}
+  .catalog-custom-actions{max-width:420px;display:grid;grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .catalog-page .catalog-hero{min-height:0}
+  .catalog-page .catalog-hero .shero-bg img{object-position:61% center}
+  .catalog-page .catalog-hero::after{background:linear-gradient(90deg,rgba(10,13,16,.97) 0%,rgba(10,13,16,.84) 72%,rgba(10,13,16,.54) 100%)}
+  .catalog-section{padding:62px 0}
+  .catalog-section-head{align-items:flex-start;flex-direction:column;gap:16px;margin-bottom:26px}
+  .catalog-grid{grid-template-columns:1fr}
+  .catalog-card,.catalog-card-half,.catalog-card-wide{grid-column:auto}
+  .catalog-card-wide{display:flex}
+  .catalog-card-wide .ph{aspect-ratio:16/10;border-right:0;border-bottom:1px solid var(--line)}
+  .catalog-card .ph{aspect-ratio:16/10}
+  .catalog-custom{padding:52px 0 72px}
+  .catalog-custom-panel{gap:28px;padding:30px 24px}
+  .catalog-custom-actions{display:flex;max-width:none;width:100%}
+}

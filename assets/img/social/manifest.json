@@ -1,0 +1,2728 @@
+{
+  "previewStyle": {
+    "product": 267,
+    "branded": 34
+  },
+  "fallbackProducts": [
+    "https://www.egoe-life.ru/maf/parkovochnye-stolbiki/betoniruemyj/",
+    "https://www.egoe-life.ru/maf/parkovochnye-stolbiki/s-cepyu/",
+    "https://www.egoe-life.ru/maf/parkovochnye-stolbiki/semnyj/",
+    "https://www.egoe-life.ru/maf/parkovochnye-stolbiki/so-svetootrazhatelem/",
+    "https://www.egoe-life.ru/metallokonstrukcii/pochtovye-yashchiki/pochtovyj-yaschik/",
+    "https://www.egoe-life.ru/metallokonstrukcii/pochtovye-yashchiki/postamat/",
+    "https://www.egoe-life.ru/ograzhdeniya/ds-112/",
+    "https://www.egoe-life.ru/ograzhdeniya/ds-16/",
+    "https://www.egoe-life.ru/ograzhdeniya/ds-64/"
+  ],
+  "previews": [
+    {
+      "canonical": "https://www.egoe-life.ru/44-fz/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/44-fz.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/about/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/proizvodstvo/hero-crane-sm.webp",
+      "output": "assets/img/social/pages/about.jpg",
+      "bytes": 155277
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/catalog/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/maf-collection-2000.webp",
+      "output": "assets/img/social/pages/catalog.jpg",
+      "bytes": 131641
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/contacts/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/contacts.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/dostavka/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/dostavka.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/home.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/reveal/skamejki-dark.webp",
+      "output": "assets/img/social/pages/maf.jpg",
+      "bytes": 63943
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/kacheli/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/kacheli/12189/thumb.webp",
+      "output": "assets/img/social/pages/maf--kacheli.jpg",
+      "bytes": 155825
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/kacheli/kacheli-bulvar/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/kacheli/12202/white.webp",
+      "output": "assets/img/social/products/maf--kacheli--kacheli-bulvar.jpg",
+      "bytes": 31752
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/kacheli/kacheli-miass-raund/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/kacheli/30279/white.webp",
+      "output": "assets/img/social/products/maf--kacheli--kacheli-miass-raund.jpg",
+      "bytes": 47781
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/kacheli/kacheli-oazis/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/kacheli/39606/white.webp",
+      "output": "assets/img/social/products/maf--kacheli--kacheli-oazis.jpg",
+      "bytes": 36176
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/kacheli/kacheli-oazis-tip-7/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/kacheli/55644/white.webp",
+      "output": "assets/img/social/products/maf--kacheli--kacheli-oazis-tip-7.jpg",
+      "bytes": 45735
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/kacheli/kacheli-siti/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/kacheli/12189/white.webp",
+      "output": "assets/img/social/products/maf--kacheli--kacheli-siti.jpg",
+      "bytes": 65734
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/kacheli/kacheli-tandem/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/kacheli/61962/white.webp",
+      "output": "assets/img/social/products/maf--kacheli--kacheli-tandem.jpg",
+      "bytes": 42771
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/artdeco-a1-2651/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/lezhaki/a1-2651/hero.webp",
+      "output": "assets/img/social/products/maf--lezhaki--artdeco-a1-2651.jpg",
+      "bytes": 55384
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/artdeco-a1-2661/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/lezhaki/a1-2661/hero.webp",
+      "output": "assets/img/social/products/maf--lezhaki--artdeco-a1-2661.jpg",
+      "bytes": 51685
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/artdeco-a1-4651/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/lezhaki/a1-4651/hero.webp",
+      "output": "assets/img/social/products/maf--lezhaki--artdeco-a1-4651.jpg",
+      "bytes": 39188
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/artdeco-a1-4661/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/lezhaki/a1-4661/hero.webp",
+      "output": "assets/img/social/products/maf--lezhaki--artdeco-a1-4661.jpg",
+      "bytes": 46154
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/artdeco-i1-3451/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/lezhaki/i1-3451/hero.webp",
+      "output": "assets/img/social/products/maf--lezhaki--artdeco-i1-3451.jpg",
+      "bytes": 51656
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/artdeco-i1-3481-10/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/lezhaki/i1-3481-10/hero.webp",
+      "output": "assets/img/social/products/maf--lezhaki--artdeco-i1-3481-10.jpg",
+      "bytes": 54160
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/artdeco-i1-3561/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/lezhaki/i1-3561/hero.webp",
+      "output": "assets/img/social/products/maf--lezhaki--artdeco-i1-3561.jpg",
+      "bytes": 46886
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/artdeco-i1-3651/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/lezhaki/i1-3651/hero.webp",
+      "output": "assets/img/social/products/maf--lezhaki--artdeco-i1-3651.jpg",
+      "bytes": 43419
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/9977/thumb.webp",
+      "output": "assets/img/social/pages/maf--lezhaki.jpg",
+      "bytes": 130028
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/lezhak-delta/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/11484/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--lezhak-delta.jpg",
+      "bytes": 64352
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/lezhak-gorodskoy/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/11061/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--lezhak-gorodskoy.jpg",
+      "bytes": 35338
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/lezhak-gorodskoy-so-stolikom/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/40281/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--lezhak-gorodskoy-so-stolikom.jpg",
+      "bytes": 34791
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-1/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/9977/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-1.jpg",
+      "bytes": 23843
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-2/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/9978/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-2.jpg",
+      "bytes": 36161
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-3/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/9979/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-3.jpg",
+      "bytes": 29238
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-4/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/9980/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-4.jpg",
+      "bytes": 46423
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-7/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/10001/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-7.jpg",
+      "bytes": 41075
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-8/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/12411/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-8.jpg",
+      "bytes": 29758
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-9/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/13783/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-9.jpg",
+      "bytes": 38612
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-aristotel/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/21893/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-aristotel.jpg",
+      "bytes": 42622
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-nyuton/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/11670/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-nyuton.jpg",
+      "bytes": 29610
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-stalnoy-rastrum/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/16645/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-stalnoy-rastrum.jpg",
+      "bytes": 25765
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-lezhak-volna/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/9981/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-lezhak-volna.jpg",
+      "bytes": 28435
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/parkovyy-shezlong-rakushka/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/12159/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--parkovyy-shezlong-rakushka.jpg",
+      "bytes": 39601
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/plyazhnaya-razdevalka-komfort/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/11837/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--plyazhnaya-razdevalka-komfort.jpg",
+      "bytes": 48670
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/shezlong-parabola/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/20879/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--shezlong-parabola.jpg",
+      "bytes": 38082
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/shezlong-plyazh/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/66849/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--shezlong-plyazh.jpg",
+      "bytes": 40556
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/lezhaki/shezlong-vulkan/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/lezhaki/13983/white.webp",
+      "output": "assets/img/social/products/maf--lezhaki--shezlong-vulkan.jpg",
+      "bytes": 22341
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/parkovochnye-stolbiki/betoniruemyj/",
+      "kind": "product",
+      "previewStyle": "branded",
+      "fallbackProduct": true,
+      "source": "assets/img/catalog/categories/parkovochnye-stolbiki-1448.webp",
+      "output": "assets/img/social/products/maf--parkovochnye-stolbiki--betoniruemyj.jpg",
+      "bytes": 120380
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/parkovochnye-stolbiki/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/maf--parkovochnye-stolbiki.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/parkovochnye-stolbiki/s-cepyu/",
+      "kind": "product",
+      "previewStyle": "branded",
+      "fallbackProduct": true,
+      "source": "assets/img/catalog/categories/parkovochnye-stolbiki-1448.webp",
+      "output": "assets/img/social/products/maf--parkovochnye-stolbiki--s-cepyu.jpg",
+      "bytes": 120380
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/parkovochnye-stolbiki/semnyj/",
+      "kind": "product",
+      "previewStyle": "branded",
+      "fallbackProduct": true,
+      "source": "assets/img/catalog/categories/parkovochnye-stolbiki-1448.webp",
+      "output": "assets/img/social/products/maf--parkovochnye-stolbiki--semnyj.jpg",
+      "bytes": 120380
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/parkovochnye-stolbiki/so-svetootrazhatelem/",
+      "kind": "product",
+      "previewStyle": "branded",
+      "fallbackProduct": true,
+      "source": "assets/img/catalog/categories/parkovochnye-stolbiki-1448.webp",
+      "output": "assets/img/social/products/maf--parkovochnye-stolbiki--so-svetootrazhatelem.jpg",
+      "bytes": 120380
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/pavilony-i-navesy/besedka-atmosfera/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/pavilony-i-navesy/14663/white.webp",
+      "output": "assets/img/social/products/maf--pavilony-i-navesy--besedka-atmosfera.jpg",
+      "bytes": 34955
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/pavilony-i-navesy/besedka-listopad/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/pavilony-i-navesy/14898/white.webp",
+      "output": "assets/img/social/products/maf--pavilony-i-navesy--besedka-listopad.jpg",
+      "bytes": 57188
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/pavilony-i-navesy/besedka-tetatet/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/pavilony-i-navesy/20172/white.webp",
+      "output": "assets/img/social/products/maf--pavilony-i-navesy--besedka-tetatet.jpg",
+      "bytes": 39238
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/pavilony-i-navesy/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/pavilony-i-navesy/14663/thumb.webp",
+      "output": "assets/img/social/pages/maf--pavilony-i-navesy.jpg",
+      "bytes": 98670
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/pavilony-i-navesy/skameyka-s-navesom-filigran-volna/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/pavilony-i-navesy/14847/white.webp",
+      "output": "assets/img/social/products/maf--pavilony-i-navesy--skameyka-s-navesom-filigran-volna.jpg",
+      "bytes": 86380
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-a1-101/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/a1-101/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-a1-101.jpg",
+      "bytes": 38264
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-a1-106/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/a1-106/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-a1-106.jpg",
+      "bytes": 57325
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-a1-126/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/a1-126/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-a1-126.jpg",
+      "bytes": 43417
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-a1-251/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/a1-251/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-a1-251.jpg",
+      "bytes": 58681
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-a1-306/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/a1-306/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-a1-306.jpg",
+      "bytes": 51364
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-a4-1601/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/a4-1601/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-a4-1601.jpg",
+      "bytes": 43377
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-a4-2641/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/a4-2641/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-a4-2641.jpg",
+      "bytes": 52241
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-a4-2651/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/a4-2651/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-a4-2651.jpg",
+      "bytes": 64916
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-a5-101/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/a5-101/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-a5-101.jpg",
+      "bytes": 37573
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-e1-101/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/e1-101/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-e1-101.jpg",
+      "bytes": 32075
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-e1-321/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/e1-321/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-e1-321.jpg",
+      "bytes": 20808
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-e2-151/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/e2-151/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-e2-151.jpg",
+      "bytes": 30898
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-e2-210/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/e2-210/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-e2-210.jpg",
+      "bytes": 29804
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-e2-351/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/e2-351/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-e2-351.jpg",
+      "bytes": 35068
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-e3-311/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/e3-311/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-e3-311.jpg",
+      "bytes": 39195
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-i1-101/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/i1-101/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-i1-101.jpg",
+      "bytes": 38142
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-i1-106/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/i1-106/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-i1-106.jpg",
+      "bytes": 46990
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-i1-126/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/i1-126/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-i1-126.jpg",
+      "bytes": 37758
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-i1-306/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/i1-306/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-i1-306.jpg",
+      "bytes": 48055
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-i1-351/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/i1-351/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-i1-351.jpg",
+      "bytes": 45970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-i1-356/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/i1-356/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-i1-356.jpg",
+      "bytes": 54991
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-i1-3850/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/i1-3850/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-i1-3850.jpg",
+      "bytes": 37062
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-i1-601/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/i1-601/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-i1-601.jpg",
+      "bytes": 43238
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-i2-301/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/i2-301/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-i2-301.jpg",
+      "bytes": 48569
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-o1-1601/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/o1-1601/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-o1-1601.jpg",
+      "bytes": 43029
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-o1-1611/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/o1-1611/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-o1-1611.jpg",
+      "bytes": 42181
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-o1-1621/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/o1-1621/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-o1-1621.jpg",
+      "bytes": 33157
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-o1-2601/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/o1-2601/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-o1-2601.jpg",
+      "bytes": 49683
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-o1-2621/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/o1-2621/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-o1-2621.jpg",
+      "bytes": 34664
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-o1-3221/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/o1-3221/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-o1-3221.jpg",
+      "bytes": 35468
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-o1-3621/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/o1-3621/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-o1-3621.jpg",
+      "bytes": 31983
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-o1-3631/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/o1-3631/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-o1-3631.jpg",
+      "bytes": 28903
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u1-150/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u1-150/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u1-150.jpg",
+      "bytes": 36314
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u1-151/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u1-151/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u1-151.jpg",
+      "bytes": 33668
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u1-153/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u1-153/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u1-153.jpg",
+      "bytes": 26182
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u1-190/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u1-190/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u1-190.jpg",
+      "bytes": 35548
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u1-191/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u1-191/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u1-191.jpg",
+      "bytes": 38737
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u1-193/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u1-193/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u1-193.jpg",
+      "bytes": 31571
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u1-350/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u1-350/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u1-350.jpg",
+      "bytes": 41929
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u1-351/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u1-351/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u1-351.jpg",
+      "bytes": 41274
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u1-390/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u1-390/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u1-390.jpg",
+      "bytes": 48521
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u1-510/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u1-510/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u1-510.jpg",
+      "bytes": 19310
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u3-100/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u3-100/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u3-100.jpg",
+      "bytes": 34203
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u3-300/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u3-300/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u3-300.jpg",
+      "bytes": 46193
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u3-520/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u3-520/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u3-520.jpg",
+      "bytes": 21888
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/artdeco-u3-600/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/skamejki/u3-600/hero.webp",
+      "output": "assets/img/social/products/maf--skamejki--artdeco-u3-600.jpg",
+      "bytes": 39287
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/banketka-chugunnaya-varshava/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/13422/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--banketka-chugunnaya-varshava.jpg",
+      "bytes": 25169
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/banketka-paradise/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/20723/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--banketka-paradise.jpg",
+      "bytes": 31508
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/banketka-pifagor/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/11129/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--banketka-pifagor.jpg",
+      "bytes": 33530
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/banketka-stalnaya-mons-filigran/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/19677/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--banketka-stalnaya-mons-filigran.jpg",
+      "bytes": 25511
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/banketka-vizhen/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/15078/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--banketka-vizhen.jpg",
+      "bytes": 24135
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/divan-stalnoy-kruglyy/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/11354/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--divan-stalnoy-kruglyy.jpg",
+      "bytes": 51756
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/divan-stalnoy-sol/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/12987/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--divan-stalnoy-sol.jpg",
+      "bytes": 21570
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/7106/thumb.webp",
+      "output": "assets/img/social/pages/maf--skamejki.jpg",
+      "bytes": 125795
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/kreslo-bez-spinki-simpozium/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/22378/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--kreslo-bez-spinki-simpozium.jpg",
+      "bytes": 27536
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/modulnaya-skameyka-ekopolis-kombi3/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/12154/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--modulnaya-skameyka-ekopolis-kombi3.jpg",
+      "bytes": 48555
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/modulnaya-skameyka-ekopolis2/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/12149/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--modulnaya-skameyka-ekopolis2.jpg",
+      "bytes": 32116
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/sadovoparkovaya-skameyka-duga/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/10721/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--sadovoparkovaya-skameyka-duga.jpg",
+      "bytes": 23768
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/sadovoparkovaya-skameyka-radius/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/9705/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--sadovoparkovaya-skameyka-radius.jpg",
+      "bytes": 24922
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/sadovoparkovaya-skameyka-radius-raund-kruglaya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/22157/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--sadovoparkovaya-skameyka-radius-raund-kruglaya.jpg",
+      "bytes": 56245
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/sidene-enigma/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/21237/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--sidene-enigma.jpg",
+      "bytes": 20727
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameika-modern/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/7106/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameika-modern.jpg",
+      "bytes": 36363
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameika-modern-bez-podlokotnikov/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/7112/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameika-modern-bez-podlokotnikov.jpg",
+      "bytes": 39844
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-adonis/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/14146/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-adonis.jpg",
+      "bytes": 30903
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-arkhimed/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/11478/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-arkhimed.jpg",
+      "bytes": 59331
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-bez-spinki-avinon/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/15495/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-bez-spinki-avinon.jpg",
+      "bytes": 40334
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-bez-spinki-gloriya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/15621/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-bez-spinki-gloriya.jpg",
+      "bytes": 24487
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-bez-spinki-khold/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/14037/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-bez-spinki-khold.jpg",
+      "bytes": 19877
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-bez-spinki-tauer/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/18177/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-bez-spinki-tauer.jpg",
+      "bytes": 33482
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-bez-spinki-ulichnaya-kolledzh/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/13998/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-bez-spinki-ulichnaya-kolledzh.jpg",
+      "bytes": 18753
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-chugunnaya-goliaf/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/12233/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-chugunnaya-goliaf.jpg",
+      "bytes": 42295
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-galaktika/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/14201/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-galaktika.jpg",
+      "bytes": 41999
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-idilliya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/14137/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-idilliya.jpg",
+      "bytes": 25654
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-idilliya-bez-podlokotnikov/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/14138/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-idilliya-bez-podlokotnikov.jpg",
+      "bytes": 27217
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-kalipso/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/14300/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-kalipso.jpg",
+      "bytes": 38948
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-kubitum/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/12963/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-kubitum.jpg",
+      "bytes": 32669
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-leman/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/14901/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-leman.jpg",
+      "bytes": 34910
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-london/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/14839/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-london.jpg",
+      "bytes": 33848
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-madrid/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/12168/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-madrid.jpg",
+      "bytes": 53527
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-mekhiko/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/13979/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-mekhiko.jpg",
+      "bytes": 47690
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-parabola/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/12220/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-parabola.jpg",
+      "bytes": 44089
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-pifagor/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/10895/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-pifagor.jpg",
+      "bytes": 67168
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-prityazhenie/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/19144/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-prityazhenie.jpg",
+      "bytes": 37972
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-radiusnaya-artek/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/12409/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-radiusnaya-artek.jpg",
+      "bytes": 27003
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-so-spinkoy-avinon/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/15496/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-so-spinkoy-avinon.jpg",
+      "bytes": 66694
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-so-spinkoy-gloriya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/15632/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-so-spinkoy-gloriya.jpg",
+      "bytes": 40289
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-so-spinkoy-ladya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/14605/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-so-spinkoy-ladya.jpg",
+      "bytes": 35014
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-fergana/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/27171/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-fergana.jpg",
+      "bytes": 34939
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-fergana-bez-spinki/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/27134/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-fergana-bez-spinki.jpg",
+      "bytes": 21318
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-flesh/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/12708/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-flesh.jpg",
+      "bytes": 25692
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-globus/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/23626/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-globus.jpg",
+      "bytes": 40331
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-kvadrant/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/12410/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-kvadrant.jpg",
+      "bytes": 40626
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-ladya-bez-spinki/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/26223/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-ladya-bez-spinki.jpg",
+      "bytes": 21713
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-london-bez-spinki/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/24379/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-london-bez-spinki.jpg",
+      "bytes": 27280
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-mons/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/13872/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-mons.jpg",
+      "bytes": 29112
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-mons-bez-spinki/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/43708/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-mons-bez-spinki.jpg",
+      "bytes": 18730
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-mons-filigran/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/14913/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-mons-filigran.jpg",
+      "bytes": 33693
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-stalnaya-tashkent/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/27136/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-stalnaya-tashkent.jpg",
+      "bytes": 35019
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-ulichnaya-kolledzh/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/9467/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-ulichnaya-kolledzh.jpg",
+      "bytes": 28718
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-ulichnaya-ursula/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/19805/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-ulichnaya-ursula.jpg",
+      "bytes": 42185
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-vizhen/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/15063/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-vizhen.jpg",
+      "bytes": 44957
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/skameyka-vokrug-dereva-ekspress/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/10728/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--skameyka-vokrug-dereva-ekspress.jpg",
+      "bytes": 40319
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/skamejki/tribuna-skameyka-valensiya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/skamejki/20925/white.webp",
+      "output": "assets/img/social/products/maf--skamejki--tribuna-skameyka-valensiya.jpg",
+      "bytes": 60867
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-a20-1101/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/a20-1101/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-a20-1101.jpg",
+      "bytes": 31875
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-a20-5101/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/a20-5101/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-a20-5101.jpg",
+      "bytes": 26707
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-a20-7101/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/a20-7101/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-a20-7101.jpg",
+      "bytes": 31417
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-a20-8201/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/a20-8201/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-a20-8201.jpg",
+      "bytes": 37995
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-e20-1100/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/e20-1100/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-e20-1100.jpg",
+      "bytes": 25308
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-e20-1101/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/e20-1101/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-e20-1101.jpg",
+      "bytes": 30452
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-e20-1413/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/e20-1413/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-e20-1413.jpg",
+      "bytes": 22999
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-e20-2411/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/e20-2411/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-e20-2411.jpg",
+      "bytes": 26651
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-e20-4411/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/e20-4411/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-e20-4411.jpg",
+      "bytes": 31335
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-i20-2001/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/i20-2001/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-i20-2001.jpg",
+      "bytes": 40947
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-i20-2021/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/i20-2021/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-i20-2021.jpg",
+      "bytes": 50963
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-i20-3021/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/i20-3021/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-i20-3021.jpg",
+      "bytes": 57891
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-i20-4021/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/i20-4021/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-i20-4021.jpg",
+      "bytes": 61116
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-o20-1411/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/o20-1411/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-o20-1411.jpg",
+      "bytes": 22269
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-o20-2411/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/o20-2411/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-o20-2411.jpg",
+      "bytes": 26209
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-o20-3411/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/o20-3411/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-o20-3411.jpg",
+      "bytes": 30803
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/artdeco-o20-4411/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/urny/o20-4411/hero.webp",
+      "output": "assets/img/social/products/maf--urny--artdeco-o20-4411.jpg",
+      "bytes": 31792
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/7280/thumb.webp",
+      "output": "assets/img/social/pages/maf--urny.jpg",
+      "bytes": 106037
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-chikago/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/14171/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-chikago.jpg",
+      "bytes": 35929
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-batareek-kvadratnaya-astrey/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/42066/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-batareek-kvadratnaya-astrey.jpg",
+      "bytes": 26521
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-ekskrementov-korsika/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/25579/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-ekskrementov-korsika.jpg",
+      "bytes": 18967
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-ekskrementov-variant1/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/10549/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-ekskrementov-variant1.jpg",
+      "bytes": 18090
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-razdelnogo-sbora-fusion/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/16302/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-razdelnogo-sbora-fusion.jpg",
+      "bytes": 29897
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-alvarium/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12846/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-razdelnogo-sbora-musora-alvarium.jpg",
+      "bytes": 55163
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-gratiya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12774/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-razdelnogo-sbora-musora-gratiya.jpg",
+      "bytes": 35988
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-korsika/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/25577/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-razdelnogo-sbora-musora-korsika.jpg",
+      "bytes": 30095
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-solidum/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12770/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-razdelnogo-sbora-musora-solidum.jpg",
+      "bytes": 55012
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-stellar/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/55671/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-razdelnogo-sbora-musora-stellar.jpg",
+      "bytes": 50909
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-stellar-s-kryshkoy/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/52968/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-razdelnogo-sbora-musora-stellar-s-kryshkoy.jpg",
+      "bytes": 61292
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-tabula/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12772/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-razdelnogo-sbora-musora-tabula.jpg",
+      "bytes": 29961
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-tenoris/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12775/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-razdelnogo-sbora-musora-tenoris.jpg",
+      "bytes": 31287
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dlya-razdelnogo-sbora-musora-titaniya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/14865/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dlya-razdelnogo-sbora-musora-titaniya.jpg",
+      "bytes": 37449
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-dvoynaya-gorod/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/47907/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-dvoynaya-gorod.jpg",
+      "bytes": 44995
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-elegant/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/7284/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-elegant.jpg",
+      "bytes": 38261
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-estet/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/13007/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-estet.jpg",
+      "bytes": 33010
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-filigran/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/14824/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-filigran.jpg",
+      "bytes": 41205
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-galaktika/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/14214/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-galaktika.jpg",
+      "bytes": 24717
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-gorod/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/10853/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-gorod.jpg",
+      "bytes": 19782
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-gorod-vud/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/58619/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-gorod-vud.jpg",
+      "bytes": 28400
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-kvadratnaya-fans/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12224/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-kvadratnaya-fans.jpg",
+      "bytes": 36510
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-long/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/14163/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-long.jpg",
+      "bytes": 30470
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-park-m-gorkogo/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/10386/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-park-m-gorkogo.jpg",
+      "bytes": 37011
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-parkovaya-estel-kruglaya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/19807/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-parkovaya-estel-kruglaya.jpg",
+      "bytes": 30784
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-parkovaya-krakov-kruglaya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12315/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-parkovaya-krakov-kruglaya.jpg",
+      "bytes": 34427
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-parkovaya-krakov-kvadratnaya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12316/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-parkovaya-krakov-kvadratnaya.jpg",
+      "bytes": 33545
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-pepelnica-pa011/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/7299/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-pepelnica-pa011.jpg",
+      "bytes": 16952
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-pepelnica-pa014/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/7301/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-pepelnica-pa014.jpg",
+      "bytes": 31042
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-piksel/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/62220/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-piksel.jpg",
+      "bytes": 20551
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-plast/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/20727/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-plast.jpg",
+      "bytes": 33850
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-red/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/16301/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-red.jpg",
+      "bytes": 25454
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-ring/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/14192/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-ring.jpg",
+      "bytes": 19099
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-s-betonnym-osnovaniem-bulvar/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/9671/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-s-betonnym-osnovaniem-bulvar.jpg",
+      "bytes": 37069
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-shtrikh/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/14129/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-shtrikh.jpg",
+      "bytes": 30869
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-soyuz/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/56508/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-soyuz.jpg",
+      "bytes": 28607
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stalnaya-argo/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/19648/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stalnaya-argo.jpg",
+      "bytes": 21521
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stalnaya-dezhavyu/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/23196/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stalnaya-dezhavyu.jpg",
+      "bytes": 29874
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stalnaya-korsika/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/25578/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stalnaya-korsika.jpg",
+      "bytes": 19366
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stalnaya-neptun/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12735/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stalnaya-neptun.jpg",
+      "bytes": 39725
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stalnaya-novaya-moskva/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12144/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stalnaya-novaya-moskva.jpg",
+      "bytes": 34260
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stalnaya-novichok/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12246/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stalnaya-novichok.jpg",
+      "bytes": 28712
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stalnaya-stellar-kvadratnaya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/56127/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stalnaya-stellar-kvadratnaya.jpg",
+      "bytes": 23752
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stalnaya-stellar-kvadratnaya-s-kryshkoy/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/56126/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stalnaya-stellar-kvadratnaya-s-kryshkoy.jpg",
+      "bytes": 25428
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stefano/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/14150/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stefano.jpg",
+      "bytes": 35752
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stellar-kruglaya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/55653/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stellar-kruglaya.jpg",
+      "bytes": 29252
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stellar-kruglaya-s-kryshkoy/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/52966/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stellar-kruglaya-s-kryshkoy.jpg",
+      "bytes": 32478
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stellar-kvadratnaya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/55668/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stellar-kvadratnaya.jpg",
+      "bytes": 32579
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stellar-kvadratnaya-s-kryshkoy/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/52967/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stellar-kvadratnaya-s-kryshkoy.jpg",
+      "bytes": 25035
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-stil/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/14043/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-stil.jpg",
+      "bytes": 39233
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-ulichnaia-geo/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/7280/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-ulichnaia-geo.jpg",
+      "bytes": 30603
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-ulichnaia-radius/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/7281/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-ulichnaia-radius.jpg",
+      "bytes": 35541
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-ulichnaya-akatsiya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/9421/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-ulichnaya-akatsiya.jpg",
+      "bytes": 28848
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-ulichnaya-kruglaya-palermo/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/9676/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-ulichnaya-kruglaya-palermo.jpg",
+      "bytes": 26237
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-ulichnaya-radius2/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/12158/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-ulichnaya-radius2.jpg",
+      "bytes": 32397
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-ust-002/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/9422/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-ust-002.jpg",
+      "bytes": 29409
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/urny/urna-vizhen/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/urny/15065/white.webp",
+      "output": "assets/img/social/products/maf--urny--urna-vizhen.jpg",
+      "bytes": 30596
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/artdeco-e33-100/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/veloparkovki/e33-100/hero.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--artdeco-e33-100.jpg",
+      "bytes": 23906
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/artdeco-e33-101/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/veloparkovki/e33-101/hero.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--artdeco-e33-101.jpg",
+      "bytes": 24211
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/artdeco-i33-101/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/veloparkovki/i33-101/hero.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--artdeco-i33-101.jpg",
+      "bytes": 25444
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/artdeco-i33-111/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/artdeco/veloparkovki/i33-111/hero.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--artdeco-i33-111.jpg",
+      "bytes": 25666
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/13257/thumb.webp",
+      "output": "assets/img/social/pages/maf--veloparkovki.jpg",
+      "bytes": 114377
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/parkovka-dlya-samokatov-19i-mestnaya-velo19/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/13778/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--parkovka-dlya-samokatov-19i-mestnaya-velo19.jpg",
+      "bytes": 29991
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/parkovka-dlya-samokatov-s-navesom-lyutik/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/14025/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--parkovka-dlya-samokatov-s-navesom-lyutik.jpg",
+      "bytes": 47530
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/veloparkovka-fast/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/24045/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--veloparkovka-fast.jpg",
+      "bytes": 29181
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/veloparkovka-freym/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/14133/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--veloparkovka-freym.jpg",
+      "bytes": 35985
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/veloparkovka-gorod/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/20334/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--veloparkovka-gorod.jpg",
+      "bytes": 34817
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/veloparkovka-lokus-iz-nerzhaveyki/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/13257/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--veloparkovka-lokus-iz-nerzhaveyki.jpg",
+      "bytes": 37735
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/veloparkovka-s-logotipom-tauer2/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/25675/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--veloparkovka-s-logotipom-tauer2.jpg",
+      "bytes": 22912
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/veloparkovka-stil/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/14029/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--veloparkovka-stil.jpg",
+      "bytes": 29883
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/veloparkovka-tauer1/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/25667/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--veloparkovka-tauer1.jpg",
+      "bytes": 17423
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/veloparkovka-tur/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/14026/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--veloparkovka-tur.jpg",
+      "bytes": 43365
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/maf/veloparkovki/veloparkovka-vozdukh/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/maf/veloparkovki/15617/white.webp",
+      "output": "assets/img/social/products/maf--veloparkovki--veloparkovka-vozdukh.jpg",
+      "bytes": 39285
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/metallokonstrukcii.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13880/thumb.webp",
+      "output": "assets/img/social/pages/metallokonstrukcii--konteynernye-ploshchadki.jpg",
+      "bytes": 110576
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-maf-8/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13992/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernaya-ploshchadka-dlya-tbo-maf-8.jpg",
+      "bytes": 48189
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-maf-9/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13993/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernaya-ploshchadka-dlya-tbo-maf-9.jpg",
+      "bytes": 54805
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-nero/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/24114/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernaya-ploshchadka-dlya-tbo-nero.jpg",
+      "bytes": 70455
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-split-kh-s-khozblokom/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/31795/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernaya-ploshchadka-dlya-tbo-split-kh-s-khozblokom.jpg",
+      "bytes": 76718
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-dlya-tbo-vertikal/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15109/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernaya-ploshchadka-dlya-tbo-vertikal.jpg",
+      "bytes": 61050
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-ekologiya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/19441/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernaya-ploshchadka-ekologiya.jpg",
+      "bytes": 51487
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernaya-ploshchadka-panel/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15678/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernaya-ploshchadka-panel.jpg",
+      "bytes": 55518
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13880/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernyy-shkaf-modul.jpg",
+      "bytes": 43795
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-stalnoy/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15162/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernyy-shkaf-modul-stalnoy.jpg",
+      "bytes": 20435
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-xl/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13885/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernyy-shkaf-modul-xl.jpg",
+      "bytes": 47849
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/konteynernyy-shkaf-modul-xl-stalnoy/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15160/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--konteynernyy-shkaf-modul-xl-stalnoy.jpg",
+      "bytes": 29603
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/ograzhdenie-dlya-tbo/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/15113/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--ograzhdenie-dlya-tbo.jpg",
+      "bytes": 50167
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/ograzhdenie-dlya-tbo-bunker/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/40261/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--ograzhdenie-dlya-tbo-bunker.jpg",
+      "bytes": 45393
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/konteynernye-ploshchadki/ograzhdenie-ploshchadki-dlya-kgm/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/metallokonstrukcii/konteynernye-ploshchadki/13996/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--konteynernye-ploshchadki--ograzhdenie-ploshchadki-dlya-kgm.jpg",
+      "bytes": 57055
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART06-novaciya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART06-novaciya/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART06-novaciya.jpg",
+      "bytes": 47689
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART07-astra/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART07-astra/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART07-astra.jpg",
+      "bytes": 46288
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART08-dinamika/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART08-dinamika/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART08-dinamika.jpg",
+      "bytes": 48437
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART09-rezonans/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART09-rezonans/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART09-rezonans.jpg",
+      "bytes": 73041
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART10-fleksibl/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART10-fleksibl/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART10-fleksibl.jpg",
+      "bytes": 82079
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART11-serkil/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART11-serkil/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART11-serkil.jpg",
+      "bytes": 59278
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART12-arabika/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART12-arabika/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART12-arabika.jpg",
+      "bytes": 82175
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART13-liaf/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART13-liaf/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART13-liaf.jpg",
+      "bytes": 75836
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART14-volnenie/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART14-volnenie/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART14-volnenie.jpg",
+      "bytes": 57978
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART15-bereza/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART15-bereza/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART15-bereza.jpg",
+      "bytes": 69562
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART16-ampir/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART16-ampir/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART16-ampir.jpg",
+      "bytes": 68194
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART17-modern/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART17-modern/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART17-modern.jpg",
+      "bytes": 61363
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART18-ampir-2/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART18-ampir-2/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART18-ampir-2.jpg",
+      "bytes": 62776
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/ART19-rokoko/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/art-deco/ART19-rokoko/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--ART19-rokoko.jpg",
+      "bytes": 75511
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/STN01-romb/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/standart/STN01-romb/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--STN01-romb.jpg",
+      "bytes": 73296
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/STN02-reshetka/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/standart/STN02-reshetka/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--STN02-reshetka.jpg",
+      "bytes": 62389
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/STN03-treugolnik/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/standart/STN03-treugolnik/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--STN03-treugolnik.jpg",
+      "bytes": 65296
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/STN04-zvezda/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/standart/STN04-zvezda/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--STN04-zvezda.jpg",
+      "bytes": 61650
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/STN05-kirpich/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/standart/STN05-kirpich/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--STN05-kirpich.jpg",
+      "bytes": 54502
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/STN06-palma/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/standart/STN06-palma/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--STN06-palma.jpg",
+      "bytes": 88705
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/STN07-safari/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/standart/STN07-safari/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--STN07-safari.jpg",
+      "bytes": 89141
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/STN08-lepestok/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/standart/STN08-lepestok/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--STN08-lepestok.jpg",
+      "bytes": 63269
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/STN09-organika/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/standart/STN09-organika/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--STN09-organika.jpg",
+      "bytes": 74972
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/STN10-simmetriya/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/standart/STN10-simmetriya/white.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--korziny-dlya-konditsionerov--STN10-simmetriya.jpg",
+      "bytes": 65531
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/korziny-dlya-konditsionerov/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/korziny/hero/ac-basket-catalog-wide.webp",
+      "output": "assets/img/social/pages/metallokonstrukcii--korziny-dlya-konditsionerov.jpg",
+      "bytes": 77816
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/metalloizdeliya-na-zakaz/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/metallokonstrukcii--metalloizdeliya-na-zakaz.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/pochtovye-yashchiki/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/catalog/pochta-hall.webp",
+      "output": "assets/img/social/pages/metallokonstrukcii--pochtovye-yashchiki.jpg",
+      "bytes": 126047
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/pochtovye-yashchiki/pochtovyj-yaschik/",
+      "kind": "product",
+      "previewStyle": "branded",
+      "fallbackProduct": true,
+      "source": "assets/img/catalog/pochta.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--pochtovye-yashchiki--pochtovyj-yaschik.jpg",
+      "bytes": 76423
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/metallokonstrukcii/pochtovye-yashchiki/postamat/",
+      "kind": "product",
+      "previewStyle": "branded",
+      "fallbackProduct": true,
+      "source": "assets/img/catalog/postamat.webp",
+      "output": "assets/img/social/products/metallokonstrukcii--pochtovye-yashchiki--postamat.jpg",
+      "bytes": 63397
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/ograzhdeniya/ds-112/",
+      "kind": "product",
+      "previewStyle": "branded",
+      "fallbackProduct": true,
+      "source": "ograzhdeniya/uploads/catalog/ds-112/01.webp",
+      "output": "assets/img/social/products/ograzhdeniya--ds-112.jpg",
+      "bytes": 166292
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/ograzhdeniya/ds-16/",
+      "kind": "product",
+      "previewStyle": "branded",
+      "fallbackProduct": true,
+      "source": "ograzhdeniya/uploads/catalog/ds-16/01.webp",
+      "output": "assets/img/social/products/ograzhdeniya--ds-16.jpg",
+      "bytes": 82568
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/ograzhdeniya/ds-58/",
+      "kind": "product",
+      "previewStyle": "product",
+      "fallbackProduct": false,
+      "source": "ograzhdeniya/uploads/catalog/ds-58/04.webp",
+      "output": "assets/img/social/products/ograzhdeniya--ds-58.jpg",
+      "bytes": 34109
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/ograzhdeniya/ds-64/",
+      "kind": "product",
+      "previewStyle": "branded",
+      "fallbackProduct": true,
+      "source": "ograzhdeniya/uploads/catalog/ds-64/01.webp",
+      "output": "assets/img/social/products/ograzhdeniya--ds-64.jpg",
+      "bytes": 148585
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/ograzhdeniya/gazonnye/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/ograzhdeniya--gazonnye.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/ograzhdeniya/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "ograzhdeniya/uploads/timeline/06.webp",
+      "output": "assets/img/social/pages/ograzhdeniya.jpg",
+      "bytes": 138982
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/ograzhdeniya/perila/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/ograzhdeniya--perila.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/privacy/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/privacy.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/projects/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/projects.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/zastrojshchikam/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/portfolio/obj-10.webp",
+      "output": "assets/img/social/pages/zastrojshchikam.jpg",
+      "bytes": 222175
+    }
+  ]
+}

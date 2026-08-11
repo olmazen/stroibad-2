@@ -8,13 +8,21 @@ DirectoryIndex index.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # 1) HTTP -> HTTPS
-  RewriteCond %{HTTPS} !=on
-  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+  # Старый раздел производства объединён со страницей /about/.
+  RewriteRule ^proizvodstvo(?:/index\.html)?/?$ https://www.egoe-life.ru/about/ [R=301,L,NE,NC]
 
-  # 2) не-www -> www (canonical у сайта — www.egoe-life.ru)
-  RewriteCond %{HTTP_HOST} ^egoe-life\.ru$ [NC]
-  RewriteRule ^ https://www.egoe-life.ru%{REQUEST_URI} [L,R=301]
+  # Дубль товара: основная карточка находится в разделе павильонов и навесов.
+  RewriteRule ^maf/skamejki/skameyka-s-navesom-filigran-volna(?:/index\.html)?/?$ https://www.egoe-life.ru/maf/pavilony-i-navesy/skameyka-s-navesom-filigran-volna/ [R=301,L,NE,NC]
+
+  # Явный /index.html -> красивый URL с завершающим слешем.
+  # THE_REQUEST не даёт зациклить внутреннюю подстановку DirectoryIndex.
+  RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html(?:[?\s]) [NC]
+  RewriteRule ^(.*/)?index\.html$ https://www.egoe-life.ru/$1 [R=301,L,NE]
+
+  # HTTP или любой неканонический host -> HTTPS + www за один переход.
+  RewriteCond %{HTTPS} !=on [OR]
+  RewriteCond %{HTTP_HOST} !^www\.egoe-life\.ru$ [NC]
+  RewriteRule ^ https://www.egoe-life.ru%{REQUEST_URI} [R=301,L,NE]
 </IfModule>
 
 # Сжатие

@@ -81,7 +81,7 @@
     if (!rows.length) {
       doc.innerHTML = '<div class="sheet"><h2 class="kp-h">Список пуст</h2>' +
         '<p>Добавьте изделия в корзину, затем сформируйте КП.</p>' +
-        '<p><a href="../maf/index.html">← В каталог</a></p></div>';
+        '<p><a href="../maf/">← В каталог</a></p></div>';
       finish(); return;
     }
     var d = fmtRu(parseDate(head.date));

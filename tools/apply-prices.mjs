@@ -68,6 +68,30 @@ function replaceNearLink(file, slug, from, to, sku) {
   return n;
 }
 
+function syncProductSchema(file, price) {
+  if (!fs.existsSync(file)) return false;
+  const before = readF(file);
+  const after = before.replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g, (whole, raw) => {
+    let data;
+    try { data = JSON.parse(raw); } catch { return whole; }
+    if (!data || data['@type'] !== 'Product') return whole;
+    if (price == null) {
+      delete data.offers;
+    } else {
+      data.offers = {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'RUB',
+        lowPrice: String(price),
+        availability: 'https://schema.org/PreOrder',
+        seller: { '@type': 'Organization', name: 'EGOE' },
+      };
+    }
+    return `<script type="application/ld+json">${JSON.stringify(data)}</script>`;
+  });
+  if (after !== before) writeF(file, after);
+  return after !== before;
+}
+
 for (const it of data.items) {
   if (!it.filled) { stats.skipped++; continue; }
   const regItem = reg.items.find((r) => r.cat === it.cat && r.slug === it.slug);
@@ -77,6 +101,7 @@ for (const it of data.items) {
   if (it.underOrder) { // осталось/стало «под заказ»
     regItem.price = null; regItem.underOrder = true;
     if (it.note) regItem.note = it.note;
+    syncProductSchema(page, null);
     continue;
   }
   if (it.newPrice == null) { stats.skipped++; continue; }
@@ -113,6 +138,7 @@ for (const it of data.items) {
 
   regItem.price = it.newPrice; regItem.underOrder = false;
   if (it.note) regItem.note = it.note;
+  syncProductSchema(page, it.newPrice);
 
   // products.csv генератора (только стандарт — Art Déco в hobbyka-выгрузке нет)
   if (it.group === 'standard' && CSV_SOURCE[it.cat] && it.newPrice !== it.oldPrice) {

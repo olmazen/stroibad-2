@@ -35,7 +35,8 @@ function collectProductPages() {
     if (!existsSync(abs)) continue;
     for (const f of walk(abs)) {
       const html = readFileSync(f, 'utf8');
-      if (html.includes('class="pp-price"')) pages.push({ file: f, html });
+      const noindex = /<meta\s+name=["']robots["'][^>]*content=["'][^"']*\bnoindex\b/i.test(html);
+      if (html.includes('class="pp-price"') && !noindex) pages.push({ file: f, html });
     }
   }
   return pages;
