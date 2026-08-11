@@ -1421,24 +1421,6 @@
    "cat": "maf/skamejki",
    "catLabel": "Скамейки",
    "group": "standard",
-   "slug": "skameyka-s-navesom-filigran-volna",
-   "sku": "14847",
-   "name": "Скамейка стальная с навесом «Филигран Волна»",
-   "price": 98600,
-   "underOrder": false,
-   "photo": "assets/img/maf/skamejki/14847/main.webp",
-   "photos": [
-    "assets/img/maf/skamejki/14847/main.webp",
-    "assets/img/maf/skamejki/14847/closeup.webp",
-    "assets/img/maf/skamejki/14847/white.webp",
-    "assets/img/maf/skamejki/14847/angle.webp"
-   ],
-   "url": "maf/skamejki/skameyka-s-navesom-filigran-volna/"
-  },
-  {
-   "cat": "maf/skamejki",
-   "catLabel": "Скамейки",
-   "group": "standard",
    "slug": "skameyka-so-spinkoy-avinon",
    "sku": "15496",
    "name": "Скамейка стальная «Авиньон»",

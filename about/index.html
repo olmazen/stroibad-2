@@ -7,24 +7,70 @@
 <meta name="description" content="EGOE — завод металлоконструкций и МАФ в Балаково: два цеха, полный цикл производства, 800+ объектов по России с 2012 года. Реквизиты и команда.">
 <link rel="canonical" href="https://www.egoe-life.ru/about/">
 <meta name="robots" content="index, follow">
-<meta property="og:type" content="website">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:site_name" content="EGOE">
 <meta property="og:title" content="О заводе EGOE — производство в Балаково">
 <meta property="og:description" content="EGOE — завод металлоконструкций и МАФ в Балаково: два цеха, полный цикл производства, 800+ объектов по России с 2012 года. Реквизиты и команда.">
 <meta property="og:url" content="https://www.egoe-life.ru/about/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://www.egoe-life.ru/assets/img/social/pages/about.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="О заводе EGOE — производство в Балаково — EGOE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="О заводе EGOE — производство в Балаково">
+<meta name="twitter:description" content="EGOE — завод металлоконструкций и МАФ в Балаково: два цеха, полный цикл производства, 800+ объектов по России с 2012 года. Реквизиты и команда.">
+<meta name="twitter:image" content="https://www.egoe-life.ru/assets/img/social/pages/about.jpg">
+<meta name="twitter:image:alt" content="О заводе EGOE — производство в Балаково — EGOE">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=egoe54">
+<link rel="stylesheet" href="../assets/css/style.css?v=egoe55">
 <style>
-/* галерея «завод изнутри» — masonry из реальных фото с площадки */
+/* Компактная страница завода: все переопределения изолированы от остальных разделов. */
+.about-page main>section{padding-top:clamp(68px,7vw,90px);padding-bottom:clamp(68px,7vw,90px)}
+.about-page .shero{min-height:clamp(540px,68vh,680px)}
+.about-page .shero-bg img{object-position:center 37%}
+.about-page .shero::after{background:linear-gradient(92deg,rgba(8,11,15,.90) 0%,rgba(8,11,15,.56) 42%,rgba(8,11,15,.07) 70%,rgba(8,11,15,.02) 100%),linear-gradient(180deg,rgba(8,11,15,.02) 0%,rgba(8,11,15,.16) 100%)}
+.about-page .shero-inner{max-width:760px;padding:40px 0 54px}
+.about-page .shero h1{max-width:730px}
+.about-page .shero .lead{max-width:690px;font-size:18px}
+.about-page .shop-intro{margin-bottom:30px}
+.about-shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:stretch}
+.about-shop-card{display:flex;flex-direction:column;min-width:0;background:var(--srf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.about-shop-media{position:relative;aspect-ratio:16/10;overflow:hidden;border:0;border-bottom:1px solid var(--line);background:#0d1116}
+.about-shop-media img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .55s cubic-bezier(.16,1,.3,1)}
+.about-shop-card:hover .about-shop-media img{transform:scale(1.025)}
+.about-shop-body{display:flex;flex:1;flex-direction:column;padding:22px 24px 24px}
+.about-shop-body .type-head{padding:0 0 12px;gap:16px}
+.about-shop-body .type-head h3{font-size:24px}
+.about-shop-body .ab-shop-facts{margin-top:auto}
+.about-shop-body .ab-shop-facts li{grid-template-columns:108px 1fr;padding:10px 0}
+/* Галерея «завод изнутри» — лёгкие версии реальных фото с площадки. */
 .zavod-gallery{columns:3;column-gap:14px;margin-top:8px}
 .zavod-gallery .zg-item{break-inside:avoid;margin:0 0 14px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--srf);line-height:0}
 .zavod-gallery .zg-item img{display:block;width:100%;height:auto;transition:transform .5s cubic-bezier(.16,1,.3,1)}
-.zavod-gallery .zg-item:hover img{transform:scale(1.035)}
-@media(max-width:900px){.zavod-gallery{columns:2;column-gap:10px}.zavod-gallery .zg-item{margin-bottom:10px}}
-@media(max-width:520px){.zavod-gallery{columns:1}}
+.zavod-gallery .zg-item:hover img{transform:scale(1.025)}
+@media(max-width:900px){
+  .about-page .shero{min-height:570px}
+  .about-page .shero-bg img{object-position:58% 34%}
+  .about-page .shero::after{background:linear-gradient(180deg,rgba(8,11,15,.28) 0%,rgba(8,11,15,.76) 60%,rgba(8,11,15,.97) 100%)}
+  .about-page .shero-inner{padding:44px 0 50px}
+  .about-shop-grid{grid-template-columns:1fr;gap:14px}
+  .about-shop-body{padding:20px}
+  .zavod-gallery{columns:2;column-gap:10px}
+  .zavod-gallery .zg-item{margin-bottom:10px}
+}
+@media(max-width:520px){
+  .about-page main>section{padding-top:58px;padding-bottom:58px}
+  .about-page .shero{min-height:610px}
+  .about-page .shero h1{font-size:38px}
+  .about-page .shero .lead{font-size:16px;line-height:1.5}
+  .about-shop-body .type-head{align-items:flex-start;flex-direction:column;gap:8px}
+  .about-shop-body .ab-shop-facts li{grid-template-columns:96px 1fr;gap:10px}
+  .zavod-gallery{columns:1}
+}
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
@@ -32,45 +78,43 @@
 {"@type":"ListItem","position":2,"name":"Производство","item":"https://www.egoe-life.ru/about/"}]}
 </script>
 </head>
-<body>
+<body class="about-page">
 <div class="topbar"><div class="container">
   <div class="tb-l"><span><b>Производство:</b> г. Балаково</span><span><b>Офис:</b> г. Москва</span><span class="amber">Отгрузка по всей России</span></div>
-  <div class="tb-r"><a href="tel:+79272295828"><b>8 (927) 229-58-28</b></a><a href="#">WhatsApp</a><a href="#">Telegram</a></div>
+  <div class="tb-r"><a href="tel:+79272295828"><b>8 (927) 229-58-28</b></a><a href="https://wa.me/79272295828" target="_blank" rel="noopener">WhatsApp</a></div>
 </div></div>
 
 <header id="siteHeader"><div class="container hdr">
-  <a class="logo" href="../index.html"><span class="logo-mark"></span><span class="logo-txt"><b>EGOE</b><span>Создаём пространства</span></span></a>
+  <a class="logo" href="../"><span class="logo-mark"></span><span class="logo-txt"><b>EGOE</b><span>Создаём пространства</span></span></a>
   <nav class="main" id="nav">
     <div class="navitem">
-      <a href="../maf/index.html">Каталог</a>
+      <a href="../catalog/">Каталог</a>
       <div class="dropdown">
-        <a class="dd-item" href="../maf/index.html"><span class="dd-ico"><svg viewBox="0 0 24 24"><path d="M3 11l2-3h14l2 3M3 11h18M5 11v6M19 11v6M3 17h3M18 17h3"/></svg></span><span class="dd-tx"><b>Малые архитектурные формы</b><small>Скамейки, урны, велопарковки</small></span></a>
-        <a class="dd-item" href="../ograzhdeniya/index.html"><span class="dd-ico"><svg viewBox="0 0 24 24"><path d="M3 9h18M3 14h18M6 5v15M10 5v15M14 5v15M18 5v15"/></svg></span><span class="dd-tx"><b>Ограждения</b><small>Секционные, газонные, перила</small></span></a>
-        <a class="dd-item" href="../metallokonstrukcii/korziny-dlya-konditsionerov/index.html"><span class="dd-ico"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1"/><path d="M7 10h10M7 13.5h10"/></svg></span><span class="dd-tx"><b>Корзины для кондиционеров</b><small>На фасад, по размерам</small></span></a>
-        <a class="dd-item" href="../metallokonstrukcii/pochtovye-yashchiki/index.html"><span class="dd-ico"><svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M4 12.5h16M9.5 8V6h5v2"/></svg></span><span class="dd-tx"><b>Почтовые ящики</b><small>Для подъездов и МКД</small></span></a>
-        <a class="dd-item" href="../metallokonstrukcii/konteynernye-ploshchadki/index.html"><span class="dd-ico"><svg viewBox="0 0 24 24"><path d="M5 9l1.5 10h11L19 9M3 9h18M9 6h6"/></svg></span><span class="dd-tx"><b>Контейнерные площадки</b><small>Для ТКО</small></span></a>
+        <a class="dd-item" href="../maf/"><span class="dd-ico"><svg viewBox="0 0 24 24"><path d="M3 11l2-3h14l2 3M3 11h18M5 11v6M19 11v6M3 17h3M18 17h3"/></svg></span><span class="dd-tx"><b>Малые архитектурные формы</b><small>Скамейки, урны, велопарковки</small></span></a>
+        <a class="dd-item" href="../ograzhdeniya/"><span class="dd-ico"><svg viewBox="0 0 24 24"><path d="M3 9h18M3 14h18M6 5v15M10 5v15M14 5v15M18 5v15"/></svg></span><span class="dd-tx"><b>Ограждения</b><small>Секционные, газонные, перила</small></span></a>
+        <a class="dd-item" href="../metallokonstrukcii/korziny-dlya-konditsionerov/"><span class="dd-ico"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1"/><path d="M7 10h10M7 13.5h10"/></svg></span><span class="dd-tx"><b>Корзины для кондиционеров</b><small>На фасад, по размерам</small></span></a>
+        <a class="dd-item" href="../metallokonstrukcii/pochtovye-yashchiki/"><span class="dd-ico"><svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M4 12.5h16M9.5 8V6h5v2"/></svg></span><span class="dd-tx"><b>Почтовые ящики</b><small>Для подъездов и МКД</small></span></a>
       </div>
     </div>
     <div class="navitem">
-      <a href="../about/index.html">Производство</a>
+      <a href="../about/">Производство</a>
     </div>
-    <a href="../zastrojshchikam/index.html">Застройщикам</a>
-    <a href="../projects/index.html">Портфолио</a>
-    <a href="../contacts/index.html">Контакты</a>
+    <a href="../zastrojshchikam/">Застройщикам</a>
+    <a href="../projects/">Портфолио</a>
+    <a href="../contacts/">Контакты</a>
   </nav>
-  <div class="hdr-actions"><button class="btn btn-primary btn-sm" onclick="openModal()">Расчёт по ТЗ</button></div>
+  <div class="hdr-actions"><a class="btn btn-primary btn-sm" href="../contacts/">Обсудить проект</a></div>
   <div class="burger" onclick="toggleNav()"><span></span><span></span><span></span></div>
 </div></header>
 <main>
 
 <div class="shero">
   <div class="shero-bg">
-    <img src="../assets/img/proizvodstvo/hero-crane.webp" srcset="../assets/img/proizvodstvo/hero-crane-sm.webp 1000w, ../assets/img/proizvodstvo/hero-crane.webp 1800w" sizes="100vw" alt="Отгрузка ажурной беседки EGOE — кран поднимает изделие над фурой во дворе завода в Балаково" fetchpriority="high">
-    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,14,18,.60) 0%,rgba(11,14,18,.30) 40%,rgba(11,14,18,.88) 100%)"></div>
+    <img src="../assets/img/proizvodstvo/hero-crane-sm.webp" srcset="../assets/img/proizvodstvo/hero-crane-sm.webp 1000w, ../assets/img/proizvodstvo/hero-crane-opt.webp 1800w" sizes="100vw" width="1800" height="1393" alt="Отгрузка ажурной беседки EGOE — кран поднимает изделие над фурой во дворе завода в Балаково" fetchpriority="high" decoding="async">
   </div>
   <span class="shero-corner">Балаково · Москва · отгрузка по РФ</span>
   <div class="container"><div class="shero-inner">
-    <nav class="crumbs"><a href="../index.html">Главная</a> / <span>Производство</span></nav>
+    <nav class="crumbs"><a href="../">Главная</a> / <span>Производство</span></nav>
     <div class="eyebrow">Завод EGOE · полный цикл · с 2012 года</div>
     <h1>Завод, где металл и дерево <em>под одной крышей</em></h1>
     <p class="lead">EGOE — производство полного цикла в Балаково. Делаем металлоизделия и МАФ для застройщиков: от фасадных корзин до благоустройства дворов — со своими цехами металла и деревообработки. Никакого субподряда.</p>
@@ -105,30 +149,32 @@
 <section id="derevo">
   <div class="container">
     <div class="reveal"><div class="dim"><span class="tick"></span>02 — Два цеха</div></div>
-    <div class="sec-head reveal" style="margin-top:20px"><div><h2>Металл и дерево — под одной крышей</h2></div><p class="lead-wide">Поэтому скамейка, урна и ограждение для вашего объекта выходят с одной площадки — в одном качестве и в один срок.</p></div>
-    <div class="ab-shop">
-      <div class="ab-shop-ph ph has-img reveal"><img src="../assets/img/proizvodstvo/metal.webp?v2" srcset="../assets/img/proizvodstvo/metal-sm.webp?v2 720w, ../assets/img/proizvodstvo/metal.webp?v2 1024w" sizes="(max-width:900px) 100vw, 46vw" alt="Цех металла EGOE — гибка листа на листогибе с ЧПУ" loading="lazy"><span class="ph-tag">цех металла</span><span class="ph-label">Гибка · листогиб с ЧПУ</span></div>
-      <div class="reveal" style="--d:.1s">
-        <div class="type-head"><h3>Цех металла</h3><span class="type-tag ad">основной</span></div>
-        <ul class="ab-shop-facts">
-          <li><b>Лазер</b><span>раскрой листа до 20&nbsp;мм</span></li>
-          <li><b>Гибка</b><span>листогиб с ЧПУ, до 3&nbsp;м</span></li>
-          <li><b>Сварка</b><span>MIG/MAG, кондукторы для серий</span></li>
-          <li><b>Окраска</b><span>порошковая камера, любой RAL</span></li>
-        </ul>
-      </div>
-    </div>
-    <div class="ab-shop rev">
-      <div class="ab-shop-ph ph has-img reveal"><img src="../assets/img/proizvodstvo/wood.webp?v2" srcset="../assets/img/proizvodstvo/wood-sm.webp?v2 720w, ../assets/img/proizvodstvo/wood.webp?v2 896w" sizes="(max-width:900px) 100vw, 46vw" alt="Цех деревообработки EGOE — обработка массива на станке с ЧПУ" loading="lazy"><span class="ph-tag">цех дерева</span><span class="ph-label">Массив · ЧПУ-центр</span></div>
-      <div class="reveal" style="--d:.1s">
-        <div class="type-head"><h3>Цех дерева</h3><span class="type-tag std">свой, не субподряд</span></div>
-        <ul class="ab-shop-facts">
-          <li><b>Сырьё</b><span>лиственница, сосна, брус, массив</span></li>
-          <li><b>Обработка</b><span>сушка, строжка, шлифовка</span></li>
-          <li><b>Защита</b><span>атмосферостойкое масло, антисептик</span></li>
-          <li><b>Назначение</b><span>ламели и элементы МАФ, настилы</span></li>
-        </ul>
-      </div>
+    <div class="sec-head reveal shop-intro" style="margin-top:20px"><div><h2>Металл и дерево — под одной крышей</h2></div><p class="lead-wide">Поэтому скамейка, урна и ограждение для вашего объекта выходят с одной площадки — в одном качестве и в один срок.</p></div>
+    <div class="about-shop-grid">
+      <article class="about-shop-card reveal">
+        <div class="about-shop-media ph has-img"><img src="../assets/img/proizvodstvo/metal-sm.webp?v2" srcset="../assets/img/proizvodstvo/metal-sm.webp?v2 720w, ../assets/img/proizvodstvo/metal.webp?v2 1024w" sizes="(max-width:900px) 100vw, 50vw" width="720" height="540" alt="Цех металла EGOE — гибка листа на листогибе с ЧПУ" loading="lazy" decoding="async"><span class="ph-tag">цех металла</span><span class="ph-label">Гибка · листогиб с ЧПУ</span></div>
+        <div class="about-shop-body">
+          <div class="type-head"><h3>Цех металла</h3><span class="type-tag ad">основной</span></div>
+          <ul class="ab-shop-facts">
+            <li><b>Лазер</b><span>раскрой листа до 20&nbsp;мм</span></li>
+            <li><b>Гибка</b><span>листогиб с ЧПУ, до 3&nbsp;м</span></li>
+            <li><b>Сварка</b><span>MIG/MAG, кондукторы для серий</span></li>
+            <li><b>Окраска</b><span>порошковая камера, любой RAL</span></li>
+          </ul>
+        </div>
+      </article>
+      <article class="about-shop-card reveal" style="--d:.08s">
+        <div class="about-shop-media ph has-img"><img src="../assets/img/proizvodstvo/wood-sm.webp?v2" srcset="../assets/img/proizvodstvo/wood-sm.webp?v2 720w, ../assets/img/proizvodstvo/wood.webp?v2 896w" sizes="(max-width:900px) 100vw, 50vw" width="720" height="540" alt="Цех деревообработки EGOE — обработка массива на станке с ЧПУ" loading="lazy" decoding="async"><span class="ph-tag">цех дерева</span><span class="ph-label">Массив · ЧПУ-центр</span></div>
+        <div class="about-shop-body">
+          <div class="type-head"><h3>Цех дерева</h3><span class="type-tag std">свой, не субподряд</span></div>
+          <ul class="ab-shop-facts">
+            <li><b>Сырьё</b><span>лиственница, сосна, брус, массив</span></li>
+            <li><b>Обработка</b><span>сушка, строжка, шлифовка</span></li>
+            <li><b>Защита</b><span>атмосферостойкое масло, антисептик</span></li>
+            <li><b>Назначение</b><span>ламели и элементы МАФ, настилы</span></li>
+          </ul>
+        </div>
+      </article>
     </div>
   </div>
 </section>
@@ -139,13 +185,13 @@
     <div class="reveal"><div class="dim"><span class="tick"></span>Завод · изнутри</div></div>
     <div class="sec-head reveal" style="margin-top:20px;margin-bottom:26px"><div><h2>Как это выглядит на площадке</h2></div><p class="lead-wide">Реальные кадры с производства: раскрой и гибка металла, сварка, окраска и деревообработка — всё под одной крышей.</p></div>
     <div class="zavod-gallery reveal">
-      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z1.webp" alt="Сварка металлоконструкций на заводе EGOE" loading="lazy"></figure>
-      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z2.webp" alt="Обработка изделия на станке с ЧПУ — завод EGOE" loading="lazy"></figure>
-      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z3.webp" alt="Порошковая окраска — конвейерная линия завода EGOE" loading="lazy"></figure>
-      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z4.webp" alt="Цех деревообработки — заготовка массива, завод EGOE" loading="lazy"></figure>
-      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z5.webp" alt="Раскрой металлопрофиля на заводе EGOE" loading="lazy"></figure>
-      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z6.webp" alt="Склад пиломатериала — завод EGOE" loading="lazy"></figure>
-      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z7.webp" alt="Оператор у пульта станка — завод EGOE" loading="lazy"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z1-sm.webp" width="720" height="960" alt="Сварка металлоконструкций на заводе EGOE" loading="lazy" decoding="async"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z2-sm.webp" width="720" height="960" alt="Обработка изделия на станке с ЧПУ — завод EGOE" loading="lazy" decoding="async"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z3-sm.webp" width="720" height="540" alt="Порошковая окраска — конвейерная линия завода EGOE" loading="lazy" decoding="async"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z4-sm.webp" width="720" height="540" alt="Цех деревообработки — заготовка массива, завод EGOE" loading="lazy" decoding="async"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z5-sm.webp" width="720" height="960" alt="Раскрой металлопрофиля на заводе EGOE" loading="lazy" decoding="async"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z6-sm.webp" width="720" height="960" alt="Склад пиломатериала — завод EGOE" loading="lazy" decoding="async"></figure>
+      <figure class="zg-item"><img src="../assets/img/proizvodstvo/zavod/z7-sm.webp" width="720" height="960" alt="Оператор у пульта станка — завод EGOE" loading="lazy" decoding="async"></figure>
     </div>
   </div>
 </section>
@@ -179,7 +225,7 @@
       <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/portfolio/thumbs/obj-10.webp" alt="Комплекс благоустройства — перголы, площадки, вазоны — EGOE" loading="lazy"><span class="ph-label">Комплекс благоустройства</span></div><div class="tile-cap">Благоустройство</div><h3>Комплекс двора</h3><p>Перголы, площадки и вазоны — единой линейкой.</p></div>
       <div class="tile"><div class="ph r-43 has-img"><img src="../assets/img/portfolio/thumbs/obj-12.webp" alt="Ажурные экраны и перила с лазерным рисунком — EGOE" loading="lazy"><span class="ph-label">Ажурные экраны и перила</span></div><div class="tile-cap">Ограждения</div><h3>Экраны и перила</h3><p>Индивидуальный рисунок реза под объект.</p></div>
     </div>
-    <p style="margin-top:20px"><a class="dir-link" href="../projects/index.html">Все работы в портфолио →</a></p>
+    <p style="margin-top:20px"><a class="dir-link" href="../projects/">Все работы в портфолио →</a></p>
   </div>
 </section>
 
@@ -224,10 +270,10 @@
         <div class="reveal"><div class="dim"><span class="tick"></span>07 — Куда дальше</div></div>
         <div class="sec-head reveal" style="margin-top:20px"><div><h2>Познакомиться ближе</h2></div></div>
         <ul class="devlist reveal">
-          <li><span><b>Каталог.</b> <a href="../maf/index.html" style="color:var(--amber)">МАФ и благоустройство →</a></span></li>
-          <li><span><b>Проекты.</b> <a href="../projects/index.html" style="color:var(--amber)">Реализованные объекты →</a></span></li>
-          <li><span><b>Застройщикам.</b> <a href="../zastrojshchikam/index.html" style="color:var(--amber)">Комплектация ЖК целиком →</a></span></li>
-          <li><span><b>44-ФЗ.</b> <a href="../44-fz/index.html" style="color:var(--amber)">Работа с тендерами →</a></span></li>
+          <li><span><b>Каталог.</b> <a href="../maf/" style="color:var(--amber)">МАФ и благоустройство →</a></span></li>
+          <li><span><b>Проекты.</b> <a href="../projects/" style="color:var(--amber)">Реализованные объекты →</a></span></li>
+          <li><span><b>Застройщикам.</b> <a href="../zastrojshchikam/" style="color:var(--amber)">Комплектация ЖК целиком →</a></span></li>
+          <li><span><b>44-ФЗ.</b> <a href="../44-fz/" style="color:var(--amber)">Работа с тендерами →</a></span></li>
         </ul>
       </div>
     </div>
@@ -257,7 +303,7 @@
       <div class="row2"><div class="field"><label>Имя</label><input type="text" required></div><div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div></div>
       <div class="field"><label>Ваш проект</label><textarea rows="2" placeholder="Кратко: объект, что нужно изготовить"></textarea></div>
       <button class="btn btn-primary btn-block" type="submit">Отправить заявку</button>
-      <p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="../privacy/index.html">политикой обработки персональных данных</a>.</p>
+      <p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="../privacy/">политикой обработки персональных данных</a>.</p>
     </form>
     <div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div>
   </div></div>
@@ -267,27 +313,27 @@
 <footer><div class="container">
     <div class="foot-grid">
       <div class="foot-about">
-        <a class="logo" href="../index.html" style="margin-bottom:6px"><span class="logo-mark"></span><span class="logo-txt"><b style="color:#fff">EGOE</b><span>Создаём пространства</span></span></a>
+        <a class="logo" href="../" style="margin-bottom:6px"><span class="logo-mark"></span><span class="logo-txt"><b style="color:#fff">EGOE</b><span>Создаём пространства</span></span></a>
         <p>Производство полного цикла в Балаково: лазерная резка, гибка на ЧПУ, сварка, порошковая окраска RAL и собственный цех деревообработки.</p>
         <div class="foot-badges"><span>14 лет</span><span>800+ объектов</span><span>44-ФЗ · НДС</span></div>
-        <div class="foot-msgr" style="margin-top:18px"><a href="#">WhatsApp</a><a href="#">Telegram</a><a href="#">MAX</a></div>
+        <div class="foot-msgr" style="margin-top:18px"><a href="https://wa.me/79272295828" target="_blank" rel="noopener">WhatsApp</a></div>
       </div>
       <div>
         <div class="foot-col-h">Продукция</div>
-        <a href="../metallokonstrukcii/index.html">Изготовление металлоконструкций</a>
-        <a href="../maf/index.html">МАФ и благоустройство</a>
-        <a href="../ograzhdeniya/index.html">Ограждения</a>
-        <a href="../metallokonstrukcii/korziny-dlya-konditsionerov/index.html">Корзины для кондиционеров</a>
-        <a href="../metallokonstrukcii/pochtovye-yashchiki/index.html">Почтовые ящики</a>
-        <a href="../metallokonstrukcii/konteynernye-ploshchadki/index.html">Контейнерные площадки</a>
+        <a href="../metallokonstrukcii/">Изготовление металлоконструкций</a>
+        <a href="../maf/">МАФ и благоустройство</a>
+        <a href="../ograzhdeniya/">Ограждения</a>
+        <a href="../metallokonstrukcii/korziny-dlya-konditsionerov/">Корзины для кондиционеров</a>
+        <a href="../metallokonstrukcii/pochtovye-yashchiki/">Почтовые ящики</a>
+        <a href="../metallokonstrukcii/konteynernye-ploshchadki/">Контейнерные площадки</a>
       </div>
       <div>
         <div class="foot-col-h">Клиентам</div>
-        <a href="../about/index.html">Производство полного цикла</a>
-        <a href="../zastrojshchikam/index.html">Застройщикам</a>
-        <a href="../44-fz/index.html">Работа по 44-ФЗ</a>
-        <a href="../projects/index.html">Портфолио</a>
-        <a href="../dostavka/index.html">Доставка и оплата</a>
+        <a href="../about/">Производство полного цикла</a>
+        <a href="../zastrojshchikam/">Застройщикам</a>
+        <a href="../44-fz/">Работа по 44-ФЗ</a>
+        <a href="../projects/">Портфолио</a>
+        <a href="../dostavka/">Доставка и оплата</a>
       </div>
       <div>
         <div class="foot-col-h">Контакты</div>
@@ -298,18 +344,10 @@
         <div class="foot-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Пн–Пт 9:00–18:00</span></div>
       </div>
     </div>
-    <div class="foot-bot"><span>© 2026 EGOE. Завод металлоконструкций.</span><a href="../privacy/index.html">Политика обработки персональных данных</a><span>Информация на сайте не является публичной офертой</span></div>
+    <div class="foot-bot"><span>© 2026 EGOE. Завод металлоконструкций.</span><a href="../privacy/">Политика обработки персональных данных</a><span>Информация на сайте не является публичной офертой</span></div>
   </div>
 </footer>
 
-<div class="modal-wrap" id="modal"><div class="modal" style="position:relative">
-  <span class="modal-x" onclick="closeModal()">×</span>
-  <div class="formpanel"><h3>Расчёт по ТЗ</h3><p>Оставьте контакты — перезвоним и поможем с расчётом.</p>
-    <form onsubmit="return submitLead(this)"><div class="field"><label>Имя</label><input type="text" required></div><div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div>
-      <button class="btn btn-primary btn-block" type="submit">Отправить</button>
-      <p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="../privacy/index.html">политикой обработки персональных данных</a>.</p></form>
-    <div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div></div>
-</div></div>
 
 <script src="../assets/js/site.js?v=egoe59"></script>
 </body>

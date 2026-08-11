@@ -1,22 +1,5 @@
 /* EGOE — общий скрипт сайта v3: навигация, формы, корзина-страница, микроанимации */
 (function () {
-  // модальное окно «Расчёт по ТЗ»
-  window.openModal = function () {
-    var m = document.getElementById('modal');
-    if (m) { m.classList.add('on'); document.body.style.overflow = 'hidden'; }
-  };
-  window.closeModal = function () {
-    var m = document.getElementById('modal');
-    if (m) { m.classList.remove('on'); document.body.style.overflow = ''; }
-  };
-  document.addEventListener('click', function (e) {
-    var m = document.getElementById('modal');
-    if (m && e.target === m) window.closeModal();
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') window.closeModal();
-  });
-
   // ── КОНФИГ ЛИДОВ ─────────────────────────────────────────────────────────
   // e-mail: FormSubmit (активируется письмом-подтверждением на ПЕРВЫЙ сабмит).
   // tgRelay: URL релея Google Apps Script для Telegram — токен бота живёт В СКРИПТЕ,
@@ -456,7 +439,9 @@ window.__whenVisible = (function () {
   var esc = function (s) { return String(s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var topbar = document.querySelector('.topbar');
   var phoneA = topbar ? topbar.querySelector('a[href^="tel:"]') : null;
-  var messA = topbar ? Array.prototype.slice.call(topbar.querySelectorAll('.tb-r a:not([href^="tel:"])')) : [];
+  var messA = topbar ? Array.prototype.slice.call(topbar.querySelectorAll('.tb-r a:not([href^="tel:"])')).filter(function (a) { return a.getAttribute('href') && a.getAttribute('href') !== '#'; }) : [];
+  var contactA = nav.querySelector('a[href*="contacts/"]');
+  var contactHref = contactA ? contactA.getAttribute('href') : 'https://www.egoe-life.ru/contacts/';
 
   // --- собираем панель из пунктов desktop-меню ---
   var body = '';
@@ -477,7 +462,7 @@ window.__whenVisible = (function () {
   });
 
   var cta = '<div class="mnav-cta">'
-    + '<button class="btn btn-primary btn-block" type="button" onclick="closeMnav();openModal()">Расчёт по ТЗ</button>'
+    + '<a class="btn btn-primary btn-block" href="' + esc(contactHref) + '">Обсудить проект</a>'
     + (phoneA ? '<a class="mnav-phone" href="' + esc(phoneA.getAttribute('href')) + '">' + esc(phoneA.textContent.trim()) + '<small>звонок и расчёт бесплатно</small></a>' : '')
     + (messA.length ? '<div class="mnav-mess">' + messA.map(function (a) { return '<a href="' + esc(a.getAttribute('href')) + '">' + esc(a.textContent.trim()) + '</a>'; }).join('') + '</div>' : '')
     + '</div>';
@@ -793,8 +778,8 @@ window.__whenVisible = (function () {
         '<svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>' +
         '<h2>Список пока пуст</h2>' +
         '<p>Добавляйте изделия кнопкой «В корзину» — соберём их в одну заявку<br>и рассчитаем КП по объёму, цвету RAL и доставке.</p>' +
-        '<div class="cartp-empty-act"><a class="btn btn-primary" href="' + new URL('maf/index.html', C.siteBase).href + '">Каталог МАФ</a>' +
-        '<a class="btn" href="' + new URL('ograzhdeniya/index.html', C.siteBase).href + '">Ограждения</a></div></div>';
+        '<div class="cartp-empty-act"><a class="btn btn-primary" href="' + new URL('maf/', C.siteBase).href + '">Каталог МАФ</a>' +
+        '<a class="btn" href="' + new URL('ograzhdeniya/', C.siteBase).href + '">Ограждения</a></div></div>';
       updateSums();
       return;
     }
@@ -1036,7 +1021,7 @@ window.__whenVisible = (function () {
     });
 
     function openDrawer() {
-      if (!drawer) { window.open(new URL('kp/index.html', base).href, '_blank'); return; }
+      if (!drawer) { window.open(new URL('kp/', base).href, '_blank'); return; }
       var items = C.read();
       var genKey = cartGenKey(items);
       var already = false;
@@ -1088,7 +1073,7 @@ window.__whenVisible = (function () {
       }
 
       // настоящее КП грузится параллельно; тот же состав уже загружен (в т.ч. после стрима) — не перезагружаем
-      var target = new URL('kp/index.html?embed=1' + (already ? '' : '&stream=1') + '&_=' + genKey, base).href;
+      var target = new URL('kp/?embed=1' + (already ? '' : '&stream=1') + '&_=' + genKey, base).href;
       if (dFrame.dataset.loaded === '1' && dFrame.src.indexOf('_=' + genKey) > -1) {
         loaded = true; tryReveal();
         if (!already) setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true }, location.origin); } catch (e2) {} }, 220);
@@ -1099,7 +1084,7 @@ window.__whenVisible = (function () {
       }
       genTimers.push(setTimeout(function () { loaded = true; tryReveal(); }, 12000)); // страховка
       var tab = document.getElementById('kpdOpenTab');
-      if (tab) tab.href = new URL('kp/index.html', base).href;
+      if (tab) tab.href = new URL('kp/', base).href;
     }
     function closeDrawer() {
       if (!drawer) return;
@@ -1115,7 +1100,7 @@ window.__whenVisible = (function () {
     var pdfBtn = document.getElementById('kpdPdf');
     if (pdfBtn) pdfBtn.addEventListener('click', function () {
       // КП открыт в iframe → командуем ему собрать и СКАЧАТЬ PDF-файл (не диалог печати)
-      try { dFrame.contentWindow.postMessage({ kpDownload: true }, location.origin); } catch (e) { window.open(new URL('kp/index.html', base).href, '_blank'); }
+      try { dFrame.contentWindow.postMessage({ kpDownload: true }, location.origin); } catch (e) { window.open(new URL('kp/', base).href, '_blank'); }
     });
     var reopen = document.getElementById('kpReopen');
     if (reopen) reopen.addEventListener('click', function (e) { e.preventDefault(); openDrawer(); });
@@ -1248,7 +1233,7 @@ window.__whenVisible = (function () {
         '<div class="pdf-media"><img src="assets/img/artdeco/skamejki/a1-101/hero.webp?i12" alt=""><span class="pdf-draw"><img src="assets/img/artdeco/skamejki/a1-101/drawing-white.svg" alt=""></span></div>' +
         '<div class="pdf-spec"><span>Серия</span><b>Art Déco · коллекция A</b></div><div class="pdf-spec"><span>Материал</span><b>сталь · термодерево</b></div><div class="pdf-spec"><span>Окраска</span><b>любой RAL</b></div></div>' +
       '</div><div class="fw-pgdots"><i class="on"></i><i></i><i></i></div></div></div></div>' +
-      '<button class="fw-own" type="button" onclick="openModal()">Оставить свою заявку →</button>';
+      '<a class="fw-own" href="contacts/">Оставить свою заявку →</a>';
     if (k === 'contract') return '<div class="fw-flow2 fw-ctr">' +
       '<div class="fw-att-zone"><div class="ctr-cart">' +
         '<div class="ctr-cart-h"><b>Корзина</b><span>3 позиции · 26 ед.</span></div>' +
@@ -1983,7 +1968,7 @@ window.__whenVisible = (function () {
   try { if (localStorage.getItem('egoe_cookie_ok')) return; } catch (e) {}
   if (!document.body || document.querySelector('.cookie-bar')) return;
   var pl = document.querySelector('.foot-bot a[href*="privacy"]');
-  var href = pl ? pl.getAttribute('href') : 'privacy/index.html';
+  var href = pl ? pl.getAttribute('href') : 'privacy/';
   var bar = document.createElement('div');
   bar.className = 'cookie-bar';
   bar.innerHTML = '<div class="cookie-in"><p>Мы используем файлы cookie для работы сайта (например, чтобы сохранять список изделий). Продолжая пользоваться сайтом, вы соглашаетесь с <a href="' + href + '">политикой обработки персональных данных</a>.</p><button class="btn btn-primary btn-sm" type="button">Принять</button></div>';
@@ -2032,7 +2017,6 @@ window.__whenVisible = (function () {
   function optedOut(){ if (userOptedOut) return true; try { return sessionStorage.getItem(OPTOUT) === '1'; } catch (e) { return false; } }
 
   var STATE = null;              /* null | 'net' | 'perf' */
-  var bar = null, barDismissed = false;
   var perfLocked = false;        /* после авто-возврата из perf по perf больше не понижаем сами */
   var netCooldownUntil = 0;      /* анти-мигание для сети */
   var probeUrl = null;           /* крупный ресурс для активного пере-замера скорости */
@@ -2149,45 +2133,13 @@ window.__whenVisible = (function () {
     if (reason === 'net') netCooldownUntil = performance.now() + 60000;
     doc.setAttribute('data-lite', reason);
     try { document.dispatchEvent(new CustomEvent('egoe:lite', { detail: { reason: reason } })); } catch (e) {}
-    showBar(reason);
   }
   function exitLite(manual){
     STATE = null;
     doc.removeAttribute('data-lite');
-    if (bar) bar.classList.remove('on');
     if (manual){ userOptedOut = true; try { sessionStorage.setItem(OPTOUT, '1'); } catch (e) {} }
   }
-
-  /* ── плашка снизу ── */
-  function showBar(reason){
-    if (barDismissed) return;
-    if (!bar){
-      bar = document.createElement('div');
-      bar.className = 'lite-bar';
-      bar.innerHTML = '<span class="lite-ic" aria-hidden="true"></span>' +
-        '<span class="lite-tx"></span>' +
-        '<button class="lite-back" type="button">Вернуть полную</button>' +
-        '<button class="lite-x" type="button" aria-label="Скрыть уведомление">×</button>';
-      document.body.appendChild(bar);
-      bar.querySelector('.lite-back').addEventListener('click', function (){ exitLite(true); });
-      bar.querySelector('.lite-x').addEventListener('click', function (){ barDismissed = true; bar.classList.remove('on'); });
-    }
-    bar.querySelector('.lite-tx').textContent = reason === 'net'
-      ? 'Медленное соединение — включили лёгкую версию, чтобы сайт грузился быстрее.'
-      : 'Телефон не справляется с анимацией — включили лёгкую версию.';
-    var ck = document.querySelector('.cookie-bar.show');
-    bar.style.bottom = (ck ? ck.offsetHeight + 10 : 0) + 'px';
-    requestAnimationFrame(function (){ bar.classList.add('on'); });
-  }
-
-  function toast(msg){
-    var t = document.createElement('div');
-    t.className = 'lite-toast'; t.textContent = msg;
-    document.body.appendChild(t);
-    requestAnimationFrame(function (){ t.classList.add('on'); });
-    setTimeout(function (){ t.classList.remove('on'); setTimeout(function (){ if (t.parentNode) t.remove(); }, 400); }, 3500);
-  }
-  function recoverNet(){ exitLite(false); netCooldownUntil = performance.now() + 60000; toast('Соединение восстановилось — вернули полную версию.'); }
+  function recoverNet(){ exitLite(false); netCooldownUntil = performance.now() + 60000; }
 
   /* ── периодическая перепроверка (вдруг просадка кратковременная) ── */
   setInterval(function (){
@@ -2201,7 +2153,7 @@ window.__whenVisible = (function () {
     } else if (STATE === 'perf'){
       fpsProbe(function (r){                               /* возвращаем только при уверенно ровной картине (~60fps+) */
         if (r && r.medianMs <= 16 && r.slowRatio < 0.08){
-          exitLite(false); perfLocked = true; toast('Стало плавно — вернули полную версию.');
+          exitLite(false); perfLocked = true;
         }
       });
     } else {
