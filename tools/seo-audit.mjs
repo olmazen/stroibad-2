@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {
+  SOCIAL_ASSET_ORIGIN,
   SITE_ORIGIN,
   decodeText,
   fileToPublicUrl,
@@ -29,8 +30,15 @@ function localUrlExists(url) {
     return true;
   }
 
-  if (parsed.origin !== SITE_ORIGIN) return true;
-  const pathname = decodeURIComponent(parsed.pathname).replace(/^\/+/, '');
+  let pathname = decodeURIComponent(parsed.pathname).replace(/^\/+/, '');
+  if (parsed.origin === SOCIAL_ASSET_ORIGIN) {
+    const socialBase = new URL(SOCIAL_ASSET_ORIGIN).pathname.replace(/^\/+|\/+$/g, '');
+    if (pathname === socialBase) pathname = '';
+    else if (pathname.startsWith(`${socialBase}/`)) pathname = pathname.slice(socialBase.length + 1);
+    else return false;
+  } else if (parsed.origin !== SITE_ORIGIN) {
+    return true;
+  }
   if (!pathname) return allFiles.has('index.html');
   if (pathname.endsWith('/')) return allFiles.has(`${pathname}index.html`);
   return allFiles.has(pathname) || allFiles.has(`${pathname}/index.html`);

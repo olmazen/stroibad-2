@@ -16,7 +16,13 @@ import fsSync from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { getCanonical, getMetaContent, isNoindex, walkFiles } from './seo-utils.mjs';
+import {
+  SOCIAL_ASSET_ORIGIN,
+  getCanonical,
+  getMetaContent,
+  isNoindex,
+  walkFiles,
+} from './seo-utils.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WRITE = process.argv.includes('--write');
@@ -24,6 +30,10 @@ const PYTHON = process.env.CODEX_PYTHON || '/Users/almazrafikov/.cache/codex-run
 const RENDERER = path.join(ROOT, 'tools', 'render-social-preview.py');
 const OUTPUT_ROOT = path.join(ROOT, 'assets', 'img', 'social');
 const ORIGIN = 'https://www.egoe-life.ru';
+// Social crawlers must be able to fetch preview files before the same build is
+// copied to production hosting. GitHub Pages is the permanent public backup,
+// so it is also the stable origin for OG/Twitter images.
+const PREVIEW_ORIGIN = SOCIAL_ASSET_ORIGIN;
 
 function decode(value = '') {
   return value.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&')
@@ -37,8 +47,18 @@ function attr(value = '') {
 function localFromUrl(url) {
   try {
     const parsed = new URL(url, ORIGIN);
-    if (parsed.origin !== ORIGIN) return '';
-    return path.join(ROOT, decodeURIComponent(parsed.pathname).replace(/^\/+/, ''));
+    if (parsed.origin === ORIGIN) {
+      return path.join(ROOT, decodeURIComponent(parsed.pathname).replace(/^\/+/, ''));
+    }
+    if (parsed.origin === new URL(PREVIEW_ORIGIN).origin) {
+      const previewBase = new URL(PREVIEW_ORIGIN).pathname.replace(/^\/+|\/+$/g, '');
+      const pathname = decodeURIComponent(parsed.pathname).replace(/^\/+/, '');
+      if (pathname === previewBase) return ROOT;
+      if (pathname.startsWith(`${previewBase}/`)) {
+        return path.join(ROOT, pathname.slice(previewBase.length + 1));
+      }
+    }
+    return '';
   } catch { return ''; }
 }
 
@@ -160,7 +180,7 @@ for (const file of await walkFiles(ROOT, (f) => f.endsWith('.html'))) {
   const { source, previewStyle, fallbackProduct } = chooseSource(html, file, isProduct, canonical);
   const outputRel = `assets/img/social/${slugFromCanonical(canonical, isProduct ? 'product' : 'page')}`;
   const output = path.join(ROOT, outputRel);
-  const imageUrl = `${ORIGIN}/${outputRel}`;
+  const imageUrl = `${PREVIEW_ORIGIN}/${outputRel}`;
   const title = decode(getMetaContent(html, 'og:title') || html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || 'EGOE');
   const description = decode(getMetaContent(html, 'og:description') || getMetaContent(html, 'description'));
   const h1 = decode(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || title);
