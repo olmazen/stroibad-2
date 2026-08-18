@@ -1,0 +1,74 @@
+name: Prepare immutable release artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Reviewed commit SHA or tag to package"
+        required: true
+        default: "main"
+        type: string
+      label:
+        description: "Optional human-readable release label"
+        required: false
+        type: string
+
+run-name: "Prepare release: ${{ inputs.label || inputs.ref }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prepare-release-${{ inputs.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: Verify and package without deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout requested source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      - name: Resolve immutable source SHA
+        id: source
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build and run all quality gates
+        run: npm run check
+
+      - name: Require clean, reproducible source
+        run: |
+          git diff --exit-code
+          node -e "const r=require('./dist/release.json'); if(r.source.dirty) process.exit(1)"
+
+      - name: Upload immutable release candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: egoe-release-${{ steps.source.outputs.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 6
+
+      - name: Summary
+        shell: bash
+        run: |
+          echo "## Release candidate prepared" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source: \`${{ steps.source.outputs.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Deployment: **not performed**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Artifact: \`egoe-release-${{ steps.source.outputs.sha }}\`" >> "$GITHUB_STEP_SUMMARY"

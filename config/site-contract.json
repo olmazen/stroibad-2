@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "build": {
+    "mode": "byte-for-byte-copy",
+    "rootFiles": [
+      ".htaccess",
+      ".nojekyll",
+      "index.html",
+      "robots.txt",
+      "sitemap.xml"
+    ],
+    "publicDirectories": [
+      "44-fz",
+      "about",
+      "assets",
+      "cart",
+      "catalog",
+      "contacts",
+      "dostavka",
+      "kp",
+      "maf",
+      "metallokonstrukcii",
+      "ograzhdeniya",
+      "privacy",
+      "proizvodstvo",
+      "projects",
+      "zastrojshchikam"
+    ],
+    "legacyPublicDirectories": [
+      "tools/dogovor"
+    ],
+    "excludedPaths": [
+      "assets/data",
+      "assets/img/social/manifest.json",
+      "ograzhdeniya/_seo"
+    ],
+    "excludedFileNames": [
+      ".DS_Store",
+      "Thumbs.db",
+      "publish-report.json"
+    ],
+    "allowedExtensions": [
+      ".avif",
+      ".css",
+      ".gif",
+      ".glb",
+      ".html",
+      ".ico",
+      ".jpeg",
+      ".jpg",
+      ".js",
+      ".json",
+      ".pdf",
+      ".png",
+      ".svg",
+      ".txt",
+      ".webmanifest",
+      ".webp",
+      ".xml"
+    ],
+    "allowedJsonFiles": [
+      "assets/catalog.json",
+      "assets/products.json"
+    ]
+  },
+  "requiredFiles": [
+    "index.html",
+    "catalog/index.html",
+    "contacts/index.html",
+    "maf/index.html",
+    "metallokonstrukcii/index.html",
+    "metallokonstrukcii/pochtovye-yashchiki/index.html",
+    "ograzhdeniya/index.html",
+    "privacy/index.html",
+    "tools/dogovor/index.html",
+    "assets/css/style.css",
+    "assets/js/site.js",
+    "assets/products.json",
+    "assets/catalog.json",
+    "robots.txt",
+    "sitemap.xml"
+  ],
+  "forbiddenArtifactPrefixes": [
+    ".claude/",
+    ".github/",
+    ".git/",
+    ".private/",
+    "config/",
+    "dev-hero-variants/",
+    "dev-photo-reveal/",
+    "dev-series-splits/",
+    "dev-wheel/",
+    "docs/",
+    "node_modules/",
+    "price-edit-ewmllyku9j/",
+    "tools/"
+  ],
+  "allowedForbiddenPrefixExceptions": [
+    "tools/dogovor/"
+  ],
+  "knownLegacyBaseline": {
+    "sourceHtmlFiles": 311,
+    "publicHtmlFiles": 306,
+    "sitemapUrls": 301,
+    "dropdownPages": 303,
+    "postalDropdownPages": 32,
+    "containerDropdownPages": 0,
+    "searchProducts": 286,
+    "quoteCatalogProducts": 276,
+    "pricedProducts": 268,
+    "knownMissingDataAssets": [
+      "assets/img/og-korziny.jpg",
+      "assets/img/og-maf.jpg",
+      "assets/img/og-mk.jpg"
+    ]
+  }
+}
