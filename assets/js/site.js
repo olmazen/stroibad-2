@@ -441,7 +441,11 @@ window.__whenVisible = (function () {
   var phoneA = topbar ? topbar.querySelector('a[href^="tel:"]') : null;
   var messA = topbar ? Array.prototype.slice.call(topbar.querySelectorAll('.tb-r a:not([href^="tel:"])')).filter(function (a) { return a.getAttribute('href') && a.getAttribute('href') !== '#'; }) : [];
   var contactA = nav.querySelector('a[href*="contacts/"]');
-  var contactHref = contactA ? contactA.getAttribute('href') : 'https://www.egoe-life.ru/contacts/';
+  var headerCtaA = header.querySelector('.hdr-actions .btn');
+  var brandB = header.querySelector('.logo-txt b');
+  var ctaHref = headerCtaA ? headerCtaA.getAttribute('href') : (contactA ? contactA.getAttribute('href') : 'https://www.egoe-life.ru/contacts/');
+  var ctaLabel = headerCtaA ? headerCtaA.textContent.trim() : 'Обсудить проект';
+  var brandLabel = brandB ? brandB.textContent.trim() : 'EGOE';
 
   // --- собираем панель из пунктов desktop-меню ---
   var body = '';
@@ -462,7 +466,7 @@ window.__whenVisible = (function () {
   });
 
   var cta = '<div class="mnav-cta">'
-    + '<a class="btn btn-primary btn-block" href="' + esc(contactHref) + '">Обсудить проект</a>'
+    + '<a class="btn btn-primary btn-block" href="' + esc(ctaHref) + '">' + esc(ctaLabel) + '</a>'
     + (phoneA ? '<a class="mnav-phone" href="' + esc(phoneA.getAttribute('href')) + '">' + esc(phoneA.textContent.trim()) + '<small>звонок и расчёт бесплатно</small></a>' : '')
     + (messA.length ? '<div class="mnav-mess">' + messA.map(function (a) { return '<a href="' + esc(a.getAttribute('href')) + '">' + esc(a.textContent.trim()) + '</a>'; }).join('') + '</div>' : '')
     + '</div>';
@@ -472,25 +476,38 @@ window.__whenVisible = (function () {
   mnav.id = 'mnav';
   mnav.setAttribute('aria-hidden', 'true');
   mnav.innerHTML = '<div class="mnav-ov"></div>'
-    + '<aside class="mnav-panel" role="dialog" aria-label="Меню">'
-    + '<div class="mnav-head"><b>EGOE</b><button class="mnav-x" type="button" aria-label="Закрыть меню">×</button></div>'
+    + '<aside class="mnav-panel" role="dialog" aria-modal="true" aria-label="Меню">'
+    + '<div class="mnav-head"><b>' + esc(brandLabel) + '</b><button class="mnav-x" type="button" aria-label="Закрыть меню">×</button></div>'
     + '<div class="mnav-scroll">' + body + '</div>'
     + cta
     + '</aside>';
   document.body.appendChild(mnav);
 
   var burger = document.querySelector('.burger');
+  var lastFocused = null;
   function openMnav() {
+    lastFocused = document.activeElement;
     mnav.classList.add('on');
     mnav.setAttribute('aria-hidden', 'false');
     document.body.classList.add('mnav-lock');
-    if (burger) burger.classList.add('open');
+    if (burger) {
+      burger.classList.add('open');
+      burger.setAttribute('aria-expanded', 'true');
+      burger.setAttribute('aria-label', 'Закрыть меню');
+    }
+    setTimeout(function () { var close = mnav.querySelector('.mnav-x'); if (close) close.focus(); }, 0);
   }
   window.closeMnav = function () {
+    var wasOpen = mnav.classList.contains('on');
     mnav.classList.remove('on');
     mnav.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('mnav-lock');
-    if (burger) burger.classList.remove('open');
+    if (burger) {
+      burger.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+      burger.setAttribute('aria-label', 'Открыть меню');
+    }
+    if (wasOpen && lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
   };
   window.toggleNav = function () {
     if (mnav.classList.contains('on')) window.closeMnav(); else openMnav();
@@ -498,7 +515,16 @@ window.__whenVisible = (function () {
 
   mnav.querySelector('.mnav-ov').addEventListener('click', window.closeMnav);
   mnav.querySelector('.mnav-x').addEventListener('click', window.closeMnav);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') window.closeMnav(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && mnav.classList.contains('on')) window.closeMnav();
+    if (e.key !== 'Tab' || !mnav.classList.contains('on')) return;
+    var focusable = Array.prototype.slice.call(mnav.querySelectorAll('button:not([disabled]),.mnav-link[href],.mnav-group.open a[href],.mnav-cta a[href]')).filter(function (el) { return el.offsetParent !== null; });
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
   // переход по любой ссылке закрывает меню
   mnav.addEventListener('click', function (e) { if (e.target.closest('a')) window.closeMnav(); });
   // аккордеоны разделов

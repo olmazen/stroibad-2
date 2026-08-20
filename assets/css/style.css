@@ -94,12 +94,12 @@ header.stuck .hdr{height:64px}
 nav.main{display:flex;align-items:center;gap:32px;margin-left:auto}
 nav.main>a,.navitem>a{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:13.5px;letter-spacing:.05em;font-weight:500;color:var(--tx2);cursor:pointer;white-space:nowrap;position:relative;padding:6px 0;transition:color .2s}
 nav.main>a::after,.navitem>a::after{content:"";position:absolute;left:0;bottom:-2px;height:2px;width:100%;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .28s cubic-bezier(.2,.7,.2,1)}
-nav.main>a:hover,.navitem>a:hover,nav.main>a.active{color:#fff}
-nav.main>a:hover::after,.navitem:hover>a::after{transform:scaleX(1)}
+nav.main>a:hover,.navitem>a:hover,nav.main>a.active,.navitem>a.active{color:#fff}
+nav.main>a:hover::after,.navitem:hover>a::after,.navitem:focus-within>a::after,.navitem>a.active::after{transform:scaleX(1)}
 .navitem{position:relative}
 .dropdown{position:absolute;top:calc(100% + 14px);left:-16px;min-width:620px;background:#14181D;border:1px solid var(--line);box-shadow:0 30px 70px rgba(0,0,0,.6);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:2px;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .22s,transform .22s,visibility .22s;z-index:70}
 .dropdown::before{content:"";position:absolute;top:-7px;left:34px;width:12px;height:12px;background:#14181D;border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
-.navitem:hover .dropdown{opacity:1;visibility:visible;transform:translateY(0)}
+.navitem:hover .dropdown,.navitem:focus-within .dropdown{opacity:1;visibility:visible;transform:translateY(0)}
 .dd-item{display:flex;align-items:center;gap:15px;padding:14px 16px;border-radius:2px;transition:background .2s}
 .dd-item:hover{background:rgba(255,255,255,.05)}
 .dd-ico{width:46px;height:46px;flex-shrink:0;border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;color:var(--tx2);transition:border-color .25s,color .25s,transform .25s}
@@ -110,7 +110,8 @@ nav.main>a:hover::after,.navitem:hover>a::after{transform:scaleX(1)}
 .dd-item:hover .dd-tx b{color:var(--amber)}
 .dd-tx small{color:var(--steel);font-size:12.5px}
 .hdr-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
-.burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px}
+.burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border:0;background:transparent;color:inherit;font:inherit}
+.burger:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 .burger span{width:24px;height:2px;background:#fff;transition:.25s}
 
 /* ============ секции и ритм ============ */

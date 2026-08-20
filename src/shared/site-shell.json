@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "brand": {
+    "name": "EGOE",
+    "tagline": "Создаём пространства"
+  },
+  "topbar": {
+    "production": "г. Балаково",
+    "office": "г. Москва",
+    "shipping": "Отгрузка по всей России",
+    "phone": {
+      "label": "8 (927) 229-58-28",
+      "href": "tel:+79272295828"
+    },
+    "messengers": [
+      {
+        "label": "WhatsApp",
+        "href": "https://wa.me/79272295828"
+      }
+    ]
+  },
+  "catalog": {
+    "label": "Каталог",
+    "href": "catalog/",
+    "items": [
+      {
+        "label": "Малые архитектурные формы",
+        "description": "Скамейки, качели, урны",
+        "href": "maf/",
+        "icon": "maf"
+      },
+      {
+        "label": "Ограждения",
+        "description": "Секционные, газонные, перила",
+        "href": "ograzhdeniya/",
+        "icon": "fence"
+      },
+      {
+        "label": "Корзины для кондиционеров",
+        "description": "На фасад, по размерам",
+        "href": "metallokonstrukcii/korziny-dlya-konditsionerov/",
+        "icon": "basket"
+      },
+      {
+        "label": "Почтовые ящики",
+        "description": "Для подъездов и МКД",
+        "href": "metallokonstrukcii/pochtovye-yashchiki/",
+        "icon": "mailbox"
+      }
+    ]
+  },
+  "primaryNavigation": [
+    {
+      "label": "Производство",
+      "href": "about/"
+    },
+    {
+      "label": "Застройщикам",
+      "href": "zastrojshchikam/"
+    },
+    {
+      "label": "Портфолио",
+      "href": "projects/"
+    },
+    {
+      "label": "Контакты",
+      "href": "contacts/"
+    }
+  ],
+  "headerCta": {
+    "label": "Обсудить проект",
+    "href": "contacts/"
+  },
+  "footer": {
+    "about": "Производство полного цикла в Балаково: лазерная резка, гибка на ЧПУ, сварка, порошковая окраска RAL и собственный цех деревообработки.",
+    "badges": [
+      "14 лет",
+      "800+ объектов",
+      "44-ФЗ · НДС"
+    ],
+    "productLinks": [
+      {
+        "label": "Изготовление металлоконструкций",
+        "href": "metallokonstrukcii/"
+      },
+      {
+        "label": "МАФ и благоустройство",
+        "href": "maf/"
+      },
+      {
+        "label": "Ограждения",
+        "href": "ograzhdeniya/"
+      },
+      {
+        "label": "Корзины для кондиционеров",
+        "href": "metallokonstrukcii/korziny-dlya-konditsionerov/"
+      },
+      {
+        "label": "Почтовые ящики",
+        "href": "metallokonstrukcii/pochtovye-yashchiki/"
+      },
+      {
+        "label": "Контейнерные площадки",
+        "href": "metallokonstrukcii/konteynernye-ploshchadki/"
+      }
+    ],
+    "clientLinks": [
+      {
+        "label": "Производство полного цикла",
+        "href": "about/"
+      },
+      {
+        "label": "Застройщикам",
+        "href": "zastrojshchikam/"
+      },
+      {
+        "label": "Работа по 44-ФЗ",
+        "href": "44-fz/"
+      },
+      {
+        "label": "Портфолио",
+        "href": "projects/"
+      },
+      {
+        "label": "Доставка и оплата",
+        "href": "dostavka/"
+      }
+    ],
+    "contacts": [
+      {
+        "type": "phone",
+        "label": "8 (8453) 65-57-77",
+        "href": "tel:+78453655777"
+      },
+      {
+        "type": "email",
+        "label": "zakaz@egoe-life.ru",
+        "href": "mailto:zakaz@egoe-life.ru"
+      },
+      {
+        "type": "location",
+        "label": "Производство: г. Балаково"
+      },
+      {
+        "type": "location",
+        "label": "Офис: г. Москва"
+      },
+      {
+        "type": "hours",
+        "label": "Пн–Пт 9:00–18:00"
+      }
+    ],
+    "copyright": "© 2026 EGOE. Завод металлоконструкций.",
+    "privacy": {
+      "label": "Политика обработки персональных данных",
+      "href": "privacy/"
+    },
+    "disclaimer": "Информация на сайте не является публичной офертой"
+  }
+}

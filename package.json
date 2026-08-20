@@ -8,10 +8,14 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "node tools/build-public-site.mjs",
+    "build": "node tools/sync-site-shell.mjs --check && node tools/build-public-site.mjs",
+    "sync:shell": "node tools/sync-site-shell.mjs --write",
+    "test:shell": "node --test tools/site-shell.test.mjs",
+    "check:shell": "npm run test:shell && node tools/sync-site-shell.mjs --check",
+    "check:syntax": "node tools/check-javascript-syntax.mjs",
     "check:artifact": "node tools/verify-public-site.mjs",
     "check:seo": "node tools/run-public-seo-checks.mjs",
-    "check": "npm run build && npm run check:artifact && npm run check:seo",
+    "check": "npm run check:syntax && npm run check:shell && npm run build && npm run check:artifact && npm run check:seo",
     "verify": "npm run check"
   }
 }

@@ -4,6 +4,12 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  FOOTER_END,
+  FOOTER_START,
+  HEADER_END,
+  HEADER_START
+} from './site-shell.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
@@ -138,6 +144,99 @@ function countMatchingPages(pages, predicate) {
 function containsDropdownItem(html, text) {
   const pattern = new RegExp(`class=["'][^"']*dd-item[^"']*["'][\\s\\S]{0,900}?<b>${text}<\\/b>`, 'i');
   return pattern.test(html);
+}
+
+function countOccurrences(value, token) {
+  return value.split(token).length - 1;
+}
+
+async function verifySiteShell(contract, distFiles) {
+  const htmlFiles = distFiles.filter((rel) => rel.endsWith('.html'));
+  const excluded = new Set(contract.siteShell.excludedPages);
+  const pagesWithoutMain = new Set(contract.siteShell.pagesWithoutMain);
+  const unknownExcluded = [...excluded].filter((rel) => !htmlFiles.includes(rel));
+  for (const rel of unknownExcluded) fail(`site shell exclusion is not public HTML: ${rel}`);
+
+  const pages = await Promise.all(htmlFiles.map(async (rel) => ({
+    rel,
+    body: await fs.readFile(path.join(DIST, rel), 'utf8')
+  })));
+  const shellPages = pages.filter((page) => !excluded.has(page.rel));
+  if (shellPages.length !== contract.siteShell.expectedPages) {
+    fail(`site shell page count mismatch: expected ${contract.siteShell.expectedPages}, got ${shellPages.length}`);
+  }
+
+  for (const page of pages.filter((item) => excluded.has(item.rel))) {
+    for (const token of [HEADER_START, HEADER_END, FOOTER_START, FOOTER_END, 'data-site-header', 'data-site-footer']) {
+      if (page.body.includes(token)) fail(`${page.rel}: standalone page unexpectedly contains shared site shell token ${token}`);
+    }
+  }
+
+  for (const { rel, body } of shellPages) {
+    const exactTokens = [
+      HEADER_START,
+      HEADER_END,
+      FOOTER_START,
+      FOOTER_END,
+      'data-site-header',
+      'data-site-footer',
+      'id="siteHeader"',
+      'id="nav"',
+      '<div class="topbar">',
+      '<button class="burger"',
+      'aria-controls="mnav"',
+      'aria-expanded="false"',
+      'class="foot-grid"',
+      'class="foot-bot"'
+    ];
+    for (const token of exactTokens) {
+      const actual = countOccurrences(body, token);
+      if (actual !== 1) fail(`${rel}: expected one shared shell token ${token}, got ${actual}`);
+    }
+    if (!(body.indexOf(HEADER_START) < body.indexOf(HEADER_END)
+      && body.indexOf(HEADER_END) < body.indexOf(FOOTER_START)
+      && body.indexOf(FOOTER_START) < body.indexOf(FOOTER_END))) {
+      fail(`${rel}: shared shell markers are out of order`);
+    }
+
+    const navItems = (body.match(/class=["'][^"']*\bnavitem\b[^"']*["']/g) ?? []).length;
+    const dropdownItems = (body.match(/<a class="dd-item"/g) ?? []).length;
+    if (navItems !== 1) fail(`${rel}: expected only Catalog to be a navitem, got ${navItems}`);
+    if (dropdownItems !== 4) fail(`${rel}: expected four catalog dropdown items, got ${dropdownItems}`);
+    if (!containsDropdownItem(body, 'Почтовые ящики')) fail(`${rel}: postal dropdown item is missing`);
+    if (containsDropdownItem(body, 'Контейнерные площадки')) fail(`${rel}: container category must stay out of compact dropdown`);
+
+    const mainOpen = (body.match(/<main(?:\s[^>]*)?>/g) ?? []).length;
+    const mainClose = countOccurrences(body, '</main>');
+    const expectedMain = pagesWithoutMain.has(rel) ? 0 : 1;
+    if (mainOpen !== expectedMain || mainClose !== expectedMain) {
+      fail(`${rel}: unbalanced main element ${mainOpen}/${mainClose}, expected ${expectedMain}`);
+    }
+    const sectionOpen = (body.match(/<section(?:\s[^>]*)?>/g) ?? []).length;
+    const sectionClose = countOccurrences(body, '</section>');
+    if (sectionOpen !== sectionClose) {
+      fail(`${rel}: unbalanced section elements ${sectionOpen}/${sectionClose}`);
+    }
+    const siteScripts = (body.match(/<script\b[^>]*src=["'][^"']*assets\/js\/site\.js(?:\?[^"']*)?["'][^>]*>/gi) ?? []).length;
+    if (siteScripts !== 1) fail(`${rel}: expected one site.js script, got ${siteScripts}`);
+  }
+
+  const cart = pages.find((page) => page.rel === 'cart/index.html');
+  if (!cart || countOccurrences(cart.body, 'class="kpd-foot"') !== 1) {
+    fail('cart/index.html: quote drawer footer was not preserved');
+  }
+  for (const rel of contract.siteShell.legacyBrokenFooterPages) {
+    const page = pages.find((item) => item.rel === rel);
+    if (!page || countOccurrences(page.body, 'Другие модели качелей') !== 1) {
+      fail(`${rel}: repaired related-products section was not preserved`);
+    }
+  }
+
+  return {
+    siteShellPages: shellPages.length,
+    standaloneHtmlPages: excluded.size,
+    canonicalDropdownItemsPerPage: 4
+  };
 }
 
 function localDataPath(value) {
@@ -359,6 +458,7 @@ async function main() {
   const byteIdenticalSourceFiles = await verifySourceParity(files, contract);
   const referenceCount = await verifyReferences(files);
   const metrics = await verifyLegacyBaseline(contract, files);
+  const shellMetrics = await verifySiteShell(contract, files);
   await scanForPrivateMaterial(files);
 
   if (errors.length) {
@@ -374,7 +474,7 @@ async function main() {
     artifact: release?.artifact,
     byteIdenticalSourceFiles,
     checkedLocalReferences: referenceCount,
-    metrics
+    metrics: { ...metrics, ...shellMetrics }
   }, null, 2));
 }
 

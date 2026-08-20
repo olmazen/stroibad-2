@@ -67,6 +67,7 @@
 </head>
 <body class="maf-page">
 
+<!-- EGOE:SITE_HEADER:START -->
 <div class="topbar">
   <div class="container">
     <div class="tb-l">
@@ -77,14 +78,13 @@
     <div class="tb-r">
       <a href="tel:+79272295828"><b>8 (927) 229-58-28</b></a>
       <a href="https://wa.me/79272295828" target="_blank" rel="noopener">WhatsApp</a>
-
     </div>
   </div>
 </div>
 
-<header id="siteHeader"><div class="container hdr">
+<header id="siteHeader" data-site-header><div class="container hdr">
   <a class="logo" href="../"><span class="logo-mark"></span><span class="logo-txt"><b>EGOE</b><span>Создаём пространства</span></span></a>
-  <nav class="main" id="nav">
+  <nav class="main" id="nav" aria-label="Основная навигация">
     <div class="navitem">
       <a href="../catalog/">Каталог</a>
       <div class="dropdown">
@@ -94,16 +94,15 @@
         <a class="dd-item" href="../metallokonstrukcii/pochtovye-yashchiki/"><span class="dd-ico"><svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M4 12.5h16M9.5 8V6h5v2"/></svg></span><span class="dd-tx"><b>Почтовые ящики</b><small>Для подъездов и МКД</small></span></a>
       </div>
     </div>
-    <div class="navitem">
-      <a href="../about/">Производство</a>
-    </div>
+    <a href="../about/">Производство</a>
     <a href="../zastrojshchikam/">Застройщикам</a>
     <a href="../projects/">Портфолио</a>
     <a href="../contacts/">Контакты</a>
   </nav>
   <div class="hdr-actions"><a class="btn btn-primary btn-sm" href="../contacts/">Обсудить проект</a></div>
-  <div class="burger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+  <button class="burger" type="button" aria-label="Открыть меню" aria-controls="mnav" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
 </div></header>
+<!-- EGOE:SITE_HEADER:END -->
 
 <main>
 
@@ -221,7 +220,8 @@
 
 </main>
 
-<footer><div class="container">
+<!-- EGOE:SITE_FOOTER:START -->
+<footer data-site-footer><div class="container">
     <div class="foot-grid">
       <div class="foot-about">
         <a class="logo" href="../" style="margin-bottom:6px"><span class="logo-mark"></span><span class="logo-txt"><b style="color:#fff">EGOE</b><span>Создаём пространства</span></span></a>
@@ -258,6 +258,7 @@
     <div class="foot-bot"><span>© 2026 EGOE. Завод металлоконструкций.</span><a href="../privacy/">Политика обработки персональных данных</a><span>Информация на сайте не является публичной офертой</span></div>
   </div>
 </footer>
+<!-- EGOE:SITE_FOOTER:END -->
 
 
 <script src="../assets/js/site.js?v=egoe59"></script>

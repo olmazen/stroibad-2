@@ -93,17 +93,37 @@
     "docs/",
     "node_modules/",
     "price-edit-ewmllyku9j/",
+    "src/",
     "tools/"
   ],
   "allowedForbiddenPrefixExceptions": [
     "tools/dogovor/"
   ],
+  "siteShell": {
+    "expectedPages": 303,
+    "excludedPages": [
+      "kp/index.html",
+      "proizvodstvo/index.html",
+      "tools/dogovor/index.html"
+    ],
+    "pagesWithoutMain": [
+      "cart/index.html"
+    ],
+    "legacyBrokenFooterPages": [
+      "maf/kacheli/kacheli-bulvar/index.html",
+      "maf/kacheli/kacheli-miass-raund/index.html",
+      "maf/kacheli/kacheli-oazis-tip-7/index.html",
+      "maf/kacheli/kacheli-oazis/index.html",
+      "maf/kacheli/kacheli-siti/index.html",
+      "maf/kacheli/kacheli-tandem/index.html"
+    ]
+  },
   "knownLegacyBaseline": {
     "sourceHtmlFiles": 311,
     "publicHtmlFiles": 306,
     "sitemapUrls": 301,
     "dropdownPages": 303,
-    "postalDropdownPages": 32,
+    "postalDropdownPages": 303,
     "containerDropdownPages": 0,
     "searchProducts": 286,
     "quoteCatalogProducts": 276,

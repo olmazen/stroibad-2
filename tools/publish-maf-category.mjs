@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { loadSiteShellData, renderSiteFooter, renderSiteHeader } from './site-shell.mjs';
 
 const DEFAULT_SOURCE_ROOT = '/Users/almazrafikov/Documents/Codex/2026-06-15/files-mentioned-by-the-user-view/outputs/hobbyka-export/site-nomenclature';
 const DEFAULT_GENERATED_ROOT = join(DEFAULT_SOURCE_ROOT, 'outputs/generated-ai');
@@ -304,51 +305,6 @@ function excerptDescription(value, max = 220) {
   return `${candidate.slice(0, word > 0 ? word : max).replace(/[,:;\-–—\s]+$/, '')}…`;
 }
 
-function nav(prefix) {
-  return `
-<div class="topbar"><div class="container">
-  <div class="tb-l"><span><b>Производство:</b> г. Балаково</span><span><b>Офис:</b> г. Москва</span><span class="amber">Отгрузка по всей России</span></div>
-  <div class="tb-r"><a href="tel:+79272295828"><b>8 (927) 229-58-28</b></a><a href="https://wa.me/79272295828" target="_blank" rel="noopener">WhatsApp</a></div>
-</div></div>
-<header id="siteHeader"><div class="container hdr">
-  <a class="logo" href="${prefix}"><span class="logo-mark"></span><span class="logo-txt"><b>EGOE</b><span>Завод металлоконструкций</span></span></a>
-  <nav class="main" id="nav">
-    <div class="navitem"><a href="${prefix}catalog/">Каталог</a>
-      <div class="dropdown">
-        <a class="dd-item" href="${prefix}maf/"><span class="dd-ico"><svg viewBox="0 0 24 24"><path d="M3 11l2-3h14l2 3M3 11h18M5 11v6M19 11v6M3 17h3M18 17h3"/></svg></span><span class="dd-tx"><b>Малые архитектурные формы</b><small>Скамейки, качели, урны, лежаки, навесы</small></span></a>
-        <a class="dd-item" href="${prefix}ograzhdeniya/"><span class="dd-ico"><svg viewBox="0 0 24 24"><path d="M3 9h18M3 14h18M6 5v15M10 5v15M14 5v15M18 5v15"/></svg></span><span class="dd-tx"><b>Ограждения</b><small>Секционные, газонные, перила</small></span></a>
-        <a class="dd-item" href="${prefix}metallokonstrukcii/korziny-dlya-konditsionerov/"><span class="dd-ico"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1"/><path d="M7 10h10M7 13.5h10"/></svg></span><span class="dd-tx"><b>Корзины для кондиционеров</b><small>На фасад, по размерам</small></span></a>
-      </div>
-    </div>
-    <a href="${prefix}about/">Производство</a>
-    <a href="${prefix}zastrojshchikam/">Застройщикам</a>
-    <a href="${prefix}projects/">Портфолио</a>
-    <a href="${prefix}contacts/">Контакты</a>
-  </nav>
-  <div class="hdr-actions"><a class="btn btn-primary btn-sm" href="${prefix}contacts/">Обсудить проект</a></div>
-  <div class="burger" onclick="toggleNav()"><span></span><span></span><span></span></div>
-</div></header>`;
-}
-
-function footer(prefix) {
-  return `
-<footer>
-  <div class="foot-cta"><div class="container">
-    <div><div class="eyebrow">Завод-производитель · Балаково → по всей России</div><h2>Рассчитаем ваш объект за 1 рабочий день</h2></div>
-    <div class="foot-cta-act"><a class="btn btn-primary" href="${prefix}contacts/">Обсудить проект</a><a class="foot-cta-phone" href="tel:+79272295828">8 (927) 229-58-28<small>Ваш личный куратор</small></a></div>
-  </div></div>
-  <div class="container">
-    <div class="foot-grid">
-      <div class="foot-about"><a class="logo" href="${prefix}"><span class="logo-mark"></span><span class="logo-txt"><b style="color:#fff">EGOE</b><span>Завод металлоконструкций</span></span></a><p>Производство полного цикла в Балаково: лазерная резка, гибка на ЧПУ, сварка, порошковая окраска RAL и собственный цех деревообработки.</p><div class="foot-badges"><span>14 лет</span><span>800+ объектов</span><span>44-ФЗ · НДС</span></div></div>
-      <div><div class="foot-col-h">Продукция</div><a href="${prefix}maf/skamejki/">Скамейки</a><a href="${prefix}maf/kacheli/">Качели</a><a href="${prefix}maf/urny/">Урны</a><a href="${prefix}maf/lezhaki/">Лежаки</a><a href="${prefix}maf/pavilony-i-navesy/">Павильоны и навесы</a><a href="${prefix}maf/veloparkovki/">Велопарковки</a><a href="${prefix}ograzhdeniya/">Ограждения</a></div>
-      <div><div class="foot-col-h">Клиентам</div><a href="${prefix}about/">Производство полного цикла</a><a href="${prefix}zastrojshchikam/">Застройщикам</a><a href="${prefix}44-fz/">Работа по 44-ФЗ</a><a href="${prefix}projects/">Проекты и кейсы</a><a href="${prefix}dostavka/">Доставка и оплата</a></div>
-      <div><div class="foot-col-h">Контакты</div><div class="foot-ic"><a href="tel:+78453655777">8 (8453) 65-57-77</a></div><div class="foot-ic"><a href="mailto:zakaz@egoe-life.ru">zakaz@egoe-life.ru</a></div><div class="foot-ic"><span>Производство: г. Балаково</span></div><div class="foot-ic"><span>Пн–Пт 9:00–18:00</span></div></div>
-    </div>
-    <div class="foot-bot"><span>© 2026 EGOE. Завод металлоконструкций.</span><a href="${prefix}privacy/">Политика обработки персональных данных</a><span>Информация на сайте не является публичной офертой</span></div>
-  </div>
-</footer>`;
-}
-
 function doc({ title, description, canonical, ogImage, ogType = 'website', cssPrefix, body, scriptPrefix }) {
   return `<!doctype html>
 <html lang="ru">
@@ -401,11 +357,12 @@ function card(cfg, product, prefix = '../../') {
 </a>`;
 }
 
-function renderIndex(cfg, products) {
+function renderIndex(cfg, products, shellData) {
   const prefix = '../../';
+  const pageRel = `${section(cfg)}/${cfg.target}/index.html`;
   const items = products.map((p, i) => `{"@type":"ListItem","position":${i + 1},"name":"${esc(p.name)}","url":"https://www.egoe-life.ru${categoryUrl(cfg)}${p.pageSlug}/"}`).join(',');
   const hero = imageBlock(cfg, products[0], 'main', products[0].name, '', 'eager').replaceAll('{{prefix}}', prefix);
-  const body = `${nav(prefix)}
+  const body = `${renderSiteHeader(shellData, pageRel)}
 <main>
 <div class="shero">
   <div class="shero-bg">${hero}</div>
@@ -431,7 +388,7 @@ function renderIndex(cfg, products) {
 </div></div></section>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"${esc(cfg.listName)}","itemListElement":[${items}]}</script>
 </main>
-${footer(prefix)}`;
+${renderSiteFooter(shellData, pageRel)}`;
   return doc({
     title: cfg.title,
     description: cfg.metaDescription,
@@ -445,8 +402,9 @@ ${footer(prefix)}`;
   });
 }
 
-function renderProduct(cfg, product, allProducts) {
+function renderProduct(cfg, product, allProducts, shellData) {
   const prefix = '../../../';
+  const pageRel = `${section(cfg)}/${cfg.target}/${product.pageSlug}/index.html`;
   const rel = `assets/img/${assetSection(cfg)}/${cfg.imgTarget}/${product.sku}`;
   const others = allProducts.filter((p) => p.sku !== product.sku).slice(0, 3);
   const specRows = product.specs.length ? product.specs : cfg.defaultSpecs;
@@ -468,7 +426,7 @@ function renderProduct(cfg, product, allProducts) {
   const detailVisual = imageBlock(cfg, product, 'closeup', `${product.name} — деталь`).replaceAll('{{prefix}}', prefix);
   const whiteVisual = imageBlock(cfg, product, 'white', `${product.name} — белый фон`).replaceAll('{{prefix}}', prefix);
   const angleVisual = imageBlock(cfg, product, 'angle', `${product.name} на объекте`).replaceAll('{{prefix}}', prefix);
-  const body = `${nav(prefix)}
+  const body = `${renderSiteHeader(shellData, pageRel)}
 <main>
 <div class="page-head"><div class="container">
   <nav class="crumbs"><a href="${prefix}">Главная</a> / <a href="${prefix}${section(cfg)}/">${esc(sectionLabel(cfg))}</a> / <a href="${prefix}${categoryRelativeUrl(cfg)}/">${esc(cfg.label)}</a> / <span>${esc(product.name)}</span></nav>
@@ -502,7 +460,7 @@ function renderProduct(cfg, product, allProducts) {
 <section style="padding-top:0"><div class="container"><div class="formpanel"><h3>Получить расчёт: ${esc(product.name)}</h3><p>Укажите количество, город поставки и требования — пришлём смету за 1 рабочий день.</p><form onsubmit="return submitLead(this)"><div class="row2"><div class="field"><label>Имя</label><input type="text" required></div><div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div></div><div class="field"><label>Количество и требования</label><textarea rows="2" placeholder="Например: ${esc(product.name)}, 10 шт, RAL 7016"></textarea></div><button class="btn btn-primary btn-block" type="submit">Отправить заявку</button><p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="${prefix}privacy/">политикой обработки персональных данных</a>.</p></form><div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div></div></div></section>
 <script type="application/ld+json">${JSON.stringify(productSchema)}</script>
 </main>
-${footer(prefix)}`;
+${renderSiteFooter(shellData, pageRel)}`;
   return doc({
     title: `${product.name} — производство и поставка | EGOE`,
     description: `${product.name} от производителя для благоустройства. ${product.priceText}, окраска RAL, поставка по России.`,
@@ -560,12 +518,13 @@ function normalizeProducts(products, propertiesBySku, manifests, cfg) {
   });
 }
 
-function main() {
+async function main() {
   const category = argValue('category', 'skameyki');
   const categoryConfig = CATEGORY_CONFIG[category];
   if (!categoryConfig) throw new Error(`Unknown category: ${category}`);
 
-  const siteRoot = argValue('site-root', process.cwd());
+  const siteRoot = resolve(argValue('site-root', process.cwd()));
+  const shellData = await loadSiteShellData(siteRoot);
   const sourceRoot = argValue('source-root', DEFAULT_SOURCE_ROOT);
   const generatedRoot = argValue('generated-root', DEFAULT_GENERATED_ROOT);
   const format = argValue('format', 'webp');
@@ -632,11 +591,11 @@ function main() {
   for (const entry of readdirSync(pageRoot, { withFileTypes: true })) {
     if (entry.isDirectory()) rmSync(join(pageRoot, entry.name), { recursive: true, force: true });
   }
-  writeFileSync(join(pageRoot, 'index.html'), renderIndex(cfg, products));
+  writeFileSync(join(pageRoot, 'index.html'), renderIndex(cfg, products, shellData));
   for (const product of products) {
     const dir = join(pageRoot, product.pageSlug);
     mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, 'index.html'), renderProduct(cfg, product, products));
+    writeFileSync(join(dir, 'index.html'), renderProduct(cfg, product, products, shellData));
   }
   updateSitemap(siteRoot);
 
@@ -652,4 +611,4 @@ function main() {
   }, null, 2));
 }
 
-main();
+await main();
