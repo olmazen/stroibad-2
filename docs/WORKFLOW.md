@@ -45,6 +45,10 @@ Cloud не видит незакоммиченные локальные файл
 
 Товары и цены меняют только в `src/data/products.json`, затем выполняют `npm run sync:data`. Производные `assets/products.json`, `assets/catalog.json` и `assets/data/prices.json` вручную не правят.
 
+Новый верхнеуровневый блок в `assets/js/site.js` запускают только через `EGOE_RUNTIME.run('стабильное-имя', fn)` или `value()` с явным fallback. Имя одновременно добавляют в `config/site-contract.json`; незаписанный IIFE и расхождение списка отклонит `npm run check:runtime`. Для внешнего runtime нельзя убирать timeout или конечное fallback-состояние без отдельного изменения контракта и теста.
+
+После изменения общего `style.css`, `site.js`, `ad3d.js` или `fw3d.js` выполняют `npm run sync:runtime-assets`. Версии в HTML — content-hash и вручную не назначаются; `npm run build` отклонит 303 страницы со старым query-параметром.
+
 ## Definition of done
 
 Задача завершена, когда:

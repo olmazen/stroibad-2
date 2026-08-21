@@ -1,5 +1,87 @@
 /* EGOE — общий скрипт сайта v3: навигация, формы, корзина-страница, микроанимации */
-(function () {
+/*
+   Каждый независимый блок ниже запускается через EGOE_RUNTIME.run(). Ошибка одного
+   блока фиксируется в журнале и не мешает инициализации меню, поиска, корзины и
+   остальных функций. Синтаксические ошибки отдельно блокирует npm run check:syntax.
+*/
+(function (root) {
+  if (root.EGOE_RUNTIME) return;
+  var failures = [];
+
+  function describe(error) {
+    if (!error) return 'Unknown runtime error';
+    return error.message ? String(error.message) : String(error);
+  }
+
+  function report(name, error) {
+    var entry = {
+      feature: String(name || 'unknown'),
+      message: describe(error),
+      time: new Date().toISOString()
+    };
+    failures.push(entry);
+    if (failures.length > 50) failures.shift();
+    try { console.error('[EGOE runtime] ' + entry.feature, error); } catch (_) {}
+    try {
+      if (root.dispatchEvent && typeof root.CustomEvent === 'function') {
+        root.dispatchEvent(new root.CustomEvent('egoe:runtime-error', { detail: entry }));
+      }
+    } catch (_) {}
+    return entry;
+  }
+
+  function run(name, init) {
+    try {
+      var result = init();
+      if (result && typeof result.then === 'function') {
+        Promise.resolve(result).catch(function (error) { report(name, error); });
+      }
+      return result;
+    } catch (error) {
+      report(name, error);
+      return undefined;
+    }
+  }
+
+  function value(name, init, fallback) {
+    try { return init(); }
+    catch (error) { report(name, error); return fallback; }
+  }
+
+  function withTimeout(promise, timeoutMs, label) {
+    return new Promise(function (resolve, reject) {
+      var settled = false;
+      var timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        var error = new Error((label || 'Operation') + ' timed out after ' + timeoutMs + 'ms');
+        error.code = 'EGOE_TIMEOUT';
+        reject(error);
+      }, timeoutMs);
+      Promise.resolve(promise).then(function (result) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(result);
+      }, function (error) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        reject(error);
+      });
+    });
+  }
+
+  root.EGOE_RUNTIME = {
+    run: run,
+    value: value,
+    report: report,
+    withTimeout: withTimeout,
+    failures: function () { return failures.slice(); }
+  };
+})(window);
+
+window.EGOE_RUNTIME.run('core-actions', function () {
   // ── КОНФИГ ЛИДОВ ─────────────────────────────────────────────────────────
   // e-mail: FormSubmit (активируется письмом-подтверждением на ПЕРВЫЙ сабмит).
   // tgRelay: URL релея Google Apps Script для Telegram — токен бота живёт В СКРИПТЕ,
@@ -75,10 +157,10 @@
       }
     }
   };
-})();
+});
 
 /* ── товарная галерея: замена главного кадра и крупный просмотр ── */
-(function () {
+window.EGOE_RUNTIME.run('product-gallery', function () {
   var galleries = document.querySelectorAll('.gallery');
   if (!galleries.length) return;
 
@@ -253,10 +335,10 @@
       });
     });
   });
-})();
+});
 
 /* ── утилита: вызов колбэка, когда элемент появляется во вьюпорте ── */
-window.__whenVisible = (function () {
+window.__whenVisible = window.EGOE_RUNTIME.value('visibility-observer', function () {
   // IntersectionObserver надёжнее на СЛАБЫХ устройствах: срабатывает вне основного потока,
   // поэтому reveal не «застревает» невидимым, когда главный поток занят тяжёлой анимацией
   // (из-за чего секции оставались пустыми — сквозь них проступал blueprint-фон).
@@ -303,10 +385,10 @@ window.__whenVisible = (function () {
     watched.push({ el: el, cb: cb, margin: margin || 0.08 });
     onScroll();
   };
-})();
+}, function (el, cb) { if (cb) cb(el); });
 
 /* ── появление блоков при прокрутке ── */
-(function () {
+window.EGOE_RUNTIME.run('scroll-reveal', function () {
   var els = document.querySelectorAll('.reveal');
   if (!els.length) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -327,10 +409,10 @@ window.__whenVisible = (function () {
   }
   setTimeout(revealVisible, 2000);
   setTimeout(revealVisible, 5000);
-})();
+});
 
 /* ── анимированные счётчики ── */
-(function () {
+window.EGOE_RUNTIME.run('animated-counters', function () {
   var nums = document.querySelectorAll('[data-count]');
   if (!nums.length) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -350,19 +432,19 @@ window.__whenVisible = (function () {
       requestAnimationFrame(tick);
     }, 0.15);
   });
-})();
+});
 
 /* ── тень у закреплённой шапки при скролле ── */
-(function () {
+window.EGOE_RUNTIME.run('sticky-header', function () {
   var h = document.getElementById('siteHeader');
   if (!h) return;
   var onScroll = function () { h.classList.toggle('stuck', window.scrollY > 30); };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
-})();
+});
 
 /* ── индикатор прокрутки страницы (янтарная линия сверху) ── */
-(function () {
+window.EGOE_RUNTIME.run('scroll-progress', function () {
   var bar = document.createElement('div');
   bar.className = 'scroll-progress';
   document.body.appendChild(bar);
@@ -373,10 +455,10 @@ window.__whenVisible = (function () {
   };
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
-})();
+});
 
 /* ── подсветка карточек, следующая за курсором ── */
-(function () {
+window.EGOE_RUNTIME.run('card-glow', function () {
   if (matchMedia('(hover: none)').matches) return;
   var sel = '.icard,.why-card,.model-card,.dir-tile,.dir-card,.dir-hero,.spot,.review,.tile,.type-card,.versus,.stat,.metric';
   document.querySelectorAll(sel).forEach(function (card) {
@@ -387,10 +469,10 @@ window.__whenVisible = (function () {
       card.style.setProperty('--my', (e.clientY - r.top) + 'px');
     });
   });
-})();
+});
 
 /* ── чертежи: линии «рисуются» (hero + схемы) ── */
-(function () {
+window.EGOE_RUNTIME.run('blueprint-drawing', function () {
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var svgs = document.querySelectorAll('svg[data-draw]');
   if (!svgs.length) return;
@@ -426,12 +508,12 @@ window.__whenVisible = (function () {
       setTimeout(function () { draw(svg); }, 250);
     }, 0.12);
   });
-})();
+});
 
 /* ── мобильное меню v3: панель справа, аккордеоны разделов, CTA снизу ──
    Разметка строится ИЗ существующего desktop-меню (#nav) — один источник правды,
    ничего не дублируем в HTML страниц. */
-(function () {
+window.EGOE_RUNTIME.run('mobile-navigation', function () {
   var nav = document.getElementById('nav');
   var header = document.getElementById('siteHeader');
   if (!nav || !header) return;
@@ -540,10 +622,10 @@ window.__whenVisible = (function () {
     });
   });
   window.addEventListener('resize', function () { if (innerWidth > 1180) window.closeMnav(); });
-})();
+});
 
 /* ── шапка: поиск + корзина (лист для КП) ── */
-(function () {
+window.EGOE_RUNTIME.run('header-search-cart', function () {
   var header = document.getElementById('siteHeader');
   if (!header) return;
   var logo = header.querySelector('.logo');
@@ -750,10 +832,10 @@ window.__whenVisible = (function () {
   });
 
   renderBadge();
-})();
+});
 
 /* ── страница корзины /cart/: список, количество, заявка ── */
-(function () {
+window.EGOE_RUNTIME.run('cart-page', function () {
   var itemsBox = document.getElementById('cartItems');
   if (!itemsBox || !window.__spCart) return;
   var C = window.__spCart;
@@ -1172,14 +1254,14 @@ window.__whenVisible = (function () {
   })();
 
   render();
-})();
+});
 
 /* ── главная: колесо заказа v3 ──
    ОСНОВНАЯ информация шага (номер + заголовок) закреплена НА колесе и уезжает
    вместе с его вращением; следующая подъезжает по дуге. Когда шаг встал в паз —
    проявляется ДОП (описание + смета/форма/чертёж/фото).
    Десктоп: колесо слева. Мобилка: колесо ВНИЗУ, блоки едут по дуге горизонтально. */
-(function () {
+window.EGOE_RUNTIME.run('order-wheel', function () {
   var host = document.getElementById('flowWheel');
   if (!host) return;
   var items = Array.prototype.map.call(host.querySelectorAll('.fdial-list li'), function (li, i) {
@@ -1986,11 +2068,11 @@ window.__whenVisible = (function () {
   }
   document.addEventListener('egoe:lite', goStatic);
   if (document.documentElement.hasAttribute('data-lite')) goStatic();
-})();
+});
 
 
 /* ── cookie-уведомление (один раз, путь к политике берём из подвала) ── */
-(function () {
+window.EGOE_RUNTIME.run('cookie-notice', function () {
   try { if (localStorage.getItem('egoe_cookie_ok')) return; } catch (e) {}
   if (!document.body || document.querySelector('.cookie-bar')) return;
   var pl = document.querySelector('.foot-bot a[href*="privacy"]');
@@ -2005,10 +2087,10 @@ window.__whenVisible = (function () {
     bar.classList.remove('show');
     setTimeout(function () { if (bar.parentNode) bar.remove(); }, 500);
   });
-})();
+});
 
 /* ── лайтбокс просмотра сертификатов/документов (страница корзин, о компании) ── */
-(function () {
+window.EGOE_RUNTIME.run('document-lightbox', function () {
   var cards = document.querySelectorAll('.cert-card[href]');
   if (!cards.length) return;
   var lb = document.createElement('div');
@@ -2021,7 +2103,7 @@ window.__whenVisible = (function () {
   cards.forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); open(a.getAttribute('href')); }); });
   lb.addEventListener('click', function (e) { if (e.target === lb || e.target.classList.contains('cert-lb-x')) close(); });
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && lb.classList.contains('on')) close(); });
-})();
+});
 
 /* ══════════════════════════════════════════════════════════════════════
    EGOE lite-режим — авто-упрощение сайта ТОЛЬКО для телефонов.
@@ -2029,7 +2111,7 @@ window.__whenVisible = (function () {
    при явном доказательстве слабости (медленная сеть ИЛИ устойчивый джанк).
    Отсутствующий/капнутый сигнал = НЕ повод понижать (защита мощных телефонов).
    ═══════════════════════════════════════════════════════════════════════ */
-(function () {
+window.EGOE_RUNTIME.run('mobile-lite-mode', function () {
   var doc = document.documentElement;
 
   /* 1) Только телефоны. ПК, ноуты и планшеты не трогаем. */
@@ -2201,10 +2283,10 @@ window.__whenVisible = (function () {
   }
   if (document.readyState === 'complete') boot();
   else addEventListener('load', boot);
-})();
+});
 
 /* ── плавное появление фото карточек (.ph.has-img): серый пульс → fade-in ── */
-(function () {
+window.EGOE_RUNTIME.run('image-fade', function () {
   function done(img){ var ph=img.closest && img.closest('.ph.has-img'); if(ph) ph.classList.add('loaded'); }
   function scan(){
     document.querySelectorAll('.ph.has-img img').forEach(function(img){
@@ -2215,4 +2297,4 @@ window.__whenVisible = (function () {
   }
   if(document.readyState!=='loading') scan(); else addEventListener('DOMContentLoaded', scan);
   addEventListener('load', scan);
-})();
+});

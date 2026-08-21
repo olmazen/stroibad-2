@@ -135,5 +135,55 @@
     "searchLandings": 16,
     "searchEntries": 292,
     "productsWithoutGallery": 4
+  },
+  "runtime": {
+    "script": "assets/js/site.js",
+    "features": [
+      "core-actions",
+      "product-gallery",
+      "visibility-observer",
+      "scroll-reveal",
+      "animated-counters",
+      "sticky-header",
+      "scroll-progress",
+      "card-glow",
+      "blueprint-drawing",
+      "mobile-navigation",
+      "header-search-cart",
+      "cart-page",
+      "order-wheel",
+      "cookie-notice",
+      "document-lightbox",
+      "mobile-lite-mode",
+      "image-fade"
+    ],
+    "maxFailureEntries": 50,
+    "assetRevisions": [
+      {
+        "path": "assets/css/style.css",
+        "expectedPages": 303
+      },
+      {
+        "path": "assets/js/site.js",
+        "expectedPages": 303
+      },
+      {
+        "path": "assets/js/ad3d.js",
+        "expectedPages": 75
+      },
+      {
+        "path": "assets/js/fw3d.js",
+        "expectedPages": 1
+      }
+    ],
+    "threeD": {
+      "moduleTimeoutMs": 12000,
+      "modelTimeoutMs": 20000,
+      "artDecoScript": "assets/js/ad3d.js",
+      "artDecoPages": 75,
+      "orderWheelScript": "assets/js/fw3d.js",
+      "orderWheelPages": 1,
+      "fallbackText": "3D недоступно — показан чертёж"
+    }
   }
 }
