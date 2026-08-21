@@ -125,13 +125,15 @@
     "dropdownPages": 303,
     "postalDropdownPages": 303,
     "containerDropdownPages": 0,
-    "searchProducts": 286,
+    "searchProducts": 292,
     "quoteCatalogProducts": 276,
-    "pricedProducts": 268,
-    "knownMissingDataAssets": [
-      "assets/img/og-korziny.jpg",
-      "assets/img/og-maf.jpg",
-      "assets/img/og-mk.jpg"
-    ]
+    "pricedProducts": 276,
+    "knownMissingDataAssets": []
+  },
+  "productData": {
+    "canonicalProducts": 276,
+    "searchLandings": 16,
+    "searchEntries": 292,
+    "productsWithoutGallery": 4
   }
 }
