@@ -4,7 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
-import { applyRevision } from './sync-runtime-assets.mjs';
+import { applyRevision, insertScriptAfter } from './sync-runtime-assets.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTRACT = JSON.parse(await fs.readFile(path.join(ROOT, 'config/site-contract.json'), 'utf8'));
@@ -92,6 +92,18 @@ test('asset revision sync only changes real href/src attributes', () => {
   assert.equal(
     result.updated,
     '<div data-src="assets/js/site.js?v=legacy"></div>\n<script src="assets/js/site.js?v=abc123"></script>'
+  );
+
+  const inserted = insertScriptAfter(
+    '<script src="../../assets/js/site.js?v=old"></script>',
+    'assets/js/leads.js',
+    'assets/js/site.js',
+    'lead123'
+  );
+  assert.equal(inserted.matches, 1);
+  assert.equal(
+    inserted.updated,
+    '<script src="../../assets/js/site.js?v=old"></script>\n<script src="../../assets/js/leads.js?v=lead123"></script>'
   );
 });
 

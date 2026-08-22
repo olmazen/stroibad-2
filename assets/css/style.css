@@ -384,6 +384,13 @@ svg.drawn .bp-fade{opacity:1}
 .consent{font-size:12.5px;color:#6E757C;margin-top:12px}
 .form-ok{background:rgba(242,111,29,.1);border:1px solid var(--amber);padding:22px;border-radius:var(--r);color:#fff;font-size:15px}
 .form-ok b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:6px;color:var(--amber)}
+.form-result span,.form-result small{display:block;line-height:1.5}
+.form-result small{margin-top:8px;color:var(--steel);font-size:12px}
+.form-result>a{display:inline-block;margin-top:10px;color:#fff;text-decoration:underline;text-underline-offset:3px}
+.form-error{background:rgba(226,90,78,.09);border:1px solid #E25A4E;padding:18px 20px;border-radius:var(--r);color:#fff;font-size:14px;margin-top:14px}
+.form-error b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:6px;color:#ff887e}
+.formpanel button[type="submit"]:disabled,.kp-gen button[type="submit"]:disabled{cursor:wait;opacity:.65;filter:saturate(.65)}
+.lead-honey{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 
 /* ============ section hero (внутренние) ============ */
 .shero{position:relative;background:var(--bg);color:#fff;overflow:hidden;border-bottom:1px solid var(--line);min-height:calc(100vh - 104px);display:flex;align-items:flex-end}
@@ -934,6 +941,9 @@ body.mnav-lock{overflow:hidden}
 .kp-gen input.kp-invalid{border-color:var(--bad)!important;background:#2a1315}
 #kpOpen{margin-top:4px}
 .kp-gen .form-ok{margin-top:12px}
+.kp-lead-status{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.12);color:var(--steel);font-size:12.5px}
+.kp-lead-status.is-success{color:#43C383}
+.kp-lead-status.is-error{color:#FF8B80;font-weight:600}
 
 /* ── КП: «генератор» — тёмные чертёжные сцены в стиле сайта, оранжевые линии рисуются ── */
 .kp-preview{background:#14181e;border-color:var(--line-2)}
@@ -1026,6 +1036,9 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .gb-prog{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--amber),#ffc858);width:0;transition:width .5s ease}
 @media(max-width:640px){.gb-film{display:none}}
 .kpd-foot{display:flex;gap:16px;align-items:center;padding:13px 20px;border-top:1px solid var(--line)}
+.kpd-lead-status{flex:1;min-width:180px;font-size:12px;line-height:1.35;color:var(--steel)}
+.kpd-lead-status.is-success{color:#43C383}
+.kpd-lead-status.is-error{color:#FF8B80;font-weight:600}
 .kpd-foot .btn{flex-shrink:0}
 .kpd-alt{font-size:13px;color:var(--steel);text-decoration:underline;text-underline-offset:3px}
 .kpd-alt:hover{color:#fff}
@@ -1033,7 +1046,8 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
  .kpd-panel{width:100%}
  .kpd-head{padding:12px 14px}
  .kpd-title{font-size:13px}
- .kpd-foot{padding:11px 14px;gap:12px}
+ .kpd-foot{padding:11px 14px;gap:10px;flex-wrap:wrap}
+ .kpd-lead-status{flex:0 0 100%;order:-1;min-width:0}
  .kpd-foot .btn{flex:1}
  .kpd-mini{height:300px}
 }

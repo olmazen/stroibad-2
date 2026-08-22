@@ -15,13 +15,15 @@
     "test:shell": "node --test tools/site-shell.test.mjs",
     "test:data": "node --test tools/product-data.test.mjs",
     "test:runtime": "node --test tools/runtime-resilience.test.mjs",
+    "test:leads": "node --test tools/lead-delivery.test.mjs",
     "check:shell": "npm run test:shell && node tools/sync-site-shell.mjs --check",
     "check:data": "npm run test:data && node tools/sync-product-data.mjs --check && node tools/verify-product-data.mjs",
     "check:runtime": "npm run test:runtime && node tools/sync-runtime-assets.mjs --check",
+    "check:leads": "npm run test:leads",
     "check:syntax": "node tools/check-javascript-syntax.mjs",
     "check:artifact": "node tools/verify-public-site.mjs",
     "check:seo": "node tools/run-public-seo-checks.mjs",
-    "check": "npm run check:syntax && npm run check:shell && npm run check:data && npm run check:runtime && npm run build && npm run check:artifact && npm run check:seo",
+    "check": "npm run check:syntax && npm run check:shell && npm run check:data && npm run check:runtime && npm run check:leads && npm run build && npm run check:artifact && npm run check:seo",
     "verify": "npm run check"
   }
 }

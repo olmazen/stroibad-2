@@ -82,61 +82,6 @@
 })(window);
 
 window.EGOE_RUNTIME.run('core-actions', function () {
-  // ── КОНФИГ ЛИДОВ ─────────────────────────────────────────────────────────
-  // e-mail: FormSubmit (активируется письмом-подтверждением на ПЕРВЫЙ сабмит).
-  // tgRelay: URL релея Google Apps Script для Telegram — токен бота живёт В СКРИПТЕ,
-  //          НЕ в этом файле и НЕ в публичном репозитории. Пусто = канал выключен.
-  window.LEAD_CFG = window.LEAD_CFG || { email: 'zakaz@egoe-life.ru', tgRelay: 'https://script.google.com/macros/s/AKfycbx5_jnp2K1hCTRHX_7dMErdReIMhClkpFtWE6hIm19W_3V3uh6S2JEoQXBK6KMG914j7Q/exec' };
-
-  // собрать пары «подпись поля → значение» из любой формы (у полей нет name — берём label/placeholder)
-  function leadFields(form) {
-    var out = {}, n = 0;
-    form.querySelectorAll('input, textarea, select').forEach(function (el) {
-      var t = (el.type || '').toLowerCase();
-      if (t === 'hidden' || t === 'submit' || t === 'button' || t === 'file') return;
-      var wrap = el.closest('.field'), lab = wrap && wrap.querySelector('label');
-      var key = (lab && lab.textContent.trim()) || el.getAttribute('placeholder') || el.getAttribute('aria-label') || ('Поле ' + (++n));
-      var val = (t === 'checkbox') ? (el.checked ? 'да' : '') : (el.value || '').trim();
-      if (val) out[key] = val;
-    });
-    return out;
-  }
-  // номер к единому виду +7XXXXXXXXXX (клиент мог ввести с пробелами/тире/через 8) → кликабелен в Telegram
-  function normPhone(v) {
-    var dg = String(v == null ? '' : v).replace(/\D/g, '');
-    if (dg.length === 11 && (dg[0] === '8' || dg[0] === '7')) dg = '7' + dg.slice(1);
-    else if (dg.length === 10) dg = '7' + dg;
-    return dg.length === 11 ? '+' + dg : String(v == null ? '' : v);
-  }
-  function sendLead(fields, tag) {
-    var payload = { _subject: 'Заявка с сайта EGOE — ' + (tag || 'форма') };
-    Object.keys(fields).forEach(function (k) { payload[k] = fields[k]; });
-    Object.keys(payload).forEach(function (k) { if (/тел|phone/i.test(k)) payload[k] = normPhone(payload[k]); });
-    var C = window.LEAD_CFG || {};
-    if (C.email) {
-      fetch('https://formsubmit.co/ajax/' + encodeURIComponent(C.email), {
-        method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload)
-      }).catch(function () {});
-    }
-    if (C.tgRelay) {
-      // text/plain = «простой» CORS-запрос → браузер НЕ шлёт preflight OPTIONS,
-      // который Apps Script не умеет (иначе POST блокируется и в Telegram ничего не приходит).
-      // Тело остаётся JSON-строкой — на стороне скрипта JSON.parse(e.postData.contents) её читает.
-      fetch(C.tgRelay, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) }).catch(function () {});
-    }
-  }
-  window.__sendLead = sendLead;   // переиспользуется КП-генератором
-
-  // отправка любой формы-заявки -> e-mail + Telegram, затем «спасибо»
-  window.submitLead = function (form) {
-    try { sendLead(leadFields(form), 'форма'); } catch (e) {}
-    var box = form.querySelector('.form-result') || form.parentNode.querySelector('.form-result');
-    form.style.display = 'none';
-    if (box) box.style.display = 'block';
-    return false;
-  };
-
   // счётчик количества на странице товара
   window.qtyStep = function (btn, delta) {
     var input = btn.parentNode.querySelector('input');
@@ -755,38 +700,6 @@ window.EGOE_RUNTIME.run('header-search-cart', function () {
     }
   }
 
-  /* прикрепление файла (чертёж/ТЗ) в формах заявки — drag&drop + лимит; готово под будущую CRM */
-  (function () {
-    var MAX = 10 * 1024 * 1024;  // 10 МБ
-    var ACCEPT = '.pdf,.jpg,.jpeg,.png,.webp,.dwg,.dxf,.doc,.docx,.xls,.xlsx,.zip';
-    var forms = document.querySelectorAll('form[onsubmit*="submitLead"]');
-    Array.prototype.forEach.call(forms, function (form) {
-      if (form.querySelector('.lead-file')) return;
-      var wrap = document.createElement('div');
-      wrap.className = 'field lead-file';
-      wrap.innerHTML = '<label>Прикрепить файл (чертёж, ТЗ, план) — необязательно</label>' +
-        '<div class="filedrop" tabindex="0" role="button" aria-label="Прикрепить файл">' +
-        '<input type="file" name="attachment" accept="' + ACCEPT + '" hidden>' +
-        '<span class="filedrop-txt"><b>Перетащите файл</b> сюда или нажмите<small>до 10 МБ · PDF, JPG, PNG, DWG, DOC, XLS, ZIP</small></span></div>';
-      var submit = form.querySelector('button[type="submit"], .btn[type="submit"], button.btn-block');
-      if (submit) form.insertBefore(wrap, submit); else form.appendChild(wrap);
-      var drop = wrap.querySelector('.filedrop'), input = wrap.querySelector('input[type="file"]'), txt = wrap.querySelector('.filedrop-txt');
-      function setFile(file) {
-        if (!file) return;
-        if (file.size > MAX) { drop.classList.add('err'); drop.classList.remove('has'); txt.innerHTML = '<b>Файл больше 10 МБ</b><small>' + file.name + ' — выберите файл поменьше</small>'; input.value = ''; return; }
-        drop.classList.remove('err'); drop.classList.add('has');
-        txt.innerHTML = '<b>' + file.name + '</b><small>' + Math.round(file.size / 1024) + ' КБ · прикреплён · <span class="filedrop-x">убрать</span></small>';
-        form.__attachment = file;  // ссылка для будущей отправки в CRM
-      }
-      drop.addEventListener('click', function (e) { if (e.target.closest('.filedrop-x')) { e.stopPropagation(); input.value = ''; form.__attachment = null; drop.classList.remove('has', 'err'); txt.innerHTML = '<b>Перетащите файл</b> сюда или нажмите<small>до 10 МБ · PDF, JPG, PNG, DWG, DOC, XLS, ZIP</small>'; return; } input.click(); });
-      drop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
-      input.addEventListener('change', function () { setFile(input.files[0]); });
-      ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('drag'); }); });
-      ['dragleave', 'dragend', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('drag'); }); });
-      drop.addEventListener('drop', function (e) { var f = e.dataTransfer && e.dataTransfer.files[0]; if (f) { try { input.files = e.dataTransfer.files; } catch (_) {} setFile(f); } });
-    });
-  })();
-
   /* ================= ПОИСК ================= */
   var searchOv = wrap.querySelector('#searchOv'), input = wrap.querySelector('#searchInput'),
       results = wrap.querySelector('#searchResults'), INDEX = null, sel = -1;
@@ -939,7 +852,6 @@ window.EGOE_RUNTIME.run('cart-page', function () {
   (function wireKpGen() {
     var gen = document.getElementById('kpGen');
     if (!gen) return;
-    var HEAD_KEY = 'sp_kp_head_v1', LEADS_KEY = 'sp_leads_v1';
     var stage = document.getElementById('kpvStage');
     var form = document.getElementById('kpForm');
     var nameEl = document.getElementById('kpName');
@@ -947,20 +859,23 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     var emailEl = document.getElementById('kpEmail');
     var addrEl = document.getElementById('kpAddressee');   // компания → «Кому» в КП
     var okBox = document.getElementById('kpOk');
+    var leadStatus = document.getElementById('kpLeadStatus');
+    var submitBtn = form && form.querySelector('button[type="submit"]');
+    var kpLeadPending = false;
+    var currentKpHead = null;
+    var kpTabWindow = null;
     var base = C.siteBase || (location.origin + '/');
 
     function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
-    // № КП уникален по дате+времени (до секунды) — не путается между заявками и устройствами
+    // Человекочитаемый номер документа; уникальный ID заявки создаёт lead-модуль.
     function autoNum() { var d = new Date(), p = function (n) { return ('0' + n).slice(-2); }; return 'КП-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()); }
+    function leadRequestId() {
+      if (window.EGOE_LEADS && typeof window.EGOE_LEADS.requestId === 'function') return window.EGOE_LEADS.requestId();
+      try { if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID(); } catch (e) {}
+      return 'egoe-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+    }
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
     function money(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
-
-    // префилл контактов (если уже оставляли)
-    var saved = {}; try { saved = JSON.parse(localStorage.getItem(HEAD_KEY)) || {}; } catch (e) {}
-    if (nameEl) nameEl.value = saved.name || '';
-    if (phoneEl) phoneEl.value = saved.phone || '';
-    if (emailEl) emailEl.value = saved.email || '';
-    if (addrEl) addrEl.value = saved.addressee || '';
 
     /* — сцены «генерации» КП: тёмный чертёжный скелет в стиле сайта, всё рисуется
          оранжевыми линиями (обложка → ведомость → лист изделия → условия) — */
@@ -1071,6 +986,7 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     /* — шторка с настоящим КП — */
     var drawer = document.getElementById('kpDrawer');
     var dFrame = document.getElementById('kpdFrame');
+    var tab = document.getElementById('kpdOpenTab');
     var dStage = document.getElementById('kpdStage');
     var dFilm = document.getElementById('kpdFilm');
     var dStatus = document.getElementById('kpdStatus');
@@ -1081,11 +997,23 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     var dGbFilm = document.getElementById('kpdGbFilm');
     var dGbProg = document.getElementById('kpdGbProg');
     var dPlayer = dStage ? makePlayer(dStage) : null;
+    var dLeadStatus = document.getElementById('kpdLeadStatus');
     var genTimers = [];
     var GEN_KEY = 'sp_kp_generated_v1'; // какой состав КП уже «сгенерирован» — второй раз не пересобираем
     var lastGenKey = '', gbStage = '', gbTotal = 0;
     function hashStr(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
     function cartGenKey(items) { return hashStr(JSON.stringify(items.map(function (i) { return [i.id, i.qty, i.price || 0]; }))); }
+    function sendKpHead(target) {
+      if (!target || !currentKpHead) return;
+      try { target.postMessage({ kpHead: currentKpHead }, location.origin); } catch (e) {}
+    }
+    function setLeadStatus(text, state) {
+      if (leadStatus) leadStatus.textContent = text;
+      if (!dLeadStatus) return;
+      dLeadStatus.textContent = text;
+      dLeadStatus.classList.toggle('is-error', state === 'error');
+      dLeadStatus.classList.toggle('is-success', state === 'success');
+    }
 
     /* — полоса генерации над документом: статус + чипы готовых разделов + прогресс — */
     var GB_LABELS = { cover: 'обложка', ledger: 'ведомость', product: 'листы изделий', terms: 'условия' };
@@ -1107,6 +1035,10 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     var pendingBuilt = null; // вызывается, когда КП-iframe сообщил, что макет собран (для быстрого показа)
     window.addEventListener('message', function (e) {
       if (e.origin !== location.origin) return;
+      if (e.data && e.data.kpNeedHead) {
+        if ((dFrame && e.source === dFrame.contentWindow) || (kpTabWindow && e.source === kpTabWindow)) sendKpHead(e.source);
+        return;
+      }
       var m = e.data && e.data.kpStream;
       if (!m || !dGenbar) return;
       if (m.built) { if (pendingBuilt) { var f = pendingBuilt; pendingBuilt = null; f(); } return; }
@@ -1137,7 +1069,7 @@ window.EGOE_RUNTIME.run('cart-page', function () {
       drawer.classList.remove('ready');
       drawer.classList.add('open');
       document.documentElement.classList.add('kpd-lock');
-      if (dNum) dNum.textContent = autoNum() + ' · ' + today().split('-').reverse().join('.');
+      if (dNum) dNum.textContent = (currentKpHead ? currentKpHead.number : autoNum()) + ' · ' + today().split('-').reverse().join('.');
       genTimers.forEach(clearTimeout); genTimers = [];
 
       // Первая генерация: документ «печатается» потоково прямо в КП (стрим из iframe),
@@ -1181,17 +1113,18 @@ window.EGOE_RUNTIME.run('cart-page', function () {
       }
 
       // настоящее КП грузится параллельно; тот же состав уже загружен (в т.ч. после стрима) — не перезагружаем
-      var target = new URL('kp/?embed=1' + (already ? '' : '&stream=1') + '&_=' + genKey, base).href;
-      if (dFrame.dataset.loaded === '1' && dFrame.src.indexOf('_=' + genKey) > -1) {
+      var docKey = genKey + '-' + hashStr(currentKpHead ? (currentKpHead.number + '|' + currentKpHead.addressee) : 'generic');
+      var target = new URL('kp/?embed=1' + (already ? '' : '&stream=1') + '&_=' + docKey, base).href;
+      if (dFrame.dataset.loaded === '1' && dFrame.src.indexOf('_=' + docKey) > -1) {
+        sendKpHead(dFrame.contentWindow);
         loaded = true; tryReveal();
         if (!already) setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true }, location.origin); } catch (e2) {} }, 220);
       } else {
         dFrame.dataset.loaded = '';
-        dFrame.onload = function () { dFrame.dataset.loaded = '1'; loaded = true; tryReveal(); };
+        dFrame.onload = function () { dFrame.dataset.loaded = '1'; sendKpHead(dFrame.contentWindow); loaded = true; tryReveal(); };
         dFrame.src = target;
       }
       genTimers.push(setTimeout(function () { loaded = true; tryReveal(); }, 12000)); // страховка
-      var tab = document.getElementById('kpdOpenTab');
       if (tab) tab.href = new URL('kp/', base).href;
     }
     function closeDrawer() {
@@ -1212,25 +1145,42 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     });
     var reopen = document.getElementById('kpReopen');
     if (reopen) reopen.addEventListener('click', function (e) { e.preventDefault(); openDrawer(); });
+    if (tab) tab.addEventListener('click', function (e) {
+      if (!currentKpHead) return;
+      e.preventDefault();
+      kpTabWindow = window.open(tab.href || new URL('kp/', base).href, '_blank');
+      if (!kpTabWindow) return;
+      [150, 500, 1200].forEach(function (delay) {
+        setTimeout(function () { sendKpHead(kpTabWindow); }, delay);
+      });
+    });
 
     function digits(s) { return (s || '').replace(/\D/g, ''); }
     function markInvalid(el) { el.classList.add('kp-invalid'); setTimeout(function () { el.classList.remove('kp-invalid'); }, 2500); }
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (kpLeadPending) return;
       var name = (nameEl.value || '').trim(), phone = (phoneEl.value || '').trim(), company = (addrEl.value || '').trim();
       var email = emailEl ? (emailEl.value || '').trim() : '';
       var bad = null;
       if (!name) { markInvalid(nameEl); bad = bad || nameEl; }
-      if (digits(phone).length < 10) { markInvalid(phoneEl); bad = bad || phoneEl; }
+      var validKpPhone = window.EGOE_LEADS && typeof window.EGOE_LEADS.validPhone === 'function'
+        ? window.EGOE_LEADS.validPhone(phone)
+        : (digits(phone).length === 10 || (digits(phone).length === 11 && /^[78]/.test(digits(phone))));
+      if (!validKpPhone) { markInvalid(phoneEl); bad = bad || phoneEl; }
       if (emailEl && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { markInvalid(emailEl); bad = bad || emailEl; }
       if (bad) { bad.focus(); return; }
 
       // шапка КП: адресат = компания или имя; №/дата — авто
-      var head = { name: name, phone: phone, email: email, addressee: company || name, object: '', number: autoNum(), date: today() };
-      try { localStorage.setItem(HEAD_KEY, JSON.stringify(head)); } catch (e2) {}
+      var quoteNumber = form.dataset.quoteNumber || autoNum();
+      var leadId = form.dataset.leadId || leadRequestId();
+      form.dataset.quoteNumber = quoteNumber;
+      form.dataset.leadId = leadId;
+      currentKpHead = { addressee: company || name, object: '', number: quoteNumber, date: today() };
 
-      // лид: отправляем на e-mail/Telegram + дублируем локально как резерв
+      // КП собирается локально; передачу контактов подтверждает отдельный lead-модуль.
+      var leadTask = null;
       try {
         var items = C.read(), grand = 0, anyReq = false;
         var fmt = function (n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); };
@@ -1240,16 +1190,27 @@ window.EGOE_RUNTIME.run('cart-page', function () {
           return '• ' + (it.name || it.id) + (it.ral ? ' (' + it.ral + ')' : '') + ' — ' + q + ' шт' + (u > 0 ? ' × ' + fmt(u) + ' = ' + fmt(u * q) + ' ₽' : ' · по запросу');
         }).join('\n');
         var totalTxt = grand > 0 ? (anyReq ? '≈ ' + fmt(grand) + ' ₽ (часть по запросу)' : fmt(grand) + ' ₽') : 'по запросу';
-        if (window.__sendLead) window.__sendLead({ 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': '\n' + itemsTxt, 'Итого': totalTxt, '№ КП': head.number }, 'КП');
-      } catch (e3) {}
-      try {
-        var leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-        leads.push({ ts: Date.now(), name: name, phone: phone, email: email, company: company, items: C.read() });
-        localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
-      } catch (e4) {}
+        if (!window.__sendLead) throw new Error('Lead module is unavailable');
+        leadTask = window.__sendLead({ 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': '\n' + itemsTxt, 'Итого': totalTxt, '№ КП': currentKpHead.number }, 'КП', {
+          leadId: leadId,
+          formId: 'cart:quote'
+        });
+      } catch (e3) { leadTask = Promise.reject(e3); }
 
       openDrawer();
       if (okBox) okBox.style.display = 'block';
+      setLeadStatus('Передаём контакты менеджеру…', 'pending');
+      kpLeadPending = true;
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Передаём контакты…'; }
+      Promise.resolve(leadTask).then(function (result) {
+        setLeadStatus('Заявка подтверждена. № ' + currentKpHead.number + '.', 'success');
+        form.style.display = 'none';
+      }).catch(function () {
+        setLeadStatus('КП готово, но передачу контактов подтвердить не удалось. Закройте КП и повторите отправку.', 'error');
+      }).finally(function () {
+        kpLeadPending = false;
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Получить КП (PDF)'; }
+      });
     });
   })();
 

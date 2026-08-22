@@ -9,7 +9,7 @@
 <meta name="robots" content="noindex, follow">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=8b7e64b8fdbc">
+<link rel="stylesheet" href="../assets/css/style.css?v=5bef010627a5">
 </head>
 <body>
 <!-- EGOE:SITE_HEADER:START -->
@@ -70,17 +70,17 @@
               <div class="kp-preview-fade"></div>
               <div class="kp-preview-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>Предпросмотр · ваши изделия</div>
             </div>
-            <p class="kp-gen-hint">Красивое КП в PDF: обложка, ведомость с ценами, фото и чертёж каждого изделия. Оставьте контакты — соберём его прямо здесь, копию пришлём на почту.</p>
+            <p class="kp-gen-hint">Красивое КП в PDF: обложка, ведомость с ценами, фото и чертёж каждого изделия. Оставьте контакты — соберём документ прямо здесь и передадим заявку менеджеру.</p>
             <form id="kpForm" novalidate>
               <div class="field"><label>Ваше имя<span class="req">*</span></label><input type="text" id="kpName" placeholder="Как к вам обращаться"></div>
               <div class="field"><label>Телефон<span class="req">*</span></label><input type="tel" id="kpPhone" placeholder="+7 ___ ___-__-__"></div>
-              <div class="field"><label>Почта<span class="req">*</span></label><input type="email" id="kpEmail" placeholder="Пришлём КП на эту почту"></div>
+              <div class="field"><label>Почта<span class="req">*</span></label><input type="email" id="kpEmail" placeholder="Для связи по заявке"></div>
               <div class="field"><label>Компания (необязательно)</label><input type="text" id="kpAddressee" placeholder="Появится в КП как «Кому»"></div>
               <textarea name="items" id="cartFormItems" hidden></textarea>
               <button class="btn btn-primary btn-block" type="submit" id="kpOpen">Получить КП (PDF)</button>
               <p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="../privacy/">политикой обработки персональных данных</a>.</p>
             </form>
-            <div class="form-result form-ok" id="kpOk" style="display:none"><b>Готово!</b>КП собрано — копию пришлём на почту. <a href="#" id="kpReopen">Открыть ещё раз</a></div>
+            <div class="form-result form-ok" id="kpOk" style="display:none"><b>Заявка подтверждена</b>Документ можно открыть и скачать в PDF. <span id="kpLeadStatus" class="kp-lead-status">Заявка передана менеджеру.</span> <a href="#" id="kpReopen">Открыть ещё раз</a></div>
           </div>
           <div class="cartp-dg"><span>Готовы к заказу?</span> <a href="../tools/dogovor/">Составить договор поставки онлайн →</a></div>
         <p class="cartp-note">Завод-производитель · окраска RAL · отгрузка по всей России</p>
@@ -153,12 +153,14 @@
       <iframe id="kpdFrame" title="Коммерческое предложение"></iframe>
     </div>
     <footer class="kpd-foot">
-      <button class="btn btn-primary" id="kpdPdf" type="button">Скачать PDF</button>
+      <div class="kpd-lead-status" id="kpdLeadStatus" role="status" aria-live="polite">Передаём контакты менеджеру…</div>
+      <button class="btn btn-primary" id="kpdPdf" type="button" disabled>Скачать PDF</button>
       <a class="kpd-alt" id="kpdOpenTab" target="_blank" rel="noopener">Открыть отдельной вкладкой</a>
     </footer>
   </aside>
 </div>
 
-<script src="../assets/js/site.js?v=f3ccc18169ed"></script>
+<script src="../assets/js/site.js?v=cbc385e9db67"></script>
+<script src="../assets/js/leads.js?v=ded587551663"></script>
 </body>
 </html>

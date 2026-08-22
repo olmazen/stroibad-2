@@ -75,6 +75,7 @@
     "tools/dogovor/index.html",
     "assets/css/style.css",
     "assets/js/site.js",
+    "assets/js/leads.js",
     "assets/products.json",
     "assets/catalog.json",
     "robots.txt",
@@ -168,6 +169,11 @@
         "expectedPages": 303
       },
       {
+        "path": "assets/js/leads.js",
+        "expectedPages": 303,
+        "insertAfter": "assets/js/site.js"
+      },
+      {
         "path": "assets/js/ad3d.js",
         "expectedPages": 75
       },
@@ -185,5 +191,36 @@
       "orderWheelPages": 1,
       "fallbackText": "3D недоступно — показан чертёж"
     }
+  },
+  "leadDelivery": {
+    "script": "assets/js/leads.js",
+    "provider": "formsubmit",
+    "status": "transitional",
+    "standardForms": 287,
+    "quoteForms": 1,
+    "timeoutMs": 15000,
+    "uploadTimeoutMs": 120000,
+    "attachmentsEnabled": false,
+    "attachmentProviderStatus": "disabled-until-controlled-endpoint",
+    "consentVersion": "2026-07-06",
+    "maxFileBytes": 10485760,
+    "allowedExtensions": [
+      "pdf",
+      "jpg",
+      "jpeg",
+      "png",
+      "webp",
+      "dwg",
+      "dxf",
+      "doc",
+      "docx",
+      "xls",
+      "xlsx",
+      "zip"
+    ],
+    "forbiddenLocalStorageKeys": [
+      "sp_leads_v1",
+      "sp_kp_head_v1"
+    ]
   }
 }

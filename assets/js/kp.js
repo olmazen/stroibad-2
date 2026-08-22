@@ -1,14 +1,13 @@
 /* ============================================================
    EGOE · рендер коммерческого предложения (/kp/)
    Один красивый КП. Читает корзину (localStorage sp_cart_v1)
-   + шапку (sp_kp_head_v1) + каталог (assets/catalog.json).
+   + одноразовую шапку из родительской вкладки + каталог (assets/catalog.json).
    PDF = Chrome window.print → «Сохранить как PDF».
    ============================================================ */
 (function () {
   'use strict';
 
   var CART_KEY = 'sp_cart_v1';
-  var HEAD_KEY = 'sp_kp_head_v1';
   var VAT = 0.20;
 
   /* Контакты изготовителя (для футера) */
@@ -65,16 +64,30 @@
   /* ---------------- загрузка ---------------- */
   var doc = document.getElementById('kp');
   var cart = readJSON(CART_KEY, []);
-  var head = readJSON(HEAD_KEY, {});
+  var head = {};
+  var buildStarted = false;
 
-  fetch('../assets/catalog.json?v=kp4').then(function (r) { return r.json(); }).then(function (catalog) {
-    var bySku = {}; catalog.forEach(function (x) { bySku[x.sku] = x; });
-    var rows = cart.map(function (it) { return Object.assign({}, it, { cat: bySku[it.id] || null }); });
-    build(rows);
-  }).catch(function (e) {
-    doc.innerHTML = '<div class="sheet"><p>Не удалось загрузить каталог. ' + esc(e.message) + '</p></div>';
-    finish();
-  });
+  function cleanHead(value) {
+    var source = value && typeof value === 'object' ? value : {};
+    var out = {};
+    ['addressee', 'object', 'number', 'date'].forEach(function (key) {
+      if (source[key] != null) out[key] = String(source[key]).slice(0, 240);
+    });
+    return out;
+  }
+
+  function startBuild() {
+    if (buildStarted) return;
+    buildStarted = true;
+    fetch('../assets/catalog.json?v=kp4').then(function (r) { return r.json(); }).then(function (catalog) {
+      var bySku = {}; catalog.forEach(function (x) { bySku[x.sku] = x; });
+      var rows = cart.map(function (it) { return Object.assign({}, it, { cat: bySku[it.id] || null }); });
+      build(rows);
+    }).catch(function (e) {
+      doc.innerHTML = '<div class="sheet"><p>Не удалось загрузить каталог. ' + esc(e.message) + '</p></div>';
+      finish();
+    });
+  }
 
   /* ---------------- сборка ---------------- */
   function build(rows) {
@@ -100,8 +113,24 @@
   function runStreamOnce() { if (streamStarted) return; streamStarted = true; runStream(); }
   window.addEventListener('message', function (e) {
     if (e.origin !== location.origin) return;
+    var trustedHeadSource = (P.get('embed') === '1' && e.source === window.parent)
+      || (P.get('embed') !== '1' && window.opener && e.source === window.opener);
+    if (e.data && e.data.kpHead && trustedHeadSource && !buildStarted) {
+      head = cleanHead(e.data.kpHead);
+      startBuild();
+      if (P.get('embed') !== '1') try { window.opener = null; } catch (_) {}
+    }
     if (e.data && e.data.kpGo) runStreamOnce();     // шторка показала документ — начинаем плавную сборку
   });
+  if (P.get('embed') === '1' && window.parent !== window) {
+    try { window.parent.postMessage({ kpNeedHead: true }, location.origin); } catch (_) {}
+    setTimeout(startBuild, 2000);
+  } else if (window.opener) {
+    try { window.opener.postMessage({ kpNeedHead: true }, location.origin); } catch (_) {}
+    setTimeout(startBuild, 2000);
+  } else {
+    startBuild();
+  }
 
   /* =============== плавная сборка документа («таймлайн дизайнера») =============== */
   var streamUnits = [], streamTimers = [], typingEls = [];

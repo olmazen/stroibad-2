@@ -69,6 +69,20 @@ export function applyRevision(html, assetPath, revision) {
   return { updated, matches };
 }
 
+export function insertScriptAfter(html, assetPath, anchorPath, revision) {
+  let matches = 0;
+  const anchor = new RegExp(
+    `(<script\\b[^>]*\\bsrc=(["'])((?:\\.\\.\\/)*${escapeRegExp(anchorPath)})(?:\\?[^"']*)?\\2[^>]*>\\s*</script>)`,
+    'gm'
+  );
+  const updated = html.replace(anchor, (whole, tag, quote, relativeAnchor) => {
+    matches += 1;
+    const prefix = relativeAnchor.slice(0, relativeAnchor.length - anchorPath.length);
+    return `${tag}\n<script src=${quote}${prefix}${assetPath}?v=${revision}${quote}></script>`;
+  });
+  return { updated, matches };
+}
+
 async function contentRevision(assetPath) {
   const body = await fs.readFile(path.join(ROOT, assetPath));
   return createHash('sha256').update(body).digest('hex').slice(0, 12);
@@ -95,6 +109,9 @@ async function main() {
     if (!Number.isInteger(asset.expectedPages) || asset.expectedPages < 1) {
       throw new Error(`Invalid expectedPages for ${asset.path}`);
     }
+    if (asset.insertAfter && (!/^assets\/js\/[a-z0-9._/-]+$/i.test(asset.insertAfter) || asset.insertAfter.includes('..'))) {
+      throw new Error(`Unsafe runtime insertion anchor: ${asset.insertAfter}`);
+    }
     revisions.set(asset.path, await contentRevision(asset.path));
   }
 
@@ -106,7 +123,10 @@ async function main() {
     const original = await fs.readFile(absolute, 'utf8');
     let updated = original;
     for (const asset of assets) {
-      const result = applyRevision(updated, asset.path, revisions.get(asset.path));
+      let result = applyRevision(updated, asset.path, revisions.get(asset.path));
+      if (result.matches === 0 && WRITE && asset.insertAfter) {
+        result = insertScriptAfter(updated, asset.path, asset.insertAfter, revisions.get(asset.path));
+      }
       if (result.matches > 1) throw new Error(`${rel}: duplicate reference to ${asset.path}`);
       totals.set(asset.path, totals.get(asset.path) + result.matches);
       updated = result.updated;

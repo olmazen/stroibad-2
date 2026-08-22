@@ -330,6 +330,7 @@ ${ogImage ? `<meta property="og:image" content="${esc(ogImage)}">` : ''}
 <body${canonical.includes('/maf/') ? ' class="maf-page"' : ''}>
 ${body}
 <script src="${scriptPrefix}assets/js/site.js?v=gallery-2"></script>
+<script src="${scriptPrefix}assets/js/leads.js"></script>
 </body>
 </html>
 `;
