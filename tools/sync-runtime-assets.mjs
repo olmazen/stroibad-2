@@ -95,6 +95,7 @@ async function main() {
   if (!Array.isArray(assets) || !assets.length) throw new Error('runtime.assetRevisions is missing');
 
   const publicHtml = await walkPublicHtml(contract);
+  const publicHtmlSet = new Set(publicHtml);
   const excluded = new Set(contract.siteShell.excludedPages);
   const pages = publicHtml.filter((rel) => !excluded.has(rel));
   if (pages.length !== contract.siteShell.expectedPages) {
@@ -102,6 +103,7 @@ async function main() {
   }
 
   const revisions = new Map();
+  const targetPages = new Map();
   for (const asset of assets) {
     if (!/^assets\/(?:css|js)\/[a-z0-9._/-]+$/i.test(asset.path) || asset.path.includes('..')) {
       throw new Error(`Unsafe runtime asset path: ${asset.path}`);
@@ -112,17 +114,29 @@ async function main() {
     if (asset.insertAfter && (!/^assets\/js\/[a-z0-9._/-]+$/i.test(asset.insertAfter) || asset.insertAfter.includes('..'))) {
       throw new Error(`Unsafe runtime insertion anchor: ${asset.insertAfter}`);
     }
+    const configuredPages = asset.pages == null ? pages : asset.pages;
+    if (!Array.isArray(configuredPages) || !configuredPages.length || new Set(configuredPages).size !== configuredPages.length) {
+      throw new Error(`Invalid target pages for ${asset.path}`);
+    }
+    for (const rel of configuredPages) {
+      if (typeof rel !== 'string' || rel.includes('..') || !publicHtmlSet.has(rel)) {
+        throw new Error(`Unsafe or non-public target page for ${asset.path}: ${rel}`);
+      }
+    }
+    targetPages.set(asset.path, new Set(configuredPages));
     revisions.set(asset.path, await contentRevision(asset.path));
   }
 
   const totals = new Map(assets.map((asset) => [asset.path, 0]));
   const changed = [];
   const pendingWrites = [];
-  for (const rel of pages) {
+  const scannedPages = [...new Set(assets.flatMap((asset) => [...targetPages.get(asset.path)]))].sort(compareNames);
+  for (const rel of scannedPages) {
     const absolute = path.join(ROOT, rel);
     const original = await fs.readFile(absolute, 'utf8');
     let updated = original;
     for (const asset of assets) {
+      if (!targetPages.get(asset.path).has(rel)) continue;
       let result = applyRevision(updated, asset.path, revisions.get(asset.path));
       if (result.matches === 0 && WRITE && asset.insertAfter) {
         result = insertScriptAfter(updated, asset.path, asset.insertAfter, revisions.get(asset.path));
@@ -160,6 +174,7 @@ async function main() {
   const result = {
     mode: WRITE ? 'write' : 'check',
     runtimePages: pages.length,
+    scannedPages: scannedPages.length,
     changedPages: changed.length,
     assets: assets.map((asset) => ({
       path: asset.path,

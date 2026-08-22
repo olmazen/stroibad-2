@@ -863,12 +863,12 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     var submitBtn = form && form.querySelector('button[type="submit"]');
     var kpLeadPending = false;
     var currentKpHead = null;
-    var kpTabWindow = null;
+    var kpTabWindows = [];
     var base = C.siteBase || (location.origin + '/');
 
     function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
     // Человекочитаемый номер документа; уникальный ID заявки создаёт lead-модуль.
-    function autoNum() { var d = new Date(), p = function (n) { return ('0' + n).slice(-2); }; return 'КП-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()); }
+    function autoNum() { var d = new Date(), p = function (n) { return ('0' + n).slice(-2); }, tail = Math.random().toString(36).slice(2, 6).toUpperCase(); return 'КП-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + '-' + tail; }
     function leadRequestId() {
       if (window.EGOE_LEADS && typeof window.EGOE_LEADS.requestId === 'function') return window.EGOE_LEADS.requestId();
       try { if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID(); } catch (e) {}
@@ -998,21 +998,25 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     var dGbProg = document.getElementById('kpdGbProg');
     var dPlayer = dStage ? makePlayer(dStage) : null;
     var dLeadStatus = document.getElementById('kpdLeadStatus');
+    var activeDocKey = '';
+    var frameDocKey = '';
+    var readyDocKey = '';
     var genTimers = [];
     var GEN_KEY = 'sp_kp_generated_v1'; // какой состав КП уже «сгенерирован» — второй раз не пересобираем
     var lastGenKey = '', gbStage = '', gbTotal = 0;
     function hashStr(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
     function cartGenKey(items) { return hashStr(JSON.stringify(items.map(function (i) { return [i.id, i.qty, i.price || 0]; }))); }
-    function sendKpHead(target) {
+    function sendKpHead(target, instanceKey) {
       if (!target || !currentKpHead) return;
-      try { target.postMessage({ kpHead: currentKpHead }, location.origin); } catch (e) {}
+      try { target.postMessage({ kpHead: currentKpHead, kpInstance: instanceKey || '' }, location.origin); } catch (e) {}
     }
     function setLeadStatus(text, state) {
-      if (leadStatus) leadStatus.textContent = text;
-      if (!dLeadStatus) return;
-      dLeadStatus.textContent = text;
-      dLeadStatus.classList.toggle('is-error', state === 'error');
-      dLeadStatus.classList.toggle('is-success', state === 'success');
+      [leadStatus, dLeadStatus].forEach(function (node) {
+        if (!node) return;
+        node.textContent = text;
+        node.classList.toggle('is-error', state === 'error');
+        node.classList.toggle('is-success', state === 'success');
+      });
     }
 
     /* — полоса генерации над документом: статус + чипы готовых разделов + прогресс — */
@@ -1033,10 +1037,39 @@ window.EGOE_RUNTIME.run('cart-page', function () {
       dGbFilm.appendChild(th);
     }
     var pendingBuilt = null; // вызывается, когда КП-iframe сообщил, что макет собран (для быстрого показа)
+    var pendingReady = null;
     window.addEventListener('message', function (e) {
       if (e.origin !== location.origin) return;
       if (e.data && e.data.kpNeedHead) {
-        if ((dFrame && e.source === dFrame.contentWindow) || (kpTabWindow && e.source === kpTabWindow)) sendKpHead(e.source);
+        kpTabWindows = kpTabWindows.filter(function (win) { try { return win && !win.closed; } catch (_) { return false; } });
+        if (dFrame && e.source === dFrame.contentWindow && e.data.kpInstance === frameDocKey) sendKpHead(e.source, frameDocKey);
+        else if (kpTabWindows.indexOf(e.source) !== -1) sendKpHead(e.source, e.data.kpInstance || '');
+        return;
+      }
+      if (!dFrame || e.source !== dFrame.contentWindow || !e.data || e.data.kpInstance !== frameDocKey) return;
+      if (e.data.kpReady) {
+        readyDocKey = frameDocKey;
+        if (activeDocKey === frameDocKey) {
+          if (pdfBtn) pdfBtn.disabled = false;
+          if (pendingReady) { var ready = pendingReady; pendingReady = null; ready(); }
+        }
+        return;
+      }
+      if (e.data.kpInstance !== activeDocKey) return;
+      if (e.data.kpDownloadStatus) {
+        if (!pdfBtn) return;
+        if (e.data.kpDownloadStatus === 'started') {
+          pdfBtn.disabled = true;
+          pdfBtn.textContent = 'Собираем PDF…';
+        } else if (e.data.kpDownloadStatus === 'error') {
+          pdfBtn.disabled = readyDocKey !== activeDocKey;
+          pdfBtn.textContent = 'Повторить PDF';
+          pdfBtn.title = 'Не удалось собрать файл. Открыт диалог печати.';
+        } else {
+          pdfBtn.disabled = readyDocKey !== activeDocKey;
+          pdfBtn.textContent = 'Скачать PDF';
+          pdfBtn.title = '';
+        }
         return;
       }
       var m = e.data && e.data.kpStream;
@@ -1064,13 +1097,19 @@ window.EGOE_RUNTIME.run('cart-page', function () {
       if (!drawer) { window.open(new URL('kp/', base).href, '_blank'); return; }
       var items = C.read();
       var genKey = cartGenKey(items);
+      var docKey = genKey + '-' + hashStr(currentKpHead ? (currentKpHead.number + '|' + currentKpHead.addressee) : 'generic');
+      activeDocKey = docKey;
+      pendingBuilt = null;
+      pendingReady = null;
       var already = false;
       try { already = localStorage.getItem(GEN_KEY) === genKey; } catch (e) {}
       drawer.classList.remove('ready');
       drawer.classList.add('open');
+      drawer.setAttribute('aria-hidden', 'false');
       document.documentElement.classList.add('kpd-lock');
       if (dNum) dNum.textContent = (currentKpHead ? currentKpHead.number : autoNum()) + ' · ' + today().split('-').reverse().join('.');
       genTimers.forEach(clearTimeout); genTimers = [];
+      if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.textContent = 'Скачать PDF'; pdfBtn.title = ''; }
 
       // Первая генерация: документ «печатается» потоково прямо в КП (стрим из iframe),
       // повтор того же состава — открывается сразу, без генератора.
@@ -1108,30 +1147,39 @@ window.EGOE_RUNTIME.run('cart-page', function () {
         // когда iframe сообщит «макет готов» — показываем документ и командуем начать плавную сборку
         pendingBuilt = function () {
           loaded = true; tryReveal();
-          setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true }, location.origin); } catch (e2) {} }, 220);
+          setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true, kpInstance: docKey }, location.origin); } catch (e2) {} }, 220);
         };
       }
 
       // настоящее КП грузится параллельно; тот же состав уже загружен (в т.ч. после стрима) — не перезагружаем
-      var docKey = genKey + '-' + hashStr(currentKpHead ? (currentKpHead.number + '|' + currentKpHead.addressee) : 'generic');
+      pendingReady = function () { loaded = true; tryReveal(); };
+      if (readyDocKey === docKey) {
+        if (pdfBtn) pdfBtn.disabled = false;
+        pendingReady(); pendingReady = null;
+      }
       var target = new URL('kp/?embed=1' + (already ? '' : '&stream=1') + '&_=' + docKey, base).href;
       if (dFrame.dataset.loaded === '1' && dFrame.src.indexOf('_=' + docKey) > -1) {
-        sendKpHead(dFrame.contentWindow);
-        loaded = true; tryReveal();
-        if (!already) setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true }, location.origin); } catch (e2) {} }, 220);
+        frameDocKey = docKey;
+        sendKpHead(dFrame.contentWindow, docKey);
+        if (!already) setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true, kpInstance: docKey }, location.origin); } catch (e2) {} }, 220);
       } else {
         dFrame.dataset.loaded = '';
-        dFrame.onload = function () { dFrame.dataset.loaded = '1'; sendKpHead(dFrame.contentWindow); loaded = true; tryReveal(); };
+        frameDocKey = docKey;
+        dFrame.onload = function () { dFrame.dataset.loaded = '1'; sendKpHead(dFrame.contentWindow, docKey); };
         dFrame.src = target;
       }
       genTimers.push(setTimeout(function () { loaded = true; tryReveal(); }, 12000)); // страховка
       if (tab) tab.href = new URL('kp/', base).href;
+      setTimeout(function () { if (xBtn) xBtn.focus(); }, 0);
     }
     function closeDrawer() {
       if (!drawer) return;
       drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden', 'true');
       document.documentElement.classList.remove('kpd-lock');
       genTimers.forEach(clearTimeout); genTimers = [];
+      pendingBuilt = null; pendingReady = null;
+      activeDocKey = '';
       if (dPlayer) dPlayer.stop();
     }
     var xBtn = document.getElementById('kpdClose'), backEl = document.getElementById('kpdBack');
@@ -1140,18 +1188,20 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
     var pdfBtn = document.getElementById('kpdPdf');
     if (pdfBtn) pdfBtn.addEventListener('click', function () {
+      if (pdfBtn.disabled || readyDocKey !== activeDocKey) return;
       // КП открыт в iframe → командуем ему собрать и СКАЧАТЬ PDF-файл (не диалог печати)
-      try { dFrame.contentWindow.postMessage({ kpDownload: true }, location.origin); } catch (e) { window.open(new URL('kp/', base).href, '_blank'); }
+      try { dFrame.contentWindow.postMessage({ kpDownload: true, kpInstance: activeDocKey }, location.origin); } catch (e) { window.open(new URL('kp/', base).href, '_blank'); }
     });
     var reopen = document.getElementById('kpReopen');
     if (reopen) reopen.addEventListener('click', function (e) { e.preventDefault(); openDrawer(); });
     if (tab) tab.addEventListener('click', function (e) {
       if (!currentKpHead) return;
       e.preventDefault();
-      kpTabWindow = window.open(tab.href || new URL('kp/', base).href, '_blank');
-      if (!kpTabWindow) return;
+      var popup = window.open(tab.href || new URL('kp/', base).href, '_blank');
+      if (!popup) return;
+      kpTabWindows.push(popup);
       [150, 500, 1200].forEach(function (delay) {
-        setTimeout(function () { sendKpHead(kpTabWindow); }, delay);
+        setTimeout(function () { sendKpHead(popup, ''); }, delay);
       });
     });
 
@@ -1198,13 +1248,13 @@ window.EGOE_RUNTIME.run('cart-page', function () {
       } catch (e3) { leadTask = Promise.reject(e3); }
 
       openDrawer();
-      if (okBox) okBox.style.display = 'block';
       setLeadStatus('Передаём контакты менеджеру…', 'pending');
       kpLeadPending = true;
       if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Передаём контакты…'; }
       Promise.resolve(leadTask).then(function (result) {
         setLeadStatus('Заявка подтверждена. № ' + currentKpHead.number + '.', 'success');
         form.style.display = 'none';
+        if (okBox) okBox.style.display = 'block';
       }).catch(function () {
         setLeadStatus('КП готово, но передачу контактов подтвердить не удалось. Закройте КП и повторите отправку.', 'error');
       }).finally(function () {
@@ -1739,7 +1789,7 @@ window.EGOE_RUNTIME.run('order-wheel', function () {
           t(function () { telI.classList.remove('focus'); curTo(cur, qBtn, 650, 0.5, 0.55); }, 3550);
           t(function () { qBtn.classList.add('press'); cur.classList.add('press'); }, 4300);
           t(function () { qBtn.classList.remove('press'); cur.classList.remove('press', 'show'); qflow.classList.add('sent'); gen.classList.add('go'); }, 4580);
-          t(function () { gen.classList.add('ok'); if (genTx) genTx.textContent = 'КП готово ✓ · отправили на почту'; }, 5950);
+          t(function () { gen.classList.add('ok'); if (genTx) genTx.textContent = 'КП готово ✓ · можно скачать'; }, 5950);
           t(function () { qflow.classList.add('opened'); winShow(win, true); }, 6300);
           t(function () { showPg(1); }, 8500);
           t(function () { showPg(2); }, 10700);

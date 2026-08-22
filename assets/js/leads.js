@@ -158,31 +158,32 @@
     };
   }
 
-  function appendReadableFields(body, envelope) {
-    body.append('_subject', 'Заявка с сайта EGOE — ' + envelope.tag);
-    body.append('_template', 'table');
-    body.append('_honey', envelope.spamCheck.website);
-    body.append('_url', envelope.page.url || '');
-    body.append('ID заявки', envelope.leadId);
-    body.append('Форма', envelope.formId);
-    body.append('Страница', envelope.page.url || envelope.page.title || 'не указана');
-    body.append('Заголовок страницы', envelope.page.title || 'не указан');
-    body.append('Версия согласия', envelope.consentVersion);
-    body.append('Время', envelope.createdAt);
+  function readablePayload(envelope) {
+    var payload = {};
     Object.keys(envelope.fields).forEach(function (key) {
-      body.append(key, envelope.fields[key]);
+      payload[key] = envelope.fields[key];
     });
+    payload._subject = 'Заявка с сайта EGOE — ' + envelope.tag;
+    payload._template = 'table';
+    payload._honey = envelope.spamCheck.website;
+    payload._url = envelope.page.url || '';
+    payload['ID заявки'] = envelope.leadId;
+    payload['Форма'] = envelope.formId;
+    payload['Страница'] = envelope.page.url || envelope.page.title || 'не указана';
+    payload['Заголовок страницы'] = envelope.page.title || 'не указан';
+    payload['Версия согласия'] = envelope.consentVersion;
+    payload['Время'] = envelope.createdAt;
+    return payload;
   }
 
   function requestBody(envelope, attachment, cfg) {
-    var body = new root.FormData();
     if (cfg.provider === 'api') {
+      var body = new root.FormData();
       body.append('payload', JSON.stringify(envelope));
-    } else {
-      appendReadableFields(body, envelope);
+      if (attachment) body.append('attachment', attachment, attachment.name);
+      return body;
     }
-    if (attachment) body.append('attachment', attachment, attachment.name);
-    return body;
+    return JSON.stringify(readablePayload(envelope));
   }
 
   function endpointFor(cfg) {
@@ -275,9 +276,11 @@
     }
 
     var requestTimeoutMs = attachmentCheck.file ? Math.max(cfg.timeoutMs, cfg.uploadTimeoutMs) : cfg.timeoutMs;
+    var headers = { Accept: 'application/json' };
+    if (cfg.provider === 'formsubmit') headers['Content-Type'] = 'application/json';
     return confirmedRequest(url, {
       method: 'POST',
-      headers: { Accept: 'application/json' },
+      headers: headers,
       body: body
     }, requestTimeoutMs, cfg, envelope.leadId).then(function (result) {
       sendRelay(envelope, cfg);
