@@ -3,6 +3,10 @@
   'use strict';
 
   var moduleStartedAt = Date.now();
+  var FORM_SELECTOR = 'form[onsubmit*="EGOE_LEADS"], form[onsubmit*="submitLead"], form#kpForm';
+  var STATUS_ENDPOINT = '/api/leads/status/';
+  var collectionState = productionEndpoint() ? 'pending' : 'disabled';
+  var collectionPromise = null;
 
   function productionEndpoint() {
     var hostname = root.location && String(root.location.hostname || '').toLowerCase();
@@ -49,6 +53,108 @@
         root.dispatchEvent(new root.CustomEvent('egoe:lead-status', { detail: payload }));
       }
     } catch (_) {}
+  }
+
+  function collectionEnabled() {
+    return collectionState === 'enabled';
+  }
+
+  function gateMessage(form) {
+    if (!form || typeof form.querySelector !== 'function' || !root.document || typeof root.document.createElement !== 'function') return null;
+    var existing = form.querySelector('.lead-collection-gate');
+    if (existing) return existing;
+    var box = root.document.createElement('div');
+    box.className = 'lead-collection-gate';
+    box.setAttribute('role', 'status');
+    box.setAttribute('aria-live', 'polite');
+    box.appendChild(root.document.createTextNode('Онлайн-форма временно не принимает данные. Позвоните '));
+    var phone = root.document.createElement('a');
+    phone.href = 'tel:+79272295828';
+    phone.textContent = '8 (927) 229-58-28';
+    box.appendChild(phone);
+    box.appendChild(root.document.createTextNode(' или напишите в '));
+    var whatsapp = root.document.createElement('a');
+    whatsapp.href = 'https://wa.me/79272295828';
+    whatsapp.target = '_blank';
+    whatsapp.rel = 'noopener';
+    whatsapp.textContent = 'WhatsApp';
+    box.appendChild(whatsapp);
+    box.appendChild(root.document.createTextNode('.'));
+    if (typeof form.appendChild === 'function') form.appendChild(box);
+    return box;
+  }
+
+  function lockForm(form) {
+    if (!form) return;
+    if (typeof form.setAttribute === 'function') form.setAttribute('aria-disabled', 'true');
+    if (typeof form.querySelectorAll === 'function') {
+      Array.prototype.forEach.call(form.querySelectorAll('input, textarea, select, button'), function (control) {
+        if (!control.disabled) {
+          control.disabled = true;
+          if (control.dataset) control.dataset.collectionGate = '1';
+          else if (typeof control.setAttribute === 'function') control.setAttribute('data-collection-gate', '1');
+        }
+      });
+    }
+    var message = gateMessage(form);
+    if (message) message.hidden = false;
+  }
+
+  function unlockForm(form) {
+    if (!form) return;
+    if (typeof form.removeAttribute === 'function') form.removeAttribute('aria-disabled');
+    if (typeof form.querySelectorAll === 'function') {
+      Array.prototype.forEach.call(form.querySelectorAll('[data-collection-gate="1"]'), function (control) {
+        control.disabled = false;
+        if (control.dataset) delete control.dataset.collectionGate;
+        if (typeof control.removeAttribute === 'function') control.removeAttribute('data-collection-gate');
+      });
+    }
+    if (typeof form.querySelector === 'function') {
+      var message = form.querySelector('.lead-collection-gate');
+      if (message) message.hidden = true;
+    }
+  }
+
+  function leadForms() {
+    if (!root.document || typeof root.document.querySelectorAll !== 'function') return [];
+    return root.document.querySelectorAll(FORM_SELECTOR);
+  }
+
+  function lockAllForms() {
+    Array.prototype.forEach.call(leadForms(), lockForm);
+  }
+
+  function unlockAllForms() {
+    Array.prototype.forEach.call(leadForms(), unlockForm);
+  }
+
+  function verifyCollectionStatus() {
+    if (collectionPromise) return collectionPromise;
+    if (!productionEndpoint() || typeof root.fetch !== 'function') {
+      collectionState = 'disabled';
+      lockAllForms();
+      collectionPromise = Promise.resolve(false);
+      return collectionPromise;
+    }
+    collectionPromise = Promise.resolve().then(function () {
+      return root.fetch(STATUS_ENDPOINT, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+        cache: 'no-store'
+      });
+    }).then(function (response) {
+      if (!response || response.ok !== true) return false;
+      return response.json().then(function (data) {
+        return !!data && Object.keys(data).length === 1 && data.enabled === true;
+      }, function () { return false; });
+    }, function () { return false; }).then(function (enabled) {
+      collectionState = enabled ? 'enabled' : 'disabled';
+      if (enabled) unlockAllForms(); else lockAllForms();
+      return enabled;
+    });
+    return collectionPromise;
   }
 
   function makeError(code, message, cause) {
@@ -223,6 +329,17 @@
 
   function parseConfirmedResponse(response, cfg, fallbackLeadId) {
     if (!response || !response.ok) {
+      if (response && response.status === 503 && typeof response.json === 'function') {
+        return response.json().catch(function () { return null; }).then(function (data) {
+          if (data && data.code === 'COLLECTION_DISABLED') {
+            collectionState = 'disabled';
+            collectionPromise = Promise.resolve(false);
+            lockAllForms();
+            throw makeError('COLLECTION_DISABLED', 'Онлайн-форма временно не принимает данные. Позвоните нам или напишите в WhatsApp.');
+          }
+          throw makeError('LEAD_HTTP', 'Lead endpoint returned HTTP ' + response.status);
+        });
+      }
       throw makeError('LEAD_HTTP', 'Lead endpoint returned HTTP ' + (response ? response.status : 'unknown'));
     }
     return response.json().catch(function (error) {
@@ -234,7 +351,7 @@
     });
   }
 
-  function send(fields, tag, options) {
+  function sendVerified(fields, tag, options) {
     var opts = options || {};
     var cfg = config();
     var attachmentCheck = validateAttachment(opts.attachment, cfg);
@@ -274,6 +391,25 @@
       report(error);
       emit('error', { formId: envelope.formId, leadId: envelope.leadId });
       throw error;
+    });
+  }
+
+  function send(fields, tag, options) {
+    var opts = options || {};
+    if (collectionState === 'disabled') {
+      var disabledError = makeError('COLLECTION_DISABLED', 'Онлайн-форма временно не принимает данные. Позвоните нам или напишите в WhatsApp.');
+      report(disabledError);
+      emit('error', { formId: opts.formId, leadId: opts.leadId });
+      return Promise.reject(disabledError);
+    }
+    return verifyCollectionStatus().then(function (enabled) {
+      if (!enabled) {
+        var error = makeError('COLLECTION_DISABLED', 'Онлайн-форма временно не принимает данные. Позвоните нам или напишите в WhatsApp.');
+        report(error);
+        emit('error', { formId: opts.formId, leadId: opts.leadId });
+        throw error;
+      }
+      return sendVerified(fields, tag, opts);
     });
   }
 
@@ -329,7 +465,7 @@
     form.setAttribute('aria-busy', sending ? 'true' : 'false');
     if (!button) return;
     if (!button.dataset.leadLabel) button.dataset.leadLabel = button.textContent;
-    button.disabled = sending;
+    button.disabled = sending || !collectionEnabled();
     button.textContent = sending ? 'Отправляем…' : button.dataset.leadLabel;
   }
 
@@ -345,6 +481,10 @@
 
   function submitForm(form) {
     if (!form || (inFlight && inFlight.has(form))) return false;
+    if (!collectionEnabled()) {
+      lockForm(form);
+      return false;
+    }
     var phone = phoneInput(form);
     if (phone && !validPhone(phone.value)) {
       phone.setCustomValidity('Введите телефон из 10 или 11 цифр.');
@@ -561,7 +701,7 @@
   }
 
   function prepareForms() {
-    var forms = root.document.querySelectorAll('form[onsubmit*="EGOE_LEADS"], form[onsubmit*="submitLead"], form#kpForm');
+    var forms = leadForms();
     Array.prototype.forEach.call(forms, function (form, index) {
       form.dataset.leadForm = form.dataset.leadForm || inferFormId(form, index);
       form.dataset.leadTag = form.dataset.leadTag || (root.document.title || 'форма');
@@ -594,6 +734,7 @@
       if (box) { box.setAttribute('aria-live', 'polite'); box.setAttribute('role', 'status'); }
       consentUi(form);
       fileUi(form);
+      if (!collectionEnabled()) lockForm(form);
     });
   }
 
@@ -605,6 +746,8 @@
     requestId: requestId,
     validateAttachment: validateAttachment,
     attachmentTransportReady: attachmentTransportReady,
+    collectionEnabled: collectionEnabled,
+    verifyCollectionStatus: verifyCollectionStatus,
     send: send,
     submitForm: submitForm,
     prepareForms: prepareForms
@@ -612,6 +755,10 @@
   root.EGOE_LEADS = api;
   root.__sendLead = send;
   root.submitLead = submitForm;
+
+  // Fail closed synchronously; only the same-origin server status can unlock controls.
+  lockAllForms();
+  verifyCollectionStatus();
 
   function initialize() {
     try {

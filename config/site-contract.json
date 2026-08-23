@@ -218,8 +218,11 @@
   "leadDelivery": {
     "script": "assets/js/leads.js",
     "provider": "same-origin-api",
-    "status": "active-russian-storage",
+    "status": "collection-disabled-pending-legal-approval",
     "endpoint": "/api/leads/",
+    "statusEndpoint": "/api/leads/status/",
+    "collectionEnabledDefault": false,
+    "collectionApprovalMarker": "state/collection-approved",
     "databaseSchemaVersion": 2,
     "persistentStore": "deploy-shared-leads-sqlite",
     "relayDefault": "off",

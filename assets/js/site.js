@@ -1231,6 +1231,21 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (kpLeadPending) return;
+      if (!window.EGOE_LEADS || typeof window.EGOE_LEADS.collectionEnabled !== 'function' || !window.EGOE_LEADS.collectionEnabled()) {
+        setLeadStatus('Онлайн-форма временно не принимает данные. Позвоните 8 (927) 229-58-28 или напишите в WhatsApp.', 'error');
+        return;
+      }
+      var quoteConsent = form.querySelector('[data-lead-consent]');
+      if (!quoteConsent || !quoteConsent.checked) {
+        setLeadStatus('Подтвердите согласие на обработку персональных данных.', 'error');
+        if (quoteConsent) {
+          quoteConsent.setCustomValidity('Нужно согласие на обработку персональных данных.');
+          if (typeof quoteConsent.reportValidity === 'function') quoteConsent.reportValidity();
+          quoteConsent.focus();
+        }
+        return;
+      }
+      quoteConsent.setCustomValidity('');
       var name = (nameEl.value || '').trim(), phone = (phoneEl.value || '').trim(), company = (addrEl.value || '').trim();
       var email = emailEl ? (emailEl.value || '').trim() : '';
       var bad = null;
@@ -1293,7 +1308,10 @@ window.EGOE_RUNTIME.run('cart-page', function () {
           form.__leadRequest = null;
           delete form.dataset.leadId;
         }
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Получить КП (PDF)'; }
+        if (submitBtn) {
+          submitBtn.disabled = !(window.EGOE_LEADS && window.EGOE_LEADS.collectionEnabled());
+          submitBtn.textContent = 'Получить КП (PDF)';
+        }
       });
     });
   })();

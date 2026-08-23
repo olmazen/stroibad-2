@@ -32,12 +32,13 @@ DirectoryIndex index.html
   RewriteCond %{HTTP_HOST} !^www\.egoe-life\.ru$ [NC]
   RewriteRule ^ https://www.egoe-life.ru%{REQUEST_URI} [R=301,L,NE]
 
-  # Единственная публичная PHP-точка: same-origin приём заявки.
+  # Два same-origin URL (статус и приём) ведут к единственной PHP-точке.
   # Общая библиотека и CLI входят в immutable release, но не доступны по HTTP.
   RewriteRule ^api/leads/(?:cli|lib)(?:/|$) - [R=404,L,NC]
   RewriteCond %{THE_REQUEST} \s/+api/leads/index\.php(?:[/?\s]) [NC]
   RewriteRule ^api/leads/index\.php(?:/.*)?$ - [R=404,L,NC]
   RewriteRule ^api/leads/index/?$ - [R=404,L,NC]
+  RewriteRule ^api/leads/status/?$ api/leads/index.php [END]
   RewriteRule ^api/leads/?$ api/leads/index.php [END]
 </IfModule>
 

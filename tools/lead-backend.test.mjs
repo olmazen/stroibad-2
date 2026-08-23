@@ -68,6 +68,7 @@ function settings(overrides = {}) {
   const base = {
     site_host: 'www.egoe-life.ru',
     allowed_hosts: ['www.egoe-life.ru', 'egoe-life.ru'],
+    collection_enabled: false,
     consent_version: '2026-08-23',
     ip_hash_key: '0123456789abcdef'.repeat(4),
     minimum_elapsed_ms: 600,
@@ -88,6 +89,10 @@ function settings(overrides = {}) {
     }
   };
   return { ...base, ...overrides, relay: { ...base.relay, ...(overrides.relay || {}) } };
+}
+
+function activeSettings(overrides = {}) {
+  return settings({ collection_enabled: true, ...overrides });
 }
 
 async function writeConfig(deployRoot, value) {
@@ -139,10 +144,10 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   const env = { ...process.env, EGOE_DEPLOY_ROOT: deployRoot };
 
   const initialized = await run(PHP, [cli, 'init'], { env });
-  assert.match(initialized.stdout, /INITIALIZED schema=2 relay=off/);
+  assert.match(initialized.stdout, /INITIALIZED schema=2 collection=off relay=off/);
   await writeConfig(deployRoot, settings());
   const health = JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout);
-  assert.deepEqual(health, { ok: true, schemaVersion: 2, relayEnabled: false });
+  assert.deepEqual(health, { ok: true, schemaVersion: 2, collectionEnabled: false, relayEnabled: false });
   assert.equal((await fs.stat(path.join(deployRoot, 'shared/leads'))).mode & 0o777, 0o700);
   assert.equal((await fs.stat(path.join(deployRoot, 'shared/leads/config.php'))).mode & 0o777, 0o600);
   assert.equal((await fs.stat(path.join(deployRoot, 'shared/leads/leads.sqlite3'))).mode & 0o777, 0o600);
@@ -161,7 +166,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   await writeConfig(deployRoot, settings());
 
   const port = await freePort();
-  const server = spawn(PHP, ['-S', `127.0.0.1:${port}`, '-t', release], {
+  const server = spawn(PHP, ['-S', `127.0.0.1:${port}`, '-t', release, path.join(release, 'api/leads/index.php')], {
     cwd: release,
     env,
     stdio: ['ignore', 'pipe', 'pipe']
@@ -170,11 +175,29 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   server.stderr.on('data', (chunk) => { serverErrors += chunk; });
   t.after(() => { if (server.exitCode === null) server.kill('SIGTERM'); });
   const endpoint = `http://127.0.0.1:${port}/api/leads/`;
+  const statusEndpoint = `http://127.0.0.1:${port}/api/leads/status/`;
   await waitForServer(endpoint, server);
   const endpointContract = await httpRequest(endpoint, { headers: { Host: 'www.egoe-life.ru' } });
   assert.equal(endpointContract.status, 405);
   assert.match(String(endpointContract.headers['cache-control']), /no-store/);
   assert.equal(endpointContract.headers['x-content-type-options'], 'nosniff');
+  for (const unsafePath of [
+    '/api/leads/index.php',
+    '/api/leads/%69ndex.php',
+    '/api/leads/index.php/anything',
+    '/api/leads/status/anything',
+    '/api/leads/anything'
+  ]) {
+    const rejected = await httpRequest(`http://127.0.0.1:${port}${unsafePath}`, { headers: { Host: 'www.egoe-life.ru' } });
+    assert.equal(rejected.status, 404, `${unsafePath} must not reach either endpoint`);
+    assert.equal(JSON.parse(rejected.text).code, 'NOT_FOUND');
+  }
+  const rejectedPostPath = await httpRequest(`http://127.0.0.1:${port}/api/leads/anything`, {
+    method: 'POST',
+    headers: { Host: 'www.egoe-life.ru' }
+  });
+  assert.equal(rejectedPostPath.status, 404);
+  assert.equal(JSON.parse(rejectedPostPath.text).code, 'NOT_FOUND');
 
   async function post(payload, extraHeaders = {}) {
     const boundary = `----egoe-test-${crypto.randomBytes(12).toString('hex')}`;
@@ -197,6 +220,57 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
     });
     return { response, json: JSON.parse(response.text) };
   }
+
+  const zeroCountScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); echo json_encode(['leads'=>(int)$p->query('SELECT count(*) FROM leads')->fetchColumn(),'evidence'=>(int)$p->query('SELECT count(*) FROM consent_evidence')->fetchColumn(),'outbox'=>(int)$p->query('SELECT count(*) FROM outbox')->fetchColumn(),'rates'=>(int)$p->query('SELECT count(*) FROM rate_limits')->fetchColumn()]);`;
+  async function status(host = 'www.egoe-life.ru') {
+    const response = await httpRequest(statusEndpoint, { headers: { Host: host, Accept: 'application/json' } });
+    return { response, json: JSON.parse(response.text) };
+  }
+
+  let gate = await status();
+  assert.equal(gate.response.status, 200);
+  assert.deepEqual(gate.json, { enabled: false });
+  assert.match(String(gate.response.headers['cache-control']), /no-store/);
+  let blocked = await post(lead());
+  assert.equal(blocked.response.status, 503);
+  assert.equal(blocked.json.code, 'COLLECTION_DISABLED');
+  assert.deepEqual(JSON.parse((await run(PHP, ['-r', zeroCountScript], { env })).stdout), { leads: 0, evidence: 0, outbox: 0, rates: 0 });
+
+  await writeConfig(deployRoot, activeSettings());
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).collectionEnabled, false, 'config alone must not enable collection');
+  assert.equal((await status()).json.enabled, false);
+  const approvalMarker = path.join(deployRoot, 'state/collection-approved');
+  const symlinkTarget = path.join(deployRoot, 'state/not-an-approval');
+  await fs.writeFile(symlinkTarget, 'egoe-life.ru');
+  await fs.symlink(symlinkTarget, approvalMarker);
+  assert.equal((await status()).json.enabled, false, 'symlinked approval marker must fail closed');
+  await fs.unlink(approvalMarker);
+  await fs.writeFile(approvalMarker, 'egoe-life.ru extra\n');
+  assert.equal((await status()).json.enabled, false, 'malformed approval marker must fail closed');
+  await fs.writeFile(approvalMarker, 'egoe-life.ru\n');
+  assert.equal((await status()).json.enabled, false, 'approval marker bytes must match exactly');
+  await fs.writeFile(approvalMarker, 'egoe-life.ru');
+  await fs.chmod(path.join(deployRoot, 'state'), 0o777);
+  assert.equal((await status()).json.enabled, false, 'group/world-writable state directory must fail closed');
+  await fs.chmod(path.join(deployRoot, 'state'), 0o755);
+  await fs.chmod(approvalMarker, 0o666);
+  assert.equal((await status()).json.enabled, false, 'group/world-writable approval marker must fail closed');
+  await fs.chmod(approvalMarker, 0o644);
+  gate = await status();
+  assert.deepEqual(gate.json, { enabled: true });
+  assert.equal((await fs.stat(path.join(deployRoot, 'state'))).mode & 0o777, 0o755);
+  assert.equal((await fs.stat(approvalMarker)).mode & 0o777, 0o644);
+
+  const ownerMismatchScript = `namespace Egoe\\Leads { function lstat(string $path): array|false { $metadata=\\lstat($path); if (is_array($metadata) && basename($path)==='collection-approved') $metadata['uid']=(int)$metadata['uid']+1; return $metadata; } } namespace { require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $settings=Egoe\\Leads\\Settings::load(getenv('EGOE_DEPLOY_ROOT')); echo $settings['collection_enabled'] ? 'enabled' : 'disabled'; }`;
+  assert.equal((await run(PHP, ['-r', ownerMismatchScript], { env })).stdout, 'disabled', 'owner mismatch must fail closed');
+
+  await fs.chmod(approvalMarker, 0o600);
+  assert.equal((await status()).json.enabled, true, 'a private mode-0600 marker must be accepted');
+  await fs.chmod(approvalMarker, 0o644);
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).collectionEnabled, true);
+  const rejectedStatusHost = await status('evil.example');
+  assert.equal(rejectedStatusHost.response.status, 403);
+  assert.equal(rejectedStatusHost.json.code, 'HOST_REJECTED');
 
   const first = lead();
   let result = await post(first);
@@ -299,7 +373,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   let counts = JSON.parse((await run(PHP, ['-r', queryScript], { env })).stdout);
   assert.deepEqual(counts, { leads: 1, evidence: 1, outbox: 0 }, 'relay=off must create no outbox/network work');
 
-  await writeConfig(deployRoot, settings({ rate_limit: { max_requests: 2, window_seconds: 600 } }));
+  await writeConfig(deployRoot, activeSettings({ rate_limit: { max_requests: 2, window_seconds: 600 } }));
   const clearRate = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT'))->exec('DELETE FROM rate_limits');`;
   await run(PHP, ['-r', clearRate], { env });
   assert.equal((await post(lead())).response.status, 201);
@@ -318,7 +392,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
     '-keyout', relayKey, '-out', relayCertificate,
     '-subj', '/CN=127.0.0.1', '-addext', 'subjectAltName=IP:127.0.0.1'
   ]);
-  const technicalSettings = settings({
+  const technicalSettings = activeSettings({
     relay: {
       enabled: true,
       url: `https://127.0.0.1:${relayPort}/relay`,
@@ -364,7 +438,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(JSON.stringify(relayed).includes('7927'), false);
   assert.equal(JSON.stringify(relayed).includes('fields'), false);
   await new Promise((resolve) => relayServer.close(resolve));
-  await writeConfig(deployRoot, settings());
+  await writeConfig(deployRoot, activeSettings());
 
   const mutateOld = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $id='${first.leadId}'; $p->prepare("UPDATE leads SET received_at=datetime('now','-400 days') WHERE lead_id=?")->execute([$id]); $p->prepare("UPDATE consent_evidence SET received_at=datetime('now','-1000 days') WHERE lead_id=?")->execute([$id]);`;
   await run(PHP, ['-r', mutateOld], { env });
@@ -426,7 +500,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal((await run(PHP, ['-r', evidenceCount], { env })).stdout, '0');
 
   const deleteTarget = lead();
-  await writeConfig(deployRoot, settings());
+  await writeConfig(deployRoot, activeSettings());
   await run(PHP, ['-r', clearRate], { env });
   assert.equal((await post(deleteTarget)).response.status, 201);
   const deleted = await run(PHP, [cli, 'delete', deleteTarget.leadId, '--with-evidence'], { env });

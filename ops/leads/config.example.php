@@ -7,6 +7,8 @@ declare(strict_types=1);
 return [
     'site_host' => 'www.egoe-life.ru',
     'allowed_hosts' => ['www.egoe-life.ru', 'egoe-life.ru'],
+    // Fail closed until legal review, any required RKN update and the state marker.
+    'collection_enabled' => false,
     'consent_version' => '2026-08-23',
     'ip_hash_key' => 'REPLACE_WITH_64_HEX_CHARACTERS_OUTSIDE_GIT',
     'minimum_elapsed_ms' => 600,

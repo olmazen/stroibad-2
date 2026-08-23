@@ -2,7 +2,22 @@
 
 Production writes first to `<deploy_root>/shared/leads/leads.sqlite3`. The
 directory, database, backups and `config.php` are persistent and never enter a
-release artifact or Git. The browser only posts to `/api/leads/`.
+release artifact or Git. The browser checks `/api/leads/status/` and only posts
+to `/api/leads/` after the server confirms that collection is enabled.
+
+Collection is fail-closed until the responsible person completes and records
+the legal review of the website processing workflow. `collection_enabled` defaults to `false`. Setting
+it to `true` is not sufficient: the runtime also requires a regular,
+non-symlink `<deploy_root>/state/collection-approved` file whose complete byte
+content is exactly `egoe-life.ru` (with no newline or spaces). Create that marker
+only after the responsible person records the decision on whether the existing
+RKN entry is sufficient and completes any update that decision requires. The
+deploy root, `state` directory and marker must have the same owner; neither
+`state` nor the marker may be group/world-writable (typical modes `0755` and
+`0644` or `0600` are accepted). A missing, malformed, unsafe or symlinked
+marker keeps the public status
+`{"enabled":false}` and every POST returns `COLLECTION_DISABLED` without
+opening SQLite or writing a row. Relay remains independently disabled.
 
 From an immutable release:
 
