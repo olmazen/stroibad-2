@@ -27,9 +27,14 @@ DirectoryIndex index.html
   RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html(?:[?\s]) [NC]
   RewriteRule ^(.*/)?index\.html$ https://www.egoe-life.ru/$1 [R=301,L,NE]
 
-  # HTTP или любой неканонический host -> HTTPS + www за один переход.
-  RewriteCond %{HTTPS} !=on [OR]
+  # Любой неканонический host -> HTTPS + www за один переход.
   RewriteCond %{HTTP_HOST} !^www\.egoe-life\.ru$ [NC]
+  RewriteRule ^ https://www.egoe-life.ru%{REQUEST_URI} [R=301,L,NE]
+
+  # HTTP -> HTTPS. На REG.RU TLS завершается на nginx, поэтому Apache получает
+  # HTTPS=off и доверенный прокси передаёт исходную схему в X-Forwarded-Proto.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
   RewriteRule ^ https://www.egoe-life.ru%{REQUEST_URI} [R=301,L,NE]
 
   # Два same-origin URL (статус и приём) ведут к единственной PHP-точке.

@@ -502,6 +502,7 @@ test('production smoke and remote helper contain rollback hardening', async () =
   const production = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'deploy-production.yml'), 'utf8');
   const remote = await fs.readFile(path.join(ROOT, 'ops', 'deploy', 'remote-release.sh'), 'utf8');
   const bootstrap = await fs.readFile(BOOTSTRAP, 'utf8');
+  const htaccess = await fs.readFile(path.join(ROOT, '.htaccess'), 'utf8');
   await execute('/bin/sh', ['-n', path.join(ROOT, 'ops', 'deploy', 'remote-release.sh')]);
   await execute('/bin/sh', ['-n', BOOTSTRAP]);
 
@@ -524,6 +525,9 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(production, /api\/leads\/index\.php\/anything/);
   assert.match(production, /api\/leads\/lib\/LeadBackend\.php/);
   assert.match(production, /api\/leads\/cli\/leads\.php/);
+  assert.match(htaccess, /RewriteCond %\{HTTP_HOST\} !\^www\\\.egoe-life\\\.ru\$/);
+  assert.match(htaccess, /RewriteCond %\{HTTPS\} !=on\s+RewriteCond %\{HTTP:X-Forwarded-Proto\} !\^https\$/);
+  assert.doesNotMatch(htaccess, /RewriteCond %\{HTTPS\} !=on \[OR\]/);
   assert.match(remote, /flock -n 9/);
   assert.match(remote, /Deployment lock must not be a symlink/);
   assert.match(remote, /PHP_VERSION_ID >= 80200/);
