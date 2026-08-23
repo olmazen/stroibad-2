@@ -38,7 +38,7 @@ jobs:
   verify:
     name: Verify the exact staging artifact
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     outputs:
       archive_sha256: ${{ steps.archive.outputs.sha256 }}
       expected_sha: ${{ steps.input.outputs.sha }}
@@ -73,17 +73,18 @@ jobs:
           fi
           echo "sha=$EXPECTED_SHA" >> "$GITHUB_OUTPUT"
       - name: Checkout trusted deployment tooling
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: main
+          ref: ${{ github.sha }}
           fetch-depth: 0
-      - name: Require reviewed SHA in main history
+          persist-credentials: false
+      - name: Require the reviewed SHA to be the current deployment source
         shell: bash
         env:
           EXPECTED_SHA: ${{ steps.input.outputs.sha }}
         run: |
           git cat-file -e "$EXPECTED_SHA^{commit}"
-          git merge-base --is-ancestor "$EXPECTED_SHA" origin/main
+          test "$EXPECTED_SHA" = "$GITHUB_SHA"
       - name: Verify staging workflow run
         shell: bash
         env:
@@ -130,7 +131,7 @@ jobs:
           echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
           echo "archive=$archive" >> "$GITHUB_OUTPUT"
       - name: Preserve verified production candidate
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: egoe-production-candidate-${{ steps.input.outputs.sha }}
           path: ${{ steps.archive.outputs.archive }}
@@ -142,18 +143,19 @@ jobs:
     name: REG.RU ${{ inputs.mode }}
     needs: verify
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     environment:
       name: production
       url: ${{ vars.REG_PUBLIC_URL }}
     steps:
       - name: Checkout trusted deployment tooling
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: main
+          ref: ${{ github.sha }}
+          persist-credentials: false
           sparse-checkout: ops/deploy
       - name: Download verified production candidate
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: egoe-production-candidate-${{ needs.verify.outputs.expected_sha }}
           path: ${{ runner.temp }}/candidate
@@ -165,17 +167,55 @@ jobs:
           archive=$(find "$RUNNER_TEMP/candidate" -maxdepth 1 -type f -name '*.tar.gz' -print -quit)
           test -n "$archive"
           test "$(sha256sum "$archive" | awk '{print $1}')" = "$EXPECTED_ARCHIVE_SHA"
+      - name: Validate REG.RU environment values
+        shell: bash
+        env:
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+          REG_SSH_USER: ${{ vars.REG_SSH_USER }}
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          REG_PUBLIC_URL: ${{ vars.REG_PUBLIC_URL }}
+        run: |
+          node --input-type=module <<'NODE'
+          const env = process.env;
+          const fail = (message) => { throw new Error(message); };
+          if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(env.REG_SSH_HOST || '')) {
+            fail('REG_SSH_HOST must be a plain DNS hostname');
+          }
+          if (!/^[0-9]{1,5}$/.test(env.REG_SSH_PORT || '')) fail('REG_SSH_PORT must be numeric');
+          const port = Number(env.REG_SSH_PORT);
+          if (!Number.isInteger(port) || port < 1 || port > 65535) fail('REG_SSH_PORT is outside 1..65535');
+          if (!/^[a-z_][a-z0-9._-]{0,63}$/i.test(env.REG_SSH_USER || '')) fail('REG_SSH_USER is unsafe');
+          const root = env.REG_DEPLOY_ROOT || '';
+          if (!/^\/[A-Za-z0-9._/-]+$/.test(root)) fail('REG_DEPLOY_ROOT contains unsafe shell characters');
+          if (root.endsWith('/') || root.includes('//') || root.split('/').some((part) => part === '.' || part === '..')) {
+            fail('REG_DEPLOY_ROOT must be a normalized absolute path without a trailing slash');
+          }
+          const protectedRoots = new Set(['/', '/bin', '/boot', '/dev', '/etc', '/home', '/root', '/tmp', '/usr', '/var', '/var/www', '/www']);
+          if (protectedRoots.has(root)) fail('REG_DEPLOY_ROOT is too broad');
+          if (env.REG_PUBLIC_URL !== 'https://www.egoe-life.ru') fail('REG_PUBLIC_URL must be the canonical HTTPS origin');
+          console.log('REG.RU deployment variables passed strict validation.');
+          NODE
       - name: Configure isolated SSH credentials
         shell: bash
         env:
           REG_SSH_PRIVATE_KEY: ${{ secrets.REG_SSH_PRIVATE_KEY }}
           REG_SSH_KNOWN_HOSTS: ${{ secrets.REG_SSH_KNOWN_HOSTS }}
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
         run: |
-          install -m 700 -d "$HOME/.ssh"
-          printf '%s\n' "$REG_SSH_PRIVATE_KEY" > "$HOME/.ssh/egoe_deploy"
-          chmod 600 "$HOME/.ssh/egoe_deploy"
-          printf '%s\n' "$REG_SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
-          chmod 600 "$HOME/.ssh/known_hosts"
+          ssh_dir="$RUNNER_TEMP/egoe-ssh"
+          install -m 700 -d "$ssh_dir"
+          printf '%s\n' "$REG_SSH_PRIVATE_KEY" > "$ssh_dir/deploy-key"
+          chmod 600 "$ssh_dir/deploy-key"
+          printf '%s\n' "$REG_SSH_KNOWN_HOSTS" > "$ssh_dir/known-hosts"
+          chmod 600 "$ssh_dir/known-hosts"
+          ssh-keygen -y -f "$ssh_dir/deploy-key" >/dev/null
+          known_host="$REG_SSH_HOST"
+          if [[ "$REG_SSH_PORT" != "22" ]]; then known_host="[$REG_SSH_HOST]:$REG_SSH_PORT"; fi
+          ssh-keygen -F "$known_host" -f "$ssh_dir/known-hosts" >/dev/null
+          echo "EGOE_SSH_KEY=$ssh_dir/deploy-key" >> "$GITHUB_ENV"
+          echo "EGOE_KNOWN_HOSTS=$ssh_dir/known-hosts" >> "$GITHUB_ENV"
       - name: Check REG.RU deployment host
         shell: bash
         env:
@@ -184,23 +224,48 @@ jobs:
           REG_SSH_USER: ${{ vars.REG_SSH_USER }}
           REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
         run: |
-          ssh -i "$HOME/.ssh/egoe_deploy" -p "$REG_SSH_PORT" \
-            -o BatchMode=yes -o IdentitiesOnly=yes \
+          ssh -i "$EGOE_SSH_KEY" -p "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$EGOE_KNOWN_HOSTS" -o ConnectTimeout=20 \
             "$REG_SSH_USER@$REG_SSH_HOST" \
             "sh -s -- '$REG_DEPLOY_ROOT'" <<'REMOTE'
           set -eu
           deploy_root=$1
-          case "$deploy_root" in /*) ;; *) exit 20 ;; esac
-          test "$deploy_root" != "/"
+          case "$deploy_root" in
+            /*) ;;
+            *) exit 20 ;;
+          esac
           test -d "$deploy_root"
+          test ! -L "$deploy_root"
           test -f "$deploy_root/state/site-hostname"
           test "$(cat "$deploy_root/state/site-hostname")" = "egoe-life.ru"
-          command -v tar
-          command -v sha256sum
-          command -v php
-          command -v ln
-          command -v mv
-          command -v readlink
+          test -f "$deploy_root/state/production-enabled"
+          test ! -L "$deploy_root/state/production-enabled"
+          test "$(cat "$deploy_root/state/production-enabled")" = "egoe-life.ru"
+          for directory in incoming releases shared state; do
+            test -d "$deploy_root/$directory"
+            test ! -L "$deploy_root/$directory"
+          done
+          test -d "$deploy_root/shared/leads"
+          test ! -L "$deploy_root/shared/leads"
+          for command_name in tar sha256sum php ln mv readlink grep find sort flock cmp; do
+            command -v "$command_name" >/dev/null
+          done
+          php -r '
+            exit(PHP_VERSION_ID >= 80200
+              && extension_loaded("pdo_sqlite")
+              && extension_loaded("mbstring")
+              && extension_loaded("curl") ? 0 : 1);
+          '
+          test -w "$deploy_root/shared/leads"
+          test -L "$deploy_root/current"
+          current_target=$(readlink "$deploy_root/current")
+          case "$current_target" in releases/*) ;; *) exit 21 ;; esac
+          current_name=${current_target#releases/}
+          case "$current_name" in ''|.|..|*/*|*[!A-Za-z0-9._-]*) exit 22 ;; esac
+          test -d "$deploy_root/$current_target"
+          test ! -L "$deploy_root/$current_target"
           df -h "$deploy_root"
           REMOTE
       - name: Stop after safe preflight
@@ -217,16 +282,22 @@ jobs:
           EXPECTED_SHA: ${{ needs.verify.outputs.expected_sha }}
         run: |
           archive=$(find "$RUNNER_TEMP/candidate" -maxdepth 1 -type f -name '*.tar.gz' -print -quit)
-          scp -i "$HOME/.ssh/egoe_deploy" -P "$REG_SSH_PORT" \
-            -o BatchMode=yes -o IdentitiesOnly=yes \
+          scp -i "$EGOE_SSH_KEY" -P "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$EGOE_KNOWN_HOSTS" -o ConnectTimeout=20 \
             "$archive" \
             "$REG_SSH_USER@$REG_SSH_HOST:$REG_DEPLOY_ROOT/incoming/$EXPECTED_SHA.tar.gz.part"
-          scp -i "$HOME/.ssh/egoe_deploy" -P "$REG_SSH_PORT" \
-            -o BatchMode=yes -o IdentitiesOnly=yes \
+          scp -i "$EGOE_SSH_KEY" -P "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$EGOE_KNOWN_HOSTS" -o ConnectTimeout=20 \
             ops/deploy/remote-release.sh \
             "$REG_SSH_USER@$REG_SSH_HOST:$REG_DEPLOY_ROOT/incoming/remote-release.sh.part"
-          ssh -i "$HOME/.ssh/egoe_deploy" -p "$REG_SSH_PORT" \
-            -o BatchMode=yes -o IdentitiesOnly=yes \
+          ssh -i "$EGOE_SSH_KEY" -p "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$EGOE_KNOWN_HOSTS" -o ConnectTimeout=20 \
             "$REG_SSH_USER@$REG_SSH_HOST" \
             "mv '$REG_DEPLOY_ROOT/incoming/$EXPECTED_SHA.tar.gz.part' '$REG_DEPLOY_ROOT/incoming/$EXPECTED_SHA.tar.gz' && mv '$REG_DEPLOY_ROOT/incoming/remote-release.sh.part' '$REG_DEPLOY_ROOT/incoming/remote-release.sh'"
       - name: Atomically activate release
@@ -240,8 +311,10 @@ jobs:
           EXPECTED_SHA: ${{ needs.verify.outputs.expected_sha }}
           ARCHIVE_SHA256: ${{ needs.verify.outputs.archive_sha256 }}
         run: |
-          ssh -i "$HOME/.ssh/egoe_deploy" -p "$REG_SSH_PORT" \
-            -o BatchMode=yes -o IdentitiesOnly=yes \
+          ssh -i "$EGOE_SSH_KEY" -p "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$EGOE_KNOWN_HOSTS" -o ConnectTimeout=20 \
             "$REG_SSH_USER@$REG_SSH_HOST" \
             "sh '$REG_DEPLOY_ROOT/incoming/remote-release.sh' deploy '$REG_DEPLOY_ROOT' '$EXPECTED_SHA' '$REG_DEPLOY_ROOT/incoming/$EXPECTED_SHA.tar.gz' '$ARCHIVE_SHA256'"
       - name: Smoke-test production and roll back on failure
@@ -257,18 +330,63 @@ jobs:
         run: |
           set +e
           failed=0
-          for path in / /catalog/ /cart/ /contacts/ /privacy/ /consent/ /cookies/ /assets/js/site.js /release.json; do
+          smoke_token="$EXPECTED_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          for path in / /catalog/ /maf/skamejki/artdeco-a1-101/ /cart/ /contacts/ /privacy/ /consent/ /cookies/ /assets/js/site.js /release.json; do
             curl --fail --location --silent --show-error --retry 2 --max-time 30 \
-              "$REG_PUBLIC_URL$path" >/dev/null || failed=1
+              --header 'Cache-Control: no-cache, no-store' \
+              "$REG_PUBLIC_URL$path?egoe_deploy=$smoke_token" >/dev/null || failed=1
           done
           release_sha=$(curl --fail --location --silent --show-error --retry 2 --max-time 30 \
-            "$REG_PUBLIC_URL/release.json" | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>console.log(JSON.parse(d).source.commit))')
+            --header 'Cache-Control: no-cache, no-store' \
+            "$REG_PUBLIC_URL/release.json?egoe_deploy=$smoke_token" \
+            | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>console.log(JSON.parse(d).source.commit))')
           if [[ "$release_sha" != "$EXPECTED_SHA" ]]; then
             failed=1
           fi
+          api_headers="$RUNNER_TEMP/egoe-api-headers"
+          api_body_file="$RUNNER_TEMP/egoe-api-body"
+          api_status=$(curl --silent --show-error --retry 2 --max-time 30 \
+            --header 'Accept: application/json' \
+            --header 'Cache-Control: no-cache, no-store' \
+            --dump-header "$api_headers" \
+            --output "$api_body_file" \
+            --write-out '%{http_code}' \
+            "$REG_PUBLIC_URL/api/leads/?egoe_deploy=$smoke_token")
+          if [[ "$api_status" != "405" ]] || ! node -e '
+            const fs = require("node:fs");
+            let data = "";
+            data = fs.readFileSync(process.argv[1], "utf8");
+            const body = JSON.parse(data);
+            if (body.ok !== false || body.code !== "METHOD_NOT_ALLOWED") process.exit(1);
+          ' "$api_body_file"; then
+            failed=1
+          fi
+          for required_header in \
+            '^x-content-type-options:[[:space:]]*nosniff' \
+            '^referrer-policy:[[:space:]]*strict-origin-when-cross-origin' \
+            '^x-frame-options:[[:space:]]*SAMEORIGIN' \
+            '^permissions-policy:' \
+            '^strict-transport-security:'; do
+            grep -Eiq "$required_header" "$api_headers" || failed=1
+          done
+          for protected_path in \
+            /api/leads/index.php \
+            /api/leads/index.php/anything \
+            /api/leads/index \
+            /api/leads/lib/LeadBackend.php \
+            /api/leads/cli/leads.php; do
+            protected_status=$(curl --silent --show-error --retry 2 --max-time 30 \
+              --header 'Cache-Control: no-cache, no-store' \
+              --output /dev/null \
+              --write-out '%{http_code}' \
+              "$REG_PUBLIC_URL$protected_path?egoe_deploy=$smoke_token")
+            [[ "$protected_status" == "404" ]] || failed=1
+          done
           if [[ "$failed" -ne 0 ]]; then
-            ssh -i "$HOME/.ssh/egoe_deploy" -p "$REG_SSH_PORT" \
-              -o BatchMode=yes -o IdentitiesOnly=yes \
+            ssh -i "$EGOE_SSH_KEY" -p "$REG_SSH_PORT" \
+              -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+              -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
+              -o UserKnownHostsFile="$EGOE_KNOWN_HOSTS" -o ConnectTimeout=20 \
               "$REG_SSH_USER@$REG_SSH_HOST" \
               "sh '$REG_DEPLOY_ROOT/incoming/remote-release.sh' rollback '$REG_DEPLOY_ROOT'"
             echo "::error::Production smoke test failed; previous release restored"

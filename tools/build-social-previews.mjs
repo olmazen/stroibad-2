@@ -30,9 +30,8 @@ const PYTHON = process.env.CODEX_PYTHON || '/Users/almazrafikov/.cache/codex-run
 const RENDERER = path.join(ROOT, 'tools', 'render-social-preview.py');
 const OUTPUT_ROOT = path.join(ROOT, 'assets', 'img', 'social');
 const ORIGIN = 'https://www.egoe-life.ru';
-// Social crawlers must be able to fetch preview files before the same build is
-// copied to production hosting. GitHub Pages is the permanent public backup,
-// so it is also the stable origin for OG/Twitter images.
+// Social crawlers fetch previews only from the canonical production origin.
+// GitHub Pages is a non-indexed technical preview, not a public asset origin.
 const PREVIEW_ORIGIN = SOCIAL_ASSET_ORIGIN;
 
 function decode(value = '') {

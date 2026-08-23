@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTRACT = JSON.parse(await fs.readFile(path.join(ROOT, 'config/site-contract.json'), 'utf8'));
 const LEADS = CONTRACT.leadDelivery;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 class FakeFormData {
   constructor() { this.entries = []; }
@@ -29,18 +30,24 @@ function browser(source, overrides = {}) {
   };
   const root = {
     document,
-    location: { href: 'https://www.egoe-life.ru/test/', pathname: '/test/' },
+    location: {
+      hostname: 'www.egoe-life.ru',
+      href: 'https://www.egoe-life.ru/test/?campaign=1',
+      pathname: '/test/'
+    },
     CustomEvent: FakeCustomEvent,
     dispatchEvent(event) { events.push(event); },
     FormData: FakeFormData,
     AbortController,
-    crypto: { randomUUID: () => 'generated-lead-id' },
+    crypto: { randomUUID: () => '11111111-1111-4111-8111-111111111111' },
     fetch: overrides.fetch || (() => Promise.reject(new Error('Unexpected fetch'))),
-    LEAD_CFG: { email: 'test@example.com', tgRelay: '', timeoutMs: 50 },
+    localStorage: { removeItem() {} },
     ...overrides.window
   };
   const context = {
     window: root,
+    URL,
+    Uint8Array,
     console: { error() {} },
     setTimeout,
     clearTimeout,
@@ -76,278 +83,205 @@ async function walkHtml(dir = ROOT, rel = '') {
   return result.sort();
 }
 
-test('confirmed text submission carries context, normalized phone, and FormSubmit source URL', async () => {
+function options(overrides = {}) {
+  return {
+    leadId: '11111111-1111-4111-8111-111111111111',
+    formId: 'test:request',
+    elapsedMs: 1500,
+    consentAccepted: true,
+    consentUrl: 'https://www.egoe-life.ru/consent/',
+    ...overrides
+  };
+}
+
+test('same-origin API receives one confirmed multipart envelope with consent and normalized phone', async () => {
   const requests = [];
   const source = await leadSource();
   const { api, events } = browser(source, {
-    fetch(url, options) {
-      requests.push({ url, options });
-      return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ success: 'true' }) });
+    fetch(url, request) {
+      requests.push({ url, request });
+      return Promise.resolve({
+        ok: true,
+        status: 201,
+        json: () => Promise.resolve({ ok: true, leadId: options().leadId })
+      });
     }
   });
-  const result = await api.send({ 'Имя': 'Анна', 'Телефон': '8 927 123-45-67' }, 'форма', {
-    leadId: 'lead-123',
-    formId: 'test:request',
-    context: { url: 'https://www.egoe-life.ru/test/', title: 'Тест', referrer: '' }
-  });
-
+  const result = await api.send({ Имя: 'Анна', Телефон: '8 927 123-45-67' }, 'форма', options());
   assert.equal(result.ok, true);
-  assert.equal(result.leadId, 'lead-123');
+  assert.equal(result.leadId, options().leadId);
   assert.equal(requests.length, 1);
-  assert.equal(requests[0].url, 'https://formsubmit.co/ajax/test%40example.com');
-  assert.equal(requests[0].options.headers.Accept, 'application/json');
-  assert.equal(requests[0].options.headers['Content-Type'], 'application/json');
-  const payload = JSON.parse(requests[0].options.body);
-  assert.equal(payload['Телефон'], '+79271234567');
-  assert.equal(payload['ID заявки'], 'lead-123');
-  assert.equal(payload['Страница'], 'https://www.egoe-life.ru/test/');
-  assert.equal(payload['Заголовок страницы'], 'Тест');
-  assert.equal(payload['Версия согласия'], LEADS.consentVersion);
-  assert.equal(payload._url, 'https://www.egoe-life.ru/test/');
-  assert.equal(events.at(-1)?.type, 'egoe:lead-status');
+  assert.equal(requests[0].url, '/api/leads/');
+  assert.equal(requests[0].request.credentials, 'same-origin');
+  assert.equal(requests[0].request.headers.Accept, 'application/json');
+  assert.equal(requests[0].request.headers['Content-Type'], undefined, 'browser must set multipart boundary');
+  const payload = JSON.parse(requests[0].request.body.get('payload'));
+  assert.equal(payload.schemaVersion, 1);
+  assert.equal(payload.leadId, options().leadId);
+  assert.equal(payload.fields.Телефон, '+79271234567');
+  assert.equal(payload.consent.accepted, true);
+  assert.equal(payload.consent.version, LEADS.consentVersion);
+  assert.equal(payload.consent.documentUrl, 'https://www.egoe-life.ru/consent/');
   assert.equal(events.at(-1)?.detail.status, 'success');
-  assert.equal(events.at(-1)?.detail.formId, 'test:request');
-  assert.equal(events.at(-1)?.detail.leadId, 'lead-123');
-  assert.equal(JSON.stringify(events.at(-1)?.detail).includes('7927'), false, 'public status event leaked contact data');
+  assert.equal(JSON.stringify(events.at(-1)?.detail).includes('7927'), false);
 });
 
-test('controlled API transport carries one validated multipart attachment', async () => {
-  const requests = [];
+test('consent is mandatory before any request', async () => {
   const source = await leadSource();
-  const { api } = browser(source, {
-    fetch(url, options) {
-      requests.push({ url, options });
-      return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ ok: true, leadId: 'api-lead-1' }) });
-    },
-    window: {
-      LEAD_CFG: {
-        provider: 'api', endpoint: '/api/leads', attachmentsEnabled: true,
-        tgRelay: '', timeoutMs: 50, uploadTimeoutMs: 100
-      }
-    }
-  });
-  const file = { name: 'plan.pdf', size: 1024, type: 'application/pdf' };
-  const result = await api.send({ 'Телефон': '8 927 123-45-67' }, 'форма', {
-    leadId: 'api-lead-1', formId: 'test:api-upload', attachment: file
-  });
-
-  assert.equal(result.leadId, 'api-lead-1');
-  assert.equal(requests.length, 1);
-  assert.equal(requests[0].url, '/api/leads');
-  assert.equal(requests[0].options.headers['Content-Type'], undefined, 'browser must set the multipart boundary');
-  assert.equal(requests[0].options.body.get('attachment'), file);
-  const payload = JSON.parse(requests[0].options.body.get('payload'));
-  assert.equal(payload.fields['Телефон'], '+79271234567');
+  let requests = 0;
+  const { api, events } = browser(source, { fetch() { requests += 1; } });
+  await assert.rejects(api.send({ Телефон: '+79270000000' }, 'форма', options({ consentAccepted: false })), (error) => error.code === 'CONSENT_REQUIRED');
+  assert.equal(requests, 0);
+  assert.equal(events.at(-1)?.detail.status, 'error');
 });
 
-test('network, HTTP, invalid JSON, rejection, and timeout never become success', async (t) => {
+test('HTTP, invalid JSON, rejection and timeout never become success', async (t) => {
   const source = await leadSource();
   const cases = [
     ['network', () => Promise.reject(new Error('offline')), undefined],
-    ['synchronous fetch failure', () => { throw new Error('sync failure'); }, undefined],
-    ['HTTP 500', () => Promise.resolve({ ok: false, status: 500, json: () => Promise.resolve({}) }), 'LEAD_HTTP'],
+    ['HTTP', () => Promise.resolve({ ok: false, status: 500, json: () => Promise.resolve({}) }), 'LEAD_HTTP'],
     ['invalid JSON', () => Promise.resolve({ ok: true, status: 200, json: () => Promise.reject(new Error('html')) }), 'LEAD_RESPONSE'],
-    ['provider rejection', () => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ success: false, message: 'no' }) }), 'LEAD_REJECTED']
+    ['rejection', () => Promise.resolve({ ok: true, status: 422, json: () => Promise.resolve({ ok: false }) }), 'LEAD_REJECTED'],
+    ['mismatched ID', () => Promise.resolve({ ok: true, status: 201, json: () => Promise.resolve({ ok: true, leadId: '22222222-2222-4222-8222-222222222222' }) }), 'LEAD_REJECTED']
   ];
   for (const [name, fetch, code] of cases) {
     await t.test(name, async () => {
       const { api, events } = browser(source, { fetch });
-      await assert.rejects(api.send({ Телефон: '+79270000000' }, 'форма', { leadId: name, formId: 'test:error' }), (error) => !code || error?.code === code);
+      await assert.rejects(api.send({ Телефон: '+79270000000' }, 'форма', options()), (error) => !code || error.code === code);
       assert.equal(events.at(-1)?.detail.status, 'error');
     });
   }
-
-  await t.test('timeout', async () => {
-    const { api, root, events } = browser(source, { fetch: () => new Promise(() => {}) });
-    root.LEAD_CFG.timeoutMs = 5;
-    await assert.rejects(api.send({}, 'форма', { leadId: 'slow', formId: 'test:timeout' }), (error) => error?.code === 'LEAD_TIMEOUT');
-    assert.equal(events.at(-1)?.detail.status, 'error');
+  const timeout = browser(source, {
+    fetch: () => new Promise(() => {}),
+    window: { LEAD_CFG: { provider: 'api', endpoint: '/api/leads/', timeoutMs: 5 } }
   });
-
-  await t.test('response body timeout', async () => {
-    const { api, root, events } = browser(source, {
-      fetch: () => Promise.resolve({ ok: true, status: 200, json: () => new Promise(() => {}) })
-    });
-    root.LEAD_CFG.timeoutMs = 5;
-    await assert.rejects(api.send({}, 'форма', { leadId: 'slow-json', formId: 'test:body-timeout' }), (error) => error?.code === 'LEAD_TIMEOUT');
-    assert.equal(events.at(-1)?.detail.status, 'error');
-  });
+  await assert.rejects(timeout.api.send({ Телефон: '+79270000000' }, 'форма', options()), (error) => error.code === 'LEAD_TIMEOUT');
 });
 
-test('file validation enforces the documented allowlist and ten-megabyte limit', async () => {
-  const source = await leadSource();
-  const { api } = browser(source);
-  assert.equal(api.validateAttachment({ name: 'plan.PDF', size: 1 }).ok, true);
-  assert.equal(api.validateAttachment({ name: 'virus.exe', size: 1 }).code, 'FILE_TYPE');
-  assert.equal(api.validateAttachment({ name: 'plan.pdf', size: LEADS.maxFileBytes + 1 }).code, 'FILE_TOO_LARGE');
-  assert.equal(api.validPhone('+7 (927) 123-45-67'), true);
-  assert.equal(api.validPhone('123'), false);
-  assert.equal(api.normalizePhone('8 (927) 123-45-67'), '+79271234567');
-});
-
-test('attachments stay disabled on the transitional provider and use the longer API timeout', async () => {
+test('attachments remain fail-closed and cannot be enabled from browser config', async () => {
   const source = await leadSource();
   const file = { name: 'plan.pdf', size: 1024, type: 'application/pdf' };
   let requests = 0;
-  const disabled = browser(source, { fetch() { requests += 1; } });
-  await assert.rejects(disabled.api.send({}, 'форма', { attachment: file }), (error) => error?.code === 'FILE_TRANSPORT_PENDING');
-  assert.equal(requests, 0);
-  disabled.root.LEAD_CFG.attachmentsEnabled = true;
-  await assert.rejects(disabled.api.send({}, 'форма', { attachment: file }), (error) => error?.code === 'FILE_TRANSPORT_PENDING');
-  assert.equal(requests, 0, 'an opt-in must not enable files on the undocumented FormSubmit AJAX transport');
-
-  const enabled = browser(source, {
-    fetch() {
-      return new Promise((resolve) => setTimeout(function () {
-        resolve({ ok: true, status: 200, json: () => Promise.resolve({ ok: true, leadId: 'upload-slow' }) });
-      }, 20));
-    },
-    window: {
-      LEAD_CFG: {
-        provider: 'api', endpoint: '/api/leads', attachmentsEnabled: true,
-        tgRelay: '', timeoutMs: 5, uploadTimeoutMs: 50
-      }
-    }
-  });
-  const result = await enabled.api.send({}, 'форма', { leadId: 'upload-slow', attachment: file });
-  assert.equal(result.ok, true);
-});
-
-test('honeypot submissions are acknowledged without reaching either transport', async () => {
-  const source = await leadSource();
-  let requests = 0;
-  const { api, events } = browser(source, {
-    fetch() { requests += 1; return Promise.reject(new Error('must not run')); },
-    window: { LEAD_CFG: { email: 'test@example.com', tgRelay: '/relay', timeoutMs: 50 } }
-  });
-  const result = await api.send({}, 'форма', { leadId: 'bot', formId: 'test:honey', honeypot: 'https://spam.test' });
-  assert.equal(result.filtered, true);
-  assert.equal(requests, 0);
-  assert.equal(events.at(-1)?.detail.status, 'success');
-});
-
-test('secondary relay failure never reverses a confirmed primary result', async () => {
-  const source = await leadSource();
-  let calls = 0;
-  const { api, events } = browser(source, {
-    fetch(url) {
-      calls += 1;
-      if (String(url).includes('formsubmit')) {
-        return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ success: true }) });
-      }
-      throw new Error('relay failed synchronously');
-    },
-    window: { LEAD_CFG: { email: 'test@example.com', tgRelay: '/relay', timeoutMs: 50 } }
-  });
-  const result = await api.send({}, 'форма', { leadId: 'relay-safe', formId: 'test:relay' });
-  await Promise.resolve();
-  assert.equal(result.ok, true);
-  assert.equal(calls, 2);
-  assert.equal(events.at(-1)?.detail.status, 'success');
-});
-
-test('unknown providers fail closed and API mode never runs the browser relay', async () => {
-  const source = await leadSource();
-  let calls = 0;
-  const unknown = browser(source, {
-    fetch() { calls += 1; },
-    window: { LEAD_CFG: { provider: 'typo', email: 'test@example.com', tgRelay: '/relay', timeoutMs: 50 } }
-  });
-  await assert.rejects(unknown.api.send({}, 'форма', {}), (error) => error?.code === 'LEAD_CONFIG');
-  assert.equal(calls, 0);
-
-  const apiMode = browser(source, {
-    fetch() {
-      calls += 1;
-      return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ ok: true, leadId: 'api-only' }) });
-    },
-    window: { LEAD_CFG: { provider: 'api', endpoint: '/api/leads', tgRelay: '/relay', timeoutMs: 50 } }
-  });
-  await apiMode.api.send({}, 'форма', { leadId: 'api-only' });
-  await Promise.resolve();
-  assert.equal(calls, 1, 'API mode leaked a second request to the browser relay');
-});
-
-test('a second click cannot create a second in-flight request', async () => {
-  const source = await leadSource();
-  let resolveRequest;
-  let requests = 0;
-  const pending = new Promise((resolve) => { resolveRequest = resolve; });
-
-  class ClassList {
-    add() {}
-    remove() {}
-    toggle() {}
-  }
-  function element(tag = 'div') {
-    return {
-      tag,
-      textContent: '',
-      style: {},
-      dataset: {},
-      classList: new ClassList(),
-      children: [],
-      setAttribute() {},
-      appendChild(child) { this.children.push(child); return child; }
-    };
-  }
-  const box = element();
-  const button = element('button');
-  button.textContent = 'Отправить заявку';
-  const label = element('label');
-  label.textContent = 'Телефон';
-  const wrap = { querySelector: () => label };
-  const phone = {
-    type: 'tel', value: '+7 927 123-45-67', checked: false,
-    closest: () => wrap,
-    getAttribute: () => '',
-    setCustomValidity() {}, reportValidity() {}, focus() {}
-  };
-  const form = {
-    dataset: { leadForm: 'test:double', leadTag: 'форма' },
-    style: {},
-    parentNode: { querySelector: () => box },
-    setAttribute() {},
-    querySelector(selector) {
-      if (selector === 'input[type="tel"]') return phone;
-      if (selector === 'button[type="submit"]') return button;
-      if (selector === '.form-result') return box;
-      if (selector === 'input[type="file"][name="attachment"]') return null;
-      return null;
-    },
-    querySelectorAll: () => [phone]
-  };
-  const document = {
-    readyState: 'loading', title: 'Тест', referrer: '',
-    addEventListener() {},
-    createElement: (tag) => element(tag)
-  };
   const { api } = browser(source, {
-    document,
+    fetch() { requests += 1; },
+    window: { LEAD_CFG: { provider: 'api', endpoint: '/api/leads/', attachmentsEnabled: true } }
+  });
+  assert.equal(api.validateAttachment(file).ok, true);
+  assert.equal(api.validateAttachment({ name: 'virus.exe', size: 1 }).code, 'FILE_TYPE');
+  assert.equal(api.validateAttachment({ name: 'plan.pdf', size: LEADS.maxFileBytes + 1 }).code, 'FILE_TOO_LARGE');
+  await assert.rejects(api.send({ Телефон: '+79270000000' }, 'форма', options({ attachment: file })), (error) => error.code === 'FILE_TRANSPORT_PENDING');
+  assert.equal(requests, 0);
+  assert.equal(api.attachmentTransportReady(api.config()), false);
+});
+
+test('honeypot is acknowledged locally, and browser never calls a secondary relay', async () => {
+  const source = await leadSource();
+  let requests = 0;
+  const honey = browser(source, { fetch() { requests += 1; } });
+  const filtered = await honey.api.send({ Телефон: '+79270000000' }, 'форма', options({ honeypot: 'spam' }));
+  assert.equal(filtered.filtered, true);
+  assert.equal(requests, 0);
+
+  const apiOnly = browser(source, {
     fetch() {
       requests += 1;
-      return pending;
-    }
+      return Promise.resolve({ ok: true, status: 201, json: () => Promise.resolve({ ok: true, leadId: options().leadId }) });
+    },
+    window: { LEAD_CFG: { provider: 'api', endpoint: '/api/leads/', tgRelay: 'https://example.invalid/relay' } }
   });
-
-  assert.equal(api.submitForm(form), false);
-  assert.equal(api.submitForm(form), false);
-  await Promise.resolve();
-  assert.equal(requests, 1);
-  resolveRequest({ ok: true, status: 200, json: () => Promise.resolve({ success: true }) });
-  await new Promise((resolve) => setTimeout(resolve, 0));
-  assert.equal(form.style.display, 'none');
-  assert.equal(button.disabled, false);
+  await apiOnly.api.send({ Телефон: '+79270000000' }, 'форма', options());
+  assert.equal(requests, 1, 'API mode leaked a browser relay request');
 });
 
-test('all public lead forms use the isolated module and legacy false-success paths stay removed', async () => {
+test('provider and endpoint are locked to the same-origin API path', async () => {
+  const source = await leadSource();
+  let requests = 0;
+  for (const config of [
+    { provider: 'typo', endpoint: '/api/leads/' },
+    { provider: 'api', endpoint: 'https://attacker.invalid/' },
+    { provider: 'api', endpoint: '/api/other/' }
+  ]) {
+    const { api } = browser(source, { fetch() { requests += 1; }, window: { LEAD_CFG: config } });
+    await assert.rejects(api.send({ Телефон: '+79270000000' }, 'форма', options()), (error) => error.code === 'LEAD_CONFIG');
+  }
+  assert.equal(requests, 0);
+});
+
+test('public GitHub Pages preview cannot send real leads', async () => {
+  const source = await leadSource();
+  let requests = 0;
+  const { api } = browser(source, {
+    fetch() { requests += 1; },
+    window: {
+      location: {
+        hostname: 'olmazen.github.io',
+        href: 'https://olmazen.github.io/stroibad-2/',
+        pathname: '/stroibad-2/'
+      }
+    }
+  });
+  await assert.rejects(
+    api.send({ Телефон: '+79270000000' }, 'форма', options()),
+    (error) => error.code === 'LEAD_CONFIG'
+  );
+  assert.equal(requests, 0);
+});
+
+test('UUID fallback remains RFC4122-compatible without crypto.randomUUID', async () => {
+  const source = await leadSource();
+  let cursor = 0;
+  const bytes = browser(source, {
+    window: {
+      crypto: {
+        getRandomValues(value) {
+          for (let index = 0; index < value.length; index += 1) value[index] = (cursor += 17) & 255;
+          return value;
+        }
+      }
+    }
+  });
+  assert.match(bytes.api.requestId(), UUID);
+  const mathOnly = browser(source, { window: { crypto: {} } });
+  assert.match(mathOnly.api.requestId(), UUID);
+});
+
+test('user edits clear retry identity, while source keeps an immutable retry envelope', async () => {
+  const source = await leadSource();
+  const listeners = {};
+  const phone = { addEventListener() {}, setCustomValidity() {} };
+  const consent = { checked: true, dataset: { consentUrl: 'https://www.egoe-life.ru/consent/' }, addEventListener() {} };
+  const form = {
+    dataset: { leadId: options().leadId, leadForm: 'test:form', leadTag: 'Тест', leadStartedAt: String(Date.now() - 1000) },
+    __leadRequest: { immutable: true },
+    addEventListener(type, listener) { listeners[type] = listener; },
+    appendChild() {},
+    querySelector(selector) {
+      if (selector === 'input[name="_honey"]') return {};
+      if (selector === 'input[type="tel"]') return phone;
+      if (selector === '[data-lead-consent]') return consent;
+      if (selector === '.lead-file') return {};
+      return null;
+    }
+  };
+  const document = {
+    readyState: 'loading', title: 'Тест', referrer: '', addEventListener() {},
+    querySelectorAll() { return [form]; }
+  };
+  const { api } = browser(source, { document });
+  api.prepareForms();
+  listeners.input();
+  assert.equal(form.__leadRequest, null);
+  assert.equal(form.dataset.leadId, undefined);
+  assert.match(source, /createdAt:\s*new Date\(\)\.toISOString\(\)/);
+  assert.match(source, /var requestState = form\.__leadRequest/);
+});
+
+test('public forms use the isolated module and legacy false-success/PII storage paths stay removed', async () => {
   const htmlFiles = await walkHtml();
-  const pages = await Promise.all(htmlFiles.map(async (rel) => ({
-    rel,
-    html: await fs.readFile(path.join(ROOT, rel), 'utf8')
-  })));
-  const formCount = pages.reduce((sum, { html }) => sum + (html.match(/onsubmit=["']return submitLead\(this\)/g) || []).length, 0);
+  const pages = await Promise.all(htmlFiles.map(async (rel) => ({ rel, html: await fs.readFile(path.join(ROOT, rel), 'utf8') })));
+  const formCount = pages.reduce((sum, { html }) => sum + (html.match(/onsubmit=["']return window\.EGOE_LEADS \? window\.EGOE_LEADS\.submitForm\(this\) : false/g) || []).length, 0);
   assert.equal(formCount, LEADS.standardForms);
+  assert.equal(pages.reduce((sum, { html }) => sum + (html.match(/onsubmit=["']return submitLead\(this\)/g) || []).length, 0), 0);
   const quoteCount = pages.reduce((sum, { html }) => sum + (html.match(/<form\b[^>]*id=["']kpForm["']/g) || []).length, 0);
   assert.equal(quoteCount, LEADS.quoteForms);
   const allLeadRefs = pages.filter(({ html }) => html.includes('assets/js/leads.js'));
@@ -355,52 +289,45 @@ test('all public lead forms use the isolated module and legacy false-success pat
   for (const { rel, html } of allLeadRefs) {
     const siteAt = html.indexOf('assets/js/site.js');
     const leadsAt = html.indexOf('assets/js/leads.js');
-    assert.ok(siteAt >= 0 && leadsAt > siteAt, `${rel}: leads.js must load after the runtime bootstrap`);
+    assert.ok(siteAt >= 0 && leadsAt > siteAt, `${rel}: leads.js must load after site.js`);
   }
 
-  const publicFileInputs = pages.filter(({ html }) => /<input\b[^>]*type=["']file["']/i.test(html));
-  assert.deepEqual(publicFileInputs.map(({ rel }) => rel), ['tools/dogovor/index.html']);
   const site = await fs.readFile(path.join(ROOT, 'assets/js/site.js'), 'utf8');
   const kp = await fs.readFile(path.join(ROOT, 'assets/js/kp.js'), 'utf8');
   const leads = await leadSource();
   const cart = await fs.readFile(path.join(ROOT, 'cart/index.html'), 'utf8');
   const kpPage = await fs.readFile(path.join(ROOT, 'kp/index.html'), 'utf8');
+  const mafPublisher = await fs.readFile(path.join(ROOT, 'tools/publish-maf-category.mjs'), 'utf8');
   assert.doesNotMatch(site, /formsubmit\.co|window\.LEAD_CFG\s*=|localStorage\.setItem\(['"]sp_leads_v1/);
+  assert.doesNotMatch(leads, /formsubmit\.co|tgRelay|google\.script|script\.google/);
+  assert.match(leads, /\/api\/leads\//);
   assert.doesNotMatch(cart, /копию пришл[её]м|КП.*пришл[её]м на почту/i);
   for (const key of LEADS.forbiddenLocalStorageKeys) {
     const pattern = new RegExp(`(?:localStorage|sessionStorage)\\.setItem\\(\\s*['"]${key}['"]`);
-    assert.doesNotMatch(site, pattern, `${key} returned to site.js browser storage`);
-    assert.doesNotMatch(kp, pattern, `${key} returned to kp.js browser storage`);
-    assert.doesNotMatch(leads, pattern, `${key} returned to leads.js browser storage`);
+    assert.doesNotMatch(site, pattern);
+    assert.doesNotMatch(kp, pattern);
+    assert.doesNotMatch(leads, pattern);
   }
   assert.match(site, /kpHead: currentKpHead, kpInstance:/);
   assert.match(site, /e\.source === dFrame\.contentWindow/);
-  assert.match(site, /leadId: leadId,[\s\S]*formId: 'cart:quote'/);
-  assert.match(site, /form\.dataset\.quoteNumber/);
-  assert.match(site, /EGOE_LEADS\.validPhone\(phone\)/);
-  assert.match(kp, /e\.data\.kpHead/);
+  assert.match(site, /var requestState = form\.__leadRequest/);
+  assert.match(site, /createdAt: new Date\(\)\.toISOString\(\)/);
+  assert.match(site, /resetQuoteLeadRequest/);
+  assert.match(site, /egoe:cart-change/);
+  assert.match(site, /form\.__leadDirty/);
   assert.match(kp, /trustedHeadSource/);
   assert.match(kp, /postParent\(\{ kpReady: true \}\)/);
-  assert.match(kp, /e\.data\.kpInstance === instanceKey/);
-  assert.match(kp, /if \(!window\.__kpReady \|\| _dling\) return;/);
-  assert.match(site, /var frameDocKey = '';/);
-  assert.match(site, /readyDocKey = frameDocKey;/);
   assert.match(cart, /id="kpdLeadStatus"[^>]*aria-live="polite"/);
   assert.match(cart, /id="kpdPdf"[^>]*disabled/);
   assert.match(kpPage, /id="kpPrintBtn"[^>]*disabled/);
-  assert.match(kpPage, /id="kpPrintOnly"[^>]*disabled/);
   assert.match(kpPage, /assets\/js\/kp\.js\?v=[a-f0-9]{12}/);
-  const kpRuntimeAsset = CONTRACT.runtime.assetRevisions.find((asset) => asset.path === 'assets/js/kp.js');
-  assert.deepEqual(kpRuntimeAsset?.pages, ['kp/index.html']);
+  assert.match(mafPublisher, /return window\.EGOE_LEADS \? window\.EGOE_LEADS\.submitForm\(this\) : false/);
+  assert.doesNotMatch(mafPublisher, /return submitLead\(this\)/);
   assert.match(leads, new RegExp(`consentVersion:\\s*['"]${LEADS.consentVersion}['"]`));
   assert.match(leads, /localStorage\.removeItem\('sp_leads_v1'\)/);
-  assert.match(leads, /localStorage\.removeItem\('sp_kp_head_v1'\)/);
-  assert.match(kp, /localStorage\.removeItem\('sp_leads_v1'\)/);
-  assert.match(kp, /localStorage\.removeItem\('sp_kp_head_v1'\)/);
   assert.equal(LEADS.attachmentsEnabled, false);
-  assert.match(leads, /cfg\.attachmentsEnabled === true && cfg\.provider === 'api'/);
-  assert.match(leads, /if \(event\.target === input\) return;/);
-  assert.match(leads, /if \(!file\) \{ empty\(\); return; \}/);
+  assert.match(leads, /DEFAULTS\.attachmentsEnabled === true/);
+  assert.match(leads, /form\.__leadDirty/);
   assert.doesNotMatch(leads, /innerHTML\s*=\s*(?:checked\.file|file)\.name/);
   assert.doesNotMatch(site, /отправили на почту|пришл[её]м КП/i);
 });

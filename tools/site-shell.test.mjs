@@ -40,6 +40,7 @@ test('header renderer emits one canonical four-item dropdown', () => {
   assert.match(html, /<b>Почтовые ящики<\/b>/);
   assert.doesNotMatch(html, /<b>Контейнерные площадки<\/b>/);
   assert.match(html, /href="\.\.\/\.\.\/\.\.\/contacts\/"/);
+  assert.match(html, /class="messenger-link is-disabled"[^>]+>.*MAX/s);
   assert.match(html, /<button class="burger" type="button" aria-label="Открыть меню" aria-controls="mnav" aria-expanded="false"/);
 });
 
@@ -50,6 +51,9 @@ test('footer renderer preserves canonical order and depth-aware links', () => {
   assert.ok(html.indexOf('14 лет') < html.indexOf('800+ объектов'));
   assert.ok(html.indexOf('800+ объектов') < html.indexOf('44-ФЗ · НДС'));
   assert.match(html, /href="\.\.\/privacy\/"/);
+  assert.match(html, /href="\.\.\/consent\/"/);
+  assert.match(html, /href="\.\.\/cookies\/"/);
+  assert.match(html, /Ссылка на MAX появится позже/);
   assert.match(html, /Контейнерные площадки/);
 });
 

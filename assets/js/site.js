@@ -828,16 +828,20 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     updateSums();
   }
 
+  function notifyCartLeadChange() {
+    try { document.dispatchEvent(new CustomEvent('egoe:cart-change')); } catch (e) {}
+  }
+
   itemsBox.addEventListener('click', function (e) {
     var row = e.target.closest('.cartp-item');
     var q = e.target.closest('[data-q]');
     var d = e.target.closest('[data-del]');
-    if (q && row) { C.setQty(row.dataset.id, parseInt(q.dataset.q, 10)); render(); }
+    if (q && row) { C.setQty(row.dataset.id, parseInt(q.dataset.q, 10)); notifyCartLeadChange(); render(); }
     else if (d && row) {
       row.classList.add('out');
-      setTimeout(function () { C.del(row.dataset.id); render(); }, 240);
+      setTimeout(function () { C.del(row.dataset.id); notifyCartLeadChange(); render(); }, 240);
     } else if (e.target.closest('#cartClear')) {
-      if (confirm('Очистить весь список?')) { C.clear(); render(); }
+      if (confirm('Очистить весь список?')) { C.clear(); notifyCartLeadChange(); render(); }
     }
   });
   // редактирование цены за единицу — без ре-рендера (не теряем фокус)
@@ -845,6 +849,7 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     var pin = e.target.closest('[data-price]'); if (!pin) return;
     var row = e.target.closest('.cartp-item'); if (!row) return;
     C.update(row.dataset.id, { price: parseInt(pin.value.replace(/[^\d]/g, ''), 10) || 0 });
+    notifyCartLeadChange();
     updateSums();
   });
 
@@ -872,7 +877,10 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     function leadRequestId() {
       if (window.EGOE_LEADS && typeof window.EGOE_LEADS.requestId === 'function') return window.EGOE_LEADS.requestId();
       try { if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID(); } catch (e) {}
-      return 'egoe-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (char) {
+        var value = Math.floor(Math.random() * 16);
+        return (char === 'x' ? value : ((value & 3) | 8)).toString(16);
+      });
     }
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
     function money(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
@@ -1208,6 +1216,18 @@ window.EGOE_RUNTIME.run('cart-page', function () {
     function digits(s) { return (s || '').replace(/\D/g, ''); }
     function markInvalid(el) { el.classList.add('kp-invalid'); setTimeout(function () { el.classList.remove('kp-invalid'); }, 2500); }
 
+    function resetQuoteLeadRequest() {
+      if (kpLeadPending) {
+        form.__leadDirty = true;
+        return;
+      }
+      form.__leadRequest = null;
+      delete form.dataset.leadId;
+    }
+    form.addEventListener('input', resetQuoteLeadRequest);
+    form.addEventListener('change', resetQuoteLeadRequest);
+    document.addEventListener('egoe:cart-change', resetQuoteLeadRequest);
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (kpLeadPending) return;
@@ -1241,10 +1261,19 @@ window.EGOE_RUNTIME.run('cart-page', function () {
         }).join('\n');
         var totalTxt = grand > 0 ? (anyReq ? '≈ ' + fmt(grand) + ' ₽ (часть по запросу)' : fmt(grand) + ' ₽') : 'по запросу';
         if (!window.__sendLead) throw new Error('Lead module is unavailable');
-        leadTask = window.__sendLead({ 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': '\n' + itemsTxt, 'Итого': totalTxt, '№ КП': currentKpHead.number }, 'КП', {
-          leadId: leadId,
-          formId: 'cart:quote'
-        });
+        var requestState = form.__leadRequest;
+        if (!requestState) {
+          requestState = {
+            fields: { 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': '\n' + itemsTxt, 'Итого': totalTxt, '№ КП': currentKpHead.number },
+            options: {
+              leadId: leadId,
+              formId: 'cart:quote',
+              createdAt: new Date().toISOString()
+            }
+          };
+          form.__leadRequest = requestState;
+        }
+        leadTask = window.__sendLead(requestState.fields, 'КП', requestState.options);
       } catch (e3) { leadTask = Promise.reject(e3); }
 
       openDrawer();
@@ -1259,6 +1288,11 @@ window.EGOE_RUNTIME.run('cart-page', function () {
         setLeadStatus('КП готово, но передачу контактов подтвердить не удалось. Закройте КП и повторите отправку.', 'error');
       }).finally(function () {
         kpLeadPending = false;
+        if (form.__leadDirty) {
+          form.__leadDirty = false;
+          form.__leadRequest = null;
+          delete form.dataset.leadId;
+        }
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Получить КП (PDF)'; }
       });
     });
@@ -2082,19 +2116,19 @@ window.EGOE_RUNTIME.run('order-wheel', function () {
 });
 
 
-/* ── cookie-уведомление (один раз, путь к политике берём из подвала) ── */
+/* ── уведомление о техническом и функциональном хранилище ── */
 window.EGOE_RUNTIME.run('cookie-notice', function () {
-  try { if (localStorage.getItem('egoe_cookie_ok')) return; } catch (e) {}
+  try { if (localStorage.getItem('egoe_cookie_notice_v2')) return; } catch (e) {}
   if (!document.body || document.querySelector('.cookie-bar')) return;
-  var pl = document.querySelector('.foot-bot a[href*="privacy"]');
-  var href = pl ? pl.getAttribute('href') : 'privacy/';
+  var pl = document.querySelector('.foot-bot a[href*="cookies"]');
+  var href = pl ? pl.getAttribute('href') : 'cookies/';
   var bar = document.createElement('div');
   bar.className = 'cookie-bar';
-  bar.innerHTML = '<div class="cookie-in"><p>Мы используем файлы cookie для работы сайта (например, чтобы сохранять список изделий). Продолжая пользоваться сайтом, вы соглашаетесь с <a href="' + href + '">политикой обработки персональных данных</a>.</p><button class="btn btn-primary btn-sm" type="button">Принять</button></div>';
+  bar.innerHTML = '<div class="cookie-in"><p>Собственный код сайта использует техническое и функциональное локальное хранилище — например, для корзины и выбранных пользователем функций. Аналитика и рекламные cookie не подключены; на странице контактов Яндекс Карты могут загрузить свои технологии. <a href="' + href + '">Подробнее в Политике cookie</a>.</p><button class="btn btn-primary btn-sm" type="button">Понятно</button></div>';
   document.body.appendChild(bar);
   setTimeout(function () { bar.classList.add('show'); }, 60);
   bar.querySelector('button').addEventListener('click', function () {
-    try { localStorage.setItem('egoe_cookie_ok', '1'); } catch (e) {}
+    try { localStorage.setItem('egoe_cookie_notice_v2', '1'); } catch (e) {}
     bar.classList.remove('show');
     setTimeout(function () { if (bar.parentNode) bar.remove(); }, 500);
   });

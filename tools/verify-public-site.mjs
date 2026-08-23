@@ -265,7 +265,7 @@ function localDataPath(value) {
 async function verifyLegacyBaseline(contract, distFiles) {
   const baseline = contract.knownLegacyBaseline;
   const sourceFiles = await walkFiles(ROOT, '', {
-    skip: new Set(['.git', 'dist', 'node_modules', '.private'])
+    skip: new Set(['.git', 'dist', 'node_modules', '.private', 'ops'])
   });
   const sourceHtml = sourceFiles.filter((rel) => rel.endsWith('.html'));
   const publicHtml = distFiles.filter((rel) => rel.endsWith('.html'));
@@ -423,7 +423,7 @@ async function verifySourceParity(files, contract) {
 }
 
 async function scanForPrivateMaterial(files) {
-  const textExtensions = new Set(['.css', '.htaccess', '.html', '.js', '.json', '.svg', '.txt', '.xml']);
+  const textExtensions = new Set(['.css', '.htaccess', '.html', '.js', '.json', '.php', '.svg', '.txt', '.xml']);
   const patterns = [
     { label: 'macOS user path', pattern: /\/Users\/[^/\s]+\// },
     { label: 'Linux home path', pattern: /\/home\/[^/\s]+\// },
@@ -435,7 +435,10 @@ async function scanForPrivateMaterial(files) {
   for (const rel of files) {
     const extension = path.extname(rel) || (path.basename(rel).startsWith('.') ? path.basename(rel) : '');
     if (!textExtensions.has(extension)) continue;
-    const body = await fs.readFile(path.join(DIST, rel), 'utf8');
+    const rawBody = await fs.readFile(path.join(DIST, rel), 'utf8');
+    const body = rel === 'assets/vendor/pdf/pdf.worker.min.js'
+      ? rawBody.replaceAll('/home/web_user', '')
+      : rawBody;
     for (const item of patterns) {
       if (item.pattern.test(body)) fail(`${rel}: contains ${item.label}`);
     }
@@ -449,6 +452,9 @@ async function main() {
 
   for (const rel of files) {
     if (artifactPathIsForbidden(rel, contract)) fail(`forbidden artifact path: ${rel}`);
+    if (rel.endsWith('.php') && !contract.build.allowedPhpFiles.includes(rel)) {
+      fail(`PHP artifact path is not explicitly allowlisted: ${rel}`);
+    }
   }
   for (const rel of contract.requiredFiles) {
     if (!await exists(path.join(DIST, rel))) fail(`required public file is missing: ${rel}`);

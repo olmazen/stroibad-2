@@ -322,9 +322,7 @@ function doc({ title, description, canonical, ogImage, ogType = 'website', cssPr
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${esc(canonical)}">
 ${ogImage ? `<meta property="og:image" content="${esc(ogImage)}">` : ''}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${cssPrefix}assets/css/fonts.css">
 <link rel="stylesheet" href="${cssPrefix}assets/css/style.css?v=egoe55">
 </head>
 <body${canonical.includes('/maf/') ? ' class="maf-page"' : ''}>
@@ -458,7 +456,7 @@ function renderProduct(cfg, product, allProducts, shellData) {
   <div><div class="sec-head"><div><h2>Описание</h2></div></div><div class="prose"><p>${esc(description)}</p><p>${esc(cfg.productionNote || 'Изготавливаем модель под объект: партия, цвет металла, покрытие древесины, крепёж и график поставки согласуются под проект.')}</p></div></div>
 </div></div></section>
 <section style="padding-top:0"><div class="container"><div class="sec-head"><div><h2>${esc(cfg.relatedTitle)}</h2></div><a class="btn btn-sm" href="${prefix}${categoryRelativeUrl(cfg)}/">${esc(cfg.relatedLink)}</a></div><div class="tiles3">${others.map((p) => `<a class="tile" href="${prefix}${categoryRelativeUrl(cfg)}/${p.pageSlug}/">${imageBlock(cfg, p, 'main', p.shortName).replaceAll('{{prefix}}', prefix)}<h3>${esc(p.name)}</h3><p>${esc(p.priceText)}</p></a>`).join('')}</div></div></section>
-<section style="padding-top:0"><div class="container"><div class="formpanel"><h3>Получить расчёт: ${esc(product.name)}</h3><p>Укажите количество, город поставки и требования — пришлём смету за 1 рабочий день.</p><form onsubmit="return submitLead(this)"><div class="row2"><div class="field"><label>Имя</label><input type="text" required></div><div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div></div><div class="field"><label>Количество и требования</label><textarea rows="2" placeholder="Например: ${esc(product.name)}, 10 шт, RAL 7016"></textarea></div><button class="btn btn-primary btn-block" type="submit">Отправить заявку</button><p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="${prefix}privacy/">политикой обработки персональных данных</a>.</p></form><div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div></div></div></section>
+<section style="padding-top:0"><div class="container"><div class="formpanel"><h3>Получить расчёт: ${esc(product.name)}</h3><p>Укажите количество, город поставки и требования — пришлём смету за 1 рабочий день.</p><form onsubmit="return window.EGOE_LEADS ? window.EGOE_LEADS.submitForm(this) : false"><div class="row2"><div class="field"><label>Имя</label><input type="text" required></div><div class="field"><label>Телефон</label><input type="tel" required placeholder="+7"></div></div><div class="field"><label>Количество и требования</label><textarea rows="2" placeholder="Например: ${esc(product.name)}, 10 шт, RAL 7016"></textarea></div><button class="btn btn-primary btn-block" type="submit">Отправить заявку</button><p class="consent">Нажимая кнопку, вы соглашаетесь с <a href="${prefix}privacy/">политикой обработки персональных данных</a>.</p></form><div class="form-result form-ok" style="display:none"><b>Заявка принята</b>Мы свяжемся с вами в течение рабочего дня.</div></div></div></section>
 <script type="application/ld+json">${JSON.stringify(productSchema)}</script>
 </main>
 ${renderSiteFooter(shellData, pageRel)}`;

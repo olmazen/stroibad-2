@@ -1,7 +1,7 @@
 {
   "previewStyle": {
     "product": 267,
-    "branded": 34
+    "branded": 36
   },
   "fallbackProducts": [
     "https://www.egoe-life.ru/maf/parkovochnye-stolbiki/betoniruemyj/",
@@ -43,12 +43,30 @@
       "bytes": 131641
     },
     {
+      "canonical": "https://www.egoe-life.ru/consent/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/consent.jpg",
+      "bytes": 205970
+    },
+    {
       "canonical": "https://www.egoe-life.ru/contacts/",
       "kind": "page",
       "previewStyle": "branded",
       "fallbackProduct": false,
       "source": "assets/img/hero/facade-jk.webp",
       "output": "assets/img/social/pages/contacts.jpg",
+      "bytes": 205970
+    },
+    {
+      "canonical": "https://www.egoe-life.ru/cookies/",
+      "kind": "page",
+      "previewStyle": "branded",
+      "fallbackProduct": false,
+      "source": "assets/img/hero/facade-jk.webp",
+      "output": "assets/img/social/pages/cookies.jpg",
       "bytes": 205970
     },
     {

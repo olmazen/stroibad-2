@@ -1,18 +1,23 @@
-/* EGOE — подтверждаемая отправка заявок и вложений */
+/* EGOE — подтверждаемая отправка заявок в собственный same-origin API */
 (function (root) {
   'use strict';
 
+  var moduleStartedAt = Date.now();
+
+  function productionEndpoint() {
+    var hostname = root.location && String(root.location.hostname || '').toLowerCase();
+    return hostname === 'egoe-life.ru' || hostname === 'www.egoe-life.ru' ? '/api/leads/' : '';
+  }
+
   var DEFAULTS = {
-    provider: 'formsubmit',
-    email: 'zakaz@egoe-life.ru',
-    endpoint: '',
-    tgRelay: 'https://script.google.com/macros/s/AKfycbx5_jnp2K1hCTRHX_7dMErdReIMhClkpFtWE6hIm19W_3V3uh6S2JEoQXBK6KMG914j7Q/exec',
+    provider: 'api',
+    endpoint: productionEndpoint(),
     timeoutMs: 15000,
     uploadTimeoutMs: 120000,
     attachmentsEnabled: false,
     maxFileBytes: 10 * 1024 * 1024,
     allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'dwg', 'dxf', 'doc', 'docx', 'xls', 'xlsx', 'zip'],
-    consentVersion: '2026-07-06'
+    consentVersion: '2026-08-23'
   };
 
   var inFlight = typeof WeakMap === 'function' ? new WeakMap() : null;
@@ -56,8 +61,19 @@
   function requestId() {
     try {
       if (root.crypto && typeof root.crypto.randomUUID === 'function') return root.crypto.randomUUID();
+      if (root.crypto && typeof root.crypto.getRandomValues === 'function') {
+        var bytes = new Uint8Array(16);
+        root.crypto.getRandomValues(bytes);
+        bytes[6] = (bytes[6] & 15) | 64;
+        bytes[8] = (bytes[8] & 63) | 128;
+        var hex = Array.prototype.map.call(bytes, function (value) { return value.toString(16).padStart(2, '0'); }).join('');
+        return hex.slice(0, 8) + '-' + hex.slice(8, 12) + '-' + hex.slice(12, 16) + '-' + hex.slice(16, 20) + '-' + hex.slice(20);
+      }
     } catch (_) {}
-    return 'egoe-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (char) {
+      var value = Math.floor(Math.random() * 16);
+      return (char === 'x' ? value : ((value & 3) | 8)).toString(16);
+    });
   }
 
   function normalizePhone(value) {
@@ -83,7 +99,7 @@
     var nodes = form.querySelectorAll('input, textarea, select');
     Array.prototype.forEach.call(nodes, function (el) {
       var type = String(el.type || '').toLowerCase();
-      if (type === 'hidden' || type === 'submit' || type === 'button' || type === 'file') return;
+      if (type === 'hidden' || type === 'submit' || type === 'button' || type === 'file' || el.hasAttribute('data-lead-consent')) return;
       var wrap = el.closest ? el.closest('.field') : null;
       var label = wrap && wrap.querySelector ? wrap.querySelector('label') : null;
       var key = cleanLabel((label && label.textContent) || el.getAttribute('placeholder') || el.getAttribute('aria-label'));
@@ -133,11 +149,19 @@
   }
 
   function attachmentTransportReady(cfg) {
-    return cfg.attachmentsEnabled === true && cfg.provider === 'api';
+    return DEFAULTS.attachmentsEnabled === true && cfg.attachmentsEnabled === true && cfg.provider === 'api';
   }
 
   function buildEnvelope(fields, tag, options, cfg) {
     var context = options.context || pageContext();
+    var createdAt = options.createdAt || new Date().toISOString();
+    var consentAccepted = options.consentAccepted === true;
+    var consentUrl = options.consentUrl || '';
+    if (!consentAccepted && options.formId === 'cart:quote' && root.document) {
+      var quoteConsent = root.document.querySelector('#kpForm [data-lead-consent]');
+      consentAccepted = !!(quoteConsent && quoteConsent.checked);
+      consentUrl = quoteConsent && quoteConsent.dataset ? quoteConsent.dataset.consentUrl || '' : '';
+    }
     var normalizedFields = {};
     Object.keys(fields || {}).forEach(function (key) {
       normalizedFields[key] = /тел|phone/i.test(key) ? normalizePhone(fields[key]) : fields[key];
@@ -147,55 +171,36 @@
       leadId: options.leadId || requestId(),
       formId: options.formId || 'programmatic',
       tag: tag || 'форма',
-      createdAt: new Date().toISOString(),
-      consentVersion: cfg.consentVersion,
+      createdAt: createdAt,
+      consent: {
+        accepted: consentAccepted,
+        version: cfg.consentVersion,
+        acceptedAt: createdAt,
+        documentUrl: consentUrl
+      },
       page: context,
       spamCheck: {
         website: String(options.honeypot || ''),
-        elapsedMs: Math.max(0, Number(options.elapsedMs) || 0)
+        elapsedMs: Math.max(0, Number(options.elapsedMs) || (Date.now() - moduleStartedAt))
       },
       fields: normalizedFields
     };
   }
 
-  function readablePayload(envelope) {
-    var payload = {};
-    Object.keys(envelope.fields).forEach(function (key) {
-      payload[key] = envelope.fields[key];
-    });
-    payload._subject = 'Заявка с сайта EGOE — ' + envelope.tag;
-    payload._template = 'table';
-    payload._honey = envelope.spamCheck.website;
-    payload._url = envelope.page.url || '';
-    payload['ID заявки'] = envelope.leadId;
-    payload['Форма'] = envelope.formId;
-    payload['Страница'] = envelope.page.url || envelope.page.title || 'не указана';
-    payload['Заголовок страницы'] = envelope.page.title || 'не указан';
-    payload['Версия согласия'] = envelope.consentVersion;
-    payload['Время'] = envelope.createdAt;
-    return payload;
-  }
-
   function requestBody(envelope, attachment, cfg) {
-    if (cfg.provider === 'api') {
-      var body = new root.FormData();
-      body.append('payload', JSON.stringify(envelope));
-      if (attachment) body.append('attachment', attachment, attachment.name);
-      return body;
-    }
-    return JSON.stringify(readablePayload(envelope));
+    var body = new root.FormData();
+    body.append('payload', JSON.stringify(envelope));
+    if (attachment) body.append('attachment', attachment, attachment.name);
+    return body;
   }
 
   function endpointFor(cfg) {
-    if (cfg.provider !== 'api' && cfg.provider !== 'formsubmit') {
-      throw makeError('LEAD_CONFIG', 'Unknown lead provider: ' + String(cfg.provider));
+    if (cfg.provider !== 'api') throw makeError('LEAD_CONFIG', 'Unknown lead provider: ' + String(cfg.provider));
+    if (!cfg.endpoint) throw makeError('LEAD_CONFIG', 'Lead endpoint is not configured');
+    if (!/^\/api\/leads\/?$/.test(String(cfg.endpoint))) {
+      throw makeError('LEAD_CONFIG', 'Lead endpoint must stay on the current site origin');
     }
-    if (cfg.provider === 'api') {
-      if (!cfg.endpoint) throw makeError('LEAD_CONFIG', 'Lead endpoint is not configured');
-      return cfg.endpoint;
-    }
-    if (!cfg.email) throw makeError('LEAD_CONFIG', 'Lead email is not configured');
-    return 'https://formsubmit.co/ajax/' + encodeURIComponent(cfg.email);
+    return cfg.endpoint;
   }
 
   function confirmedRequest(url, options, timeoutMs, cfg, leadId) {
@@ -223,31 +228,10 @@
     return response.json().catch(function (error) {
       throw makeError('LEAD_RESPONSE', 'Lead endpoint returned invalid JSON', error);
     }).then(function (data) {
-      var accepted = cfg.provider === 'api'
-        ? data && data.ok === true && typeof data.leadId === 'string' && data.leadId
-        : data && (data.success === true || data.success === 'true');
+      var accepted = data && data.ok === true && typeof data.leadId === 'string' && data.leadId === fallbackLeadId;
       if (!accepted) throw makeError('LEAD_REJECTED', data && data.message ? String(data.message) : 'Lead endpoint did not confirm acceptance');
-      return { ok: true, leadId: cfg.provider === 'api' ? data.leadId : fallbackLeadId };
+      return { ok: true, leadId: fallbackLeadId };
     });
-  }
-
-  function sendRelay(envelope, cfg) {
-    if (cfg.provider !== 'formsubmit' || !cfg.tgRelay || typeof root.fetch !== 'function') return;
-    var readable = {
-      _subject: 'Заявка с сайта EGOE — ' + envelope.tag,
-      'ID заявки': envelope.leadId,
-      'Форма': envelope.formId,
-      'Страница': envelope.page.url || envelope.page.title || 'не указана'
-    };
-    Object.keys(envelope.fields).forEach(function (key) { readable[key] = envelope.fields[key]; });
-    Promise.resolve().then(function () {
-      return root.fetch(cfg.tgRelay, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(readable)
-      });
-    }).catch(function (error) { report(makeError('LEAD_RELAY', 'Secondary lead relay failed', error)); });
   }
 
   function send(fields, tag, options) {
@@ -267,6 +251,7 @@
         emit('success', { formId: envelope.formId, leadId: envelope.leadId });
         return Promise.resolve({ ok: true, leadId: envelope.leadId, filtered: true });
       }
+      if (!envelope.consent.accepted) throw makeError('CONSENT_REQUIRED', 'Personal data consent is required');
       url = endpointFor(cfg);
       body = requestBody(envelope, attachmentCheck.file, cfg);
     } catch (error) {
@@ -276,14 +261,13 @@
     }
 
     var requestTimeoutMs = attachmentCheck.file ? Math.max(cfg.timeoutMs, cfg.uploadTimeoutMs) : cfg.timeoutMs;
-    var headers = { Accept: 'application/json' };
-    if (cfg.provider === 'formsubmit') headers['Content-Type'] = 'application/json';
     return confirmedRequest(url, {
       method: 'POST',
-      headers: headers,
+      headers: { Accept: 'application/json' },
+      credentials: 'same-origin',
+      cache: 'no-store',
       body: body
     }, requestTimeoutMs, cfg, envelope.leadId).then(function (result) {
-      sendRelay(envelope, cfg);
       emit('success', { formId: envelope.formId, leadId: result.leadId });
       return result;
     }).catch(function (error) {
@@ -370,6 +354,17 @@
     }
     if (phone) phone.setCustomValidity('');
 
+    var consent = form.querySelector('[data-lead-consent]');
+    if (!consent || !consent.checked) {
+      if (consent) {
+        consent.setCustomValidity('Подтвердите согласие на обработку персональных данных.');
+        if (consent.reportValidity) consent.reportValidity();
+        consent.focus();
+      }
+      return false;
+    }
+    consent.setCustomValidity('');
+
     if (form.__attachmentError) {
       var invalidDrop = form.querySelector('.filedrop');
       if (invalidDrop) invalidDrop.focus();
@@ -386,15 +381,29 @@
 
     clearResult(form);
     setSending(form, true);
-    var leadId = form.dataset.leadId || requestId();
-    form.dataset.leadId = leadId;
-    var task = send(leadFields(form), form.dataset.leadTag || 'форма', {
-      leadId: leadId,
-      formId: form.dataset.leadForm || 'page:request',
-      attachment: checked.file,
-      honeypot: (form.querySelector('input[name="_honey"]') || {}).value || '',
-      elapsedMs: Date.now() - (Number(form.dataset.leadStartedAt) || Date.now())
-    }).then(function (result) {
+    var requestState = form.__leadRequest;
+    if (!requestState) {
+      var leadId = form.dataset.leadId || requestId();
+      form.dataset.leadId = leadId;
+      requestState = {
+        fields: leadFields(form),
+        tag: form.dataset.leadTag || 'форма',
+        options: {
+          leadId: leadId,
+          formId: form.dataset.leadForm || 'page:request',
+          attachment: checked.file,
+          honeypot: (form.querySelector('input[name="_honey"]') || {}).value || '',
+          elapsedMs: Date.now() - (Number(form.dataset.leadStartedAt) || Date.now()),
+          createdAt: new Date().toISOString(),
+          context: pageContext(),
+          consentAccepted: true,
+          consentUrl: consent.dataset.consentUrl || ''
+        }
+      };
+      form.__leadRequest = requestState;
+    }
+    var task = send(requestState.fields, requestState.tag, requestState.options).then(function (result) {
+      form.__leadRequest = null;
       form.style.display = 'none';
       renderResult(form, 'success', result.leadId);
       return result;
@@ -404,9 +413,60 @@
     }).finally(function () {
       setSending(form, false);
       if (inFlight) inFlight.delete(form);
+      if (form.__leadDirty) {
+        form.__leadDirty = false;
+        form.__leadRequest = null;
+        delete form.dataset.leadId;
+      }
     });
     if (inFlight) inFlight.set(form, task);
     return false;
+  }
+
+  function absoluteHref(value) {
+    try { return new URL(String(value || ''), root.location && root.location.href || '').href; } catch (_) { return String(value || ''); }
+  }
+
+  function routeFromRuntime(route) {
+    var script = root.document.querySelector('script[src*="assets/js/leads.js"]');
+    var source = script && script.getAttribute ? script.getAttribute('src') : '';
+    var marker = 'assets/js/leads.js';
+    var at = String(source || '').indexOf(marker);
+    return at >= 0 ? source.slice(0, at) + route.replace(/^\/+/, '') : route;
+  }
+
+  function legalHref(fragment, route) {
+    var link = root.document.querySelector('.foot-legal a[href*="' + fragment + '"], a[href*="' + fragment + '"]');
+    return absoluteHref(link ? link.getAttribute('href') : routeFromRuntime(route));
+  }
+
+  function consentUi(form) {
+    if (form.querySelector('[data-lead-consent]')) return;
+    var old = form.querySelector('p.consent');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var wrap = root.document.createElement('label');
+    wrap.className = 'lead-consent-check';
+    var input = root.document.createElement('input');
+    input.type = 'checkbox';
+    input.required = true;
+    input.setAttribute('data-lead-consent', '');
+    input.dataset.consentUrl = legalHref('/consent/', 'consent/');
+    var copy = root.document.createElement('span');
+    copy.appendChild(root.document.createTextNode('Я даю '));
+    var consentLink = root.document.createElement('a');
+    consentLink.href = input.dataset.consentUrl;
+    consentLink.textContent = 'согласие на обработку персональных данных';
+    copy.appendChild(consentLink);
+    copy.appendChild(root.document.createTextNode(' и ознакомлен(а) с '));
+    var policyLink = root.document.createElement('a');
+    policyLink.href = legalHref('/privacy/', 'privacy/');
+    policyLink.textContent = 'Политикой';
+    copy.appendChild(policyLink);
+    wrap.appendChild(input);
+    wrap.appendChild(copy);
+    var submit = form.querySelector('button[type="submit"], .btn[type="submit"], button.btn-block');
+    if (submit) form.insertBefore(wrap, submit); else form.appendChild(wrap);
+    input.addEventListener('change', function () { input.setCustomValidity(''); });
   }
 
   function fileUi(form) {
@@ -501,7 +561,7 @@
   }
 
   function prepareForms() {
-    var forms = root.document.querySelectorAll('form[onsubmit*="submitLead"]');
+    var forms = root.document.querySelectorAll('form[onsubmit*="EGOE_LEADS"], form[onsubmit*="submitLead"], form#kpForm');
     Array.prototype.forEach.call(forms, function (form, index) {
       form.dataset.leadForm = form.dataset.leadForm || inferFormId(form, index);
       form.dataset.leadTag = form.dataset.leadTag || (root.document.title || 'форма');
@@ -518,8 +578,21 @@
       }
       var phone = phoneInput(form);
       if (phone) phone.addEventListener('input', function () { phone.setCustomValidity(''); });
+      if (typeof form.addEventListener === 'function') {
+        var resetRetry = function () {
+          if (inFlight && inFlight.has(form)) {
+            form.__leadDirty = true;
+            return;
+          }
+          form.__leadRequest = null;
+          delete form.dataset.leadId;
+        };
+        form.addEventListener('input', resetRetry);
+        form.addEventListener('change', resetRetry);
+      }
       var box = resultBox(form);
       if (box) { box.setAttribute('aria-live', 'polite'); box.setAttribute('role', 'status'); }
+      consentUi(form);
       fileUi(form);
     });
   }

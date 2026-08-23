@@ -4,6 +4,12 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+const ALLOWED_PHP_PATHS = new Set([
+  'api/leads/index.php',
+  'api/leads/lib/leadbackend.php',
+  'api/leads/cli/leads.php'
+]);
+
 function fail(message) {
   throw new Error(message);
 }
@@ -22,13 +28,45 @@ function parseArgs(argv) {
 }
 
 function assertSafeRelativePath(value) {
-  if (typeof value !== 'string' || !value || value.includes('\\')) {
+  if (
+    typeof value !== 'string'
+    || !value
+    || value.includes('\\')
+    || /[\u0000-\u001f\u007f]/.test(value)
+  ) {
     fail(`Unsafe artifact path: ${String(value)}`);
   }
   if (path.posix.isAbsolute(value) || path.posix.normalize(value) !== value) {
     fail(`Unsafe artifact path: ${value}`);
   }
   if (value.split('/').includes('..')) fail(`Unsafe artifact path: ${value}`);
+}
+
+function assertReleasePathPolicy(value) {
+  const segments = value.split('/');
+  const lower = segments.map((segment) => segment.toLowerCase());
+  const basename = lower.at(-1);
+  const root = lower[0];
+  const normalizedLower = lower.join('/');
+
+  if (basename === '.env' || basename?.startsWith('.env.')) {
+    fail(`Persistent secret/config file is forbidden in release: ${value}`);
+  }
+  if (['.git', '.github', '.private', 'shared', 'state', 'storage', 'runtime'].includes(root)) {
+    fail(`Persistent or private root is forbidden in release: ${value}`);
+  }
+  if (root === 'api' && lower.slice(1, -1).some((segment) => ['config', 'state', 'storage', 'runtime'].includes(segment))) {
+    fail(`Persistent API path is forbidden in release: ${value}`);
+  }
+  if (
+    root === 'api'
+    && (basename === 'secrets.php' || /^config(?:[._-].*)?\.php$/.test(basename || ''))
+  ) {
+    fail(`Persistent API configuration is forbidden in release: ${value}`);
+  }
+  if (basename?.endsWith('.php') && !ALLOWED_PHP_PATHS.has(normalizedLower)) {
+    fail(`PHP file is not explicitly allowed in release: ${value}`);
+  }
 }
 
 async function walkFiles(root, dir = root, prefix = '') {
@@ -75,6 +113,7 @@ async function main() {
   const listed = new Map();
   for (const entry of manifest.files) {
     assertSafeRelativePath(entry?.path);
+    assertReleasePathPolicy(entry.path);
     if (listed.has(entry.path)) fail(`Duplicate manifest path: ${entry.path}`);
     listed.set(entry.path, entry);
   }

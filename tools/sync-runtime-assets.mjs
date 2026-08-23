@@ -9,6 +9,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTRACT_PATH = path.join(ROOT, 'config/site-contract.json');
 const WRITE = process.argv.includes('--write');
 const CHECK = process.argv.includes('--check');
+const LEGACY_LEAD_SUBMIT = 'onsubmit="return submitLead(this)"';
+const SAFE_LEAD_SUBMIT = 'onsubmit="return window.EGOE_LEADS ? window.EGOE_LEADS.submitForm(this) : false"';
 
 function toPosix(value) {
   return value.split(path.sep).join('/');
@@ -128,13 +130,14 @@ async function main() {
   }
 
   const totals = new Map(assets.map((asset) => [asset.path, 0]));
+  let safeLeadForms = 0;
   const changed = [];
   const pendingWrites = [];
   const scannedPages = [...new Set(assets.flatMap((asset) => [...targetPages.get(asset.path)]))].sort(compareNames);
   for (const rel of scannedPages) {
     const absolute = path.join(ROOT, rel);
     const original = await fs.readFile(absolute, 'utf8');
-    let updated = original;
+    let updated = original.split(LEGACY_LEAD_SUBMIT).join(SAFE_LEAD_SUBMIT);
     for (const asset of assets) {
       if (!targetPages.get(asset.path).has(rel)) continue;
       let result = applyRevision(updated, asset.path, revisions.get(asset.path));
@@ -145,6 +148,7 @@ async function main() {
       totals.set(asset.path, totals.get(asset.path) + result.matches);
       updated = result.updated;
     }
+    safeLeadForms += updated.split(SAFE_LEAD_SUBMIT).length - 1;
     if (updated !== original) {
       changed.push(rel);
       if (WRITE) pendingWrites.push({ absolute, updated });
@@ -156,6 +160,9 @@ async function main() {
     if (actual !== asset.expectedPages) {
       throw new Error(`${asset.path}: expected ${asset.expectedPages} page references, found ${actual}`);
     }
+  }
+  if (safeLeadForms !== contract.leadDelivery.standardForms) {
+    throw new Error(`Expected ${contract.leadDelivery.standardForms} fail-closed lead forms, found ${safeLeadForms}`);
   }
 
   if (WRITE && pendingWrites.length) {
@@ -175,6 +182,7 @@ async function main() {
     mode: WRITE ? 'write' : 'check',
     runtimePages: pages.length,
     scannedPages: scannedPages.length,
+    failClosedLeadForms: safeLeadForms,
     changedPages: changed.length,
     assets: assets.map((asset) => ({
       path: asset.path,

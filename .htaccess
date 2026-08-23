@@ -2,8 +2,16 @@
 # Работает, если хостинг обслуживает Apache (в т.ч. Apache за nginx в ISPmanager).
 # На чистом nginx этот файл игнорируется — тогда включите те же редиректы тумблерами в панели.
 
-Options -Indexes
+Options -Indexes -MultiViews
 DirectoryIndex index.html
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
@@ -23,6 +31,14 @@ DirectoryIndex index.html
   RewriteCond %{HTTPS} !=on [OR]
   RewriteCond %{HTTP_HOST} !^www\.egoe-life\.ru$ [NC]
   RewriteRule ^ https://www.egoe-life.ru%{REQUEST_URI} [R=301,L,NE]
+
+  # Единственная публичная PHP-точка: same-origin приём заявки.
+  # Общая библиотека и CLI входят в immutable release, но не доступны по HTTP.
+  RewriteRule ^api/leads/(?:cli|lib)(?:/|$) - [R=404,L,NC]
+  RewriteCond %{THE_REQUEST} \s/+api/leads/index\.php(?:[/?\s]) [NC]
+  RewriteRule ^api/leads/index\.php(?:/.*)?$ - [R=404,L,NC]
+  RewriteRule ^api/leads/index/?$ - [R=404,L,NC]
+  RewriteRule ^api/leads/?$ api/leads/index.php [END]
 </IfModule>
 
 # Сжатие

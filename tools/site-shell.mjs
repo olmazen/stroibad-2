@@ -86,7 +86,11 @@ function validateSiteShellData(data) {
   requireList(data.topbar.messengers, 'topbar.messengers').forEach((item, index) => {
     requireRecord(item, `topbar.messengers[${index}]`);
     requireText(item.label, `topbar.messengers[${index}].label`);
-    validateExternalHref(item.href, `topbar.messengers[${index}].href`, ['https']);
+    if (item.disabled === true) {
+      if (item.href !== '') throw new Error(`Disabled site shell messenger must have an empty href: ${item.label}`);
+    } else {
+      validateExternalHref(item.href, `topbar.messengers[${index}].href`, ['https']);
+    }
   });
 
   requireRecord(data.catalog, 'catalog');
@@ -119,9 +123,7 @@ function validateSiteShellData(data) {
     if (item.href) validateExternalHref(item.href, `footer.contacts[${index}].href`, ['tel', 'mailto']);
   });
   requireText(data.footer.copyright, 'footer.copyright');
-  requireRecord(data.footer.privacy, 'footer.privacy');
-  requireText(data.footer.privacy.label, 'footer.privacy.label');
-  validateInternalRoute(data.footer.privacy.href, 'footer.privacy.href');
+  validateLinkList(data.footer.legalLinks, 'footer.legalLinks');
   requireText(data.footer.disclaimer, 'footer.disclaimer');
 }
 
@@ -167,10 +169,23 @@ function link(pageRel, item, className = '') {
   return `<a${classAttr} href="${escapeHtml(publicHref(pageRel, item.href))}">${escapeHtml(item.label)}</a>`;
 }
 
+function messengerIcon(item) {
+  if (item.icon !== 'max') return '';
+  return '<svg class="messenger-icon messenger-icon-max" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path fill="#6E1AFF" fill-rule="evenodd" clip-rule="evenodd" d="M50.757 0.262C78.293 0.262 99.886 22.597 99.886 50.147S77.607 99.49 51.021 99.49c-9.435 0-14.007-1.328-21.371-6.543a1.28 1.28 0 0 0-1.629.193c-5.664 6.043-20.171 10.286-20.835 2.036 0-14.386-7.186-23.729-7.186-45.3C0 21.555 23.221.262 50.757.262Zm.772 24.55C38.464 24.126 28.264 33.197 26.014 47.383c-1.864 11.75 1.436 26.071 4.265 26.793 1.2.307 4.078-1.9 6.178-3.879.393-.371.993-.435 1.45-.15 3.272 2 6.972 3.5 11.05 3.715 13.414.7 25.3-9.8 26.007-23.215.7-13.414-10.021-25.142-23.435-25.843v.008Z"/></svg>';
+}
+
+function renderMessenger(item) {
+  const content = `${messengerIcon(item)}<span>${escapeHtml(item.label)}</span>`;
+  if (item.disabled === true) {
+    return `<span class="messenger-link is-disabled" aria-disabled="true" title="Ссылка на MAX появится позже">${content}</span>`;
+  }
+  return `<a class="messenger-link" href="${escapeHtml(item.href)}" target="_blank" rel="noopener">${content}</a>`;
+}
+
 export function renderSiteHeader(data, pageRel) {
   const catalogActive = pageRel === 'catalog/index.html' ? ' class="active" aria-current="page"' : '';
   const messengerLinks = data.topbar.messengers
-    .map((item) => `<a href="${escapeHtml(item.href)}" target="_blank" rel="noopener">${escapeHtml(item.label)}</a>`)
+    .map(renderMessenger)
     .join('');
   const dropdown = data.catalog.items.map((item) => `
         <a class="dd-item" href="${escapeHtml(publicHref(pageRel, item.href))}"><span class="dd-ico">${ICONS[item.icon]}</span><span class="dd-tx"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.description)}</small></span></a>`).join('');
@@ -223,7 +238,10 @@ function renderContact(item) {
 
 export function renderSiteFooter(data, pageRel) {
   const badges = data.footer.badges.map((badge) => `<span>${escapeHtml(badge)}</span>`).join('');
-  const whatsapp = data.topbar.messengers.find((item) => item.label === 'WhatsApp') ?? data.topbar.messengers[0];
+  const messengerLinks = data.topbar.messengers.map(renderMessenger).join('');
+  const legalLinks = data.footer.legalLinks
+    .map((item) => `<a href="${escapeHtml(publicHref(pageRel, item.href))}">${escapeHtml(item.label)}</a>`)
+    .join('');
 
   return `${FOOTER_START}
 <footer data-site-footer><div class="container">
@@ -232,7 +250,7 @@ export function renderSiteFooter(data, pageRel) {
         <a class="logo" href="${escapeHtml(publicHref(pageRel, ''))}" style="margin-bottom:6px"><span class="logo-mark"></span><span class="logo-txt"><b style="color:#fff">${escapeHtml(data.brand.name)}</b><span>${escapeHtml(data.brand.tagline)}</span></span></a>
         <p>${escapeHtml(data.footer.about)}</p>
         <div class="foot-badges">${badges}</div>
-        <div class="foot-msgr" style="margin-top:18px"><a href="${escapeHtml(whatsapp.href)}" target="_blank" rel="noopener">${escapeHtml(whatsapp.label)}</a></div>
+        <div class="foot-msgr" style="margin-top:18px">${messengerLinks}</div>
       </div>
 ${renderFooterColumn(pageRel, 'Продукция', data.footer.productLinks)}
 ${renderFooterColumn(pageRel, 'Клиентам', data.footer.clientLinks)}
@@ -241,7 +259,7 @@ ${renderFooterColumn(pageRel, 'Клиентам', data.footer.clientLinks)}
 ${data.footer.contacts.map(renderContact).join('\n')}
       </div>
     </div>
-    <div class="foot-bot"><span>${escapeHtml(data.footer.copyright)}</span><a href="${escapeHtml(publicHref(pageRel, data.footer.privacy.href))}">${escapeHtml(data.footer.privacy.label)}</a><span>${escapeHtml(data.footer.disclaimer)}</span></div>
+    <div class="foot-bot"><span>${escapeHtml(data.footer.copyright)}</span><span class="foot-legal">${legalLinks}</span><span>${escapeHtml(data.footer.disclaimer)}</span></div>
   </div>
 </footer>
 ${FOOTER_END}`;

@@ -12,10 +12,13 @@
     "publicDirectories": [
       "44-fz",
       "about",
+      "api",
       "assets",
       "cart",
       "catalog",
+      "consent",
       "contacts",
+      "cookies",
       "dostavka",
       "kp",
       "maf",
@@ -51,16 +54,24 @@
       ".js",
       ".json",
       ".pdf",
+      ".php",
       ".png",
       ".svg",
       ".txt",
+      ".wasm",
       ".webmanifest",
       ".webp",
+      ".woff2",
       ".xml"
     ],
     "allowedJsonFiles": [
       "assets/catalog.json",
       "assets/products.json"
+    ],
+    "allowedPhpFiles": [
+      "api/leads/index.php",
+      "api/leads/lib/LeadBackend.php",
+      "api/leads/cli/leads.php"
     ]
   },
   "requiredFiles": [
@@ -72,6 +83,11 @@
     "metallokonstrukcii/pochtovye-yashchiki/index.html",
     "ograzhdeniya/index.html",
     "privacy/index.html",
+    "consent/index.html",
+    "cookies/index.html",
+    "api/leads/index.php",
+    "api/leads/lib/LeadBackend.php",
+    "api/leads/cli/leads.php",
     "tools/dogovor/index.html",
     "assets/css/style.css",
     "assets/js/site.js",
@@ -101,7 +117,7 @@
     "tools/dogovor/"
   ],
   "siteShell": {
-    "expectedPages": 303,
+    "expectedPages": 305,
     "excludedPages": [
       "kp/index.html",
       "proizvodstvo/index.html",
@@ -120,11 +136,11 @@
     ]
   },
   "knownLegacyBaseline": {
-    "sourceHtmlFiles": 311,
-    "publicHtmlFiles": 306,
-    "sitemapUrls": 301,
-    "dropdownPages": 303,
-    "postalDropdownPages": 303,
+    "sourceHtmlFiles": 313,
+    "publicHtmlFiles": 308,
+    "sitemapUrls": 303,
+    "dropdownPages": 305,
+    "postalDropdownPages": 305,
     "containerDropdownPages": 0,
     "searchProducts": 292,
     "quoteCatalogProducts": 276,
@@ -162,15 +178,15 @@
     "assetRevisions": [
       {
         "path": "assets/css/style.css",
-        "expectedPages": 303
+        "expectedPages": 305
       },
       {
         "path": "assets/js/site.js",
-        "expectedPages": 303
+        "expectedPages": 305
       },
       {
         "path": "assets/js/leads.js",
-        "expectedPages": 303,
+        "expectedPages": 305,
         "insertAfter": "assets/js/site.js"
       },
       {
@@ -201,15 +217,22 @@
   },
   "leadDelivery": {
     "script": "assets/js/leads.js",
-    "provider": "formsubmit",
-    "status": "transitional",
+    "provider": "same-origin-api",
+    "status": "active-russian-storage",
+    "endpoint": "/api/leads/",
+    "databaseSchemaVersion": 2,
+    "persistentStore": "deploy-shared-leads-sqlite",
+    "relayDefault": "off",
+    "leadRetentionDays": 365,
+    "consentEvidenceDays": 1095,
+    "backupRetentionDays": 30,
     "standardForms": 287,
     "quoteForms": 1,
     "timeoutMs": 15000,
     "uploadTimeoutMs": 120000,
     "attachmentsEnabled": false,
-    "attachmentProviderStatus": "disabled-until-controlled-endpoint",
-    "consentVersion": "2026-07-06",
+    "attachmentProviderStatus": "disabled-by-policy",
+    "consentVersion": "2026-08-23",
     "maxFileBytes": 10485760,
     "allowedExtensions": [
       "pdf",

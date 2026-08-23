@@ -14,6 +14,14 @@
   var MODULE_TIMEOUT_MS = 12000;                       // CDN/importmap не держит сцену бесконечно
   var MODEL_TIMEOUT_MS = 20000;                        // GLB/Draco либо готовы, либо статичный fallback
   var BASE_TH = -38 * D2R, BASE_PH = 66 * D2R;         // базовый трёхчетвертной ракурс
+
+  function assetUrl(relativePath) {
+    var known = window.__spCart && window.__spCart.siteBase;
+    if (known) return new URL(relativePath, known).href;
+    var logo = document.querySelector('[data-site-header] .logo');
+    var base = logo ? new URL(logo.getAttribute('href'), location.href) : new URL('/', location.href);
+    return new URL(relativePath, base).href;
+  }
   /* Раскадровка после загрузки (суммарно 7530 мс):
      0     подлёт (1100) — объект материализуется, камера наезжает издалека
      1100  мягкая посадка (350)
@@ -285,7 +293,7 @@
     };
     inst.core = core;
 
-    var draco = new DL(); draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+    var draco = new DL(); draco.setDecoderPath(assetUrl('assets/vendor/three/draco/'));
     var loader = new GL(); loader.setDRACOLoader(draco);
     function failModel(error) {
       if (modelSettled || disposed) return;

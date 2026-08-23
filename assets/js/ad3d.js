@@ -14,6 +14,14 @@
   var MODULE_TIMEOUT_MS = 12000;
   var MODEL_TIMEOUT_MS = 20000;
 
+  function assetUrl(relativePath) {
+    var known = window.__spCart && window.__spCart.siteBase;
+    if (known) return new URL(relativePath, known).href;
+    var logo = document.querySelector('[data-site-header] .logo');
+    var base = logo ? new URL(logo.getAttribute('href'), location.href) : new URL('/', location.href);
+    return new URL(relativePath, base).href;
+  }
+
   function withTimeout(promise, timeoutMs, label) {
     if (window.EGOE_RUNTIME && window.EGOE_RUNTIME.withTimeout) {
       return window.EGOE_RUNTIME.withTimeout(promise, timeoutMs, label);
@@ -167,7 +175,7 @@
     function fit() { var a = W / H, f = D * 0.72; cam.left = -f * a; cam.right = f * a; cam.top = f; cam.bottom = -f; cam.updateProjectionMatrix(); }
     function resize() { W = plate.clientWidth; H = plate.clientHeight; renderer.setSize(W, H, false); if (lines) lines.material.resolution.set(W, H); fit(); }
     function loop() { if (!running) return; raf = requestAnimationFrame(loop); controls.update(); renderer.render(scene, cam); }
-    var draco = new DL(); draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+    var draco = new DL(); draco.setDecoderPath(assetUrl('assets/vendor/three/draco/'));
     function destroy() {
       running = false;
       if (raf) cancelAnimationFrame(raf);

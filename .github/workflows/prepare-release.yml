@@ -1,4 +1,4 @@
-name: Prepare immutable release artifact
+name: Prepare archive-only artifact (not production)
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ on:
         required: false
         type: string
 
-run-name: "Prepare release: ${{ inputs.label || inputs.ref }}"
+run-name: "Prepare archive only: ${{ inputs.label || inputs.ref }}"
 
 permissions:
   contents: read
@@ -24,15 +24,16 @@ concurrency:
 
 jobs:
   package:
-    name: Verify and package without deployment
+    name: Verify and package archive not eligible for production
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Checkout requested source
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Resolve immutable source SHA
         id: source
@@ -40,10 +41,17 @@ jobs:
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Use Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
+
+      - name: Use PHP 8.2 for the real SQLite backend test
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.2'
+          extensions: pdo_sqlite, mbstring, curl
+          coverage: none
 
       - name: Install locked dependencies
         run: npm ci
@@ -54,21 +62,23 @@ jobs:
       - name: Require clean, reproducible source
         run: |
           git diff --exit-code
-          node -e "const r=require('./dist/release.json'); if(r.source.dirty) process.exit(1)"
+          node tools/verify-release-artifact.mjs --dir dist --commit "${{ steps.source.outputs.sha }}"
 
-      - name: Upload immutable release candidate
-        uses: actions/upload-artifact@v4
+      - name: Upload immutable archive-only artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: egoe-release-${{ steps.source.outputs.sha }}
+          name: egoe-archive-only-${{ steps.source.outputs.sha }}
           path: dist/
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 90
           compression-level: 6
 
       - name: Summary
         shell: bash
         run: |
-          echo "## Release candidate prepared" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Archive-only artifact prepared" >> "$GITHUB_STEP_SUMMARY"
           echo "- Source: \`${{ steps.source.outputs.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Deployment: **not performed**" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Artifact: \`egoe-release-${{ steps.source.outputs.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Production eligibility: **none; production accepts only the artifact from a successful Pages run on main**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Artifact: \`egoe-archive-only-${{ steps.source.outputs.sha }}\`" >> "$GITHUB_STEP_SUMMARY"

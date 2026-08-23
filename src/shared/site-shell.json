@@ -16,6 +16,12 @@
       {
         "label": "WhatsApp",
         "href": "https://wa.me/79272295828"
+      },
+      {
+        "label": "MAX",
+        "href": "",
+        "disabled": true,
+        "icon": "max"
       }
     ]
   },
@@ -151,10 +157,20 @@
       }
     ],
     "copyright": "© 2026 EGOE. Завод металлоконструкций.",
-    "privacy": {
-      "label": "Политика обработки персональных данных",
-      "href": "privacy/"
-    },
+    "legalLinks": [
+      {
+        "label": "Персональные данные",
+        "href": "privacy/"
+      },
+      {
+        "label": "Согласие на обработку",
+        "href": "consent/"
+      },
+      {
+        "label": "Cookie и хранилище",
+        "href": "cookies/"
+      }
+    ],
     "disclaimer": "Информация на сайте не является публичной офертой"
   }
 }

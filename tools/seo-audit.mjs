@@ -31,7 +31,7 @@ function localUrlExists(url) {
   }
 
   let pathname = decodeURIComponent(parsed.pathname).replace(/^\/+/, '');
-  if (parsed.origin === SOCIAL_ASSET_ORIGIN) {
+  if (parsed.origin === SOCIAL_ASSET_ORIGIN && SOCIAL_ASSET_ORIGIN !== SITE_ORIGIN) {
     const socialBase = new URL(SOCIAL_ASSET_ORIGIN).pathname.replace(/^\/+|\/+$/g, '');
     if (pathname === socialBase) pathname = '';
     else if (pathname.startsWith(`${socialBase}/`)) pathname = pathname.slice(socialBase.length + 1);

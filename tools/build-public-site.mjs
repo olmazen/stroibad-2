@@ -86,6 +86,9 @@ async function copyTree(sourceRel, targetRel, contract) {
   if (extension === '.json' && !contract.build.allowedJsonFiles.includes(normalizedSource)) {
     throw new Error(`JSON file is not explicitly allowed in public artifact: ${sourceRel}`);
   }
+  if (extension === '.php' && !contract.build.allowedPhpFiles.includes(normalizedSource)) {
+    throw new Error(`PHP file is not explicitly allowed in public artifact: ${sourceRel}`);
+  }
 
   await fs.mkdir(path.dirname(target), { recursive: true });
   await fs.copyFile(source, target);

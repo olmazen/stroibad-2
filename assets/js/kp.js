@@ -18,7 +18,7 @@
 
   /* Контакты изготовителя (для футера) */
   var CO = {
-    brand: 'EGOE', maker: 'ООО «Фабрика «САМШИТ»',
+    brand: 'EGOE', maker: 'ООО «Ф»САМШИТ»',
     tel: '8 (8453) 65-57-77', email: 'zakaz@egoe-life.ru',
     place: 'Производство: г. Балаково · отгрузка по всей России',
   };
@@ -555,8 +555,8 @@
     if (_libP) return _libP;
     _libP = new Promise(function (resolve, reject) {
       var srcs = [];
-      if (!window.html2canvas) srcs.push('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
-      if (!(window.jspdf && window.jspdf.jsPDF)) srcs.push('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+      if (!window.html2canvas) srcs.push(new URL('../assets/vendor/pdf/html2canvas.min.js', location.href).href);
+      if (!(window.jspdf && window.jspdf.jsPDF)) srcs.push(new URL('../assets/vendor/pdf/jspdf.umd.min.js', location.href).href);
       var left = srcs.length; if (!left) return resolve();
       srcs.forEach(function (src) {
         var s = document.createElement('script'); s.src = src;
