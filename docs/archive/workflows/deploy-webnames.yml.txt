@@ -1,7 +1,11 @@
+# ARCHIVED 2026-08-18 — DO NOT RESTORE AS AN ACTIVE WORKFLOW.
+#
+# This workflow targeted the obsolete Webnames hosting configuration, always
+# checked out `main`, and uploaded the repository root. It never performed a
+# confirmed production deployment. It is retained only as an audit record.
+
 name: Deploy to Webnames (manual)
 
-# This workflow never runs on push. Start it only when a production deployment
-# has been explicitly requested.
 on:
   workflow_dispatch:
     inputs:
@@ -23,8 +27,6 @@ concurrency:
 jobs:
   deploy:
     name: Deploy static site
-    # The source always comes from the reviewed default branch. The workflow
-    # itself may be run from this setup branch for a harmless pre-merge dry run.
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment:
@@ -39,24 +41,14 @@ jobs:
       - name: Deploy over FTP or FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-          # Connection details are repository variables; the password is the
-          # only credential and stays in a GitHub Actions secret.
           server: ${{ vars.WEBNAMES_FTP_HOST }}
           username: ${{ vars.WEBNAMES_FTP_USERNAME }}
           password: ${{ secrets.WEBNAMES_FTP_PASSWORD }}
           protocol: ${{ vars.WEBNAMES_FTP_PROTOCOL }}
           port: ${{ vars.WEBNAMES_FTP_PORT }}
-          # Webnames presents a self-signed FTPS certificate. The transport
-          # remains encrypted, but its certificate is not CA-verified.
           security: loose
-
-          # The dedicated FTP user is jailed to /www/egoe-life.ru.
           local-dir: ./
           server-dir: ./
-
-          # Existing server files are never wiped wholesale. Files are removed
-          # only when this workflow previously deployed them and they are later
-          # removed from the selected Git ref.
           dangerous-clean-slate: false
           dry-run: ${{ inputs.dry_run }}
           log-level: standard

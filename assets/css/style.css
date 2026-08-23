@@ -94,12 +94,12 @@ header.stuck .hdr{height:64px}
 nav.main{display:flex;align-items:center;gap:32px;margin-left:auto}
 nav.main>a,.navitem>a{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:13.5px;letter-spacing:.05em;font-weight:500;color:var(--tx2);cursor:pointer;white-space:nowrap;position:relative;padding:6px 0;transition:color .2s}
 nav.main>a::after,.navitem>a::after{content:"";position:absolute;left:0;bottom:-2px;height:2px;width:100%;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .28s cubic-bezier(.2,.7,.2,1)}
-nav.main>a:hover,.navitem>a:hover,nav.main>a.active{color:#fff}
-nav.main>a:hover::after,.navitem:hover>a::after{transform:scaleX(1)}
+nav.main>a:hover,.navitem>a:hover,nav.main>a.active,.navitem>a.active{color:#fff}
+nav.main>a:hover::after,.navitem:hover>a::after,.navitem:focus-within>a::after,.navitem>a.active::after{transform:scaleX(1)}
 .navitem{position:relative}
 .dropdown{position:absolute;top:calc(100% + 14px);left:-16px;min-width:620px;background:#14181D;border:1px solid var(--line);box-shadow:0 30px 70px rgba(0,0,0,.6);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:2px;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .22s,transform .22s,visibility .22s;z-index:70}
 .dropdown::before{content:"";position:absolute;top:-7px;left:34px;width:12px;height:12px;background:#14181D;border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
-.navitem:hover .dropdown{opacity:1;visibility:visible;transform:translateY(0)}
+.navitem:hover .dropdown,.navitem:focus-within .dropdown{opacity:1;visibility:visible;transform:translateY(0)}
 .dd-item{display:flex;align-items:center;gap:15px;padding:14px 16px;border-radius:2px;transition:background .2s}
 .dd-item:hover{background:rgba(255,255,255,.05)}
 .dd-ico{width:46px;height:46px;flex-shrink:0;border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;color:var(--tx2);transition:border-color .25s,color .25s,transform .25s}
@@ -110,7 +110,8 @@ nav.main>a:hover::after,.navitem:hover>a::after{transform:scaleX(1)}
 .dd-item:hover .dd-tx b{color:var(--amber)}
 .dd-tx small{color:var(--steel);font-size:12.5px}
 .hdr-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
-.burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px}
+.burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border:0;background:transparent;color:inherit;font:inherit}
+.burger:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 .burger span{width:24px;height:2px;background:#fff;transition:.25s}
 
 /* ============ секции и ритм ============ */
@@ -381,8 +382,20 @@ svg.drawn .bp-fade{opacity:1}
 .file-row{display:flex;align-items:center;gap:12px;border:1px dashed rgba(255,255,255,.3);padding:13px 14px;border-radius:var(--r);color:var(--steel);font-size:14px;cursor:pointer;transition:border-color .25s,color .25s}
 .file-row:hover{border-color:var(--amber);color:var(--tx2)}
 .consent{font-size:12.5px;color:#6E757C;margin-top:12px}
+.lead-consent-check{display:grid;grid-template-columns:20px minmax(0,1fr);align-items:start;gap:10px;margin:14px 0;color:var(--steel);font-size:12.5px;line-height:1.45;cursor:pointer}
+.lead-consent-check input{appearance:auto;width:18px;height:18px;margin:1px 0 0;accent-color:var(--amber);cursor:pointer}
+.lead-consent-check input:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.lead-consent-check a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(242,111,29,.4)}
+.lead-consent-check a:hover{border-bottom-color:var(--amber)}
 .form-ok{background:rgba(242,111,29,.1);border:1px solid var(--amber);padding:22px;border-radius:var(--r);color:#fff;font-size:15px}
 .form-ok b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:6px;color:var(--amber)}
+.form-result span,.form-result small{display:block;line-height:1.5}
+.form-result small{margin-top:8px;color:var(--steel);font-size:12px}
+.form-result>a{display:inline-block;margin-top:10px;color:#fff;text-decoration:underline;text-underline-offset:3px}
+.form-error{background:rgba(226,90,78,.09);border:1px solid #E25A4E;padding:18px 20px;border-radius:var(--r);color:#fff;font-size:14px;margin-top:14px}
+.form-error b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:6px;color:#ff887e}
+.formpanel button[type="submit"]:disabled,.kp-gen button[type="submit"]:disabled{cursor:wait;opacity:.65;filter:saturate(.65)}
+.lead-honey{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 
 /* ============ section hero (внутренние) ============ */
 .shero{position:relative;background:var(--bg);color:#fff;overflow:hidden;border-bottom:1px solid var(--line);min-height:calc(100vh - 104px);display:flex;align-items:flex-end}
@@ -633,9 +646,14 @@ footer{background:#0A0C0F;color:#9AA0A7;padding:0 0 26px}
 .foot-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
 .foot-badges span{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#9AA0A7;border:1px solid var(--line-2);padding:6px 11px;border-radius:1px}
 .foot-msgr{display:flex;gap:10px}
-.foot-msgr a{border:1px solid var(--line-2);padding:7px 13px;border-radius:var(--r);font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em;transition:border-color .2s,color .2s,transform .2s}
-.foot-msgr a:hover{border-color:var(--amber);color:var(--amber-h);transform:translateY(-2px)}
+.foot-msgr>a,.foot-msgr>.messenger-link{border:1px solid var(--line-2);padding:7px 13px;border-radius:var(--r);font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.05em;transition:border-color .2s,color .2s,transform .2s;display:inline-flex;align-items:center;gap:6px}
+.foot-msgr>a:hover{border-color:var(--amber);color:var(--amber-h);transform:translateY(-2px)}
+.messenger-link.is-disabled{color:var(--steel);opacity:.7;cursor:not-allowed;pointer-events:none;user-select:none}
+.messenger-icon{width:16px;height:16px;display:block;flex:0 0 16px}
+.tb-r .messenger-link{display:inline-flex;align-items:center;gap:5px}
 .foot-bot{display:flex;justify-content:space-between;padding-top:22px;font-size:13px;flex-wrap:wrap;gap:12px;color:#6E757C}
+.foot-legal{display:flex;gap:8px 16px;flex-wrap:wrap}
+.foot-legal a{margin:0!important}
 
 /* ============ производство: кейс и основатель ============ */
 .tile-cap{font-family:'Oswald',sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
@@ -933,6 +951,9 @@ body.mnav-lock{overflow:hidden}
 .kp-gen input.kp-invalid{border-color:var(--bad)!important;background:#2a1315}
 #kpOpen{margin-top:4px}
 .kp-gen .form-ok{margin-top:12px}
+.kp-lead-status{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.12);color:var(--steel);font-size:12.5px}
+.kp-lead-status.is-success{color:#43C383}
+.kp-lead-status.is-error{color:#FF8B80;font-weight:600}
 
 /* ── КП: «генератор» — тёмные чертёжные сцены в стиле сайта, оранжевые линии рисуются ── */
 .kp-preview{background:#14181e;border-color:var(--line-2)}
@@ -1025,6 +1046,9 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .gb-prog{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--amber),#ffc858);width:0;transition:width .5s ease}
 @media(max-width:640px){.gb-film{display:none}}
 .kpd-foot{display:flex;gap:16px;align-items:center;padding:13px 20px;border-top:1px solid var(--line)}
+.kpd-lead-status{flex:1;min-width:180px;font-size:12px;line-height:1.35;color:var(--steel)}
+.kpd-lead-status.is-success{color:#43C383}
+.kpd-lead-status.is-error{color:#FF8B80;font-weight:600}
 .kpd-foot .btn{flex-shrink:0}
 .kpd-alt{font-size:13px;color:var(--steel);text-decoration:underline;text-underline-offset:3px}
 .kpd-alt:hover{color:#fff}
@@ -1032,7 +1056,8 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
  .kpd-panel{width:100%}
  .kpd-head{padding:12px 14px}
  .kpd-title{font-size:13px}
- .kpd-foot{padding:11px 14px;gap:12px}
+ .kpd-foot{padding:11px 14px;gap:10px;flex-wrap:wrap}
+ .kpd-lead-status{flex:0 0 100%;order:-1;min-width:0}
  .kpd-foot .btn{flex:1}
  .kpd-mini{height:300px}
 }
@@ -1536,6 +1561,10 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .legal-req span{color:var(--steel);font-size:13px}
 .legal-req b{color:#fff;font-size:14px;font-weight:600}
 .legal-note{color:var(--steel);font-size:13.5px;line-height:1.6;font-style:italic}
+.legal-table{width:100%;border-collapse:collapse;margin:14px 0 20px;font-size:14px}
+.legal-table th,.legal-table td{border:1px solid var(--line);padding:11px 12px;text-align:left;vertical-align:top;color:var(--tx2);line-height:1.5}
+.legal-table th{color:#fff;background:rgba(255,255,255,.035);font-weight:600}
+.legal-callout{border:1px solid rgba(242,111,29,.42);border-left:3px solid var(--amber);background:rgba(242,111,29,.07);padding:16px 18px;margin:16px 0;color:var(--tx2);line-height:1.6}
 @media(max-width:600px){.legal-req>div{grid-template-columns:1fr;gap:3px}}
 
 /* ── cookie-уведомление ── */
@@ -1798,8 +1827,9 @@ html.kpd-lock,html.kpd-lock body{overflow:hidden}
 .fw-pp-3d-stage.ld::before{content:"Загрузка 3D";position:absolute;left:0;right:0;bottom:22px;z-index:3;text-align:center;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:8px;color:#d8b979}
 .fw-pp-3d-stage.ld::after{content:"";position:absolute;left:30%;right:30%;bottom:14px;height:2px;z-index:3;background:linear-gradient(90deg,#d8b979,#f2c66d);transform-origin:left;transform:scaleX(0);animation:fwLdBar .88s cubic-bezier(.35,.15,.35,1) forwards}
 @keyframes fwLdBar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-/* fallback: FW3D не смог загрузить модель — чертёж-заглушка мягко покачивается */
-.fw-pp-3d-stage.fw3d-fb .fw-pp-3dimg{animation:fwSpin3d 3.6s ease-in-out infinite alternate}
+/* fallback: вместо бесконечного loader/покачивания показываем статичный чертёж и честный статус */
+.fw-pp-3d-stage.fw3d-fb .fw-pp-3dimg,.fw-pp.spin3d .fw-pp-3dimg{animation:none!important}
+.fw-pp-3d-stage.fw3d-fb::before,.fw-pp.spin3d .fw-pp-3d-stage::before{content:"3D недоступно — показан чертёж";position:absolute;left:10px;right:10px;bottom:8px;z-index:3;text-align:center;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:8px;color:#d8b979}
 .fw-pp-3dimg{width:auto;height:100%;max-width:96%;object-fit:contain;filter:drop-shadow(0 18px 30px rgba(0,0,0,.55));transition:transform 1s cubic-bezier(.3,.7,.3,1),opacity .5s ease}
 .fw-pp.spin3d .fw-pp-3dimg{animation:fwSpin3d 3.6s ease-in-out infinite alternate}
 @keyframes fwSpin3d{from{transform:rotateY(-15deg) rotateX(3deg)}to{transform:rotateY(15deg) rotateX(-2deg)}}
@@ -1943,6 +1973,10 @@ body .ad-plate{min-height:640px;border-radius:3px 3px 0 0}
 .ad-3d canvas{position:absolute;inset:0;width:100%!important;height:100%!important;touch-action:none;cursor:grab}
 .ad-3d canvas:active{cursor:grabbing}
 .ad-plate.is3d .ad-draw-holder{opacity:0;pointer-events:none}
+.ad-plate.is3d.ad3d-fallback .ad-draw-holder{opacity:.42;pointer-events:none}
+.ad-3d.failed{background:linear-gradient(180deg,rgba(8,17,29,.12),rgba(8,17,29,.72));pointer-events:none}
+.ad-3d.failed .ad-3d-load{display:block;opacity:1;color:#d8b979;text-shadow:0 1px 12px rgba(0,0,0,.9)}
+.ad-3d.failed .ad-3d-hint{display:none}
 .ad-3d-load,.ad-3d-hint{position:absolute;left:0;right:0;text-align:center;font-family:'Oswald',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9fb8dc;pointer-events:none;z-index:2}
 .ad-3d-load{top:50%;transform:translateY(-50%);font-size:12px;opacity:.75}
 .ad-3d.ready .ad-3d-load{display:none}

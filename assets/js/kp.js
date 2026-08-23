@@ -1,24 +1,30 @@
 /* ============================================================
    EGOE · рендер коммерческого предложения (/kp/)
    Один красивый КП. Читает корзину (localStorage sp_cart_v1)
-   + шапку (sp_kp_head_v1) + каталог (assets/catalog.json).
+   + одноразовую шапку из родительской вкладки + каталог (assets/catalog.json).
    PDF = Chrome window.print → «Сохранить как PDF».
    ============================================================ */
 (function () {
   'use strict';
 
   var CART_KEY = 'sp_cart_v1';
-  var HEAD_KEY = 'sp_kp_head_v1';
   var VAT = 0.20;
+
+  // Одноразово удаляем PII, оставшиеся у посетителей от прежней реализации КП.
+  try {
+    localStorage.removeItem('sp_leads_v1');
+    localStorage.removeItem('sp_kp_head_v1');
+  } catch (_) {}
 
   /* Контакты изготовителя (для футера) */
   var CO = {
-    brand: 'EGOE', maker: 'ООО «Фабрика «САМШИТ»',
+    brand: 'EGOE', maker: 'ООО «Ф»САМШИТ»',
     tel: '8 (8453) 65-57-77', email: 'zakaz@egoe-life.ru',
     place: 'Производство: г. Балаково · отгрузка по всей России',
   };
 
   var P = new URLSearchParams(location.search);
+  var instanceKey = P.get('_') || '';
   var ledgerOnly = P.get('ledger') === '1';
   var auto = P.get('auto') === '1';
   var preview = P.get('preview') === '1';   // мини-превью в корзине (обложка+ведомость, без панели, некликабельно)
@@ -65,16 +71,30 @@
   /* ---------------- загрузка ---------------- */
   var doc = document.getElementById('kp');
   var cart = readJSON(CART_KEY, []);
-  var head = readJSON(HEAD_KEY, {});
+  var head = {};
+  var buildStarted = false;
 
-  fetch('../assets/catalog.json?v=kp4').then(function (r) { return r.json(); }).then(function (catalog) {
-    var bySku = {}; catalog.forEach(function (x) { bySku[x.sku] = x; });
-    var rows = cart.map(function (it) { return Object.assign({}, it, { cat: bySku[it.id] || null }); });
-    build(rows);
-  }).catch(function (e) {
-    doc.innerHTML = '<div class="sheet"><p>Не удалось загрузить каталог. ' + esc(e.message) + '</p></div>';
-    finish();
-  });
+  function cleanHead(value) {
+    var source = value && typeof value === 'object' ? value : {};
+    var out = {};
+    ['addressee', 'object', 'number', 'date'].forEach(function (key) {
+      if (source[key] != null) out[key] = String(source[key]).slice(0, 240);
+    });
+    return out;
+  }
+
+  function startBuild() {
+    if (buildStarted) return;
+    buildStarted = true;
+    fetch('../assets/catalog.json?v=kp4').then(function (r) { return r.json(); }).then(function (catalog) {
+      var bySku = {}; catalog.forEach(function (x) { bySku[x.sku] = x; });
+      var rows = cart.map(function (it) { return Object.assign({}, it, { cat: bySku[it.id] || null }); });
+      build(rows);
+    }).catch(function (e) {
+      doc.innerHTML = '<div class="sheet"><p>Не удалось загрузить каталог. ' + esc(e.message) + '</p></div>';
+      finish();
+    });
+  }
 
   /* ---------------- сборка ---------------- */
   function build(rows) {
@@ -100,8 +120,24 @@
   function runStreamOnce() { if (streamStarted) return; streamStarted = true; runStream(); }
   window.addEventListener('message', function (e) {
     if (e.origin !== location.origin) return;
-    if (e.data && e.data.kpGo) runStreamOnce();     // шторка показала документ — начинаем плавную сборку
+    var trustedHeadSource = (P.get('embed') === '1' && e.source === window.parent)
+      || (P.get('embed') !== '1' && window.opener && e.source === window.opener);
+    if (e.data && e.data.kpHead && e.data.kpInstance === instanceKey && trustedHeadSource && !buildStarted) {
+      head = cleanHead(e.data.kpHead);
+      startBuild();
+      if (P.get('embed') !== '1') try { window.opener = null; } catch (_) {}
+    }
+    if (e.data && e.data.kpGo && e.data.kpInstance === instanceKey && e.source === window.parent) runStreamOnce();     // шторка показала документ — начинаем плавную сборку
   });
+  if (P.get('embed') === '1' && window.parent !== window) {
+    try { window.parent.postMessage({ kpNeedHead: true, kpInstance: instanceKey }, location.origin); } catch (_) {}
+    setTimeout(startBuild, 2000);
+  } else if (window.opener) {
+    try { window.opener.postMessage({ kpNeedHead: true, kpInstance: instanceKey }, location.origin); } catch (_) {}
+    setTimeout(startBuild, 2000);
+  } else {
+    startBuild();
+  }
 
   /* =============== плавная сборка документа («таймлайн дизайнера») =============== */
   var streamUnits = [], streamTimers = [], typingEls = [];
@@ -144,7 +180,13 @@
       }
     });
   }
-  function postStream(msg) { try { parent.postMessage({ kpStream: msg }, location.origin); } catch (e) {} }
+  function postParent(message) {
+    if (window.parent === window) return;
+    var payload = message || {};
+    payload.kpInstance = instanceKey;
+    try { window.parent.postMessage(payload, location.origin); } catch (e) {}
+  }
+  function postStream(msg) { postParent({ kpStream: msg }); }
 
   /* печать текста по буквам с сохранением разметки (<br>, <span>) и мигающей кареткой */
   function typeMarkup(el, dur, done) {
@@ -478,6 +520,9 @@
     Promise.all([fonts].concat(waits)).then(function () {
       var m = document.getElementById('kp-ready'); if (m) m.setAttribute('data-ready', '1');
       window.__kpReady = true;
+      if (pb) pb.disabled = false;
+      if (pbPrint) pbPrint.disabled = false;
+      postParent({ kpReady: true });
       fitNarrow();
       if (auto) setTimeout(function () { window.print(); }, 120);
     });
@@ -510,8 +555,8 @@
     if (_libP) return _libP;
     _libP = new Promise(function (resolve, reject) {
       var srcs = [];
-      if (!window.html2canvas) srcs.push('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
-      if (!(window.jspdf && window.jspdf.jsPDF)) srcs.push('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+      if (!window.html2canvas) srcs.push(new URL('../assets/vendor/pdf/html2canvas.min.js', location.href).href);
+      if (!(window.jspdf && window.jspdf.jsPDF)) srcs.push(new URL('../assets/vendor/pdf/jspdf.umd.min.js', location.href).href);
       var left = srcs.length; if (!left) return resolve();
       srcs.forEach(function (src) {
         var s = document.createElement('script'); s.src = src;
@@ -519,19 +564,21 @@
         s.onerror = function () { reject(new Error('lib')); };
         document.head.appendChild(s);
       });
-    });
+    }).catch(function (error) { _libP = null; throw error; });
     return _libP;
   }
   var _dling = false;
   function setDlBusy(on) { if (pb) { pb.disabled = on; pb.textContent = on ? 'Собираем PDF…' : 'Скачать PDF'; } }
   function downloadPDF() {
-    if (_dling) return; _dling = true; setDlBusy(true);
+    if (!window.__kpReady || _dling) return; _dling = true; setDlBusy(true);
+    postParent({ kpDownloadStatus: 'started' });
     finishStreamNow();
     var d = document.querySelector('.kp-doc');
     var saved = d ? { t: d.style.transform, w: d.style.width, h: d.style.height } : null;
     if (d) { d.style.transform = 'none'; d.style.width = SHEET_W + 'px'; d.style.height = ''; }   // снимаем мобильный масштаб — рендерим в полный A4
-    function done() { if (d && saved) { d.style.transform = saved.t; d.style.width = saved.w; d.style.height = saved.h; } fitNarrow(); _dling = false; setDlBusy(false); }
-    function fail() { done(); try { window.print(); } catch (e) {} }   // запасной путь — обычная печать
+    function restore() { if (d && saved) { d.style.transform = saved.t; d.style.width = saved.w; d.style.height = saved.h; } fitNarrow(); _dling = false; setDlBusy(false); }
+    function done() { restore(); postParent({ kpDownloadStatus: 'done' }); }
+    function fail() { restore(); postParent({ kpDownloadStatus: 'error' }); try { window.print(); } catch (e) {} }   // запасной путь — обычная печать
     ensureLibs().then(function () { return (document.fonts && document.fonts.ready) || Promise.resolve(); }).then(function () {
       var JsPDF = window.jspdf.jsPDF;
       var sheets = [].slice.call(doc.querySelectorAll('.sheet'));
@@ -551,7 +598,10 @@
   window.__kpDownload = downloadPDF;
   if (pb) pb.addEventListener('click', downloadPDF);
   var pbPrint = document.getElementById('kpPrintOnly');
-  if (pbPrint) pbPrint.addEventListener('click', function () { window.print(); });
+  if (pbPrint) pbPrint.addEventListener('click', function () { if (window.__kpReady) window.print(); });
   // команда «скачать» из корзинной шторки (КП открыт в iframe)
-  window.addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.kpDownload) downloadPDF(); });
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data) return;
+    if (e.data.kpDownload && e.data.kpInstance === instanceKey) downloadPDF();
+  });
 })();

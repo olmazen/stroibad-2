@@ -11,11 +11,69 @@
   if (!toggle || !v3d) return;
   var GLB = plate.getAttribute('data-glb');
   var inited = false, api = null;
+  var MODULE_TIMEOUT_MS = 12000;
+  var MODEL_TIMEOUT_MS = 20000;
+
+  function assetUrl(relativePath) {
+    var known = window.__spCart && window.__spCart.siteBase;
+    if (known) return new URL(relativePath, known).href;
+    var logo = document.querySelector('[data-site-header] .logo');
+    var base = logo ? new URL(logo.getAttribute('href'), location.href) : new URL('/', location.href);
+    return new URL(relativePath, base).href;
+  }
+
+  function withTimeout(promise, timeoutMs, label) {
+    if (window.EGOE_RUNTIME && window.EGOE_RUNTIME.withTimeout) {
+      return window.EGOE_RUNTIME.withTimeout(promise, timeoutMs, label);
+    }
+    return new Promise(function (resolve, reject) {
+      var done = false;
+      var timer = setTimeout(function () {
+        if (done) return;
+        done = true;
+        reject(new Error((label || 'Operation') + ' timed out after ' + timeoutMs + 'ms'));
+      }, timeoutMs);
+      Promise.resolve(promise).then(function (value) {
+        if (done) return;
+        done = true; clearTimeout(timer); resolve(value);
+      }, function (error) {
+        if (done) return;
+        done = true; clearTimeout(timer); reject(error);
+      });
+    });
+  }
+
+  function clearFallback() {
+    plate.classList.remove('ad3d-fallback');
+    v3d.classList.remove('failed');
+    v3d.removeAttribute('data-3d-error');
+  }
+
+  function showFallback(error) {
+    var active = plate.classList.contains('is3d');
+    if (api && api.destroy) api.destroy();
+    api = null;
+    Array.prototype.forEach.call(v3d.children, function (child) {
+      if (child.tagName === 'CANVAS') child.remove();
+    });
+    inited = false;
+    plate.classList.add('ad3d-fallback');
+    v3d.classList.remove('ready');
+    v3d.classList.add('failed');
+    v3d.classList.toggle('show', active);
+    v3d.setAttribute('aria-hidden', active ? 'false' : 'true');
+    v3d.setAttribute('data-3d-error', error && error.code === 'EGOE_TIMEOUT' ? 'timeout' : 'load');
+    var load = v3d.querySelector('.ad-3d-load');
+    if (load) load.textContent = '3D недоступно — показан чертёж';
+    if (window.EGOE_RUNTIME && window.EGOE_RUNTIME.report) window.EGOE_RUNTIME.report('artdeco-3d', error);
+    else try { console.error('Art Déco 3D', error); } catch (_) {}
+  }
 
   toggle.addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
     toggle.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
     if (b.getAttribute('data-view') === '3d') {
+      if (!inited) clearFallback();
       plate.classList.add('is3d'); v3d.setAttribute('aria-hidden', 'false');
       requestAnimationFrame(function () { v3d.classList.add('show'); });
       if (!inited) { inited = true; boot(); } else if (api) { api.resume(); }
@@ -27,6 +85,7 @@
 
   /* ── анимация загрузки: каркас-скамейка «собирается» из точек и граней ── */
   function startLoader(host) {
+    if (!host) return { stage: function () {}, stop: function () {} };
     host.textContent = '';
     var wrap = document.createElement('div'); wrap.className = 'ad3d-load-wrap';
     var cv = document.createElement('canvas'); cv.className = 'ad3d-load-cv';
@@ -85,38 +144,62 @@
     var ld = startLoader(v3d.querySelector('.ad-3d-load'));
     try {
       ld.stage('Загрузка 3D-движка…', 0.2);
-      var THREE = await import('three'); ld.stage('Загрузка 3D-движка…', 0.42);
-      var OC = (await import('three/addons/controls/OrbitControls.js')).OrbitControls; ld.stage('Загрузчик модели…', 0.55);
-      var GL = (await import('three/addons/loaders/GLTFLoader.js')).GLTFLoader;
-      var DL = (await import('three/addons/loaders/DRACOLoader.js')).DRACOLoader; ld.stage('Декодер геометрии…', 0.68);
-      var LS2 = (await import('three/addons/lines/LineSegments2.js')).LineSegments2;
-      var LSG = (await import('three/addons/lines/LineSegmentsGeometry.js')).LineSegmentsGeometry;
-      var LM = (await import('three/addons/lines/LineMaterial.js')).LineMaterial; ld.stage('Построение граней…', 0.82);
-      build(THREE, OC, GL, DL, LS2, LSG, LM, ld);
+      var mods = await withTimeout(Promise.all([
+        import('three'),
+        import('three/addons/controls/OrbitControls.js'),
+        import('three/addons/loaders/GLTFLoader.js'),
+        import('three/addons/loaders/DRACOLoader.js'),
+        import('three/addons/lines/LineSegments2.js'),
+        import('three/addons/lines/LineSegmentsGeometry.js'),
+        import('three/addons/lines/LineMaterial.js')
+      ]), MODULE_TIMEOUT_MS, '3D engine');
+      ld.stage('Построение граней…', 0.82);
+      await build(
+        mods[0], mods[1].OrbitControls, mods[2].GLTFLoader, mods[3].DRACOLoader,
+        mods[4].LineSegments2, mods[5].LineSegmentsGeometry, mods[6].LineMaterial, ld
+      );
     } catch (err) {
-      console.error('3D load', err); ld.stop(); var l = v3d.querySelector('.ad-3d-load'); if (l) l.textContent = '3D недоступно';
+      ld.stop();
+      showFallback(err);
     }
   }
 
-  function build(THREE, OC, GL, DL, LS2, LSG, LM, ld) {
+  async function build(THREE, OC, GL, DL, LS2, LSG, LM, ld) {
     var canvas = document.createElement('canvas'); v3d.insertBefore(canvas, v3d.firstChild);
     var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     var scene = new THREE.Scene();
     var cam = new THREE.OrthographicCamera(-1, 1, 1, -1, -20000, 20000);
     var controls = new OC(cam, canvas); controls.enableDamping = true; controls.enablePan = false; controls.rotateSpeed = 0.9;
-    var running = false, raf = null, lines = null, D = 1, W = 1, H = 1;
+    var running = false, raf = null, lines = null, D = 1, W = 1, H = 1, resizeBound = false;
     function fit() { var a = W / H, f = D * 0.72; cam.left = -f * a; cam.right = f * a; cam.top = f; cam.bottom = -f; cam.updateProjectionMatrix(); }
     function resize() { W = plate.clientWidth; H = plate.clientHeight; renderer.setSize(W, H, false); if (lines) lines.material.resolution.set(W, H); fit(); }
     function loop() { if (!running) return; raf = requestAnimationFrame(loop); controls.update(); renderer.render(scene, cam); }
-    api = { pause: function () { running = false; if (raf) cancelAnimationFrame(raf); raf = null; },
-            resume: function () { if (!running) { running = true; loop(); } } };
-    var draco = new DL(); draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+    var draco = new DL(); draco.setDecoderPath(assetUrl('assets/vendor/three/draco/'));
+    function destroy() {
+      running = false;
+      if (raf) cancelAnimationFrame(raf);
+      raf = null;
+      if (resizeBound) removeEventListener('resize', resize);
+      resizeBound = false;
+      try { controls.dispose(); } catch (_) {}
+      try { renderer.dispose(); } catch (_) {}
+      try { draco.dispose(); } catch (_) {}
+      if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+    }
+    api = {
+      pause: function () { running = false; if (raf) cancelAnimationFrame(raf); raf = null; },
+      resume: function () { if (!running && v3d.classList.contains('ready')) { running = true; loop(); } },
+      destroy: destroy
+    };
     var loader = new GL(); loader.setDRACOLoader(draco);
-    loader.load(GLB, function (g) {
+    try {
+      var g = await withTimeout(new Promise(function (resolve, reject) {
+        loader.load(GLB, resolve, undefined, reject);
+      }), MODEL_TIMEOUT_MS, '3D model');
       var geos = []; g.scene.updateWorldMatrix(true, true);
       g.scene.traverse(function (o) { if (o.isMesh) { var q = o.geometry.clone(); q.applyMatrix4(o.matrixWorld); geos.push(q); } });
-      var geo = geos[0]; if (!geo) { if (ld) ld.stop(); return; }
+      var geo = geos[0]; if (!geo) throw new Error('3D model contains no renderable geometry');
       geo.computeBoundingBox(); var c = geo.boundingBox.getCenter(new THREE.Vector3()); geo.translate(-c.x, -c.y, -c.z);
       var size = geo.boundingBox.getSize(new THREE.Vector3()); D = Math.max(size.x, size.y, size.z) || 1;
       var fill = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x0c2136, transparent: true, opacity: 0.9, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 }));
@@ -127,9 +210,16 @@
       cam.position.set(-D * 2, D * 1.6, D * 2.3); controls.target.set(0, 0, 0);
       resize();
       if (ld) ld.stop();
+      clearFallback();
       v3d.classList.add('ready');
-      running = true; loop();
-    }, undefined, function () { if (ld) ld.stop(); var l = v3d.querySelector('.ad-3d-load'); if (l) l.textContent = 'Не удалось загрузить модель'; });
-    addEventListener('resize', resize); resize();
+      running = plate.classList.contains('is3d');
+      if (running) loop();
+      else { v3d.classList.remove('show'); v3d.setAttribute('aria-hidden', 'true'); }
+      addEventListener('resize', resize); resizeBound = true;
+    } catch (error) {
+      destroy();
+      api = null;
+      throw error;
+    }
   }
 })();

@@ -11,7 +11,17 @@
 (function () {
   var D2R = Math.PI / 180;
   var LOAD_MS = 900;                                   // «1 секунда на загрузку»
+  var MODULE_TIMEOUT_MS = 12000;                       // CDN/importmap не держит сцену бесконечно
+  var MODEL_TIMEOUT_MS = 20000;                        // GLB/Draco либо готовы, либо статичный fallback
   var BASE_TH = -38 * D2R, BASE_PH = 66 * D2R;         // базовый трёхчетвертной ракурс
+
+  function assetUrl(relativePath) {
+    var known = window.__spCart && window.__spCart.siteBase;
+    if (known) return new URL(relativePath, known).href;
+    var logo = document.querySelector('[data-site-header] .logo');
+    var base = logo ? new URL(logo.getAttribute('href'), location.href) : new URL('/', location.href);
+    return new URL(relativePath, base).href;
+  }
   /* Раскадровка после загрузки (суммарно 7530 мс):
      0     подлёт (1100) — объект материализуется, камера наезжает издалека
      1100  мягкая посадка (350)
@@ -43,19 +53,52 @@
   };
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  function withTimeout(promise, timeoutMs, label) {
+    if (window.EGOE_RUNTIME && window.EGOE_RUNTIME.withTimeout) {
+      return window.EGOE_RUNTIME.withTimeout(promise, timeoutMs, label);
+    }
+    return new Promise(function (resolve, reject) {
+      var done = false;
+      var timer = setTimeout(function () {
+        if (done) return;
+        done = true;
+        var error = new Error((label || 'Operation') + ' timed out after ' + timeoutMs + 'ms');
+        error.code = 'EGOE_TIMEOUT';
+        reject(error);
+      }, timeoutMs);
+      Promise.resolve(promise).then(function (value) {
+        if (done) return;
+        done = true; clearTimeout(timer); resolve(value);
+      }, function (error) {
+        if (done) return;
+        done = true; clearTimeout(timer); reject(error);
+      });
+    });
+  }
+
+  function report(error) {
+    if (window.EGOE_RUNTIME && window.EGOE_RUNTIME.report) window.EGOE_RUNTIME.report('order-wheel-3d', error);
+    else try { console.warn('FW3D', error); } catch (_) {}
+  }
+
   var modsP = null;
   function loadMods() {
     if (modsP) return modsP;
-    modsP = (async function () {
-      var THREE = await import('three');
-      var OC = (await import('three/addons/controls/OrbitControls.js')).OrbitControls;
-      var GL = (await import('three/addons/loaders/GLTFLoader.js')).GLTFLoader;
-      var DL = (await import('three/addons/loaders/DRACOLoader.js')).DRACOLoader;
-      var LS2 = (await import('three/addons/lines/LineSegments2.js')).LineSegments2;
-      var LSG = (await import('three/addons/lines/LineSegmentsGeometry.js')).LineSegmentsGeometry;
-      var LM = (await import('three/addons/lines/LineMaterial.js')).LineMaterial;
-      return { THREE: THREE, OC: OC, GL: GL, DL: DL, LS2: LS2, LSG: LSG, LM: LM };
-    })();
+    modsP = withTimeout(Promise.all([
+      import('three'),
+      import('three/addons/controls/OrbitControls.js'),
+      import('three/addons/loaders/GLTFLoader.js'),
+      import('three/addons/loaders/DRACOLoader.js'),
+      import('three/addons/lines/LineSegments2.js'),
+      import('three/addons/lines/LineSegmentsGeometry.js'),
+      import('three/addons/lines/LineMaterial.js')
+    ]).then(function (mods) {
+      return {
+        THREE: mods[0], OC: mods[1].OrbitControls, GL: mods[2].GLTFLoader,
+        DL: mods[3].DRACOLoader, LS2: mods[4].LineSegments2,
+        LSG: mods[5].LineSegmentsGeometry, LM: mods[6].LineMaterial
+      };
+    }), MODULE_TIMEOUT_MS, 'Order wheel 3D engine');
     return modsP;
   }
 
@@ -67,7 +110,7 @@
     inst.play = function () {
       inst.played = true;
       if (inst.core) { inst.wantPlay = false; inst.core.play(); }
-      else if (inst.failedMods) { stage.classList.remove('ld'); stage.classList.add('fw3d-fb'); }  // модули не встали → покачиваем чертёж
+      else if (inst.failedMods) { stage.classList.remove('ld'); stage.classList.add('fw3d-fb'); }  // модули не встали → статичный чертёж
       else { inst.wantPlay = true; inst.want = true; }
     };
     inst.spin = function () { inst.play(); };   // совместимость со старым API
@@ -80,10 +123,15 @@
     inst.destroy = function () { inst.dead = true; if (inst.core) inst.core.destroy(); };
     loadMods().then(function (m) { if (!inst.dead) build(m, stage, glb, inst); })
       .catch(function (e) {
-        console.warn('FW3D modules', e); inst.failedMods = true;
+        if (inst.dead) return;
+        inst.failedMods = true;
+        stage.setAttribute('data-3d-state', 'failed');
         stage.classList.remove('ld');
-        // fallback-покачивание НЕ на монтировании, а только когда демо реально дошло до 3D-акта
+        var strayCanvas = stage.querySelector('.fw-pp-3dcv');
+        if (strayCanvas) strayCanvas.remove();
+        // fallback показываем только когда демо реально дошло до 3D-акта
         if (inst.played || inst.wantPlay) stage.classList.add('fw3d-fb');
+        report(e);
       });
     return inst;
   }
@@ -98,6 +146,7 @@
     var cam = new THREE.OrthographicCamera(-1, 1, 1, -1, -20000, 20000);
 
     var running = false, loaded = false, failed = false, waitLoad = false, raf = null, pend = null;
+    var disposed = false, resizeBound = false, modelSettled = false, modelTimer = null;
     var W = 1, H = 1, halfY = 0.5, halfDiag = 0.7, dist = 10;
     var sph = { th: BASE_TH, ph: BASE_PH }, zoomCur = 1, txCur = 0, matK = 1;
     var C0 = new THREE.Vector3(), CD = new THREE.Vector3(), tgt = new THREE.Vector3();
@@ -107,6 +156,7 @@
     /* наш pointerdown ДО OrbitControls: первый же захват мышью прерывает демо и отдаёт вращение.
        Гасим и отложенные фазы (pend/waitLoad), чтобы begin() не отобрал управление обратно. */
     canvas.addEventListener('pointerdown', function () {
+      if (failed || disposed) return;
       userTook = true; choreo = null;
       if (pend) { clearTimeout(pend); pend = null; }
       waitLoad = false; stage.classList.remove('ld');
@@ -177,7 +227,7 @@
       }
       if (loaded) renderer.render(scene, cam);
     }
-    function startLoop() { if (running && raf == null) raf = requestAnimationFrame(loop); }
+    function startLoop() { if (!failed && !disposed && running && raf == null) raf = requestAnimationFrame(loop); }
 
     function begin() {   // старт раскадровки: издалека, полупрозрачный, вне базового угла
       if (userTook) { stage.classList.add('has3d'); controls.enabled = true; return; }   // мышь уже у пользователя — не отбираем
@@ -195,9 +245,14 @@
     }
 
     var core = {
-      start: function () { running = true; startLoop(); },
+      start: function () { if (failed || disposed) return; running = true; startLoop(); },
       stop: function () { running = false; if (raf) { cancelAnimationFrame(raf); raf = null; } },
       play: function () {
+        if (failed || disposed) {
+          stage.classList.remove('ld', 'has3d');
+          stage.classList.add('fw3d-fb');
+          return;
+        }
         core.start();
         if (userTook) return;   // мышь у пользователя — демо не вмешивается до следующего цикла
         if (pend) clearTimeout(pend);
@@ -224,52 +279,88 @@
         return { loaded: loaded, failed: failed, seg: choreo ? choreo.i : -1, th: +(sph.th / D2R).toFixed(1), ph: +(sph.ph / D2R).toFixed(1), zoom: +zoomCur.toFixed(3), tx: +txCur.toFixed(2), user: controls.enabled };
       },
       destroy: function () {
-        core.reset(); running = false; if (raf) cancelAnimationFrame(raf);
-        removeEventListener('resize', resize);
-        try { controls.dispose(); renderer.dispose(); } catch (e) {}
+        if (disposed) return;
+        core.reset(); disposed = true; modelSettled = true;
+        running = false; if (raf) cancelAnimationFrame(raf);
+        if (modelTimer) { clearTimeout(modelTimer); modelTimer = null; }
+        if (resizeBound) removeEventListener('resize', resize);
+        resizeBound = false;
+        try { controls.dispose(); } catch (_) {}
+        try { renderer.dispose(); } catch (_) {}
+        try { if (draco) draco.dispose(); } catch (_) {}
         if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
       }
     };
     inst.core = core;
 
-    var draco = new DL(); draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+    var draco = new DL(); draco.setDecoderPath(assetUrl('assets/vendor/three/draco/'));
     var loader = new GL(); loader.setDRACOLoader(draco);
+    function failModel(error) {
+      if (modelSettled || disposed) return;
+      modelSettled = true; failed = true; loaded = false;
+      if (modelTimer) { clearTimeout(modelTimer); modelTimer = null; }
+      if (pend) { clearTimeout(pend); pend = null; }
+      waitLoad = false; core.stop();
+      stage.setAttribute('data-3d-state', 'failed');
+      stage.classList.remove('ld', 'has3d');
+      stage.classList.add('fw3d-fb');
+      try { controls.dispose(); } catch (_) {}
+      try { renderer.dispose(); } catch (_) {}
+      try { draco.dispose(); } catch (_) {}
+      if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+      report(error);
+    }
+    modelTimer = setTimeout(function () {
+      var error = new Error('Order wheel 3D model timed out after ' + MODEL_TIMEOUT_MS + 'ms');
+      error.code = 'EGOE_TIMEOUT';
+      failModel(error);
+    }, MODEL_TIMEOUT_MS);
     loader.load(glb, function (g) {
-      if (inst.dead) return;   // уничтожили до прихода модели — не строим сцену и не вешаем слушатели
-      g.scene.updateWorldMatrix(true, true);
-      var group = new THREE.Group();
-      g.scene.traverse(function (o) {
-        if (o.isMesh && o.geometry) {
-          var q = o.geometry.clone(); q.applyMatrix4(o.matrixWorld);
-          var fm = new THREE.MeshBasicMaterial({ color: 0x0c2136, transparent: true, opacity: 0.92, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
-          fillMats.push(fm); group.add(new THREE.Mesh(q, fm));
-          var lsg = new LSG().fromEdgesGeometry(new THREE.EdgesGeometry(q, 18));
-          var lm = new LM({ color: 0xEDEFF1, linewidth: 1.5, transparent: true, opacity: 1 }); lm.resolution.set(W || 1, H || 1);
-          edgeMats.push(lm); group.add(new LS2(lsg, lm));
+      if (modelSettled || inst.dead || disposed) return;   // timeout/destroy уже перевёл сцену в конечное состояние
+      if (modelTimer) { clearTimeout(modelTimer); modelTimer = null; }
+      try {
+        g.scene.updateWorldMatrix(true, true);
+        var group = new THREE.Group(), meshCount = 0;
+        g.scene.traverse(function (o) {
+          if (o.isMesh && o.geometry) {
+            meshCount++;
+            var q = o.geometry.clone(); q.applyMatrix4(o.matrixWorld);
+            var fm = new THREE.MeshBasicMaterial({ color: 0x0c2136, transparent: true, opacity: 0.92, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+            fillMats.push(fm); group.add(new THREE.Mesh(q, fm));
+            var lsg = new LSG().fromEdgesGeometry(new THREE.EdgesGeometry(q, 18));
+            var lm = new LM({ color: 0xEDEFF1, linewidth: 1.5, transparent: true, opacity: 1 }); lm.resolution.set(W || 1, H || 1);
+            edgeMats.push(lm); group.add(new LS2(lsg, lm));
+          }
+        });
+        if (!meshCount) throw new Error('Order wheel 3D model contains no renderable geometry');
+        var box = new THREE.Box3().setFromObject(group);
+        var c = box.getCenter(new THREE.Vector3()); group.position.set(-c.x, -c.y, -c.z);
+        var s = box.getSize(new THREE.Vector3());
+        halfY = (s.y / 2) || 0.5;
+        halfDiag = (Math.sqrt(s.x * s.x + s.z * s.z) / 2) || 0.7;
+        dist = s.length() * 2 || 10;
+        C0.set(0, 0, 0);
+        CD.set(s.x * 0.18, s.y * 0.22, s.z * 0.05);   // «деталь» — верхний узел для крупного плана
+        scene.add(group);
+        addEventListener('resize', resize); resizeBound = true; resize(); applyCam(0);
+        modelSettled = true; loaded = true;
+        stage.setAttribute('data-3d-state', 'ready');
+        stage.classList.remove('fw3d-fb');
+        try { draco.dispose(); } catch (_) {}
+        renderer.render(scene, cam);   // тёплый первый кадр
+        if (waitLoad) {
+          waitLoad = false; stage.classList.remove('ld');
+          if (userTook) { stage.classList.add('has3d'); controls.enabled = true; }                       // мышь уже у пользователя
+          else if (reduced || performance.now() - playAt > LOAD_MS + 1600) revealStatic();               // сильно опоздали — курсор ушёл вперёд, без раскадровки
+          else begin();
         }
-      });
-      var box = new THREE.Box3().setFromObject(group);
-      var c = box.getCenter(new THREE.Vector3()); group.position.set(-c.x, -c.y, -c.z);
-      var s = box.getSize(new THREE.Vector3());
-      halfY = (s.y / 2) || 0.5;
-      halfDiag = (Math.sqrt(s.x * s.x + s.z * s.z) / 2) || 0.7;
-      dist = s.length() * 2 || 10;
-      C0.set(0, 0, 0);
-      CD.set(s.x * 0.18, s.y * 0.22, s.z * 0.05);   // «деталь» — верхний узел для крупного плана
-      scene.add(group);
-      addEventListener('resize', resize); resize(); applyCam(0);
-      loaded = true;
-      renderer.render(scene, cam);   // тёплый первый кадр
-      if (waitLoad) {
-        waitLoad = false; stage.classList.remove('ld');
-        if (userTook) { stage.classList.add('has3d'); controls.enabled = true; }                       // мышь уже у пользователя
-        else if (reduced || performance.now() - playAt > LOAD_MS + 1600) revealStatic();               // сильно опоздали — курсор ушёл вперёд, без раскадровки
-        else begin();
+        startLoop();
+      } catch (error) {
+        modelSettled = false;
+        failModel(error);
       }
-      startLoop();
     }, undefined, function (err) {
-      console.warn('FW3D glb', err); failed = true;
-      if (waitLoad || pend) { if (pend) { clearTimeout(pend); pend = null; } waitLoad = false; stage.classList.remove('ld'); stage.classList.add('fw3d-fb'); }
+      failModel(err || new Error('Order wheel 3D model failed to load'));
     });
 
     if (inst.wantPlay) { inst.wantPlay = false; core.play(); }

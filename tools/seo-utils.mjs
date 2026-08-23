@@ -2,9 +2,9 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 export const SITE_ORIGIN = 'https://www.egoe-life.ru';
-export const SOCIAL_ASSET_ORIGIN = 'https://olmazen.github.io/stroibad-2';
+export const SOCIAL_ASSET_ORIGIN = 'https://www.egoe-life.ru';
 
-const IGNORED_DIRECTORIES = new Set(['.git', 'node_modules']);
+const IGNORED_DIRECTORIES = new Set(['.git', 'dist', 'node_modules', 'ops']);
 
 export async function walkFiles(directory, predicate = () => true) {
   const files = [];

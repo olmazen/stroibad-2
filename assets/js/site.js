@@ -1,60 +1,87 @@
 /* EGOE — общий скрипт сайта v3: навигация, формы, корзина-страница, микроанимации */
-(function () {
-  // ── КОНФИГ ЛИДОВ ─────────────────────────────────────────────────────────
-  // e-mail: FormSubmit (активируется письмом-подтверждением на ПЕРВЫЙ сабмит).
-  // tgRelay: URL релея Google Apps Script для Telegram — токен бота живёт В СКРИПТЕ,
-  //          НЕ в этом файле и НЕ в публичном репозитории. Пусто = канал выключен.
-  window.LEAD_CFG = window.LEAD_CFG || { email: 'zakaz@egoe-life.ru', tgRelay: 'https://script.google.com/macros/s/AKfycbx5_jnp2K1hCTRHX_7dMErdReIMhClkpFtWE6hIm19W_3V3uh6S2JEoQXBK6KMG914j7Q/exec' };
+/*
+   Каждый независимый блок ниже запускается через EGOE_RUNTIME.run(). Ошибка одного
+   блока фиксируется в журнале и не мешает инициализации меню, поиска, корзины и
+   остальных функций. Синтаксические ошибки отдельно блокирует npm run check:syntax.
+*/
+(function (root) {
+  if (root.EGOE_RUNTIME) return;
+  var failures = [];
 
-  // собрать пары «подпись поля → значение» из любой формы (у полей нет name — берём label/placeholder)
-  function leadFields(form) {
-    var out = {}, n = 0;
-    form.querySelectorAll('input, textarea, select').forEach(function (el) {
-      var t = (el.type || '').toLowerCase();
-      if (t === 'hidden' || t === 'submit' || t === 'button' || t === 'file') return;
-      var wrap = el.closest('.field'), lab = wrap && wrap.querySelector('label');
-      var key = (lab && lab.textContent.trim()) || el.getAttribute('placeholder') || el.getAttribute('aria-label') || ('Поле ' + (++n));
-      var val = (t === 'checkbox') ? (el.checked ? 'да' : '') : (el.value || '').trim();
-      if (val) out[key] = val;
+  function describe(error) {
+    if (!error) return 'Unknown runtime error';
+    return error.message ? String(error.message) : String(error);
+  }
+
+  function report(name, error) {
+    var entry = {
+      feature: String(name || 'unknown'),
+      message: describe(error),
+      time: new Date().toISOString()
+    };
+    failures.push(entry);
+    if (failures.length > 50) failures.shift();
+    try { console.error('[EGOE runtime] ' + entry.feature, error); } catch (_) {}
+    try {
+      if (root.dispatchEvent && typeof root.CustomEvent === 'function') {
+        root.dispatchEvent(new root.CustomEvent('egoe:runtime-error', { detail: entry }));
+      }
+    } catch (_) {}
+    return entry;
+  }
+
+  function run(name, init) {
+    try {
+      var result = init();
+      if (result && typeof result.then === 'function') {
+        Promise.resolve(result).catch(function (error) { report(name, error); });
+      }
+      return result;
+    } catch (error) {
+      report(name, error);
+      return undefined;
+    }
+  }
+
+  function value(name, init, fallback) {
+    try { return init(); }
+    catch (error) { report(name, error); return fallback; }
+  }
+
+  function withTimeout(promise, timeoutMs, label) {
+    return new Promise(function (resolve, reject) {
+      var settled = false;
+      var timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        var error = new Error((label || 'Operation') + ' timed out after ' + timeoutMs + 'ms');
+        error.code = 'EGOE_TIMEOUT';
+        reject(error);
+      }, timeoutMs);
+      Promise.resolve(promise).then(function (result) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(result);
+      }, function (error) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        reject(error);
+      });
     });
-    return out;
   }
-  // номер к единому виду +7XXXXXXXXXX (клиент мог ввести с пробелами/тире/через 8) → кликабелен в Telegram
-  function normPhone(v) {
-    var dg = String(v == null ? '' : v).replace(/\D/g, '');
-    if (dg.length === 11 && (dg[0] === '8' || dg[0] === '7')) dg = '7' + dg.slice(1);
-    else if (dg.length === 10) dg = '7' + dg;
-    return dg.length === 11 ? '+' + dg : String(v == null ? '' : v);
-  }
-  function sendLead(fields, tag) {
-    var payload = { _subject: 'Заявка с сайта EGOE — ' + (tag || 'форма') };
-    Object.keys(fields).forEach(function (k) { payload[k] = fields[k]; });
-    Object.keys(payload).forEach(function (k) { if (/тел|phone/i.test(k)) payload[k] = normPhone(payload[k]); });
-    var C = window.LEAD_CFG || {};
-    if (C.email) {
-      fetch('https://formsubmit.co/ajax/' + encodeURIComponent(C.email), {
-        method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload)
-      }).catch(function () {});
-    }
-    if (C.tgRelay) {
-      // text/plain = «простой» CORS-запрос → браузер НЕ шлёт preflight OPTIONS,
-      // который Apps Script не умеет (иначе POST блокируется и в Telegram ничего не приходит).
-      // Тело остаётся JSON-строкой — на стороне скрипта JSON.parse(e.postData.contents) её читает.
-      fetch(C.tgRelay, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) }).catch(function () {});
-    }
-  }
-  window.__sendLead = sendLead;   // переиспользуется КП-генератором
 
-  // отправка любой формы-заявки -> e-mail + Telegram, затем «спасибо»
-  window.submitLead = function (form) {
-    try { sendLead(leadFields(form), 'форма'); } catch (e) {}
-    var box = form.querySelector('.form-result') || form.parentNode.querySelector('.form-result');
-    form.style.display = 'none';
-    if (box) box.style.display = 'block';
-    return false;
+  root.EGOE_RUNTIME = {
+    run: run,
+    value: value,
+    report: report,
+    withTimeout: withTimeout,
+    failures: function () { return failures.slice(); }
   };
+})(window);
 
+window.EGOE_RUNTIME.run('core-actions', function () {
   // счётчик количества на странице товара
   window.qtyStep = function (btn, delta) {
     var input = btn.parentNode.querySelector('input');
@@ -75,10 +102,10 @@
       }
     }
   };
-})();
+});
 
 /* ── товарная галерея: замена главного кадра и крупный просмотр ── */
-(function () {
+window.EGOE_RUNTIME.run('product-gallery', function () {
   var galleries = document.querySelectorAll('.gallery');
   if (!galleries.length) return;
 
@@ -253,10 +280,10 @@
       });
     });
   });
-})();
+});
 
 /* ── утилита: вызов колбэка, когда элемент появляется во вьюпорте ── */
-window.__whenVisible = (function () {
+window.__whenVisible = window.EGOE_RUNTIME.value('visibility-observer', function () {
   // IntersectionObserver надёжнее на СЛАБЫХ устройствах: срабатывает вне основного потока,
   // поэтому reveal не «застревает» невидимым, когда главный поток занят тяжёлой анимацией
   // (из-за чего секции оставались пустыми — сквозь них проступал blueprint-фон).
@@ -303,10 +330,10 @@ window.__whenVisible = (function () {
     watched.push({ el: el, cb: cb, margin: margin || 0.08 });
     onScroll();
   };
-})();
+}, function (el, cb) { if (cb) cb(el); });
 
 /* ── появление блоков при прокрутке ── */
-(function () {
+window.EGOE_RUNTIME.run('scroll-reveal', function () {
   var els = document.querySelectorAll('.reveal');
   if (!els.length) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -327,10 +354,10 @@ window.__whenVisible = (function () {
   }
   setTimeout(revealVisible, 2000);
   setTimeout(revealVisible, 5000);
-})();
+});
 
 /* ── анимированные счётчики ── */
-(function () {
+window.EGOE_RUNTIME.run('animated-counters', function () {
   var nums = document.querySelectorAll('[data-count]');
   if (!nums.length) return;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -350,19 +377,19 @@ window.__whenVisible = (function () {
       requestAnimationFrame(tick);
     }, 0.15);
   });
-})();
+});
 
 /* ── тень у закреплённой шапки при скролле ── */
-(function () {
+window.EGOE_RUNTIME.run('sticky-header', function () {
   var h = document.getElementById('siteHeader');
   if (!h) return;
   var onScroll = function () { h.classList.toggle('stuck', window.scrollY > 30); };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
-})();
+});
 
 /* ── индикатор прокрутки страницы (янтарная линия сверху) ── */
-(function () {
+window.EGOE_RUNTIME.run('scroll-progress', function () {
   var bar = document.createElement('div');
   bar.className = 'scroll-progress';
   document.body.appendChild(bar);
@@ -373,10 +400,10 @@ window.__whenVisible = (function () {
   };
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
-})();
+});
 
 /* ── подсветка карточек, следующая за курсором ── */
-(function () {
+window.EGOE_RUNTIME.run('card-glow', function () {
   if (matchMedia('(hover: none)').matches) return;
   var sel = '.icard,.why-card,.model-card,.dir-tile,.dir-card,.dir-hero,.spot,.review,.tile,.type-card,.versus,.stat,.metric';
   document.querySelectorAll(sel).forEach(function (card) {
@@ -387,10 +414,10 @@ window.__whenVisible = (function () {
       card.style.setProperty('--my', (e.clientY - r.top) + 'px');
     });
   });
-})();
+});
 
 /* ── чертежи: линии «рисуются» (hero + схемы) ── */
-(function () {
+window.EGOE_RUNTIME.run('blueprint-drawing', function () {
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var svgs = document.querySelectorAll('svg[data-draw]');
   if (!svgs.length) return;
@@ -426,12 +453,12 @@ window.__whenVisible = (function () {
       setTimeout(function () { draw(svg); }, 250);
     }, 0.12);
   });
-})();
+});
 
 /* ── мобильное меню v3: панель справа, аккордеоны разделов, CTA снизу ──
    Разметка строится ИЗ существующего desktop-меню (#nav) — один источник правды,
    ничего не дублируем в HTML страниц. */
-(function () {
+window.EGOE_RUNTIME.run('mobile-navigation', function () {
   var nav = document.getElementById('nav');
   var header = document.getElementById('siteHeader');
   if (!nav || !header) return;
@@ -441,7 +468,11 @@ window.__whenVisible = (function () {
   var phoneA = topbar ? topbar.querySelector('a[href^="tel:"]') : null;
   var messA = topbar ? Array.prototype.slice.call(topbar.querySelectorAll('.tb-r a:not([href^="tel:"])')).filter(function (a) { return a.getAttribute('href') && a.getAttribute('href') !== '#'; }) : [];
   var contactA = nav.querySelector('a[href*="contacts/"]');
-  var contactHref = contactA ? contactA.getAttribute('href') : 'https://www.egoe-life.ru/contacts/';
+  var headerCtaA = header.querySelector('.hdr-actions .btn');
+  var brandB = header.querySelector('.logo-txt b');
+  var ctaHref = headerCtaA ? headerCtaA.getAttribute('href') : (contactA ? contactA.getAttribute('href') : 'https://www.egoe-life.ru/contacts/');
+  var ctaLabel = headerCtaA ? headerCtaA.textContent.trim() : 'Обсудить проект';
+  var brandLabel = brandB ? brandB.textContent.trim() : 'EGOE';
 
   // --- собираем панель из пунктов desktop-меню ---
   var body = '';
@@ -462,7 +493,7 @@ window.__whenVisible = (function () {
   });
 
   var cta = '<div class="mnav-cta">'
-    + '<a class="btn btn-primary btn-block" href="' + esc(contactHref) + '">Обсудить проект</a>'
+    + '<a class="btn btn-primary btn-block" href="' + esc(ctaHref) + '">' + esc(ctaLabel) + '</a>'
     + (phoneA ? '<a class="mnav-phone" href="' + esc(phoneA.getAttribute('href')) + '">' + esc(phoneA.textContent.trim()) + '<small>звонок и расчёт бесплатно</small></a>' : '')
     + (messA.length ? '<div class="mnav-mess">' + messA.map(function (a) { return '<a href="' + esc(a.getAttribute('href')) + '">' + esc(a.textContent.trim()) + '</a>'; }).join('') + '</div>' : '')
     + '</div>';
@@ -472,25 +503,38 @@ window.__whenVisible = (function () {
   mnav.id = 'mnav';
   mnav.setAttribute('aria-hidden', 'true');
   mnav.innerHTML = '<div class="mnav-ov"></div>'
-    + '<aside class="mnav-panel" role="dialog" aria-label="Меню">'
-    + '<div class="mnav-head"><b>EGOE</b><button class="mnav-x" type="button" aria-label="Закрыть меню">×</button></div>'
+    + '<aside class="mnav-panel" role="dialog" aria-modal="true" aria-label="Меню">'
+    + '<div class="mnav-head"><b>' + esc(brandLabel) + '</b><button class="mnav-x" type="button" aria-label="Закрыть меню">×</button></div>'
     + '<div class="mnav-scroll">' + body + '</div>'
     + cta
     + '</aside>';
   document.body.appendChild(mnav);
 
   var burger = document.querySelector('.burger');
+  var lastFocused = null;
   function openMnav() {
+    lastFocused = document.activeElement;
     mnav.classList.add('on');
     mnav.setAttribute('aria-hidden', 'false');
     document.body.classList.add('mnav-lock');
-    if (burger) burger.classList.add('open');
+    if (burger) {
+      burger.classList.add('open');
+      burger.setAttribute('aria-expanded', 'true');
+      burger.setAttribute('aria-label', 'Закрыть меню');
+    }
+    setTimeout(function () { var close = mnav.querySelector('.mnav-x'); if (close) close.focus(); }, 0);
   }
   window.closeMnav = function () {
+    var wasOpen = mnav.classList.contains('on');
     mnav.classList.remove('on');
     mnav.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('mnav-lock');
-    if (burger) burger.classList.remove('open');
+    if (burger) {
+      burger.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+      burger.setAttribute('aria-label', 'Открыть меню');
+    }
+    if (wasOpen && lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
   };
   window.toggleNav = function () {
     if (mnav.classList.contains('on')) window.closeMnav(); else openMnav();
@@ -498,7 +542,16 @@ window.__whenVisible = (function () {
 
   mnav.querySelector('.mnav-ov').addEventListener('click', window.closeMnav);
   mnav.querySelector('.mnav-x').addEventListener('click', window.closeMnav);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') window.closeMnav(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && mnav.classList.contains('on')) window.closeMnav();
+    if (e.key !== 'Tab' || !mnav.classList.contains('on')) return;
+    var focusable = Array.prototype.slice.call(mnav.querySelectorAll('button:not([disabled]),.mnav-link[href],.mnav-group.open a[href],.mnav-cta a[href]')).filter(function (el) { return el.offsetParent !== null; });
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
   // переход по любой ссылке закрывает меню
   mnav.addEventListener('click', function (e) { if (e.target.closest('a')) window.closeMnav(); });
   // аккордеоны разделов
@@ -514,10 +567,10 @@ window.__whenVisible = (function () {
     });
   });
   window.addEventListener('resize', function () { if (innerWidth > 1180) window.closeMnav(); });
-})();
+});
 
 /* ── шапка: поиск + корзина (лист для КП) ── */
-(function () {
+window.EGOE_RUNTIME.run('header-search-cart', function () {
   var header = document.getElementById('siteHeader');
   if (!header) return;
   var logo = header.querySelector('.logo');
@@ -647,38 +700,6 @@ window.__whenVisible = (function () {
     }
   }
 
-  /* прикрепление файла (чертёж/ТЗ) в формах заявки — drag&drop + лимит; готово под будущую CRM */
-  (function () {
-    var MAX = 10 * 1024 * 1024;  // 10 МБ
-    var ACCEPT = '.pdf,.jpg,.jpeg,.png,.webp,.dwg,.dxf,.doc,.docx,.xls,.xlsx,.zip';
-    var forms = document.querySelectorAll('form[onsubmit*="submitLead"]');
-    Array.prototype.forEach.call(forms, function (form) {
-      if (form.querySelector('.lead-file')) return;
-      var wrap = document.createElement('div');
-      wrap.className = 'field lead-file';
-      wrap.innerHTML = '<label>Прикрепить файл (чертёж, ТЗ, план) — необязательно</label>' +
-        '<div class="filedrop" tabindex="0" role="button" aria-label="Прикрепить файл">' +
-        '<input type="file" name="attachment" accept="' + ACCEPT + '" hidden>' +
-        '<span class="filedrop-txt"><b>Перетащите файл</b> сюда или нажмите<small>до 10 МБ · PDF, JPG, PNG, DWG, DOC, XLS, ZIP</small></span></div>';
-      var submit = form.querySelector('button[type="submit"], .btn[type="submit"], button.btn-block');
-      if (submit) form.insertBefore(wrap, submit); else form.appendChild(wrap);
-      var drop = wrap.querySelector('.filedrop'), input = wrap.querySelector('input[type="file"]'), txt = wrap.querySelector('.filedrop-txt');
-      function setFile(file) {
-        if (!file) return;
-        if (file.size > MAX) { drop.classList.add('err'); drop.classList.remove('has'); txt.innerHTML = '<b>Файл больше 10 МБ</b><small>' + file.name + ' — выберите файл поменьше</small>'; input.value = ''; return; }
-        drop.classList.remove('err'); drop.classList.add('has');
-        txt.innerHTML = '<b>' + file.name + '</b><small>' + Math.round(file.size / 1024) + ' КБ · прикреплён · <span class="filedrop-x">убрать</span></small>';
-        form.__attachment = file;  // ссылка для будущей отправки в CRM
-      }
-      drop.addEventListener('click', function (e) { if (e.target.closest('.filedrop-x')) { e.stopPropagation(); input.value = ''; form.__attachment = null; drop.classList.remove('has', 'err'); txt.innerHTML = '<b>Перетащите файл</b> сюда или нажмите<small>до 10 МБ · PDF, JPG, PNG, DWG, DOC, XLS, ZIP</small>'; return; } input.click(); });
-      drop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
-      input.addEventListener('change', function () { setFile(input.files[0]); });
-      ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('drag'); }); });
-      ['dragleave', 'dragend', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('drag'); }); });
-      drop.addEventListener('drop', function (e) { var f = e.dataTransfer && e.dataTransfer.files[0]; if (f) { try { input.files = e.dataTransfer.files; } catch (_) {} setFile(f); } });
-    });
-  })();
-
   /* ================= ПОИСК ================= */
   var searchOv = wrap.querySelector('#searchOv'), input = wrap.querySelector('#searchInput'),
       results = wrap.querySelector('#searchResults'), INDEX = null, sel = -1;
@@ -724,10 +745,10 @@ window.__whenVisible = (function () {
   });
 
   renderBadge();
-})();
+});
 
 /* ── страница корзины /cart/: список, количество, заявка ── */
-(function () {
+window.EGOE_RUNTIME.run('cart-page', function () {
   var itemsBox = document.getElementById('cartItems');
   if (!itemsBox || !window.__spCart) return;
   var C = window.__spCart;
@@ -807,16 +828,20 @@ window.__whenVisible = (function () {
     updateSums();
   }
 
+  function notifyCartLeadChange() {
+    try { document.dispatchEvent(new CustomEvent('egoe:cart-change')); } catch (e) {}
+  }
+
   itemsBox.addEventListener('click', function (e) {
     var row = e.target.closest('.cartp-item');
     var q = e.target.closest('[data-q]');
     var d = e.target.closest('[data-del]');
-    if (q && row) { C.setQty(row.dataset.id, parseInt(q.dataset.q, 10)); render(); }
+    if (q && row) { C.setQty(row.dataset.id, parseInt(q.dataset.q, 10)); notifyCartLeadChange(); render(); }
     else if (d && row) {
       row.classList.add('out');
-      setTimeout(function () { C.del(row.dataset.id); render(); }, 240);
+      setTimeout(function () { C.del(row.dataset.id); notifyCartLeadChange(); render(); }, 240);
     } else if (e.target.closest('#cartClear')) {
-      if (confirm('Очистить весь список?')) { C.clear(); render(); }
+      if (confirm('Очистить весь список?')) { C.clear(); notifyCartLeadChange(); render(); }
     }
   });
   // редактирование цены за единицу — без ре-рендера (не теряем фокус)
@@ -824,6 +849,7 @@ window.__whenVisible = (function () {
     var pin = e.target.closest('[data-price]'); if (!pin) return;
     var row = e.target.closest('.cartp-item'); if (!row) return;
     C.update(row.dataset.id, { price: parseInt(pin.value.replace(/[^\d]/g, ''), 10) || 0 });
+    notifyCartLeadChange();
     updateSums();
   });
 
@@ -831,7 +857,6 @@ window.__whenVisible = (function () {
   (function wireKpGen() {
     var gen = document.getElementById('kpGen');
     if (!gen) return;
-    var HEAD_KEY = 'sp_kp_head_v1', LEADS_KEY = 'sp_leads_v1';
     var stage = document.getElementById('kpvStage');
     var form = document.getElementById('kpForm');
     var nameEl = document.getElementById('kpName');
@@ -839,20 +864,26 @@ window.__whenVisible = (function () {
     var emailEl = document.getElementById('kpEmail');
     var addrEl = document.getElementById('kpAddressee');   // компания → «Кому» в КП
     var okBox = document.getElementById('kpOk');
+    var leadStatus = document.getElementById('kpLeadStatus');
+    var submitBtn = form && form.querySelector('button[type="submit"]');
+    var kpLeadPending = false;
+    var currentKpHead = null;
+    var kpTabWindows = [];
     var base = C.siteBase || (location.origin + '/');
 
     function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
-    // № КП уникален по дате+времени (до секунды) — не путается между заявками и устройствами
-    function autoNum() { var d = new Date(), p = function (n) { return ('0' + n).slice(-2); }; return 'КП-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()); }
+    // Человекочитаемый номер документа; уникальный ID заявки создаёт lead-модуль.
+    function autoNum() { var d = new Date(), p = function (n) { return ('0' + n).slice(-2); }, tail = Math.random().toString(36).slice(2, 6).toUpperCase(); return 'КП-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + '-' + tail; }
+    function leadRequestId() {
+      if (window.EGOE_LEADS && typeof window.EGOE_LEADS.requestId === 'function') return window.EGOE_LEADS.requestId();
+      try { if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID(); } catch (e) {}
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (char) {
+        var value = Math.floor(Math.random() * 16);
+        return (char === 'x' ? value : ((value & 3) | 8)).toString(16);
+      });
+    }
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
     function money(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
-
-    // префилл контактов (если уже оставляли)
-    var saved = {}; try { saved = JSON.parse(localStorage.getItem(HEAD_KEY)) || {}; } catch (e) {}
-    if (nameEl) nameEl.value = saved.name || '';
-    if (phoneEl) phoneEl.value = saved.phone || '';
-    if (emailEl) emailEl.value = saved.email || '';
-    if (addrEl) addrEl.value = saved.addressee || '';
 
     /* — сцены «генерации» КП: тёмный чертёжный скелет в стиле сайта, всё рисуется
          оранжевыми линиями (обложка → ведомость → лист изделия → условия) — */
@@ -963,6 +994,7 @@ window.__whenVisible = (function () {
     /* — шторка с настоящим КП — */
     var drawer = document.getElementById('kpDrawer');
     var dFrame = document.getElementById('kpdFrame');
+    var tab = document.getElementById('kpdOpenTab');
     var dStage = document.getElementById('kpdStage');
     var dFilm = document.getElementById('kpdFilm');
     var dStatus = document.getElementById('kpdStatus');
@@ -973,11 +1005,27 @@ window.__whenVisible = (function () {
     var dGbFilm = document.getElementById('kpdGbFilm');
     var dGbProg = document.getElementById('kpdGbProg');
     var dPlayer = dStage ? makePlayer(dStage) : null;
+    var dLeadStatus = document.getElementById('kpdLeadStatus');
+    var activeDocKey = '';
+    var frameDocKey = '';
+    var readyDocKey = '';
     var genTimers = [];
     var GEN_KEY = 'sp_kp_generated_v1'; // какой состав КП уже «сгенерирован» — второй раз не пересобираем
     var lastGenKey = '', gbStage = '', gbTotal = 0;
     function hashStr(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
     function cartGenKey(items) { return hashStr(JSON.stringify(items.map(function (i) { return [i.id, i.qty, i.price || 0]; }))); }
+    function sendKpHead(target, instanceKey) {
+      if (!target || !currentKpHead) return;
+      try { target.postMessage({ kpHead: currentKpHead, kpInstance: instanceKey || '' }, location.origin); } catch (e) {}
+    }
+    function setLeadStatus(text, state) {
+      [leadStatus, dLeadStatus].forEach(function (node) {
+        if (!node) return;
+        node.textContent = text;
+        node.classList.toggle('is-error', state === 'error');
+        node.classList.toggle('is-success', state === 'success');
+      });
+    }
 
     /* — полоса генерации над документом: статус + чипы готовых разделов + прогресс — */
     var GB_LABELS = { cover: 'обложка', ledger: 'ведомость', product: 'листы изделий', terms: 'условия' };
@@ -997,8 +1045,41 @@ window.__whenVisible = (function () {
       dGbFilm.appendChild(th);
     }
     var pendingBuilt = null; // вызывается, когда КП-iframe сообщил, что макет собран (для быстрого показа)
+    var pendingReady = null;
     window.addEventListener('message', function (e) {
       if (e.origin !== location.origin) return;
+      if (e.data && e.data.kpNeedHead) {
+        kpTabWindows = kpTabWindows.filter(function (win) { try { return win && !win.closed; } catch (_) { return false; } });
+        if (dFrame && e.source === dFrame.contentWindow && e.data.kpInstance === frameDocKey) sendKpHead(e.source, frameDocKey);
+        else if (kpTabWindows.indexOf(e.source) !== -1) sendKpHead(e.source, e.data.kpInstance || '');
+        return;
+      }
+      if (!dFrame || e.source !== dFrame.contentWindow || !e.data || e.data.kpInstance !== frameDocKey) return;
+      if (e.data.kpReady) {
+        readyDocKey = frameDocKey;
+        if (activeDocKey === frameDocKey) {
+          if (pdfBtn) pdfBtn.disabled = false;
+          if (pendingReady) { var ready = pendingReady; pendingReady = null; ready(); }
+        }
+        return;
+      }
+      if (e.data.kpInstance !== activeDocKey) return;
+      if (e.data.kpDownloadStatus) {
+        if (!pdfBtn) return;
+        if (e.data.kpDownloadStatus === 'started') {
+          pdfBtn.disabled = true;
+          pdfBtn.textContent = 'Собираем PDF…';
+        } else if (e.data.kpDownloadStatus === 'error') {
+          pdfBtn.disabled = readyDocKey !== activeDocKey;
+          pdfBtn.textContent = 'Повторить PDF';
+          pdfBtn.title = 'Не удалось собрать файл. Открыт диалог печати.';
+        } else {
+          pdfBtn.disabled = readyDocKey !== activeDocKey;
+          pdfBtn.textContent = 'Скачать PDF';
+          pdfBtn.title = '';
+        }
+        return;
+      }
       var m = e.data && e.data.kpStream;
       if (!m || !dGenbar) return;
       if (m.built) { if (pendingBuilt) { var f = pendingBuilt; pendingBuilt = null; f(); } return; }
@@ -1024,13 +1105,19 @@ window.__whenVisible = (function () {
       if (!drawer) { window.open(new URL('kp/', base).href, '_blank'); return; }
       var items = C.read();
       var genKey = cartGenKey(items);
+      var docKey = genKey + '-' + hashStr(currentKpHead ? (currentKpHead.number + '|' + currentKpHead.addressee) : 'generic');
+      activeDocKey = docKey;
+      pendingBuilt = null;
+      pendingReady = null;
       var already = false;
       try { already = localStorage.getItem(GEN_KEY) === genKey; } catch (e) {}
       drawer.classList.remove('ready');
       drawer.classList.add('open');
+      drawer.setAttribute('aria-hidden', 'false');
       document.documentElement.classList.add('kpd-lock');
-      if (dNum) dNum.textContent = autoNum() + ' · ' + today().split('-').reverse().join('.');
+      if (dNum) dNum.textContent = (currentKpHead ? currentKpHead.number : autoNum()) + ' · ' + today().split('-').reverse().join('.');
       genTimers.forEach(clearTimeout); genTimers = [];
+      if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.textContent = 'Скачать PDF'; pdfBtn.title = ''; }
 
       // Первая генерация: документ «печатается» потоково прямо в КП (стрим из iframe),
       // повтор того же состава — открывается сразу, без генератора.
@@ -1068,29 +1155,39 @@ window.__whenVisible = (function () {
         // когда iframe сообщит «макет готов» — показываем документ и командуем начать плавную сборку
         pendingBuilt = function () {
           loaded = true; tryReveal();
-          setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true }, location.origin); } catch (e2) {} }, 220);
+          setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true, kpInstance: docKey }, location.origin); } catch (e2) {} }, 220);
         };
       }
 
       // настоящее КП грузится параллельно; тот же состав уже загружен (в т.ч. после стрима) — не перезагружаем
-      var target = new URL('kp/?embed=1' + (already ? '' : '&stream=1') + '&_=' + genKey, base).href;
-      if (dFrame.dataset.loaded === '1' && dFrame.src.indexOf('_=' + genKey) > -1) {
-        loaded = true; tryReveal();
-        if (!already) setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true }, location.origin); } catch (e2) {} }, 220);
+      pendingReady = function () { loaded = true; tryReveal(); };
+      if (readyDocKey === docKey) {
+        if (pdfBtn) pdfBtn.disabled = false;
+        pendingReady(); pendingReady = null;
+      }
+      var target = new URL('kp/?embed=1' + (already ? '' : '&stream=1') + '&_=' + docKey, base).href;
+      if (dFrame.dataset.loaded === '1' && dFrame.src.indexOf('_=' + docKey) > -1) {
+        frameDocKey = docKey;
+        sendKpHead(dFrame.contentWindow, docKey);
+        if (!already) setTimeout(function () { try { dFrame.contentWindow.postMessage({ kpGo: true, kpInstance: docKey }, location.origin); } catch (e2) {} }, 220);
       } else {
         dFrame.dataset.loaded = '';
-        dFrame.onload = function () { dFrame.dataset.loaded = '1'; loaded = true; tryReveal(); };
+        frameDocKey = docKey;
+        dFrame.onload = function () { dFrame.dataset.loaded = '1'; sendKpHead(dFrame.contentWindow, docKey); };
         dFrame.src = target;
       }
       genTimers.push(setTimeout(function () { loaded = true; tryReveal(); }, 12000)); // страховка
-      var tab = document.getElementById('kpdOpenTab');
       if (tab) tab.href = new URL('kp/', base).href;
+      setTimeout(function () { if (xBtn) xBtn.focus(); }, 0);
     }
     function closeDrawer() {
       if (!drawer) return;
       drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden', 'true');
       document.documentElement.classList.remove('kpd-lock');
       genTimers.forEach(clearTimeout); genTimers = [];
+      pendingBuilt = null; pendingReady = null;
+      activeDocKey = '';
       if (dPlayer) dPlayer.stop();
     }
     var xBtn = document.getElementById('kpdClose'), backEl = document.getElementById('kpdBack');
@@ -1099,30 +1196,61 @@ window.__whenVisible = (function () {
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
     var pdfBtn = document.getElementById('kpdPdf');
     if (pdfBtn) pdfBtn.addEventListener('click', function () {
+      if (pdfBtn.disabled || readyDocKey !== activeDocKey) return;
       // КП открыт в iframe → командуем ему собрать и СКАЧАТЬ PDF-файл (не диалог печати)
-      try { dFrame.contentWindow.postMessage({ kpDownload: true }, location.origin); } catch (e) { window.open(new URL('kp/', base).href, '_blank'); }
+      try { dFrame.contentWindow.postMessage({ kpDownload: true, kpInstance: activeDocKey }, location.origin); } catch (e) { window.open(new URL('kp/', base).href, '_blank'); }
     });
     var reopen = document.getElementById('kpReopen');
     if (reopen) reopen.addEventListener('click', function (e) { e.preventDefault(); openDrawer(); });
+    if (tab) tab.addEventListener('click', function (e) {
+      if (!currentKpHead) return;
+      e.preventDefault();
+      var popup = window.open(tab.href || new URL('kp/', base).href, '_blank');
+      if (!popup) return;
+      kpTabWindows.push(popup);
+      [150, 500, 1200].forEach(function (delay) {
+        setTimeout(function () { sendKpHead(popup, ''); }, delay);
+      });
+    });
 
     function digits(s) { return (s || '').replace(/\D/g, ''); }
     function markInvalid(el) { el.classList.add('kp-invalid'); setTimeout(function () { el.classList.remove('kp-invalid'); }, 2500); }
 
+    function resetQuoteLeadRequest() {
+      if (kpLeadPending) {
+        form.__leadDirty = true;
+        return;
+      }
+      form.__leadRequest = null;
+      delete form.dataset.leadId;
+    }
+    form.addEventListener('input', resetQuoteLeadRequest);
+    form.addEventListener('change', resetQuoteLeadRequest);
+    document.addEventListener('egoe:cart-change', resetQuoteLeadRequest);
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (kpLeadPending) return;
       var name = (nameEl.value || '').trim(), phone = (phoneEl.value || '').trim(), company = (addrEl.value || '').trim();
       var email = emailEl ? (emailEl.value || '').trim() : '';
       var bad = null;
       if (!name) { markInvalid(nameEl); bad = bad || nameEl; }
-      if (digits(phone).length < 10) { markInvalid(phoneEl); bad = bad || phoneEl; }
+      var validKpPhone = window.EGOE_LEADS && typeof window.EGOE_LEADS.validPhone === 'function'
+        ? window.EGOE_LEADS.validPhone(phone)
+        : (digits(phone).length === 10 || (digits(phone).length === 11 && /^[78]/.test(digits(phone))));
+      if (!validKpPhone) { markInvalid(phoneEl); bad = bad || phoneEl; }
       if (emailEl && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { markInvalid(emailEl); bad = bad || emailEl; }
       if (bad) { bad.focus(); return; }
 
       // шапка КП: адресат = компания или имя; №/дата — авто
-      var head = { name: name, phone: phone, email: email, addressee: company || name, object: '', number: autoNum(), date: today() };
-      try { localStorage.setItem(HEAD_KEY, JSON.stringify(head)); } catch (e2) {}
+      var quoteNumber = form.dataset.quoteNumber || autoNum();
+      var leadId = form.dataset.leadId || leadRequestId();
+      form.dataset.quoteNumber = quoteNumber;
+      form.dataset.leadId = leadId;
+      currentKpHead = { addressee: company || name, object: '', number: quoteNumber, date: today() };
 
-      // лид: отправляем на e-mail/Telegram + дублируем локально как резерв
+      // КП собирается локально; передачу контактов подтверждает отдельный lead-модуль.
+      var leadTask = null;
       try {
         var items = C.read(), grand = 0, anyReq = false;
         var fmt = function (n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); };
@@ -1132,28 +1260,53 @@ window.__whenVisible = (function () {
           return '• ' + (it.name || it.id) + (it.ral ? ' (' + it.ral + ')' : '') + ' — ' + q + ' шт' + (u > 0 ? ' × ' + fmt(u) + ' = ' + fmt(u * q) + ' ₽' : ' · по запросу');
         }).join('\n');
         var totalTxt = grand > 0 ? (anyReq ? '≈ ' + fmt(grand) + ' ₽ (часть по запросу)' : fmt(grand) + ' ₽') : 'по запросу';
-        if (window.__sendLead) window.__sendLead({ 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': '\n' + itemsTxt, 'Итого': totalTxt, '№ КП': head.number }, 'КП');
-      } catch (e3) {}
-      try {
-        var leads = JSON.parse(localStorage.getItem(LEADS_KEY)) || [];
-        leads.push({ ts: Date.now(), name: name, phone: phone, email: email, company: company, items: C.read() });
-        localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
-      } catch (e4) {}
+        if (!window.__sendLead) throw new Error('Lead module is unavailable');
+        var requestState = form.__leadRequest;
+        if (!requestState) {
+          requestState = {
+            fields: { 'Имя': name, 'Телефон': phone, 'E-mail': email, 'Компания': company, 'Позиции': '\n' + itemsTxt, 'Итого': totalTxt, '№ КП': currentKpHead.number },
+            options: {
+              leadId: leadId,
+              formId: 'cart:quote',
+              createdAt: new Date().toISOString()
+            }
+          };
+          form.__leadRequest = requestState;
+        }
+        leadTask = window.__sendLead(requestState.fields, 'КП', requestState.options);
+      } catch (e3) { leadTask = Promise.reject(e3); }
 
       openDrawer();
-      if (okBox) okBox.style.display = 'block';
+      setLeadStatus('Передаём контакты менеджеру…', 'pending');
+      kpLeadPending = true;
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Передаём контакты…'; }
+      Promise.resolve(leadTask).then(function (result) {
+        setLeadStatus('Заявка подтверждена. № ' + currentKpHead.number + '.', 'success');
+        form.style.display = 'none';
+        if (okBox) okBox.style.display = 'block';
+      }).catch(function () {
+        setLeadStatus('КП готово, но передачу контактов подтвердить не удалось. Закройте КП и повторите отправку.', 'error');
+      }).finally(function () {
+        kpLeadPending = false;
+        if (form.__leadDirty) {
+          form.__leadDirty = false;
+          form.__leadRequest = null;
+          delete form.dataset.leadId;
+        }
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Получить КП (PDF)'; }
+      });
     });
   })();
 
   render();
-})();
+});
 
 /* ── главная: колесо заказа v3 ──
    ОСНОВНАЯ информация шага (номер + заголовок) закреплена НА колесе и уезжает
    вместе с его вращением; следующая подъезжает по дуге. Когда шаг встал в паз —
    проявляется ДОП (описание + смета/форма/чертёж/фото).
    Десктоп: колесо слева. Мобилка: колесо ВНИЗУ, блоки едут по дуге горизонтально. */
-(function () {
+window.EGOE_RUNTIME.run('order-wheel', function () {
   var host = document.getElementById('flowWheel');
   if (!host) return;
   var items = Array.prototype.map.call(host.querySelectorAll('.fdial-list li'), function (li, i) {
@@ -1670,7 +1823,7 @@ window.__whenVisible = (function () {
           t(function () { telI.classList.remove('focus'); curTo(cur, qBtn, 650, 0.5, 0.55); }, 3550);
           t(function () { qBtn.classList.add('press'); cur.classList.add('press'); }, 4300);
           t(function () { qBtn.classList.remove('press'); cur.classList.remove('press', 'show'); qflow.classList.add('sent'); gen.classList.add('go'); }, 4580);
-          t(function () { gen.classList.add('ok'); if (genTx) genTx.textContent = 'КП готово ✓ · отправили на почту'; }, 5950);
+          t(function () { gen.classList.add('ok'); if (genTx) genTx.textContent = 'КП готово ✓ · можно скачать'; }, 5950);
           t(function () { qflow.classList.add('opened'); winShow(win, true); }, 6300);
           t(function () { showPg(1); }, 8500);
           t(function () { showPg(2); }, 10700);
@@ -1960,29 +2113,29 @@ window.__whenVisible = (function () {
   }
   document.addEventListener('egoe:lite', goStatic);
   if (document.documentElement.hasAttribute('data-lite')) goStatic();
-})();
+});
 
 
-/* ── cookie-уведомление (один раз, путь к политике берём из подвала) ── */
-(function () {
-  try { if (localStorage.getItem('egoe_cookie_ok')) return; } catch (e) {}
+/* ── уведомление о техническом и функциональном хранилище ── */
+window.EGOE_RUNTIME.run('cookie-notice', function () {
+  try { if (localStorage.getItem('egoe_cookie_notice_v2')) return; } catch (e) {}
   if (!document.body || document.querySelector('.cookie-bar')) return;
-  var pl = document.querySelector('.foot-bot a[href*="privacy"]');
-  var href = pl ? pl.getAttribute('href') : 'privacy/';
+  var pl = document.querySelector('.foot-bot a[href*="cookies"]');
+  var href = pl ? pl.getAttribute('href') : 'cookies/';
   var bar = document.createElement('div');
   bar.className = 'cookie-bar';
-  bar.innerHTML = '<div class="cookie-in"><p>Мы используем файлы cookie для работы сайта (например, чтобы сохранять список изделий). Продолжая пользоваться сайтом, вы соглашаетесь с <a href="' + href + '">политикой обработки персональных данных</a>.</p><button class="btn btn-primary btn-sm" type="button">Принять</button></div>';
+  bar.innerHTML = '<div class="cookie-in"><p>Собственный код сайта использует техническое и функциональное локальное хранилище — например, для корзины и выбранных пользователем функций. Аналитика и рекламные cookie не подключены; на странице контактов Яндекс Карты могут загрузить свои технологии. <a href="' + href + '">Подробнее в Политике cookie</a>.</p><button class="btn btn-primary btn-sm" type="button">Понятно</button></div>';
   document.body.appendChild(bar);
   setTimeout(function () { bar.classList.add('show'); }, 60);
   bar.querySelector('button').addEventListener('click', function () {
-    try { localStorage.setItem('egoe_cookie_ok', '1'); } catch (e) {}
+    try { localStorage.setItem('egoe_cookie_notice_v2', '1'); } catch (e) {}
     bar.classList.remove('show');
     setTimeout(function () { if (bar.parentNode) bar.remove(); }, 500);
   });
-})();
+});
 
 /* ── лайтбокс просмотра сертификатов/документов (страница корзин, о компании) ── */
-(function () {
+window.EGOE_RUNTIME.run('document-lightbox', function () {
   var cards = document.querySelectorAll('.cert-card[href]');
   if (!cards.length) return;
   var lb = document.createElement('div');
@@ -1995,7 +2148,7 @@ window.__whenVisible = (function () {
   cards.forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); open(a.getAttribute('href')); }); });
   lb.addEventListener('click', function (e) { if (e.target === lb || e.target.classList.contains('cert-lb-x')) close(); });
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && lb.classList.contains('on')) close(); });
-})();
+});
 
 /* ══════════════════════════════════════════════════════════════════════
    EGOE lite-режим — авто-упрощение сайта ТОЛЬКО для телефонов.
@@ -2003,7 +2156,7 @@ window.__whenVisible = (function () {
    при явном доказательстве слабости (медленная сеть ИЛИ устойчивый джанк).
    Отсутствующий/капнутый сигнал = НЕ повод понижать (защита мощных телефонов).
    ═══════════════════════════════════════════════════════════════════════ */
-(function () {
+window.EGOE_RUNTIME.run('mobile-lite-mode', function () {
   var doc = document.documentElement;
 
   /* 1) Только телефоны. ПК, ноуты и планшеты не трогаем. */
@@ -2175,10 +2328,10 @@ window.__whenVisible = (function () {
   }
   if (document.readyState === 'complete') boot();
   else addEventListener('load', boot);
-})();
+});
 
 /* ── плавное появление фото карточек (.ph.has-img): серый пульс → fade-in ── */
-(function () {
+window.EGOE_RUNTIME.run('image-fade', function () {
   function done(img){ var ph=img.closest && img.closest('.ph.has-img'); if(ph) ph.classList.add('loaded'); }
   function scan(){
     document.querySelectorAll('.ph.has-img img').forEach(function(img){
@@ -2189,4 +2342,4 @@ window.__whenVisible = (function () {
   }
   if(document.readyState!=='loading') scan(); else addEventListener('DOMContentLoaded', scan);
   addEventListener('load', scan);
-})();
+});

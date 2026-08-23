@@ -1,34 +1,92 @@
-name: Deploy static site to GitHub Pages
+name: Deploy public artifact to GitHub Pages
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
+  build:
+    name: Build and verify
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Require main branch staging source
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "::error::GitHub Pages staging may be published only from main"
+            exit 1
+          fi
+      - name: Checkout exact source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Resolve immutable source SHA
+        id: source
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Use Node.js 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Use PHP 8.2 for the real SQLite backend test
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.2'
+          extensions: pdo_sqlite, mbstring, curl
+          coverage: none
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Build and run all quality gates
+        run: npm run check
+      - name: Ensure checks did not mutate tracked source
+        run: git diff --exit-code
+      - name: Verify release provenance
+        run: node tools/verify-release-artifact.mjs --dir dist --commit "${{ steps.source.outputs.sha }}"
+      - name: Preserve the exact staging release
+        id: release-artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: egoe-release-${{ steps.source.outputs.sha }}
+          path: dist/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 30
+          compression-level: 6
+      - name: Setup Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: dist/
+      - name: Record immutable staging artifact
+        shell: bash
+        run: |
+          echo "- Release artifact: \`egoe-release-${{ steps.source.outputs.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Artifact digest: \`${{ steps.release-artifact.outputs.artifact-digest }}\`" >> "$GITHUB_STEP_SUMMARY"
+
   deploy:
+    name: Deploy staging
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload site artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

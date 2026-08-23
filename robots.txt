@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /stroibad-2/
 
 Sitemap: https://www.egoe-life.ru/sitemap.xml

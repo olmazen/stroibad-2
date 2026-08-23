@@ -1,176 +1,158 @@
 #!/usr/bin/env node
-// Применяет заполненный владельцем файл egoe-prices.json ко всему сайту:
-//  1) страницы товаров (pp-price, meta description, schema.org lowPrice)
-//  2) карточки в категориях и прочих страницах, где товар упомянут ссылкой
-//  3) канонический реестр assets/data/prices.json
-//  4) исходные products.csv генератора (hobbyka-export), чтобы перегенерация не откатила цены
-// Запуск: node tools/apply-prices.mjs <egoe-prices.json> [--dry]
-import fs from 'node:fs';
+
+// Applies an export from the private price-review page to the canonical product
+// source, then materializes the controlled price fields in HTML and all JSON
+// consumer views. It never writes to absolute paths outside this repository.
+
+import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+  PRODUCT_SOURCE_REL,
+  loadProductSource,
+  serializeJson,
+  validateProductSource,
+} from './product-data.mjs';
+import {
+  syncLinkedCardPrices,
+  syncProductPagePrice,
+} from './product-price-sync.mjs';
+import { syncProductData } from './sync-product-data.mjs';
+import { verifyProductData } from './verify-product-data.mjs';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const SOURCE_ROOT = process.env.EGOE_SOURCE_ROOT || '/Users/almazrafikov/Documents/Codex/2026-06-15/files-mentioned-by-the-user-view/outputs/hobbyka-export/site-nomenclature';
-const CSV_SOURCE = {
-  'maf/skamejki': 'skameyki',
-  'maf/lezhaki': 'lezhaki_dlya_plyazha_i_dachi',
-  'maf/pavilony-i-navesy': 'pavilony_i_navesy',
-  'maf/urny': 'urny',
-  'metallokonstrukcii/konteynernye-ploshchadki': 'konteynernye_ploshchadki_dlya_tbo',
-  'maf/veloparkovki': 'velosipednye_parkovki',
-  'maf/kacheli': 'kacheli_parkovye',
-  'metallokonstrukcii/korziny-dlya-konditsionerov': 'korziny_dlya_konditsionerov',
-};
-
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const [, , fileArg, ...flags] = process.argv;
 const DRY = flags.includes('--dry');
-if (!fileArg) { console.error('нужен путь к egoe-prices.json'); process.exit(1); }
 
-const data = JSON.parse(fs.readFileSync(fileArg, 'utf8'));
-const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/data/prices.json'), 'utf8'));
-const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-
-const stats = { pages: 0, repl: 0, csvRows: 0, skipped: 0, warn: [] };
-const touched = new Map(); // file -> content
-const readF = (f) => touched.get(f) ?? fs.readFileSync(f, 'utf8');
-const writeF = (f, s) => touched.set(f, s);
-
-// все html сайта — для карточек вне категории (главная и т.п.)
-const allHtml = [];
-(function walk(d) {
-  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-    if (e.name.startsWith('.') || e.name === 'node_modules' || e.name === 'tools') continue;
-    const p = path.join(d, e.name);
-    if (e.isDirectory()) walk(p);
-    else if (e.name.endsWith('.html')) allHtml.push(p);
-  }
-})(ROOT);
-
-function replaceNearLink(file, slug, from, to, sku) {
-  let s = readF(file); let n = 0;
-  const linkRe = new RegExp(slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '/(index\\.html)?"', 'g');
-  let m;
-  while ((m = linkRe.exec(s))) {
-    const start = m.index;
-    let win = s.slice(start, start + 2400);
-    const close = win.indexOf('</a>'); // карточка/плитка товара заканчивается </a>
-    if (close >= 0) win = win.slice(0, close);
-    // карточки-фантомы: модель без своей страницы ссылается на соседа —
-    // если в карточке указан артикул и он НЕ наш, эту карточку не трогаем
-    const art = win.match(/Артикул<\/span>\s*<b>([^<]+)<\/b>/);
-    if (sku && art && art[1].trim() !== String(sku)) continue;
-    if (win.includes(from)) {
-      const rep = win.replace(from, to); // только первое совпадение внутри своей карточки
-      n += 1;
-      s = s.slice(0, start) + rep + s.slice(start + win.length);
-    }
-  }
-  if (n) writeF(file, s);
-  return n;
+if (!fileArg) {
+  console.error('Usage: node tools/apply-prices.mjs <egoe-prices.json> [--dry]');
+  process.exit(1);
 }
 
-function syncProductSchema(file, price) {
-  if (!fs.existsSync(file)) return false;
-  const before = readF(file);
-  const after = before.replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g, (whole, raw) => {
-    let data;
-    try { data = JSON.parse(raw); } catch { return whole; }
-    if (!data || data['@type'] !== 'Product') return whole;
-    if (price == null) {
-      delete data.offers;
-    } else {
-      data.offers = {
-        '@type': 'AggregateOffer',
-        priceCurrency: 'RUB',
-        lowPrice: String(price),
-        availability: 'https://schema.org/PreOrder',
-        seller: { '@type': 'Organization', name: 'EGOE' },
-      };
-    }
-    return `<script type="application/ld+json">${JSON.stringify(data)}</script>`;
-  });
-  if (after !== before) writeF(file, after);
-  return after !== before;
+function samePrice(a, b) {
+  return a.kind === b.kind && a.amount === b.amount;
 }
 
-for (const it of data.items) {
-  if (!it.filled) { stats.skipped++; continue; }
-  const regItem = reg.items.find((r) => r.cat === it.cat && r.slug === it.slug);
-  if (!regItem) { stats.warn.push('нет в реестре: ' + it.cat + '/' + it.slug); continue; }
-  const page = path.join(ROOT, it.cat, it.slug, 'index.html');
-
-  if (it.underOrder) { // осталось/стало «под заказ»
-    regItem.price = null; regItem.underOrder = true;
-    if (it.note) regItem.note = it.note;
-    syncProductSchema(page, null);
-    continue;
+function exportPrice(item) {
+  if (item.underOrder) return { kind: 'onrequest', amount: null };
+  if (!Number.isSafeInteger(item.newPrice) || item.newPrice <= 0) {
+    throw new Error(`${item.cat}/${item.slug}: newPrice must be a positive integer or underOrder=true`);
   }
-  if (it.newPrice == null) { stats.skipped++; continue; }
+  return { kind: 'from', amount: item.newPrice };
+}
 
-  const oldTxt = it.oldPrice != null ? 'от ' + fmt(it.oldPrice) + ' ₽' : null;
-  const newTxt = 'от ' + fmt(it.newPrice) + ' ₽';
+function isExcluded(rel, contract) {
+  const normalized = rel.split(path.sep).join('/');
+  return contract.build.excludedPaths.some((entry) => (
+    normalized === entry || normalized.startsWith(`${entry}/`)
+  ));
+}
 
-  if (it.oldPrice != null && it.newPrice !== it.oldPrice) {
-    // страница товара: все вхождения старой цены + schema lowPrice
-    let s = readF(page); let n = 0;
-    n += (s.match(new RegExp(oldTxt.replace(/ /g, '[\\s\\u00a0]'), 'g')) || []).length;
-    s = s.replace(new RegExp('от[\\s\\u00a0]' + fmt(it.oldPrice).replace(/ /g, '[\\s\\u00a0]') + '[\\s\\u00a0]₽', 'g'), newTxt);
-    s = s.replace(new RegExp('"lowPrice":"' + it.oldPrice + '"', 'g'), '"lowPrice":"' + it.newPrice + '"');
-    if (n) { writeF(page, s); stats.pages++; stats.repl += n; }
-    // карточки на остальных страницах
-    for (const f of allHtml) {
-      if (f === page) continue;
-      const nn = replaceNearLink(f, it.slug, oldTxt, newTxt, it.sku);
-      if (nn) { stats.pages++; stats.repl += nn; }
-    }
-  } else if (it.oldPrice == null) {
-    // был «под заказ» (Art Déco) → появилась цена
-    let s = readF(page);
-    const before = s;
-    s = s.replace('<span class="big">Под заказ</span>', '<span class="big">' + newTxt + '</span>');
-    if (s !== before) { writeF(page, s); stats.pages++; stats.repl++; }
-    else stats.warn.push('не нашёл «Под заказ» на ' + it.cat + '/' + it.slug);
-    for (const f of allHtml) {
-      if (f === page) continue;
-      const nn = replaceNearLink(f, it.slug, '<b>под заказ</b>', '<b>' + newTxt + '</b>', it.sku);
-      if (nn) { stats.pages++; stats.repl += nn; }
-    }
-  }
-
-  regItem.price = it.newPrice; regItem.underOrder = false;
-  if (it.note) regItem.note = it.note;
-  syncProductSchema(page, it.newPrice);
-
-  // products.csv генератора (только стандарт — Art Déco в hobbyka-выгрузке нет)
-  if (it.group === 'standard' && CSV_SOURCE[it.cat] && it.newPrice !== it.oldPrice) {
-    const csvFile = path.join(SOURCE_ROOT, CSV_SOURCE[it.cat], 'products.csv');
-    if (fs.existsSync(csvFile)) {
-      let csv = readF(csvFile);
-      const lines = csv.split('\n');
-      const hdr = lines[0].split(';');
-      const priceIdx = hdr.findIndex((h) => /price|цена/i.test(h));
-      const skuIdx = hdr.findIndex((h) => /article|sku|артикул/i.test(h));
-      if (priceIdx >= 0 && skuIdx >= 0) {
-        let hit = false;
-        for (let i = 1; i < lines.length; i++) {
-          const cells = lines[i].split(';');
-          if ((cells[skuIdx] || '').replace(/"/g, '').trim() === String(it.sku)) {
-            cells[priceIdx] = String(it.newPrice); lines[i] = cells.join(';'); hit = true; stats.csvRows++;
-          }
-        }
-        if (hit) writeF(csvFile, lines.join('\n'));
-        else stats.warn.push('csv: артикул ' + it.sku + ' не найден в ' + CSV_SOURCE[it.cat]);
-      } else stats.warn.push('csv: не нашёл колонки price/sku в ' + CSV_SOURCE[it.cat]);
-    }
+async function walkHtml(root, rel, contract, out) {
+  if (isExcluded(rel, contract)) return;
+  const absolute = path.join(root, rel);
+  const stat = await fs.lstat(absolute);
+  if (stat.isDirectory()) {
+    const entries = await fs.readdir(absolute, { withFileTypes: true });
+    for (const entry of entries) await walkHtml(root, path.join(rel, entry.name), contract, out);
+  } else if (stat.isFile() && rel.endsWith('.html')) {
+    out.push(rel.split(path.sep).join('/'));
   }
 }
 
-if (!DRY) {
-  for (const [f, s] of touched) fs.writeFileSync(f, s);
-  reg.updated = data.exportedAt || null;
-  fs.writeFileSync(path.join(ROOT, 'assets/data/prices.json'), JSON.stringify(reg, null, 1));
-  // каталог КП (assets/catalog.json) собирается из страниц — пересобрать, чтобы КП не показывало старые цены
-  const { execFileSync } = await import('node:child_process');
-  execFileSync('node', [path.join(ROOT, 'tools/build-catalog.mjs')], { stdio: 'inherit' });
+async function publicHtmlFiles(contract) {
+  const files = contract.build.rootFiles.filter((rel) => rel.endsWith('.html'));
+  for (const rel of [...contract.build.publicDirectories, ...contract.build.legacyPublicDirectories]) {
+    await walkHtml(ROOT, rel, contract, files);
+  }
+  return [...new Set(files)].sort();
 }
-console.log((DRY ? '[DRY RUN] ' : '') + 'страниц изменено:', new Set([...touched.keys()]).size, '| замен:', stats.repl, '| csv-строк:', stats.csvRows, '| пропущено (не заполнено):', stats.skipped);
-if (stats.warn.length) console.log('ПРЕДУПРЕЖДЕНИЯ:\n - ' + stats.warn.join('\n - '));
+
+async function writePrepared(files) {
+  const staged = [];
+  try {
+    for (const [target, body] of files) {
+      await fs.mkdir(path.dirname(target), { recursive: true });
+      const temp = `${target}.tmp-${process.pid}`;
+      await fs.writeFile(temp, body);
+      staged.push({ target, temp });
+    }
+    for (const { target, temp } of staged) await fs.rename(temp, target);
+  } catch (error) {
+    await Promise.all(staged.map(({ temp }) => fs.rm(temp, { force: true })));
+    throw error;
+  }
+}
+
+async function main() {
+  const priceExport = JSON.parse(await fs.readFile(path.resolve(fileArg), 'utf8'));
+  if (!Array.isArray(priceExport.items)) throw new Error('Price export must contain an items array');
+
+  const source = await loadProductSource(ROOT);
+  const next = structuredClone(source);
+  const byIdentity = new Map(next.products.map((product) => {
+    const slug = product.url.split('/').filter(Boolean).at(-1);
+    return [`${product.catKey}/${slug}`, product];
+  }));
+  const changes = new Map();
+  const filledIdentities = new Set();
+  let skipped = 0;
+
+  for (const item of priceExport.items) {
+    if (!item.filled || item.keep) {
+      skipped++;
+      continue;
+    }
+    const identity = `${item.cat}/${item.slug}`;
+    if (filledIdentities.has(identity)) throw new Error(`Duplicate filled price row: ${identity}`);
+    filledIdentities.add(identity);
+    const product = byIdentity.get(identity);
+    if (!product) throw new Error(`Filled price row is not in canonical products: ${identity}`);
+    if (String(item.sku) !== product.sku) throw new Error(`${identity}: SKU mismatch (${item.sku} vs ${product.sku})`);
+    if ((item.oldPrice ?? null) !== product.price.amount) {
+      throw new Error(
+        `${identity}: stale export (oldPrice=${item.oldPrice ?? 'null'}, canonical=${product.price.amount ?? 'null'})`
+      );
+    }
+    const before = { ...product.price };
+    const after = exportPrice(item);
+    if (samePrice(before, after)) {
+      skipped++;
+      continue;
+    }
+    product.price = after;
+    changes.set(product.url, { before, after, product });
+  }
+
+  validateProductSource(next);
+  const contract = JSON.parse(await fs.readFile(path.join(ROOT, 'config/site-contract.json'), 'utf8'));
+  const prepared = new Map();
+
+  for (const { product } of changes.values()) {
+    const rel = `${product.url}index.html`;
+    const file = path.join(ROOT, rel);
+    const html = await fs.readFile(file, 'utf8');
+    prepared.set(file, syncProductPagePrice(html, product));
+  }
+
+  for (const rel of await publicHtmlFiles(contract)) {
+    const file = path.join(ROOT, rel);
+    const html = prepared.get(file) ?? await fs.readFile(file, 'utf8');
+    const synced = syncLinkedCardPrices(html, rel, changes);
+    if (synced !== html || prepared.has(file)) prepared.set(file, synced);
+  }
+
+  prepared.set(path.join(ROOT, PRODUCT_SOURCE_REL), serializeJson(next));
+  if (!DRY) {
+    await writePrepared(prepared);
+    await syncProductData({ root: ROOT, write: true });
+    await verifyProductData({ root: ROOT });
+  }
+
+  console.log(
+    `${DRY ? '[DRY RUN] ' : ''}price changes=${changes.size}; ` +
+    `preparedFiles=${prepared.size}; skipped=${skipped}`
+  );
+}
+
+await main();

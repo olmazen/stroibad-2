@@ -1,15 +1,19 @@
 #!/usr/bin/env node
-// Генерирует скрытую страницу пересмотра цен из assets/data/prices.json (v2: галереи фото)
+// Генерирует скрытую страницу пересмотра цен из производного assets/data/prices.json.
+// Канонический источник товаров и цен: src/data/products.json.
 // Запуск: node tools/build-price-editor.mjs <slug-папки>
 import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const slug = process.argv[2];
-if (!slug) { console.error('нужен slug папки, напр. price-edit-xxxxx'); process.exit(1); }
+if (!/^price-edit-[a-z0-9-]+$/.test(slug || '')) {
+  console.error('нужен безопасный slug папки вида price-edit-xxxxx');
+  process.exit(1);
+}
 
 const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/data/prices.json'), 'utf8'));
-const DATA = JSON.stringify(reg.items);
+const DATA = JSON.stringify(reg.items).replace(/</g, '\\u003c');
 
 const html = `<!DOCTYPE html>
 <html lang="ru">
@@ -153,7 +157,7 @@ function cardHtml(i,idx){
  +'<div class="pin"><input type="text" inputmode="numeric" placeholder="'+(i.price!=null?fmt(i.price):'цена от')+'" value="'+val+'"'+(s.keep||s.poz?' disabled':'')+'></div>'
  +'<div class="mini">'
  +(i.price!=null?'<button class="mb keep'+(s.keep?' on':'')+'">без изменений</button>':'')
- +(i.group==='artdeco'?'<button class="mb poz'+(s.poz?' on':'')+'">под заказ</button>':'')
+ +'<button class="mb poz'+(s.poz?' on':'')+'">по запросу</button>'
  +'<button class="mb nt">✎</button></div>'
  +'<input class="note-in'+(s.note?' show':'')+'" placeholder="заметка (необязательно)" value="'+(s.note||'').replace(/"/g,'&quot;')+'">'
  +'</div></div>';

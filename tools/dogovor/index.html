@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Договор поставки — сформировать в Word · EGOE</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0E1114;--srf:#181D23;--srf2:#12161b;--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.2);--tx:#EDEFF1;--tx2:#C3C8CD;--steel:#8E959C;--steel-l:#6E757C;--amber:#F26F1D;--amber-h:#ff8534;--ok:#43C383;--bad:#E25A4E;--fh:'Oswald',Arial,sans-serif;--fb:'PT Sans',Arial,sans-serif}
 *{box-sizing:border-box}
@@ -67,6 +65,9 @@ input.err ~ .ferr{display:block}
 .saverow{display:flex;gap:9px;margin-top:8px}
 .saverow button{flex:1;background:transparent;border:1px solid var(--line);color:var(--steel);padding:8px;font:inherit;font-size:12px;cursor:pointer;font-family:var(--fh);text-transform:uppercase;letter-spacing:.04em}
 .saverow button:hover{color:var(--tx);border-color:var(--line2)}
+.storage-note{font-size:12px;color:var(--steel);line-height:1.45;margin:8px 0 0}
+.tool-legal{max-width:1240px;margin:0 auto 28px;padding:0 24px;color:var(--steel);font-size:12px;display:flex;gap:8px 16px;flex-wrap:wrap}
+.tool-legal a{color:var(--tx2);text-decoration:underline;text-underline-offset:3px}
 
 /* preview — plain document, sharp */
 .prev-wrap{position:sticky;top:24px}
@@ -91,6 +92,7 @@ input.err ~ .ferr{display:block}
 @media(max-width:960px){.wrap{grid-template-columns:1fr}.prev-wrap{position:static}}
 @media print{.top,.form,.intro,.prev-head,.btn-print,.btn-dl{display:none!important}.wrap{display:block;padding:0}.paper{box-shadow:none;max-height:none;overflow:visible;padding:12mm 14mm}}
 </style>
+<link rel="stylesheet" href="../../assets/css/fonts.css">
 </head>
 <body>
 
@@ -114,7 +116,7 @@ input.err ~ .ferr{display:block}
       <div class="dz" id="dz">
         <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.rtf" hidden>
         <span class="dz-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4m0 0L8 8m4-4l4 4"/><path d="M4 15v4a1 1 0 001 1h14a1 1 0 001-1v-4"/></svg></span>
-        <div class="dz-t">Перетащите файл карточки предприятия<span>PDF или Word — считаем реквизиты автоматически</span></div>
+        <div class="dz-t">Перетащите файл карточки предприятия<span>PDF или Word — считаем реквизиты автоматически. Файл обрабатывается только в этом браузере и не загружается на сервер.</span></div>
         <button type="button" class="btn2" id="dzPick">Выбрать файл</button>
       </div>
       <div class="dz-status" id="dzStatus"></div>
@@ -151,9 +153,10 @@ input.err ~ .ferr{display:block}
 
       <div class="divider"></div>
       <div class="two"><div><label class="f" style="margin-top:0">Договор №</label><input id="dNo"></div><div><label class="f" style="margin-top:0">Город</label><input id="dCity" value="г. Балаково"></div></div>
-      <p class="suppl" style="margin-top:12px">Дата — сегодняшняя. Поставщик: <b>ООО «Фабрика «САМШИТ»</b> (ИНН 6439086125). Гарантия 12/36/60 мес., срок 45 раб. дней — фиксированные условия завода.</p>
+      <p class="suppl" style="margin-top:12px">Дата — сегодняшняя. Поставщик: <b>ООО «Ф»САМШИТ»</b> (ИНН 6439086125). Гарантия 12/36/60 мес., срок 45 раб. дней — фиксированные условия завода.</p>
 
       <div class="saverow"><button type="button" id="btnSave">Запомнить реквизиты</button><button type="button" id="btnForget">Очистить</button></div>
+      <p class="storage-note">Без нажатия «Запомнить реквизиты» введённые данные остаются только в открытой вкладке и не сохраняются сайтом.</p>
 
       <div class="actions">
         <button type="button" class="btn-dl" id="btnDocx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Скачать договор (Word)</button>
@@ -167,6 +170,8 @@ input.err ~ .ferr{display:block}
     <div class="paper" id="paper"></div>
   </div>
 </div>
+
+<div class="tool-legal"><a href="../../privacy/">Персональные данные</a><a href="../../consent/">Согласие на обработку</a><a href="../../cookies/">Cookie и локальное хранилище</a></div>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -189,7 +194,7 @@ document.querySelectorAll('#seg .seg-b').forEach(b=>b.onclick=()=>{
   $('bName').placeholder=ip?'Сидоров Пётр Николаевич':(buyerType==='ao'?'АО «Ромашка»':'ООО «Ромашка»');
   $('lbInn').textContent=ip?'ИНН (12 цифр)':'ИНН (10 цифр)';
   $('lbAddr').textContent=ip?'Адрес регистрации':'Юридический адрес';
-  validate();render();save();
+  validate();render();
 });
 
 /* ---- validation ---- */
@@ -224,7 +229,7 @@ function fillFrom(raw){
   if(bank&&/банк|сбербанк|втб|альфа|тинькоф|точка|райффайзен|агророс|открыти|совком|росбанк|псб|промсвяз|уралсиб|мкб|казначейств|уфк/i.test(bank[1])){$('bBank').value=bank[1].replace(/["«»]/g,'').replace(/,\s*$/,'').trim();n++;}
   const addr=t.match(/(?:Юридический\s+адрес|Юр\.?\s*адрес|Почтовый\s+адрес|Место\s+нахождения|Адрес(?:\s+регистрации)?)\s*:?\s*(\d{6}[^]{5,110}?|[^]{8,110}?)\s*(?:ИНН|КПП|ОГРН|ОКПО|ОКВЭД|Телефон|E-?mail|Банк|Р\/с|Фактическ|Расч[её]тн|$)/i);
   if(addr&&addr[1].trim().length>6){$('bAddr').value=addr[1].replace(/,\s*$/,'').trim();n++;}
-  validate();render();save();
+  validate();render();
   return n;
 }
 $('pasteBtn').onclick=()=>{
@@ -281,13 +286,12 @@ async function readDocx(file){
   x=x.replace(/<w:tab\/>/g,' ').replace(/<w:br\/>/g,'\n').replace(/<\/w:p>/g,'\n').replace(/<\/w:tr>/g,'\n').replace(/<[^>]+>/g,'');
   return x.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
 }
-/* PDF: pdf.js подгружается лениво (корректная кириллица через ToUnicode) */
-function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('нет доступа к pdf.js'));document.head.appendChild(s);});}
+/* PDF: исправленный локальный PDF.js 6.2.108 подгружается как ES-модуль; eval и PDF-скрипты запрещены. */
 let pdfReady=null;
-function ensurePdf(){if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);if(!pdfReady)pdfReady=loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js').then(()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';return window.pdfjsLib;});return pdfReady;}
+function ensurePdf(){if(!pdfReady)pdfReady=import('../../assets/vendor/pdf/pdf.min.js').then(lib=>{lib.GlobalWorkerOptions.workerSrc='../../assets/vendor/pdf/pdf.worker.min.js';return lib;});return pdfReady;}
 async function readPdf(file){
   const lib=await ensurePdf(),buf=new Uint8Array(await file.arrayBuffer());
-  const doc=await lib.getDocument({data:buf}).promise;let text='';
+  const doc=await lib.getDocument({data:buf,isEvalSupported:false,enableScripting:false}).promise;let text='';
   for(let i=1;i<=doc.numPages;i++){const pg=await doc.getPage(i),c=await pg.getTextContent();text+=c.items.map(it=>it.str).join(' ')+'\n';}
   return text;
 }
@@ -295,7 +299,7 @@ function stripRtf(s){if(!/^{\\rtf/.test(s))return s;return s.replace(/\\par[d]?/
 
 /* ---- inputs → render ---- */
 ['bName','bPost','bSign','bBasis','bBasisIp','bInn','bKpp','bOgrn','bOgrnip','bAddr','bBank','bRs','bKs','bBik','bPhone','bEmail','dNo','dCity']
-  .forEach(id=>{const e=$(id);if(e)e.addEventListener('input',()=>{validate();render();save();});});
+  .forEach(id=>{const e=$(id);if(e)e.addEventListener('input',()=>{validate();render();});});
 
 /* ---- contract data ---- */
 function buyerPreamble(){
@@ -307,7 +311,7 @@ function buyerReqLines(){
   if(buyerType==='ip')return ['Индивидуальный предприниматель '+(v('bName')||'—'),'Адрес: '+(v('bAddr')||'—'),'ИНН '+(v('bInn')||'—'),'ОГРНИП '+(v('bOgrnip')||'—'),(v('bBank')||'Банк'),'Р/с '+(v('bRs')||'—'),'К/с '+(v('bKs')||'—'),'БИК '+(v('bBik')||'—')].concat(v('bPhone')||v('bEmail')?['Тел.: '+(v('bPhone')||'—')+(v('bEmail')?', '+v('bEmail'):'')]:[]);
   return [(v('bName')||'Наименование'),'Адрес: '+(v('bAddr')||'—'),'ИНН '+(v('bInn')||'—')+' / КПП '+(v('bKpp')||'—'),'ОГРН '+(v('bOgrn')||'—'),(v('bBank')||'Банк'),'Р/с '+(v('bRs')||'—'),'К/с '+(v('bKs')||'—'),'БИК '+(v('bBik')||'—')].concat(v('bPhone')||v('bEmail')?['Тел.: '+(v('bPhone')||'—')+(v('bEmail')?', '+v('bEmail'):'')]:[]);
 }
-const SUPPLIER=['ООО «Фабрика «САМШИТ»','413801, Саратовская обл., Балаковский р-н, с. Натальино, тупик Безымянный, д. 1','ИНН 6439086125 / КПП 643901001','ОГРН 1146439002863','АО «Банк «Агророс», г. Саратов','Р/с 40702810600000008505','К/с 30101810600000000772','БИК 046311772','тел. 8 (8453) 655-777'];
+const SUPPLIER=['ООО «Ф»САМШИТ»','413801, Саратовская обл., Балаковский р-н, с. Натальино, тупик Безымянный, д. 1','ИНН 6439086125 / КПП 643901001','ОГРН 1146439002863','АО «Банк «Агророс», г. Саратов','Р/с 40702810600000008505','К/с 30101810600000000772','БИК 046311772','тел. 8 (8453) 655-777'];
 function buyerSign(){
   if(buyerType==='ip')return ['ИП _____________ / '+(shortFio(v('bName'))||'Фамилия И. О.')+' /','М.П. (при наличии печати)'];
   return [(v('bPost')||'Генеральный директор')+' _____________ / '+(shortFio(v('bSign'))||'Ф. И. О.')+' /','М.П.'];
@@ -318,7 +322,7 @@ function buildNodes(){
   return [
     {t:'title',s:'ДОГОВОР ПОСТАВКИ № '+no},
     {t:'meta',l:city,r:dt},
-    {t:'p',s:'Общество с ограниченной ответственностью «Фабрика «САМШИТ», именуемое в дальнейшем «Поставщик», в лице директора Рафикова Рината Мубиновича, действующего на основании Устава, с одной стороны, и '+buyerPreamble()+', с другой стороны, заключили настоящий договор о нижеследующем:'},
+    {t:'p',s:'Общество с ограниченной ответственностью «ФАБРИКА»САМШИТ», именуемое в дальнейшем «Поставщик», в лице директора Рафикова Рината Мубиновича, действующего на основании Устава, с одной стороны, и '+buyerPreamble()+', с другой стороны, заключили настоящий договор о нижеследующем:'},
     {t:'h',s:'1. ПРЕДМЕТ ДОГОВОРА'},
     {t:'p',s:'1.1. Поставщик обязуется изготовить и передать в собственность Покупателя, а Покупатель — принять и оплатить Товар в ассортименте, количестве и по цене согласно Спецификации (Приложение № 1), являющейся неотъемлемой частью настоящего договора.'},
     {t:'p',s:'1.2. Доставка Товара осуществляется на объект Покупателя; график отгрузки согласовывается сторонами.'},
