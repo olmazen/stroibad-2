@@ -124,7 +124,12 @@ verify_release_tree() {
     }
     $sortedListedPaths = $listedPaths;
     sort($sortedListedPaths, SORT_STRING);
-    if ($listedPaths !== $sortedListedPaths) exit(13);
+
+    // The build manifest follows a deterministic depth-first directory walk.
+    // A flat PHP string sort is different when a directory name also prefixes
+    // a sibling file (for example, "maf/..." and "maf-collection.webp").
+    // Membership is checked below using sorted copies; the signed aggregate is
+    // still recomputed in the original canonical manifest build order.
 
     $actualPaths = [];
     $iterator = new RecursiveIteratorIterator(

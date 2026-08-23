@@ -536,6 +536,9 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(remote, /schemaVersion"] \?\? null\) === 2/);
   assert.match(remote, /api\/leads\/lib\/leadbackend\.php/);
   assert.match(remote, /str_ends_with\(\$basename, "\.php"\)/);
+  assert.match(remote, /Membership is checked below using sorted copies/);
+  assert.doesNotMatch(remote, /if \(\$listedPaths !== \$sortedListedPaths\)/);
+  assert.match(remote, /if \(\$actualPaths !== \$sortedListedPaths\) exit\(16\)/);
   assert.match(remote, /verify_release_tree "\$final_release" "\$expected_sha"/);
   assert.match(remote, /cmp "\$temporary_release\/release\.json" "\$final_release\/release\.json"/);
   assert.match(remote, /lint_php_tree "\$final_release"/);
