@@ -13,14 +13,16 @@ GitHub Pages и `www.egoe-life.ru` — разные среды. Успех Pages
 ## Нормальный релиз
 
 1. PR проходит `Site quality`.
-2. CI сохраняет `dist` как artifact с SHA commit.
+2. Workflow GitHub Pages сохраняет тот же `dist` как `egoe-release-<SHA>` и без пересборки публикует его на staging.
 3. Изменение проверяется на preview/staging.
 4. Пользователь отдельно подтверждает production-релиз.
-5. Workflow скачивает уже проверенный artifact, не пересобирая его.
+5. `deploy-production.yml` по ID успешного Pages-run скачивает уже проверенный artifact, не пересобирая его.
 6. После загрузки проверяются главная, каталог, карточка, корзина, форма и ключевые ассеты.
 7. В release note фиксируются SHA, время, результат smoke и предыдущий рабочий SHA.
 
 До настройки безопасного доступа к REG.RU автоматический production deploy намеренно отсутствует. Старый Webnames workflow заархивирован: он указывал на другой хостинг и публиковал корень репозитория.
+
+`prepare-release.yml` может использоваться для архива, но production не берёт его пересобранный artifact: источником production служит только artifact фактически просмотренного GitHub Pages run.
 
 ## Rollback
 

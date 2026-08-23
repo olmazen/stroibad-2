@@ -22,6 +22,7 @@
     "check:leads": "npm run test:leads",
     "check:syntax": "node tools/check-javascript-syntax.mjs",
     "check:artifact": "node tools/verify-public-site.mjs",
+    "verify:release": "node tools/verify-release-artifact.mjs",
     "check:seo": "node tools/run-public-seo-checks.mjs",
     "check": "npm run check:syntax && npm run check:shell && npm run check:data && npm run check:runtime && npm run check:leads && npm run build && npm run check:artifact && npm run check:seo",
     "verify": "npm run check"

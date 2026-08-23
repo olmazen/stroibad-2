@@ -1,0 +1,277 @@
+name: Deploy approved staging release to REG.RU
+
+on:
+  workflow_dispatch:
+    inputs:
+      staging_run_id:
+        description: "Successful GitHub Pages workflow run ID"
+        required: true
+        type: string
+      expected_sha:
+        description: "Full 40-character commit SHA reviewed on staging"
+        required: true
+        type: string
+      mode:
+        description: "Preflight only or production deployment"
+        required: true
+        default: preflight
+        type: choice
+        options:
+          - preflight
+          - deploy
+      confirmation:
+        description: "For deploy mode, enter DEPLOY"
+        required: false
+        type: string
+
+run-name: "REG.RU ${{ inputs.mode }}: ${{ inputs.expected_sha }}"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: egoe-production
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify the exact staging artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      archive_sha256: ${{ steps.archive.outputs.sha256 }}
+      expected_sha: ${{ steps.input.outputs.sha }}
+    steps:
+      - name: Require production workflow from main
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "::error::Production workflow must be dispatched from main"
+            exit 1
+          fi
+      - name: Validate inputs
+        id: input
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          STAGING_RUN_ID: ${{ inputs.staging_run_id }}
+          MODE: ${{ inputs.mode }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          if [[ ! "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::expected_sha must be a full lowercase commit SHA"
+            exit 1
+          fi
+          if [[ ! "$STAGING_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "::error::staging_run_id must be numeric"
+            exit 1
+          fi
+          if [[ "$MODE" == "deploy" && "$CONFIRMATION" != "DEPLOY" ]]; then
+            echo "::error::Deploy mode requires confirmation DEPLOY"
+            exit 1
+          fi
+          echo "sha=$EXPECTED_SHA" >> "$GITHUB_OUTPUT"
+      - name: Checkout trusted deployment tooling
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Require reviewed SHA in main history
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ steps.input.outputs.sha }}
+        run: |
+          git cat-file -e "$EXPECTED_SHA^{commit}"
+          git merge-base --is-ancestor "$EXPECTED_SHA" origin/main
+      - name: Verify staging workflow run
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ steps.input.outputs.sha }}
+          STAGING_RUN_ID: ${{ inputs.staging_run_id }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$STAGING_RUN_ID" > "$RUNNER_TEMP/staging-run.json"
+          node --input-type=module - "$RUNNER_TEMP/staging-run.json" "$EXPECTED_SHA" <<'NODE'
+          import fs from 'node:fs';
+          const run = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          const expectedSha = process.argv[3];
+          if (run.path !== '.github/workflows/pages.yml') throw new Error(`Unexpected workflow: ${run.path}`);
+          if (run.status !== 'completed' || run.conclusion !== 'success') throw new Error('Staging run is not successful');
+          if (run.head_sha !== expectedSha) throw new Error(`Staging SHA ${run.head_sha} does not match ${expectedSha}`);
+          if (run.head_branch !== 'main') throw new Error(`Staging branch is ${run.head_branch}, not main`);
+          NODE
+      - name: Download the exact staging release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ steps.input.outputs.sha }}
+          STAGING_RUN_ID: ${{ inputs.staging_run_id }}
+        run: |
+          mkdir "$RUNNER_TEMP/release"
+          gh run download "$STAGING_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "egoe-release-$EXPECTED_SHA" \
+            --dir "$RUNNER_TEMP/release"
+      - name: Verify every release file
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ steps.input.outputs.sha }}
+        run: node tools/verify-release-artifact.mjs --dir "$RUNNER_TEMP/release" --commit "$EXPECTED_SHA"
+      - name: Package verified release
+        id: archive
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ steps.input.outputs.sha }}
+        run: |
+          archive="$RUNNER_TEMP/egoe-release-$EXPECTED_SHA.tar.gz"
+          tar -C "$RUNNER_TEMP/release" -czf "$archive" .
+          sha256=$(sha256sum "$archive" | awk '{print $1}')
+          echo "sha256=$sha256" >> "$GITHUB_OUTPUT"
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+      - name: Preserve verified production candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: egoe-production-candidate-${{ steps.input.outputs.sha }}
+          path: ${{ steps.archive.outputs.archive }}
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
+  production:
+    name: REG.RU ${{ inputs.mode }}
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: ${{ vars.REG_PUBLIC_URL }}
+    steps:
+      - name: Checkout trusted deployment tooling
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: ops/deploy
+      - name: Download verified production candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: egoe-production-candidate-${{ needs.verify.outputs.expected_sha }}
+          path: ${{ runner.temp }}/candidate
+      - name: Verify transport archive checksum
+        shell: bash
+        env:
+          EXPECTED_ARCHIVE_SHA: ${{ needs.verify.outputs.archive_sha256 }}
+        run: |
+          archive=$(find "$RUNNER_TEMP/candidate" -maxdepth 1 -type f -name '*.tar.gz' -print -quit)
+          test -n "$archive"
+          test "$(sha256sum "$archive" | awk '{print $1}')" = "$EXPECTED_ARCHIVE_SHA"
+      - name: Configure isolated SSH credentials
+        shell: bash
+        env:
+          REG_SSH_PRIVATE_KEY: ${{ secrets.REG_SSH_PRIVATE_KEY }}
+          REG_SSH_KNOWN_HOSTS: ${{ secrets.REG_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$REG_SSH_PRIVATE_KEY" > "$HOME/.ssh/egoe_deploy"
+          chmod 600 "$HOME/.ssh/egoe_deploy"
+          printf '%s\n' "$REG_SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+      - name: Check REG.RU deployment host
+        shell: bash
+        env:
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+          REG_SSH_USER: ${{ vars.REG_SSH_USER }}
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+        run: |
+          ssh -i "$HOME/.ssh/egoe_deploy" -p "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes \
+            "$REG_SSH_USER@$REG_SSH_HOST" \
+            "sh -s -- '$REG_DEPLOY_ROOT'" <<'REMOTE'
+          set -eu
+          deploy_root=$1
+          case "$deploy_root" in /*) ;; *) exit 20 ;; esac
+          test "$deploy_root" != "/"
+          test -d "$deploy_root"
+          test -f "$deploy_root/state/site-hostname"
+          test "$(cat "$deploy_root/state/site-hostname")" = "egoe-life.ru"
+          command -v tar
+          command -v sha256sum
+          command -v php
+          command -v ln
+          command -v mv
+          command -v readlink
+          df -h "$deploy_root"
+          REMOTE
+      - name: Stop after safe preflight
+        if: ${{ inputs.mode == 'preflight' }}
+        run: echo "REG.RU preflight passed; production was not changed."
+      - name: Upload release and deployment helper
+        if: ${{ inputs.mode == 'deploy' }}
+        shell: bash
+        env:
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+          REG_SSH_USER: ${{ vars.REG_SSH_USER }}
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          EXPECTED_SHA: ${{ needs.verify.outputs.expected_sha }}
+        run: |
+          archive=$(find "$RUNNER_TEMP/candidate" -maxdepth 1 -type f -name '*.tar.gz' -print -quit)
+          scp -i "$HOME/.ssh/egoe_deploy" -P "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes \
+            "$archive" \
+            "$REG_SSH_USER@$REG_SSH_HOST:$REG_DEPLOY_ROOT/incoming/$EXPECTED_SHA.tar.gz.part"
+          scp -i "$HOME/.ssh/egoe_deploy" -P "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes \
+            ops/deploy/remote-release.sh \
+            "$REG_SSH_USER@$REG_SSH_HOST:$REG_DEPLOY_ROOT/incoming/remote-release.sh.part"
+          ssh -i "$HOME/.ssh/egoe_deploy" -p "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes \
+            "$REG_SSH_USER@$REG_SSH_HOST" \
+            "mv '$REG_DEPLOY_ROOT/incoming/$EXPECTED_SHA.tar.gz.part' '$REG_DEPLOY_ROOT/incoming/$EXPECTED_SHA.tar.gz' && mv '$REG_DEPLOY_ROOT/incoming/remote-release.sh.part' '$REG_DEPLOY_ROOT/incoming/remote-release.sh'"
+      - name: Atomically activate release
+        if: ${{ inputs.mode == 'deploy' }}
+        shell: bash
+        env:
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+          REG_SSH_USER: ${{ vars.REG_SSH_USER }}
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          EXPECTED_SHA: ${{ needs.verify.outputs.expected_sha }}
+          ARCHIVE_SHA256: ${{ needs.verify.outputs.archive_sha256 }}
+        run: |
+          ssh -i "$HOME/.ssh/egoe_deploy" -p "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes \
+            "$REG_SSH_USER@$REG_SSH_HOST" \
+            "sh '$REG_DEPLOY_ROOT/incoming/remote-release.sh' deploy '$REG_DEPLOY_ROOT' '$EXPECTED_SHA' '$REG_DEPLOY_ROOT/incoming/$EXPECTED_SHA.tar.gz' '$ARCHIVE_SHA256'"
+      - name: Smoke-test production and roll back on failure
+        if: ${{ inputs.mode == 'deploy' }}
+        shell: bash
+        env:
+          REG_PUBLIC_URL: ${{ vars.REG_PUBLIC_URL }}
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+          REG_SSH_USER: ${{ vars.REG_SSH_USER }}
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          EXPECTED_SHA: ${{ needs.verify.outputs.expected_sha }}
+        run: |
+          set +e
+          failed=0
+          for path in / /catalog/ /cart/ /contacts/ /privacy/ /consent/ /cookies/ /assets/js/site.js /release.json; do
+            curl --fail --location --silent --show-error --retry 2 --max-time 30 \
+              "$REG_PUBLIC_URL$path" >/dev/null || failed=1
+          done
+          release_sha=$(curl --fail --location --silent --show-error --retry 2 --max-time 30 \
+            "$REG_PUBLIC_URL/release.json" | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>console.log(JSON.parse(d).source.commit))')
+          if [[ "$release_sha" != "$EXPECTED_SHA" ]]; then
+            failed=1
+          fi
+          if [[ "$failed" -ne 0 ]]; then
+            ssh -i "$HOME/.ssh/egoe_deploy" -p "$REG_SSH_PORT" \
+              -o BatchMode=yes -o IdentitiesOnly=yes \
+              "$REG_SSH_USER@$REG_SSH_HOST" \
+              "sh '$REG_DEPLOY_ROOT/incoming/remote-release.sh' rollback '$REG_DEPLOY_ROOT'"
+            echo "::error::Production smoke test failed; previous release restored"
+            exit 1
+          fi
+          echo "Production release $EXPECTED_SHA is healthy."
