@@ -1,0 +1,316 @@
+name: One-time bootstrap of REG.RU production
+
+on:
+  workflow_dispatch:
+    inputs:
+      staging_run_id:
+        description: "Successful GitHub Pages workflow run ID for the reviewed main commit"
+        required: true
+        type: string
+      expected_sha:
+        description: "Full 40-character main commit SHA reviewed on staging"
+        required: true
+        type: string
+      confirmation:
+        description: "Enter BOOTSTRAP to preserve the physical site and install the safe release switch"
+        required: true
+        type: string
+
+run-name: "REG.RU one-time bootstrap: ${{ inputs.expected_sha }}"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: egoe-production
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify reviewed bootstrap source
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      expected_sha: ${{ steps.input.outputs.sha }}
+      index_sha256: ${{ steps.baseline.outputs.index_sha256 }}
+      htaccess_sha256: ${{ steps.baseline.outputs.htaccess_sha256 }}
+    steps:
+      - name: Validate immutable main inputs
+        id: input
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          STAGING_RUN_ID: ${{ inputs.staging_run_id }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "::error::Bootstrap must be dispatched from main"
+            exit 1
+          fi
+          if [[ ! "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]] || [[ "$EXPECTED_SHA" != "$GITHUB_SHA" ]]; then
+            echo "::error::expected_sha must be the exact full SHA of the dispatched main commit"
+            exit 1
+          fi
+          if [[ ! "$STAGING_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "::error::staging_run_id must be numeric"
+            exit 1
+          fi
+          if [[ "$CONFIRMATION" != "BOOTSTRAP" ]]; then
+            echo "::error::One-time bootstrap requires confirmation BOOTSTRAP"
+            exit 1
+          fi
+          echo "sha=$EXPECTED_SHA" >> "$GITHUB_OUTPUT"
+      - name: Checkout exact trusted bootstrap tooling
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: ops/deploy
+      - name: Verify successful Pages provenance
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_SHA: ${{ steps.input.outputs.sha }}
+          STAGING_RUN_ID: ${{ inputs.staging_run_id }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$STAGING_RUN_ID" > "$RUNNER_TEMP/staging-run.json"
+          node --input-type=module - "$RUNNER_TEMP/staging-run.json" "$EXPECTED_SHA" <<'NODE'
+          import fs from 'node:fs';
+          const run = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          const expectedSha = process.argv[3];
+          if (run.path !== '.github/workflows/pages.yml') throw new Error(`Unexpected workflow: ${run.path}`);
+          if (run.status !== 'completed' || run.conclusion !== 'success') throw new Error('Staging run is not successful');
+          if (run.head_sha !== expectedSha) throw new Error(`Staging SHA ${run.head_sha} does not match ${expectedSha}`);
+          if (run.head_branch !== 'main') throw new Error(`Staging branch is ${run.head_branch}, not main`);
+          NODE
+      - name: Verify fail-closed bootstrap files
+        id: baseline
+        shell: bash
+        run: |
+          sh -n ops/deploy/bootstrap-production.sh
+          if grep -Eiq '<form\b|<script\b|<iframe\b|https?://|localStorage|sessionStorage' ops/deploy/safe-baseline/index.html; then
+            echo "::error::Safe baseline contains a collection or external-runtime surface"
+            exit 1
+          fi
+          index_sha256=$(sha256sum ops/deploy/safe-baseline/index.html | awk '{print $1}')
+          htaccess_sha256=$(sha256sum ops/deploy/safe-baseline/.htaccess | awk '{print $1}')
+          echo "index_sha256=$index_sha256" >> "$GITHUB_OUTPUT"
+          echo "htaccess_sha256=$htaccess_sha256" >> "$GITHUB_OUTPUT"
+
+  bootstrap:
+    name: Preserve physical site and enable release layout
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: ${{ vars.REG_PUBLIC_URL }}
+    steps:
+      - name: Checkout exact trusted bootstrap tooling
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: ops/deploy
+      - name: Recheck bootstrap source hashes
+        shell: bash
+        env:
+          EXPECTED_INDEX_SHA: ${{ needs.verify.outputs.index_sha256 }}
+          EXPECTED_HTACCESS_SHA: ${{ needs.verify.outputs.htaccess_sha256 }}
+        run: |
+          test "$(sha256sum ops/deploy/safe-baseline/index.html | awk '{print $1}')" = "$EXPECTED_INDEX_SHA"
+          test "$(sha256sum ops/deploy/safe-baseline/.htaccess | awk '{print $1}')" = "$EXPECTED_HTACCESS_SHA"
+          sh -n ops/deploy/bootstrap-production.sh
+      - name: Validate the exact REG.RU target
+        shell: bash
+        env:
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+          REG_SSH_USER: ${{ vars.REG_SSH_USER }}
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          REG_PUBLIC_URL: ${{ vars.REG_PUBLIC_URL }}
+        run: |
+          node --input-type=module <<'NODE'
+          const env = process.env;
+          const expected = {
+            REG_SSH_HOST: 'server61.hosting.reg.ru',
+            REG_SSH_PORT: '22',
+            REG_SSH_USER: 'u3602289',
+            REG_DEPLOY_ROOT: '/var/www/u3602289/data/www/egoe-deploy',
+            REG_PUBLIC_URL: 'https://www.egoe-life.ru'
+          };
+          for (const [name, value] of Object.entries(expected)) {
+            if (env[name] !== value) throw new Error(`${name} does not match the reviewed one-time bootstrap target`);
+          }
+          NODE
+      - name: Configure isolated strict SSH
+        shell: bash
+        env:
+          REG_SSH_PRIVATE_KEY: ${{ secrets.REG_SSH_PRIVATE_KEY }}
+          REG_SSH_KNOWN_HOSTS: ${{ secrets.REG_SSH_KNOWN_HOSTS }}
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+          REG_SSH_USER: ${{ vars.REG_SSH_USER }}
+        run: |
+          ssh_dir="$RUNNER_TEMP/egoe-bootstrap-ssh"
+          install -m 700 -d "$ssh_dir"
+          printf '%s\n' "$REG_SSH_PRIVATE_KEY" > "$ssh_dir/deploy-key"
+          chmod 600 "$ssh_dir/deploy-key"
+          printf '%s\n' "$REG_SSH_KNOWN_HOSTS" > "$ssh_dir/known-hosts"
+          chmod 600 "$ssh_dir/known-hosts"
+          ssh-keygen -y -f "$ssh_dir/deploy-key" >/dev/null
+          known_host="$REG_SSH_HOST"
+          if [[ "$REG_SSH_PORT" != "22" ]]; then known_host="[$REG_SSH_HOST]:$REG_SSH_PORT"; fi
+          ssh-keygen -F "$known_host" -f "$ssh_dir/known-hosts" >/dev/null
+          config="$ssh_dir/config"
+          {
+            echo 'Host egoe-production-bootstrap'
+            echo "  HostName $REG_SSH_HOST"
+            echo "  Port $REG_SSH_PORT"
+            echo "  User $REG_SSH_USER"
+            echo "  IdentityFile $ssh_dir/deploy-key"
+            echo "  UserKnownHostsFile $ssh_dir/known-hosts"
+            echo '  BatchMode yes'
+            echo '  IdentitiesOnly yes'
+            echo '  PasswordAuthentication no'
+            echo '  KbdInteractiveAuthentication no'
+            echo '  StrictHostKeyChecking yes'
+            echo '  ConnectTimeout 20'
+            echo '  ServerAliveInterval 15'
+            echo '  ServerAliveCountMax 2'
+          } > "$config"
+          chmod 600 "$config"
+          echo "EGOE_BOOTSTRAP_SSH_CONFIG=$config" >> "$GITHUB_ENV"
+      - name: Create isolated upload stage
+        id: stage
+        shell: bash
+        env:
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+        run: |
+          stage_token="$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          ssh -F "$EGOE_BOOTSTRAP_SSH_CONFIG" egoe-production-bootstrap \
+            "sh -s -- stage '$REG_DEPLOY_ROOT' '$stage_token'" \
+            < ops/deploy/bootstrap-production.sh
+          echo "token=$stage_token" >> "$GITHUB_OUTPUT"
+      - name: Upload the exact safe baseline
+        shell: bash
+        env:
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          STAGE_TOKEN: ${{ steps.stage.outputs.token }}
+        run: |
+          scp -F "$EGOE_BOOTSTRAP_SSH_CONFIG" \
+            ops/deploy/safe-baseline/index.html \
+            "egoe-production-bootstrap:$REG_DEPLOY_ROOT/incoming/bootstrap-$STAGE_TOKEN/index.html"
+          scp -F "$EGOE_BOOTSTRAP_SSH_CONFIG" \
+            ops/deploy/safe-baseline/.htaccess \
+            "egoe-production-bootstrap:$REG_DEPLOY_ROOT/incoming/bootstrap-$STAGE_TOKEN/htaccess"
+      - name: Prepare fail-closed baseline and recoverable cutover
+        id: prepare
+        shell: bash
+        env:
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          EXPECTED_SHA: ${{ needs.verify.outputs.expected_sha }}
+          INDEX_SHA256: ${{ needs.verify.outputs.index_sha256 }}
+          HTACCESS_SHA256: ${{ needs.verify.outputs.htaccess_sha256 }}
+          STAGE_TOKEN: ${{ steps.stage.outputs.token }}
+        run: |
+          ssh -F "$EGOE_BOOTSTRAP_SSH_CONFIG" egoe-production-bootstrap \
+            "sh -s -- prepare '$REG_DEPLOY_ROOT' '$EXPECTED_SHA' '$INDEX_SHA256' '$HTACCESS_SHA256' '$STAGE_TOKEN'" \
+            < ops/deploy/bootstrap-production.sh
+          echo 'prepared=true' >> "$GITHUB_OUTPUT"
+      - name: Externally smoke-test safe baseline before enablement
+        id: smoke
+        continue-on-error: true
+        shell: bash
+        env:
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          REG_PUBLIC_URL: ${{ vars.REG_PUBLIC_URL }}
+          EXPECTED_SHA: ${{ needs.verify.outputs.expected_sha }}
+          INDEX_SHA256: ${{ needs.verify.outputs.index_sha256 }}
+          HTACCESS_SHA256: ${{ needs.verify.outputs.htaccess_sha256 }}
+          STAGE_TOKEN: ${{ steps.stage.outputs.token }}
+        run: |
+          set -euo pipefail
+          ssh -F "$EGOE_BOOTSTRAP_SSH_CONFIG" egoe-production-bootstrap \
+            "sh -s -- verify '$REG_DEPLOY_ROOT' '$EXPECTED_SHA' '$INDEX_SHA256' '$HTACCESS_SHA256' prepared" \
+            < ops/deploy/bootstrap-production.sh
+
+          body="$RUNNER_TEMP/egoe-safe-baseline.html"
+          headers="$RUNNER_TEMP/egoe-safe-baseline.headers"
+          metadata="$RUNNER_TEMP/egoe-safe-baseline.metadata"
+          request_url="$REG_PUBLIC_URL/?egoe_bootstrap=$STAGE_TOKEN"
+          curl --proto '=https' --proto-redir '=https' --location --max-redirs 3 \
+            --fail --silent --show-error --retry 2 --connect-timeout 15 --max-time 30 \
+            --header 'Cache-Control: no-cache, no-store' \
+            --dump-header "$headers" --output "$body" \
+            --write-out '%{http_code}\n%{url_effective}\n' \
+            "$request_url" > "$metadata"
+          test "$(sed -n '1p' "$metadata")" = '200'
+          test "$(sed -n '2p' "$metadata")" = "$request_url"
+          test "$(sha256sum "$body" | awk '{print $1}')" = "$INDEX_SHA256"
+          grep -Eiq '^cache-control:[[:space:]].*no-store' "$headers"
+          grep -Eiq '^content-security-policy:' "$headers"
+          grep -Eiq '^x-content-type-options:[[:space:]]*nosniff' "$headers"
+          grep -Eiq '^x-frame-options:[[:space:]]*DENY' "$headers"
+          grep -Eiq '^x-robots-tag:[[:space:]].*noindex' "$headers"
+          grep -Eiq '^cross-origin-resource-policy:[[:space:]]*same-origin' "$headers"
+          grep -Eiq '^permissions-policy:' "$headers"
+          grep -Eiq '^strict-transport-security:' "$headers"
+          if grep -Eiq '^set-cookie:' "$headers"; then
+            echo 'Safe baseline unexpectedly set a cookie' >&2
+            exit 1
+          fi
+
+          ssh -F "$EGOE_BOOTSTRAP_SSH_CONFIG" egoe-production-bootstrap \
+            "sh -s -- verify '$REG_DEPLOY_ROOT' '$EXPECTED_SHA' '$INDEX_SHA256' '$HTACCESS_SHA256' prepared" \
+            < ops/deploy/bootstrap-production.sh
+      - name: Restore physical document root if external smoke failed
+        if: ${{ always() && steps.prepare.outputs.prepared == 'true' && steps.smoke.outcome == 'failure' }}
+        shell: bash
+        env:
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          EXPECTED_SHA: ${{ needs.verify.outputs.expected_sha }}
+          INDEX_SHA256: ${{ needs.verify.outputs.index_sha256 }}
+          HTACCESS_SHA256: ${{ needs.verify.outputs.htaccess_sha256 }}
+        run: |
+          ssh -F "$EGOE_BOOTSTRAP_SSH_CONFIG" egoe-production-bootstrap \
+            "sh -s -- rollback '$REG_DEPLOY_ROOT' '$EXPECTED_SHA' '$INDEX_SHA256' '$HTACCESS_SHA256'" \
+            < ops/deploy/bootstrap-production.sh
+      - name: Stop after a failed external smoke test
+        if: ${{ always() && steps.smoke.outcome == 'failure' }}
+        run: |
+          echo '::error::Safe baseline failed external smoke; production enable marker was not created'
+          exit 1
+      - name: Enable the existing production release workflow
+        if: ${{ steps.smoke.outcome == 'success' }}
+        shell: bash
+        env:
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          EXPECTED_SHA: ${{ needs.verify.outputs.expected_sha }}
+          INDEX_SHA256: ${{ needs.verify.outputs.index_sha256 }}
+          HTACCESS_SHA256: ${{ needs.verify.outputs.htaccess_sha256 }}
+        run: |
+          ssh -F "$EGOE_BOOTSTRAP_SSH_CONFIG" egoe-production-bootstrap \
+            "sh -s -- enable '$REG_DEPLOY_ROOT' '$EXPECTED_SHA' '$INDEX_SHA256' '$HTACCESS_SHA256'" \
+            < ops/deploy/bootstrap-production.sh
+      - name: Verify enabled fail-closed state
+        if: ${{ steps.smoke.outcome == 'success' }}
+        shell: bash
+        env:
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          EXPECTED_SHA: ${{ needs.verify.outputs.expected_sha }}
+          INDEX_SHA256: ${{ needs.verify.outputs.index_sha256 }}
+          HTACCESS_SHA256: ${{ needs.verify.outputs.htaccess_sha256 }}
+        run: |
+          ssh -F "$EGOE_BOOTSTRAP_SSH_CONFIG" egoe-production-bootstrap \
+            "sh -s -- verify '$REG_DEPLOY_ROOT' '$EXPECTED_SHA' '$INDEX_SHA256' '$HTACCESS_SHA256' enabled" \
+            < ops/deploy/bootstrap-production.sh
+          {
+            echo '### REG.RU bootstrap completed'
+            echo "- Reviewed source: \`$EXPECTED_SHA\`"
+            echo '- Safe baseline is live through `egoe-deploy/current`.'
+            echo '- The old physical site is preserved under `egoe-deploy/legacy/physical-docroot-pre-rkn-20260823`.'
+            echo '- `collection-approved` remains absent; online collection is OFF.'
+            echo '- The normal production workflow is now enabled and must deploy the same reviewed Pages artifact.'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -18,13 +18,19 @@ header('X-Frame-Options: DENY');
 header('Content-Security-Policy: default-src \'none\'; frame-ancestors \'none\'; base-uri \'none\'');
 
 try {
-    $result = Endpoint::handle($_SERVER, $_POST, $_FILES);
+    $requestPath = parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+    $isStatus = is_string($requestPath) && in_array($requestPath, ['/api/leads/status', '/api/leads/status/'], true);
+    $isLeadEndpoint = is_string($requestPath) && in_array($requestPath, ['/api/leads', '/api/leads/'], true);
+    if (!$isStatus && !$isLeadEndpoint) {
+        throw new HttpFailure(404, 'NOT_FOUND', 'Ресурс не найден.');
+    }
+    $result = $isStatus ? Endpoint::status($_SERVER) : Endpoint::handle($_SERVER, $_POST, $_FILES);
     http_response_code($result['status']);
     echo json_encode($result['body'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
 } catch (HttpFailure $error) {
     http_response_code($error->status);
     if ($error->status === 405) {
-        header('Allow: POST');
+        header('Allow: ' . (($isStatus ?? false) ? 'GET' : 'POST'));
     }
     echo json_encode([
         'ok' => false,

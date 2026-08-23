@@ -44,6 +44,7 @@ function initialize(): void
         $settings = [
             'site_host' => 'www.egoe-life.ru',
             'allowed_hosts' => ['www.egoe-life.ru', 'egoe-life.ru'],
+            'collection_enabled' => false,
             'consent_version' => '2026-08-23',
             'ip_hash_key' => bin2hex(random_bytes(32)),
             'minimum_elapsed_ms' => 600,
@@ -75,7 +76,8 @@ function initialize(): void
     [, $settings, $pdo] = loadRuntime();
     $version = (int)$pdo->query('PRAGMA user_version')->fetchColumn();
     $relayState = ($settings['relay']['enabled'] ?? false) === true ? 'on' : 'off';
-    echo "INITIALIZED schema={$version} relay={$relayState}\n";
+    $collectionState = ($settings['collection_enabled'] ?? false) === true ? 'on' : 'off';
+    echo "INITIALIZED schema={$version} collection={$collectionState} relay={$relayState}\n";
 }
 
 function health(): void
@@ -109,6 +111,7 @@ function health(): void
     echo json_encode([
         'ok' => true,
         'schemaVersion' => $version,
+        'collectionEnabled' => ($settings['collection_enabled'] ?? false) === true,
         'relayEnabled' => ($settings['relay']['enabled'] ?? false) === true,
     ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
 }

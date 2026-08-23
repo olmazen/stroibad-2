@@ -55,6 +55,23 @@ validate_release_target() {
   esac
 }
 
+validate_owned_mode() {
+  secured_path=$1
+  expected_type=$2
+  label=$3
+  current_uid=$(id -u)
+  "$egoe_php_command" -r '
+    $stat = lstat($argv[1]);
+    $expectedUid = (int) $argv[2];
+    $expectedType = $argv[3];
+    if (!is_array($stat) || $stat["uid"] !== $expectedUid || ($stat["mode"] & 0022) !== 0) exit(2);
+    $type = $stat["mode"] & 0170000;
+    if ($expectedType === "directory" && $type !== 0040000) exit(3);
+    if ($expectedType === "file" && $type !== 0100000) exit(4);
+  ' "$secured_path" "$current_uid" "$expected_type" \
+    || die "$label must be owned by the deployment user and not group/world-writable"
+}
+
 verify_release_tree() {
   release_root=$1
   expected_sha=$2
@@ -141,15 +158,21 @@ acquire_lock() {
   deploy_root=$1
   [ ! -L "$deploy_root/state/deploy.lock" ] || die "Deployment lock must not be a symlink"
   exec 9>"$deploy_root/state/deploy.lock"
+  chmod 600 "$deploy_root/state/deploy.lock"
+  validate_owned_mode "$deploy_root/state/deploy.lock" file "Deployment lock"
   flock -n 9 || die "Another server-side deployment operation is active"
 }
 
 write_state() {
   state_file=$1
   state_value=$2
+  [ ! -L "$state_file" ] || die "State file must not be a symlink"
   temporary_state="$state_file.tmp.$$"
-  printf '%s\n' "$state_value" > "$temporary_state"
+  [ ! -e "$temporary_state" ] && [ ! -L "$temporary_state" ] || die "Temporary state path already exists"
+  (umask 077; printf '%s\n' "$state_value" > "$temporary_state")
+  chmod 600 "$temporary_state"
   mv "$temporary_state" "$state_file"
+  validate_owned_mode "$state_file" file "Deployment state file"
 }
 
 replace_symlink() {
@@ -161,10 +184,44 @@ replace_symlink() {
   ' "$source_link" "$target_path" || die "Atomic symlink switch failed"
 }
 
+restore_failed_deploy_switch() {
+  exit_code=$?
+  trap - EXIT HUP INT TERM
+  set +e
+
+  if [ "${deployment_current_switched:-0}" = "1" ] && [ "${deployment_switch_complete:-0}" != "1" ]; then
+    expected_target="releases/$expected_sha"
+    if [ -L "$deploy_root/current" ] && [ "$(readlink "$deploy_root/current" 2>/dev/null)" = "$expected_target" ]; then
+      restore_link="$deploy_root/current.deploy-restore.$$"
+      if [ ! -e "$restore_link" ] && [ ! -L "$restore_link" ] \
+        && ln -s "$previous_target" "$restore_link" \
+        && "$egoe_php_command" -r '
+          exit(is_link($argv[1]) && rename($argv[1], $argv[2]) ? 0 : 1);
+        ' "$restore_link" "$deploy_root/current"; then
+        previous_name=${previous_target#releases/}
+        restore_state="$deploy_root/state/current.restore.$$"
+        (umask 077; printf '%s\n' "$previous_name" > "$restore_state")
+        chmod 600 "$restore_state" 2>/dev/null || true
+        mv "$restore_state" "$deploy_root/state/current" 2>/dev/null || true
+        printf '%s\n' "ERROR: activation failed; previous current symlink restored" >&2
+      else
+        printf '%s\n' "ERROR: activation failed and previous current symlink could not be restored" >&2
+      fi
+    else
+      printf '%s\n' "ERROR: activation failed after current changed unexpectedly; automatic restore refused" >&2
+    fi
+  fi
+
+  if [ -n "${next_link:-}" ] && [ -L "$next_link" ]; then
+    unlink "$next_link" 2>/dev/null || true
+  fi
+  exit "$exit_code"
+}
+
 preflight() {
   deploy_root=$1
   validate_root "$deploy_root"
-  for command_name in tar sha256sum "$egoe_php_command" ln mv readlink grep find sort flock cmp; do
+  for command_name in tar sha256sum "$egoe_php_command" chmod id ln mv readlink grep find sort flock cmp unlink; do
     require_command "$command_name"
   done
   "$egoe_php_command" -r '
@@ -174,16 +231,30 @@ preflight() {
       && extension_loaded("curl") ? 0 : 1);
   ' || die "PHP CLI 8.2+ with pdo_sqlite, mbstring and curl is required"
   [ -w "$deploy_root" ] || die "Deploy root is not writable"
+  validate_owned_mode "$deploy_root" directory "Deploy root"
+  validate_owned_mode "$deploy_root/state/site-hostname" file "Site-hostname marker"
   for persistent_directory in incoming releases shared state; do
     [ -d "$deploy_root/$persistent_directory" ] || die "Missing persistent directory: $persistent_directory"
     [ ! -L "$deploy_root/$persistent_directory" ] || die "Persistent directory must not be a symlink: $persistent_directory"
   done
+  validate_owned_mode "$deploy_root/state" directory "Deployment state directory"
   [ -d "$deploy_root/shared/leads" ] || die "Missing persistent lead runtime directory: shared/leads"
   [ ! -L "$deploy_root/shared/leads" ] || die "Persistent lead runtime directory must not be a symlink"
   [ -w "$deploy_root/shared/leads" ] || die "Persistent lead runtime directory is not writable"
   [ -f "$deploy_root/state/production-enabled" ] || die "Production deployment is not enabled"
   [ ! -L "$deploy_root/state/production-enabled" ] || die "Production marker must not be a symlink"
+  validate_owned_mode "$deploy_root/state/production-enabled" file "Production marker"
   [ "$(cat "$deploy_root/state/production-enabled")" = "egoe-life.ru" ] || die "Invalid production marker"
+  collection_marker="$deploy_root/state/collection-approved"
+  if [ -e "$collection_marker" ] || [ -L "$collection_marker" ]; then
+    [ -f "$collection_marker" ] || die "Collection approval marker must be a regular file"
+    [ ! -L "$collection_marker" ] || die "Collection approval marker must not be a symlink"
+    validate_owned_mode "$collection_marker" file "Collection approval marker"
+    "$egoe_php_command" -r '
+      $value = file_get_contents($argv[1]);
+      exit($value === "egoe-life.ru" ? 0 : 1);
+    ' "$collection_marker" || die "Invalid collection approval marker"
+  fi
   [ -L "$deploy_root/current" ] || die "Current baseline symlink is required before production deployment"
   current_target=$(readlink "$deploy_root/current")
   validate_release_target "$current_target"
@@ -246,13 +317,18 @@ deploy() {
     || die "Lead backend initialization failed"
   lead_health=$(EGOE_DEPLOY_ROOT="$deploy_root" "$egoe_php_command" "$lead_cli" health) \
     || die "Lead backend health check failed"
+  collection_marker_approved=false
+  [ -f "$deploy_root/state/collection-approved" ] && collection_marker_approved=true
   printf '%s' "$lead_health" | "$egoe_php_command" -r '
     $health = json_decode(stream_get_contents(STDIN), true);
+    $markerApproved = ($argv[1] ?? "false") === "true";
     exit(is_array($health)
       && ($health["ok"] ?? false) === true
       && ($health["schemaVersion"] ?? null) === 2
+      && is_bool($health["collectionEnabled"] ?? null)
+      && ($markerApproved || $health["collectionEnabled"] === false)
       && ($health["relayEnabled"] ?? null) === false ? 0 : 1);
-  ' || die "Lead backend health contract failed or relay is enabled"
+  ' "$collection_marker_approved" || die "Lead backend health contract failed, collection escaped its gate, or relay is enabled"
 
   [ -L "$deploy_root/current" ] || die "Current baseline symlink is required before production deployment"
   previous_target=$(readlink "$deploy_root/current")
@@ -261,10 +337,17 @@ deploy() {
   [ ! -L "$deploy_root/$previous_target" ] || die "Current release directory must not be a symlink"
   write_state "$deploy_root/state/previous" "$previous_target"
   next_link="$deploy_root/current.next.$$"
+  [ ! -e "$next_link" ] && [ ! -L "$next_link" ] || die "Temporary current link already exists"
+  deployment_current_switched=0
+  deployment_switch_complete=0
+  trap restore_failed_deploy_switch EXIT HUP INT TERM
   ln -s "releases/$expected_sha" "$next_link"
   replace_symlink "$next_link" "$deploy_root/current"
+  deployment_current_switched=1
   write_state "$deploy_root/state/current" "$expected_sha"
   printf '%s\n' "DEPLOYED_SHA=$expected_sha"
+  deployment_switch_complete=1
+  trap - EXIT HUP INT TERM
 }
 
 rollback() {

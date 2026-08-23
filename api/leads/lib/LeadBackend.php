@@ -26,6 +26,7 @@ final class HttpFailure extends RuntimeException
 final class Runtime
 {
     private const SITE_MARKER = 'egoe-life.ru';
+    private const COLLECTION_MARKER = 'collection-approved';
 
     public static function deployRoot(?string $start = null): string
     {
@@ -91,6 +92,43 @@ final class Runtime
         return $realDirectory;
     }
 
+    public static function collectionApproved(string $deployRoot): bool
+    {
+        $stateDirectory = $deployRoot . '/state';
+        $marker = $stateDirectory . '/' . self::COLLECTION_MARKER;
+        if (!is_dir($stateDirectory) || is_link($stateDirectory) || !is_file($marker) || is_link($marker)) {
+            return false;
+        }
+        $rootMetadata = @lstat($deployRoot);
+        $stateMetadata = @lstat($stateDirectory);
+        $markerMetadata = @lstat($marker);
+        if (!is_array($rootMetadata) || !is_array($stateMetadata) || !is_array($markerMetadata)) {
+            return false;
+        }
+        $rootMode = ((int)($rootMetadata['mode'] ?? 0)) & 0170000;
+        $stateMode = ((int)($stateMetadata['mode'] ?? 0));
+        $markerMode = ((int)($markerMetadata['mode'] ?? 0));
+        $owner = $rootMetadata['uid'] ?? null;
+        if ($rootMode !== 0040000
+            || ($stateMode & 0170000) !== 0040000
+            || ($markerMode & 0170000) !== 0100000
+            || !is_int($owner)
+            || ($stateMetadata['uid'] ?? null) !== $owner
+            || ($markerMetadata['uid'] ?? null) !== $owner
+            || ($stateMode & 0022) !== 0
+            || ($markerMode & 0022) !== 0
+        ) {
+            return false;
+        }
+        $realState = realpath($stateDirectory);
+        $realMarker = realpath($marker);
+        if (!is_string($realState) || !is_string($realMarker) || dirname($realMarker) !== $realState) {
+            return false;
+        }
+        $value = @file_get_contents($realMarker);
+        return $value === self::SITE_MARKER;
+    }
+
     public static function utcNow(): string
     {
         return (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.v\Z');
@@ -119,6 +157,7 @@ final class Settings
         $defaults = [
             'site_host' => 'www.egoe-life.ru',
             'allowed_hosts' => ['www.egoe-life.ru', 'egoe-life.ru'],
+            'collection_enabled' => false,
             'consent_version' => '2026-08-23',
             'minimum_elapsed_ms' => 600,
             'rate_limit' => ['max_requests' => 5, 'window_seconds' => 600],
@@ -138,6 +177,12 @@ final class Settings
             ],
         ];
         $settings = array_replace_recursive($defaults, $loaded);
+
+        if (!is_bool($settings['collection_enabled'])) {
+            throw new RuntimeException('collection_enabled must be boolean');
+        }
+        $settings['collection_enabled'] = $settings['collection_enabled'] === true
+            && Runtime::collectionApproved($deployRoot);
 
         if (!is_string($settings['ip_hash_key'] ?? null)
             || strlen($settings['ip_hash_key']) < 32
@@ -398,7 +443,7 @@ final class Validator
     private const UUID = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/Di';
 
     /** @param array<string,mixed> $settings */
-    public static function assertRequestProvenance(array $settings, array $server): void
+    public static function assertRequestHost(array $settings, array $server): void
     {
         $requestHost = strtolower(trim((string)($server['HTTP_HOST'] ?? $server['SERVER_NAME'] ?? '')));
         if (str_ends_with($requestHost, ':443')) {
@@ -409,6 +454,12 @@ final class Validator
         if (!in_array($requestHost, $settings['allowed_hosts'], true)) {
             throw new HttpFailure(403, 'HOST_REJECTED', 'Адрес запроса не разрешён.');
         }
+    }
+
+    /** @param array<string,mixed> $settings */
+    public static function assertRequestProvenance(array $settings, array $server): void
+    {
+        self::assertRequestHost($settings, $server);
         $origin = trim((string)($server['HTTP_ORIGIN'] ?? ''));
         $referer = trim((string)($server['HTTP_REFERER'] ?? ''));
         if ($origin === '' && $referer === '') {
@@ -938,6 +989,20 @@ final class Relay
 final class Endpoint
 {
     /** @param array<string,mixed> $server
+     *  @return array{status:int,body:array{enabled:bool}}
+     */
+    public static function status(array $server): array
+    {
+        if (($server['REQUEST_METHOD'] ?? '') !== 'GET') {
+            throw new HttpFailure(405, 'METHOD_NOT_ALLOWED', 'Метод не поддерживается.');
+        }
+        $root = Runtime::deployRoot();
+        $settings = Settings::load($root);
+        Validator::assertRequestHost($settings, $server);
+        return ['status' => 200, 'body' => ['enabled' => $settings['collection_enabled'] === true]];
+    }
+
+    /** @param array<string,mixed> $server
      *  @param array<string,mixed> $post
      *  @param array<string,mixed> $files
      *  @return array{status:int,body:array<string,mixed>}
@@ -946,6 +1011,16 @@ final class Endpoint
     {
         if (($server['REQUEST_METHOD'] ?? '') !== 'POST') {
             throw new HttpFailure(405, 'METHOD_NOT_ALLOWED', 'Метод не поддерживается.');
+        }
+        $root = Runtime::deployRoot();
+        $settings = Settings::load($root);
+        Validator::assertRequestHost($settings, $server);
+        if ($settings['collection_enabled'] !== true) {
+            throw new HttpFailure(
+                503,
+                'COLLECTION_DISABLED',
+                'Приём заявок на сайте временно недоступен. Позвоните нам или напишите в WhatsApp.'
+            );
         }
         $length = (int)($server['CONTENT_LENGTH'] ?? 0);
         if ($length < 1 || $length > 65536) {
@@ -962,9 +1037,6 @@ final class Endpoint
                 throw new HttpFailure(422, 'ATTACHMENTS_DISABLED', 'Вложения временно отключены.');
             }
         }
-
-        $root = Runtime::deployRoot();
-        $settings = Settings::load($root);
         Validator::assertRequestProvenance($settings, $server);
         try {
             $decoded = json_decode($post['payload'], true, 32, JSON_THROW_ON_ERROR);

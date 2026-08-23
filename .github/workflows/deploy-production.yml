@@ -243,13 +243,22 @@ jobs:
           test -f "$deploy_root/state/production-enabled"
           test ! -L "$deploy_root/state/production-enabled"
           test "$(cat "$deploy_root/state/production-enabled")" = "egoe-life.ru"
+          collection_marker="$deploy_root/state/collection-approved"
+          if test -e "$collection_marker" || test -L "$collection_marker"; then
+            test -f "$collection_marker"
+            test ! -L "$collection_marker"
+            php -r '
+              $value = file_get_contents($argv[1]);
+              exit($value === "egoe-life.ru" ? 0 : 1);
+            ' "$collection_marker"
+          fi
           for directory in incoming releases shared state; do
             test -d "$deploy_root/$directory"
             test ! -L "$deploy_root/$directory"
           done
           test -d "$deploy_root/shared/leads"
           test ! -L "$deploy_root/shared/leads"
-          for command_name in tar sha256sum php ln mv readlink grep find sort flock cmp; do
+          for command_name in tar sha256sum php id ln mv readlink grep find sort flock cmp; do
             command -v "$command_name" >/dev/null
           done
           php -r '
@@ -258,6 +267,29 @@ jobs:
               && extension_loaded("mbstring")
               && extension_loaded("curl") ? 0 : 1);
           '
+          current_uid=$(id -u)
+          php -r '
+            $expectedUid = (int) $argv[1];
+            $paths = [
+              [$argv[2], 0040000],
+              [$argv[3], 0040000],
+              [$argv[4], 0100000],
+              [$argv[5], 0100000],
+            ];
+            if ($argv[6] !== "") $paths[] = [$argv[6], 0100000];
+            foreach ($paths as [$path, $expectedType]) {
+              $stat = lstat($path);
+              if (!is_array($stat)
+                || $stat["uid"] !== $expectedUid
+                || ($stat["mode"] & 0170000) !== $expectedType
+                || ($stat["mode"] & 0022) !== 0) exit(1);
+            }
+          ' "$current_uid" \
+            "$deploy_root" \
+            "$deploy_root/state" \
+            "$deploy_root/state/site-hostname" \
+            "$deploy_root/state/production-enabled" \
+            "$([ -f "$collection_marker" ] && printf '%s' "$collection_marker" || true)"
           test -w "$deploy_root/shared/leads"
           test -L "$deploy_root/current"
           current_target=$(readlink "$deploy_root/current")
@@ -342,6 +374,51 @@ jobs:
             | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>console.log(JSON.parse(d).source.commit))')
           if [[ "$release_sha" != "$EXPECTED_SHA" ]]; then
             failed=1
+          fi
+          collection_expected=$(ssh -i "$EGOE_SSH_KEY" -p "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$EGOE_KNOWN_HOSTS" -o ConnectTimeout=20 \
+            "$REG_SSH_USER@$REG_SSH_HOST" \
+            "EGOE_DEPLOY_ROOT='$REG_DEPLOY_ROOT' php '$REG_DEPLOY_ROOT/current/api/leads/cli/leads.php' health" \
+            | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const v=JSON.parse(d).collectionEnabled;if(typeof v!=="boolean")process.exit(1);process.stdout.write(String(v))})')
+          if [[ "$collection_expected" != "true" && "$collection_expected" != "false" ]]; then
+            failed=1
+          fi
+          collection_headers="$RUNNER_TEMP/egoe-collection-headers"
+          collection_body="$RUNNER_TEMP/egoe-collection-body"
+          collection_status=$(curl --silent --show-error --retry 2 --max-time 30 \
+            --header 'Accept: application/json' \
+            --header 'Cache-Control: no-cache, no-store' \
+            --dump-header "$collection_headers" \
+            --output "$collection_body" \
+            --write-out '%{http_code}' \
+            "$REG_PUBLIC_URL/api/leads/status/?egoe_deploy=$smoke_token")
+          if [[ "$collection_status" != "200" ]] || ! node -e '
+            const fs = require("node:fs");
+            const body = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+            const expected = process.argv[2] === "true";
+            if (Object.keys(body).length !== 1 || body.enabled !== expected) process.exit(1);
+          ' "$collection_body" "$collection_expected"; then
+            failed=1
+          fi
+          grep -Eiq '^cache-control:[[:space:]].*no-store' "$collection_headers" || failed=1
+          if [[ "$collection_expected" == "false" ]]; then
+            disabled_body="$RUNNER_TEMP/egoe-disabled-body"
+            disabled_status=$(curl --silent --show-error --retry 2 --max-time 30 \
+              --request POST \
+              --header 'Accept: application/json' \
+              --header 'Cache-Control: no-cache, no-store' \
+              --output "$disabled_body" \
+              --write-out '%{http_code}' \
+              "$REG_PUBLIC_URL/api/leads/?egoe_deploy=$smoke_token")
+            if [[ "$disabled_status" != "503" ]] || ! node -e '
+              const fs = require("node:fs");
+              const body = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+              if (body.ok !== false || body.code !== "COLLECTION_DISABLED") process.exit(1);
+            ' "$disabled_body"; then
+              failed=1
+            fi
           fi
           api_headers="$RUNNER_TEMP/egoe-api-headers"
           api_body_file="$RUNNER_TEMP/egoe-api-body"

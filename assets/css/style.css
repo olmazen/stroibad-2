@@ -396,6 +396,9 @@ svg.drawn .bp-fade{opacity:1}
 .form-error b{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:6px;color:#ff887e}
 .formpanel button[type="submit"]:disabled,.kp-gen button[type="submit"]:disabled{cursor:wait;opacity:.65;filter:saturate(.65)}
 .lead-honey{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+.lead-collection-gate{margin:14px 0 0;padding:12px 14px;border:1px solid rgba(242,111,29,.35);border-radius:10px;background:rgba(242,111,29,.08);color:var(--steel);font-size:13px;line-height:1.5}
+.lead-collection-gate a{color:var(--amber);font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.lead-collection-gate[hidden]{display:none!important}
 
 /* ============ section hero (внутренние) ============ */
 .shero{position:relative;background:var(--bg);color:#fff;overflow:hidden;border-bottom:1px solid var(--line);min-height:calc(100vh - 104px);display:flex;align-items:flex-end}

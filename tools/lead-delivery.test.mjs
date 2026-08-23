@@ -28,6 +28,7 @@ function browser(source, overrides = {}) {
     referrer: '',
     addEventListener(type, listener) { if (type === 'DOMContentLoaded') domReady.push(listener); }
   };
+  const leadFetch = overrides.fetch || (() => Promise.reject(new Error('Unexpected lead fetch')));
   const root = {
     document,
     location: {
@@ -40,7 +41,13 @@ function browser(source, overrides = {}) {
     FormData: FakeFormData,
     AbortController,
     crypto: { randomUUID: () => '11111111-1111-4111-8111-111111111111' },
-    fetch: overrides.fetch || (() => Promise.reject(new Error('Unexpected fetch'))),
+    fetch(url, request) {
+      if (url === '/api/leads/status/') {
+        if (overrides.statusFetch) return overrides.statusFetch(url, request);
+        return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ enabled: true }) });
+      }
+      return leadFetch(url, request);
+    },
     localStorage: { removeItem() {} },
     ...overrides.window
   };
@@ -222,9 +229,107 @@ test('public GitHub Pages preview cannot send real leads', async () => {
   });
   await assert.rejects(
     api.send({ Телефон: '+79270000000' }, 'форма', options()),
-    (error) => error.code === 'LEAD_CONFIG'
+    (error) => error.code === 'COLLECTION_DISABLED'
   );
   assert.equal(requests, 0);
+});
+
+test('forms stay fail-closed until the exact same-origin status enables collection', async () => {
+  const source = await leadSource();
+  var resolveStatus;
+  var message = null;
+  const control = {
+    disabled: false,
+    dataset: {},
+    removeAttribute(name) { if (name === 'data-collection-gate') delete this.dataset.collectionGate; }
+  };
+  const form = {
+    dataset: {},
+    attributes: {},
+    setAttribute(name, value) { this.attributes[name] = value; },
+    removeAttribute(name) { delete this.attributes[name]; },
+    appendChild(node) { message = node; },
+    querySelector(selector) { return selector === '.lead-collection-gate' ? message : null; },
+    querySelectorAll(selector) {
+      if (selector === 'input, textarea, select, button') return [control];
+      if (selector === '[data-collection-gate="1"]') return control.dataset.collectionGate === '1' ? [control] : [];
+      return [];
+    }
+  };
+  function node() {
+    return {
+      children: [], hidden: false, className: '',
+      setAttribute() {},
+      appendChild(child) { this.children.push(child); }
+    };
+  }
+  const document = {
+    readyState: 'loading', title: 'Тест', referrer: '',
+    addEventListener() {},
+    createElement: node,
+    createTextNode(text) { return { textContent: text }; },
+    querySelectorAll() { return [form]; }
+  };
+  const statusRequests = [];
+  const enabled = browser(source, {
+    document,
+    statusFetch(url, request) {
+      statusRequests.push({ url, request });
+      return new Promise((resolve) => { resolveStatus = resolve; });
+    }
+  });
+  assert.equal(control.disabled, true, 'control must be disabled synchronously before status resolves');
+  assert.equal(form.attributes['aria-disabled'], 'true');
+  assert.equal(message.hidden, false);
+  assert.match(JSON.stringify(message), /79272295828|WhatsApp/);
+  await Promise.resolve();
+  resolveStatus({ ok: true, status: 200, json: () => Promise.resolve({ enabled: true }) });
+  assert.equal(await enabled.api.verifyCollectionStatus(), true);
+  assert.equal(enabled.api.collectionEnabled(), true);
+  assert.equal(control.disabled, false);
+  assert.equal(message.hidden, true);
+  assert.equal(statusRequests.length, 1);
+  assert.equal(statusRequests[0].url, '/api/leads/status/');
+  assert.equal(statusRequests[0].request.credentials, 'same-origin');
+
+  const disabledControl = { disabled: false, dataset: {} };
+  const disabledForm = {
+    dataset: {}, setAttribute() {}, appendChild() {},
+    querySelector() { return null; },
+    querySelectorAll(selector) { return selector === 'input, textarea, select, button' ? [disabledControl] : []; }
+  };
+  const disabledDocument = { readyState: 'loading', title: '', referrer: '', addEventListener() {}, querySelectorAll() { return [disabledForm]; } };
+  let leadRequests = 0;
+  const disabled = browser(source, {
+    document: disabledDocument,
+    statusFetch: () => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ enabled: false }) }),
+    fetch() { leadRequests += 1; }
+  });
+  assert.equal(await disabled.api.verifyCollectionStatus(), false);
+  assert.equal(disabledControl.disabled, true);
+  await assert.rejects(disabled.api.send({ Телефон: '+79270000000' }, 'форма', options()), (error) => error.code === 'COLLECTION_DISABLED');
+  assert.equal(leadRequests, 0);
+
+  const extra = browser(source, {
+    statusFetch: () => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ enabled: true, extra: true }) })
+  });
+  assert.equal(await extra.api.verifyCollectionStatus(), false, 'unexpected status fields must fail closed');
+
+  let revokedPosts = 0;
+  const revoked = browser(source, {
+    fetch: () => {
+      revokedPosts += 1;
+      return Promise.resolve({
+      ok: false,
+      status: 503,
+      json: () => Promise.resolve({ ok: false, code: 'COLLECTION_DISABLED' })
+      });
+    }
+  });
+  await assert.rejects(revoked.api.send({ Телефон: '+79270000000' }, 'форма', options()), (error) => error.code === 'COLLECTION_DISABLED');
+  assert.equal(revoked.api.collectionEnabled(), false, 'a server-side revocation must relock the page');
+  await assert.rejects(revoked.api.send({ Телефон: '+79270000000' }, 'форма', options()), (error) => error.code === 'COLLECTION_DISABLED');
+  assert.equal(revokedPosts, 1, 'revocation must prevent every later POST without a reload');
 });
 
 test('UUID fallback remains RFC4122-compatible without crypto.randomUUID', async () => {
@@ -301,6 +406,9 @@ test('public forms use the isolated module and legacy false-success/PII storage 
   assert.doesNotMatch(site, /formsubmit\.co|window\.LEAD_CFG\s*=|localStorage\.setItem\(['"]sp_leads_v1/);
   assert.doesNotMatch(leads, /formsubmit\.co|tgRelay|google\.script|script\.google/);
   assert.match(leads, /\/api\/leads\//);
+  assert.match(leads, /\/api\/leads\/status\//);
+  assert.match(leads, /collectionEnabled/);
+  assert.match(leads, /https:\/\/wa\.me\/79272295828/);
   assert.doesNotMatch(cart, /копию пришл[её]м|КП.*пришл[её]м на почту/i);
   for (const key of LEADS.forbiddenLocalStorageKeys) {
     const pattern = new RegExp(`(?:localStorage|sessionStorage)\\.setItem\\(\\s*['"]${key}['"]`);
@@ -315,6 +423,25 @@ test('public forms use the isolated module and legacy false-success/PII storage 
   assert.match(site, /resetQuoteLeadRequest/);
   assert.match(site, /egoe:cart-change/);
   assert.match(site, /form\.__leadDirty/);
+  assert.match(site, /EGOE_LEADS\.collectionEnabled/);
+  const quoteSubmitStart = site.indexOf("form.addEventListener('submit', function (e) {", site.indexOf('function resetQuoteLeadRequest'));
+  const quoteSubmitEnd = site.indexOf('\n    });\n  })();', quoteSubmitStart);
+  assert.ok(quoteSubmitStart >= 0 && quoteSubmitEnd > quoteSubmitStart, 'cart quote submit handler must remain inspectable');
+  const quoteSubmit = site.slice(quoteSubmitStart, quoteSubmitEnd);
+  const consentAcceptedAt = quoteSubmit.indexOf("quoteConsent.setCustomValidity('');");
+  assert.ok(consentAcceptedAt > 0, 'cart quote must require an explicit consent checkbox');
+  const uncheckedPath = quoteSubmit.slice(0, consentAcceptedAt);
+  assert.match(uncheckedPath, /form\.querySelector\('\[data-lead-consent\]'\)/);
+  assert.match(uncheckedPath, /if \(!quoteConsent \|\| !quoteConsent\.checked\)/);
+  assert.match(uncheckedPath, /quoteConsent\.setCustomValidity\(/);
+  assert.match(uncheckedPath, /quoteConsent\.reportValidity\(\)/);
+  assert.match(uncheckedPath, /quoteConsent\.focus\(\)/);
+  assert.match(uncheckedPath, /return;/);
+  assert.doesNotMatch(uncheckedPath, /window\.__sendLead\(|openDrawer\(|currentKpHead\s*=/,
+    'unchecked consent must neither send the lead nor construct/open the quote');
+  assert.ok(quoteSubmit.indexOf('window.__sendLead(', consentAcceptedAt) > consentAcceptedAt);
+  assert.ok(quoteSubmit.indexOf('openDrawer();', consentAcceptedAt) > consentAcceptedAt);
+  assert.ok(quoteSubmit.indexOf('currentKpHead =', consentAcceptedAt) > consentAcceptedAt);
   assert.match(kp, /trustedHeadSource/);
   assert.match(kp, /postParent\(\{ kpReady: true \}\)/);
   assert.match(cart, /id="kpdLeadStatus"[^>]*aria-live="polite"/);

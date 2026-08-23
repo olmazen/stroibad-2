@@ -91,9 +91,14 @@ test('MAX is a disabled branded placeholder until its URL is configured', async 
 
 test('lead forms require explicit consent and only call the same-origin API', async () => {
   const source = await read('assets/js/leads.js');
+  const contract = JSON.parse(await read('config/site-contract.json'));
   assert.match(source, /data-lead-consent/);
   assert.match(source, /CONSENT_REQUIRED/);
   assert.match(source, /\/api\/leads\//);
+  assert.match(source, /\/api\/leads\/status\//);
+  assert.match(source, /lockAllForms\(\)/);
+  assert.equal(contract.leadDelivery.collectionEnabledDefault, false);
+  assert.equal(contract.leadDelivery.statusEndpoint, '/api/leads/status/');
   assert.match(source, /credentials:\s*['"]same-origin['"]/);
   assert.doesNotMatch(source, /formsubmit|tgRelay|script\.google\.com/i);
 });
