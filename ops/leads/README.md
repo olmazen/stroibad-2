@@ -58,4 +58,6 @@ Suggested cron after `health` passes:
 
 The retention command itself appends a mode-`0600` `lifecycle.log` with only
 timestamps/counts, not lead fields. Review it when preparing the destruction
-register and rotate it yearly.
+register and rotate it yearly. Backups use the SQLite online-backup API rather
+than `VACUUM INTO`, so the verified procedure also works with REG.RU SQLite
+3.26 while preserving a consistent snapshot of the WAL database.

@@ -232,9 +232,11 @@ preflight() {
   "$egoe_php_command" -r '
     exit(PHP_VERSION_ID >= 80200
       && extension_loaded("pdo_sqlite")
+      && extension_loaded("sqlite3")
+      && method_exists("SQLite3", "backup")
       && extension_loaded("mbstring")
       && extension_loaded("curl") ? 0 : 1);
-  ' || die "PHP CLI 8.2+ with pdo_sqlite, mbstring and curl is required"
+  ' || die "PHP CLI 8.2+ with pdo_sqlite, sqlite3 online backup, mbstring and curl is required"
   [ -w "$deploy_root" ] || die "Deploy root is not writable"
   validate_owned_mode "$deploy_root" directory "Deploy root"
   validate_owned_mode "$deploy_root/state/site-hostname" file "Site-hostname marker"

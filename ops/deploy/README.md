@@ -55,7 +55,7 @@ Keep the deployment root outside the existing `/www/egoe-life.ru` directory unti
 
 A reviewed release contains PHP application files below `api/leads/`; they remain immutable files in `dist/`, are covered by the same per-file SHA-256 manifest, and receive `php -l` plus a real SQLite health check before activation. Persistent files such as `.env`, `api/config.php`, `api/config/`, `api/state/`, `api/storage/`, and `api/runtime/` are rejected by the artifact verifier. The application resolves its generated `0600` configuration, SQLite, backups and runtime state from `<REG_DEPLOY_ROOT>/shared/leads/` outside the document root.
 
-The server must provide `tar`, `sha256sum`, CLI PHP 8.2 or newer with `pdo_sqlite`, `mbstring` and `curl`, plus `find` and `flock`. `flock` serializes deploy and rollback operations on the host in addition to the GitHub Actions concurrency group. The RKN release refuses activation when backend health fails or any external relay is enabled.
+The server must provide `tar`, `sha256sum`, CLI PHP 8.2 or newer with `pdo_sqlite`, `sqlite3` online-backup support, `mbstring` and `curl`, plus `find` and `flock`. `flock` serializes deploy and rollback operations on the host in addition to the GitHub Actions concurrency group. The RKN release refuses activation when backend health fails or any external relay is enabled.
 
 The deployment root, `state/`, state markers and an optional `collection-approved` marker must be owned by the deployment account and must not be group- or world-writable. Bootstrap creates its state and production marker with mode `0600`; the preserved legacy parent uses mode `0700`. A path of the wrong type, a symlink marker or an ownership/mode mismatch fails closed.
 

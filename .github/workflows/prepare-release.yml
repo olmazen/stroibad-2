@@ -50,7 +50,7 @@ jobs:
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.2'
-          extensions: pdo_sqlite, mbstring, curl
+          extensions: pdo_sqlite, sqlite3, mbstring, curl
           coverage: none
 
       - name: Install locked dependencies

@@ -264,6 +264,8 @@ jobs:
           php -r '
             exit(PHP_VERSION_ID >= 80200
               && extension_loaded("pdo_sqlite")
+              && extension_loaded("sqlite3")
+              && method_exists("SQLite3", "backup")
               && extension_loaded("mbstring")
               && extension_loaded("curl") ? 0 : 1);
           '
