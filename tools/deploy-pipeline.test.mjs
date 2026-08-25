@@ -513,6 +513,8 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(production, /test -L "\$deploy_root\/current"/);
   assert.match(production, /PHP_VERSION_ID >= 80200/);
   assert.match(production, /extension_loaded\("pdo_sqlite"\)/);
+  assert.match(production, /extension_loaded\("sqlite3"\)/);
+  assert.match(production, /method_exists\("SQLite3", "backup"\)/);
   assert.match(production, /api\/leads\//);
   assert.match(production, /api\/leads\/status\//);
   assert.match(production, /COLLECTION_DISABLED/);
@@ -532,6 +534,8 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(remote, /Deployment lock must not be a symlink/);
   assert.match(remote, /PHP_VERSION_ID >= 80200/);
   assert.match(remote, /extension_loaded\("pdo_sqlite"\)/);
+  assert.match(remote, /extension_loaded\("sqlite3"\)/);
+  assert.match(remote, /method_exists\("SQLite3", "backup"\)/);
   assert.match(remote, /lead_cli/);
   assert.match(remote, /relayEnabled/);
   assert.match(remote, /collectionEnabled/);

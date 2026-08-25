@@ -82,6 +82,9 @@ function initialize(): void
 
 function health(): void
 {
+    if (!extension_loaded('sqlite3') || !class_exists(SQLite3::class) || !method_exists(SQLite3::class, 'backup')) {
+        fail('sqlite3 online backup support is unavailable');
+    }
     [$root, $settings, $pdo] = loadRuntime();
     $directory = Runtime::sharedDirectory($root);
     if (!is_writable($directory)) {
@@ -151,7 +154,7 @@ SQL);
     ) . "\n";
 }
 
-function backup(string $root, PDO $pdo): string
+function backup(string $root): string
 {
     $directory = Runtime::sharedDirectory($root) . '/backups';
     if (!is_dir($directory) && !mkdir($directory, 0700, false) && !is_dir($directory)) {
@@ -162,7 +165,44 @@ function backup(string $root, PDO $pdo): string
     }
     @chmod($directory, 0700);
     $path = $directory . '/leads-' . gmdate('Ymd-His') . '-' . bin2hex(random_bytes(4)) . '.sqlite3';
-    $pdo->exec('VACUUM INTO ' . $pdo->quote($path));
+    $sourcePath = Runtime::sharedDirectory($root) . '/leads.sqlite3';
+    if (!is_file($sourcePath) || is_link($sourcePath)) {
+        fail('Lead database is unavailable for backup');
+    }
+    if (!extension_loaded('sqlite3') || !class_exists(SQLite3::class) || !method_exists(SQLite3::class, 'backup')) {
+        fail('sqlite3 online backup support is unavailable');
+    }
+
+    $source = null;
+    $destination = null;
+    $backupError = null;
+    try {
+        $source = new SQLite3($sourcePath, SQLITE3_OPEN_READONLY);
+        $destination = new SQLite3($path, SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
+        $source->enableExceptions(true);
+        $destination->enableExceptions(true);
+        $source->busyTimeout(5000);
+        $destination->busyTimeout(5000);
+        if (!$source->backup($destination)) {
+            throw new RuntimeException('SQLite online backup returned false');
+        }
+        if ($destination->querySingle('PRAGMA quick_check') !== 'ok') {
+            throw new RuntimeException('SQLite backup integrity check failed');
+        }
+    } catch (Throwable $error) {
+        $backupError = $error->getMessage();
+    } finally {
+        if ($destination instanceof SQLite3) {
+            $destination->close();
+        }
+        if ($source instanceof SQLite3) {
+            $source->close();
+        }
+    }
+    if ($backupError !== null) {
+        @unlink($path);
+        fail('Unable to create consistent SQLite backup: ' . $backupError);
+    }
     @chmod($path, 0600);
     $permissions = fileperms($path);
     if ($permissions === false || ($permissions & 0777) !== 0600 || is_link($path) || !is_file($path)) {
@@ -175,7 +215,7 @@ function backup(string $root, PDO $pdo): string
 
 function retention(string $root, array $settings, PDO $pdo): void
 {
-    backup($root, $pdo);
+    backup($root);
     $cutoff = (new DateTimeImmutable('now', new DateTimeZone('UTC')))
         ->modify('-' . (int)$settings['retention_days'] . ' days')
         ->format('Y-m-d\TH:i:s.v\Z');
@@ -269,7 +309,7 @@ try {
             recentLeads($pdo, (string)($argv[2] ?? '20'));
             break;
         case 'backup':
-            backup($root, $pdo);
+            backup($root);
             break;
         case 'retention':
             retention($root, $settings, $pdo);

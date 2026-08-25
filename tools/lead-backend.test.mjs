@@ -130,7 +130,7 @@ function httpRequest(url, { method = 'GET', headers = {}, body = null } = {}) {
 }
 
 test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and retain safely', async (t) => {
-  execFileSync(PHP, ['-r', "exit(PHP_VERSION_ID >= 80200 && extension_loaded('pdo_sqlite') && extension_loaded('mbstring') && extension_loaded('curl') ? 0 : 1);"], { stdio: 'ignore' });
+  execFileSync(PHP, ['-r', "exit(PHP_VERSION_ID >= 80200 && extension_loaded('pdo_sqlite') && extension_loaded('sqlite3') && method_exists('SQLite3', 'backup') && extension_loaded('mbstring') && extension_loaded('curl') ? 0 : 1);"], { stdio: 'ignore' });
   const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'egoe-leads-'));
   t.after(async () => fs.rm(temporary, { recursive: true, force: true }));
   const deployRoot = path.join(temporary, 'deploy');
@@ -486,6 +486,11 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   const generatedBackups = (await fs.readdir(backupDirectory)).filter((name) => /^leads-\d{8}-\d{6}-[0-9a-f]{8}\.sqlite3$/.test(name));
   assert.ok(generatedBackups.length >= 1);
   assert.equal((await fs.stat(path.join(backupDirectory, generatedBackups.at(-1)))).mode & 0o777, 0o600);
+  assert.doesNotMatch(
+    await fs.readFile(cli, 'utf8'),
+    /VACUUM\s+INTO/i,
+    'backup must remain compatible with REG.RU SQLite 3.26'
+  );
   const lifecycleLog = path.join(deployRoot, 'shared/leads/lifecycle.log');
   assert.match(await fs.readFile(lifecycleLog, 'utf8'), /DELETED leads=\d+ evidence=\d+ backups=\d+/);
   assert.equal((await fs.stat(lifecycleLog)).mode & 0o077, 0);
