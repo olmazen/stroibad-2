@@ -63,12 +63,24 @@ jobs:
           include-hidden-files: true
           retention-days: 30
           compression-level: 6
+      - name: Prepare static Pages preview
+        shell: bash
+        run: |
+          preview_dir="$RUNNER_TEMP/pages-preview"
+          mkdir "$preview_dir"
+          cp -a dist/. "$preview_dir/"
+          find "$preview_dir" -type f -name '*.php' -delete
+          if find "$preview_dir" -type f -name '*.php' -print -quit | grep -q .; then
+            echo "::error::The public Pages preview still contains executable server source"
+            exit 1
+          fi
+          echo "EGOE_PAGES_PREVIEW=$preview_dir" >> "$GITHUB_ENV"
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
-          path: dist/
+          path: ${{ env.EGOE_PAGES_PREVIEW }}/
       - name: Record immutable staging artifact
         shell: bash
         run: |
