@@ -27,6 +27,7 @@ final class Runtime
 {
     private const SITE_MARKER = 'egoe-life.ru';
     private const COLLECTION_MARKER = 'collection-approved';
+    private const RELAY_MARKER = 'relay-approved';
 
     public static function deployRoot(?string $start = null): string
     {
@@ -94,8 +95,18 @@ final class Runtime
 
     public static function collectionApproved(string $deployRoot): bool
     {
+        return self::approvedMarker($deployRoot, self::COLLECTION_MARKER);
+    }
+
+    public static function relayApproved(string $deployRoot): bool
+    {
+        return self::approvedMarker($deployRoot, self::RELAY_MARKER, 0600);
+    }
+
+    private static function approvedMarker(string $deployRoot, string $markerName, ?int $requiredPermissions = null): bool
+    {
         $stateDirectory = $deployRoot . '/state';
-        $marker = $stateDirectory . '/' . self::COLLECTION_MARKER;
+        $marker = $stateDirectory . '/' . $markerName;
         if (!is_dir($stateDirectory) || is_link($stateDirectory) || !is_file($marker) || is_link($marker)) {
             return false;
         }
@@ -117,6 +128,7 @@ final class Runtime
             || ($markerMetadata['uid'] ?? null) !== $owner
             || ($stateMode & 0022) !== 0
             || ($markerMode & 0022) !== 0
+            || ($requiredPermissions !== null && ($markerMode & 0777) !== $requiredPermissions)
         ) {
             return false;
         }
@@ -137,6 +149,20 @@ final class Runtime
 
 final class Settings
 {
+    public const CURRENT_CONSENT_VERSION = '2026-08-27';
+    private const LEGACY_CONSENT_VERSION = '2026-08-23';
+
+    public static function isCurrentConsentVersion(string $version): bool
+    {
+        return hash_equals(self::CURRENT_CONSENT_VERSION, $version);
+    }
+
+    public static function acceptsConsentVersion(string $version): bool
+    {
+        return self::isCurrentConsentVersion($version)
+            || hash_equals(self::LEGACY_CONSENT_VERSION, $version);
+    }
+
     /** @return array<string,mixed> */
     public static function load(string $deployRoot): array
     {
@@ -158,7 +184,7 @@ final class Settings
             'site_host' => 'www.egoe-life.ru',
             'allowed_hosts' => ['www.egoe-life.ru', 'egoe-life.ru'],
             'collection_enabled' => false,
-            'consent_version' => '2026-08-23',
+            'consent_version' => self::CURRENT_CONSENT_VERSION,
             'minimum_elapsed_ms' => 600,
             'rate_limit' => ['max_requests' => 5, 'window_seconds' => 600],
             'retention_days' => 365,
@@ -174,9 +200,15 @@ final class Settings
                 'cross_border_confirmed' => false,
                 'timeout_seconds' => 3,
                 'ca_file' => '',
+                'url_sha256' => '',
+                'require_json_ok' => true,
             ],
         ];
         $settings = array_replace_recursive($defaults, $loaded);
+
+        if (!is_string($settings['consent_version']) || !self::acceptsConsentVersion($settings['consent_version'])) {
+            throw new RuntimeException('consent_version is outside the approved transition allowlist');
+        }
 
         if (!is_bool($settings['collection_enabled'])) {
             throw new RuntimeException('collection_enabled must be boolean');
@@ -230,6 +262,7 @@ final class Settings
         if (!is_array($relay) || !is_bool($relay['enabled'] ?? null)) {
             throw new RuntimeException('Invalid relay configuration');
         }
+        $relay['enabled'] = $relay['enabled'] === true && Runtime::relayApproved($deployRoot);
         if ($relay['enabled']) {
             if (!is_int($relay['timeout_seconds'] ?? null) || $relay['timeout_seconds'] < 1 || $relay['timeout_seconds'] > 10) {
                 throw new RuntimeException('Invalid relay timeout_seconds');
@@ -237,6 +270,18 @@ final class Settings
             $url = $relay['url'] ?? null;
             if (!is_string($url) || !preg_match('~^https://[^\s]+$~D', $url)) {
                 throw new RuntimeException('Enabled relay requires an HTTPS server URL');
+            }
+            $urlSha256 = $relay['url_sha256'] ?? null;
+            if (!is_string($urlSha256) || preg_match('/\A[0-9a-f]{64}\z/i', $urlSha256) !== 1) {
+                throw new RuntimeException('Enabled relay requires an approved URL SHA-256');
+            }
+            $urlSha256 = strtolower($urlSha256);
+            if (!hash_equals($urlSha256, hash('sha256', $url))) {
+                throw new RuntimeException('Relay URL does not match its approved SHA-256');
+            }
+            $relay['url_sha256'] = $urlSha256;
+            if (!is_bool($relay['require_json_ok'] ?? null)) {
+                throw new RuntimeException('Invalid relay require_json_ok flag');
             }
             $caFile = $relay['ca_file'] ?? '';
             if (!is_string($caFile)) {
@@ -248,7 +293,6 @@ final class Settings
                     throw new RuntimeException('Relay CA file is unavailable');
                 }
                 $relay['ca_file'] = $realCa;
-                $settings['relay'] = $relay;
             }
             $mode = $relay['mode'] ?? null;
             if (!in_array($mode, ['signal', 'technical', 'full'], true)) {
@@ -267,6 +311,7 @@ final class Settings
                 throw new RuntimeException('Full relay requires explicit cross-border approval flags');
             }
         }
+        $settings['relay'] = $relay;
 
         return $settings;
     }
@@ -484,7 +529,7 @@ final class Validator
      */
     public static function payload(array $input, array $settings): array
     {
-        self::onlyKeys($input, ['schemaVersion', 'leadId', 'formId', 'tag', 'createdAt', 'consent', 'page', 'spamCheck', 'fields'], 'payload');
+        self::onlyKeys($input, ['schemaVersion', 'leadId', 'formId', 'tag', 'createdAt', 'consent', 'page', 'spamCheck', 'fields', 'journey'], 'payload');
         if (($input['schemaVersion'] ?? null) !== 1) {
             throw new HttpFailure(422, 'SCHEMA_INVALID', 'Неподдерживаемая версия заявки.');
         }
@@ -512,7 +557,7 @@ final class Validator
             throw new HttpFailure(422, 'CONSENT_REQUIRED', 'Необходимо согласие на обработку персональных данных.');
         }
         $consentVersion = self::text($consent['version'] ?? null, 40, 'consent.version');
-        if (!hash_equals((string)$settings['consent_version'], $consentVersion)) {
+        if (!Settings::acceptsConsentVersion($consentVersion)) {
             throw new HttpFailure(422, 'CONSENT_VERSION_INVALID', 'Версия согласия устарела. Обновите страницу.');
         }
         $acceptedAt = self::timestamp($consent['acceptedAt'] ?? null, 'consent.acceptedAt');
@@ -530,6 +575,14 @@ final class Validator
         $pagePath = self::sameSitePath(self::text($page['url'] ?? null, 1500, 'page.url'), $settings);
         $pageTitle = self::optionalText($page['title'] ?? '', 300, 'page.title');
         $pageReferrer = self::minimizedReferrer(self::optionalText($page['referrer'] ?? '', 1500, 'page.referrer'), $settings);
+        $journey = self::journey($input['journey'] ?? [], $createdTime);
+        if (!Settings::isCurrentConsentVersion($consentVersion) && $journey !== []) {
+            throw new HttpFailure(
+                422,
+                'JOURNEY_CONSENT_REQUIRED',
+                'История просмотра недоступна для этой версии согласия. Обновите страницу.'
+            );
+        }
 
         $spam = self::object($input['spamCheck'] ?? null, 'spamCheck');
         self::onlyKeys($spam, ['website', 'elapsedMs'], 'spamCheck');
@@ -555,25 +608,27 @@ final class Validator
                 throw new HttpFailure(422, 'FIELDS_INVALID', 'Поля заявки должны содержать текст.');
             }
             $cleanKey = self::text($key, 100, 'field name');
-            $cleanValue = self::text($value, 2000, 'field value');
+            $cleanValue = self::optionalText($value, 2000, 'field value');
             $totalBytes += strlen($cleanKey) + strlen($cleanValue);
             if ($totalBytes > 24000) {
                 throw new HttpFailure(413, 'FIELDS_TOO_LARGE', 'Данные заявки слишком большие.');
             }
             if (preg_match('/тел|phone/iu', $cleanKey) === 1) {
-                $digits = preg_replace('/\D+/', '', $cleanValue) ?? '';
-                if (!(strlen($digits) === 10 || (strlen($digits) === 11 && ($digits[0] === '7' || $digits[0] === '8')))) {
-                    throw new HttpFailure(422, 'CONTACT_INVALID', 'Укажите корректный телефон.');
+                if ($cleanValue !== '') {
+                    $digits = preg_replace('/\D+/', '', $cleanValue) ?? '';
+                    if (!(strlen($digits) === 10 || (strlen($digits) === 11 && ($digits[0] === '7' || $digits[0] === '8')))) {
+                        throw new HttpFailure(422, 'CONTACT_INVALID', 'Укажите корректный телефон.');
+                    }
+                    if (strlen($digits) === 10) {
+                        $digits = '7' . $digits;
+                    } elseif ($digits[0] === '8') {
+                        $digits = '7' . substr($digits, 1);
+                    }
+                    $cleanValue = '+' . $digits;
+                    $hasPhone = true;
                 }
-                if (strlen($digits) === 10) {
-                    $digits = '7' . $digits;
-                } elseif ($digits[0] === '8') {
-                    $digits = '7' . substr($digits, 1);
-                }
-                $cleanValue = '+' . $digits;
-                $hasPhone = true;
             }
-            if (preg_match('/почт|e-?mail/iu', $cleanKey) === 1) {
+            if ($cleanValue !== '' && preg_match('/почт|e-?mail/iu', $cleanKey) === 1) {
                 if (filter_var($cleanValue, FILTER_VALIDATE_EMAIL) === false) {
                     throw new HttpFailure(422, 'CONTACT_INVALID', 'Укажите корректную электронную почту.');
                 }
@@ -601,6 +656,7 @@ final class Validator
                 'title' => $pageTitle,
                 'referrer' => $pageReferrer,
             ],
+            'journey' => $journey,
             'spamCheck' => ['website' => $website, 'elapsedMs' => $elapsedMs],
             'fields' => $normalizedFields,
         ];
@@ -642,6 +698,57 @@ final class Validator
             throw new HttpFailure(422, 'FIELD_INVALID', "Некорректное поле {$name}.");
         }
         return trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $value) ?? '');
+    }
+
+    /** @return list<array{path:string,title:string,viewedAt:string}> */
+    private static function journey(mixed $value, DateTimeImmutable $createdTime): array
+    {
+        if (!is_array($value) || !array_is_list($value) || count($value) > 20) {
+            throw new HttpFailure(422, 'JOURNEY_INVALID', 'Некорректная история просмотра. Обновите страницу.');
+        }
+        $normalized = [];
+        $paths = [];
+        $previousTimestamp = null;
+        foreach ($value as $index => $entryValue) {
+            $entry = self::object($entryValue, "journey.{$index}");
+            self::onlyKeys($entry, ['path', 'title', 'viewedAt'], "journey.{$index}");
+            $path = self::journeyPath($entry['path'] ?? null, "journey.{$index}.path");
+            if (isset($paths[$path])) {
+                throw new HttpFailure(422, 'JOURNEY_INVALID', 'История просмотра содержит повторы. Обновите страницу.');
+            }
+            $paths[$path] = true;
+            $title = self::optionalText($entry['title'] ?? '', 160, "journey.{$index}.title");
+            $title = preg_replace('/\s+/u', ' ', $title) ?? '';
+            $viewedAt = self::timestamp($entry['viewedAt'] ?? null, "journey.{$index}.viewedAt");
+            $viewedTime = new DateTimeImmutable($viewedAt);
+            if ($viewedTime->getTimestamp() > $createdTime->getTimestamp() + 600
+                || $viewedTime->getTimestamp() < $createdTime->getTimestamp() - 86400
+                || ($previousTimestamp !== null && $viewedTime->getTimestamp() < $previousTimestamp)
+            ) {
+                throw new HttpFailure(422, 'JOURNEY_INVALID', 'Время истории просмотра недопустимо. Обновите страницу.');
+            }
+            $previousTimestamp = $viewedTime->getTimestamp();
+            $normalized[] = ['path' => $path, 'title' => $title, 'viewedAt' => $viewedAt];
+        }
+        return $normalized;
+    }
+
+    private static function journeyPath(mixed $value, string $name): string
+    {
+        $path = self::text($value, 500, $name);
+        if (!str_starts_with($path, '/')
+            || str_starts_with($path, '//')
+            || str_contains($path, '?')
+            || str_contains($path, '#')
+            || preg_match('/[\r\n]/u', $path) === 1
+        ) {
+            throw new HttpFailure(422, 'JOURNEY_INVALID', 'История просмотра содержит некорректный адрес.');
+        }
+        $normalized = '/' . ltrim((string)preg_replace('~/+~', '/', $path), '/');
+        if (!hash_equals($normalized, $path)) {
+            throw new HttpFailure(422, 'JOURNEY_INVALID', 'История просмотра содержит некорректный адрес.');
+        }
+        return $path;
     }
 
     private static function timestamp(mixed $value, string $name): string
@@ -705,6 +812,272 @@ final class Validator
     }
 }
 
+final class CustomerIdentity
+{
+    private const KEY_DOMAIN = "egoe/customer-history-key/v1";
+    private const VALUE_DOMAIN = "egoe/customer-history-identity/v1";
+
+    /** @param array<string,mixed> $fields
+     *  @return array<string,string> fingerprint => identity kind
+     */
+    public static function fingerprints(array $fields, string $masterKey): array
+    {
+        if (strlen($masterKey) < 32) {
+            throw new RuntimeException('Customer history hash key is unavailable');
+        }
+        $derivedKey = hash_hmac('sha256', self::KEY_DOMAIN, $masterKey, true);
+        $fingerprints = [];
+        foreach ($fields as $fieldName => $fieldValue) {
+            if (!is_string($fieldName) || !is_string($fieldValue) || trim($fieldValue) === '') {
+                continue;
+            }
+            $kind = null;
+            $normalized = null;
+            if (preg_match('/тел|phone/iu', $fieldName) === 1) {
+                $kind = 'phone';
+                $normalized = self::phone($fieldValue);
+            } elseif (preg_match('/почт|e-?mail/iu', $fieldName) === 1) {
+                $kind = 'email';
+                $normalized = self::email($fieldValue);
+            }
+            if ($kind === null || $normalized === null) {
+                continue;
+            }
+            $message = self::VALUE_DOMAIN . "\0" . $kind . "\0" . $normalized;
+            $fingerprints[$kind . ':' . hash_hmac('sha256', $message, $derivedKey)] = $kind;
+        }
+        ksort($fingerprints, SORT_STRING);
+        return $fingerprints;
+    }
+
+    private static function phone(string $value): ?string
+    {
+        $digits = preg_replace('/\D+/', '', $value) ?? '';
+        if (strlen($digits) === 10) {
+            $digits = '7' . $digits;
+        } elseif (strlen($digits) === 11 && $digits[0] === '8') {
+            $digits = '7' . substr($digits, 1);
+        }
+        return strlen($digits) === 11 && $digits[0] === '7' ? '+' . $digits : null;
+    }
+
+    private static function email(string $value): ?string
+    {
+        $normalized = mb_strtolower(trim($value), 'UTF-8');
+        return filter_var($normalized, FILTER_VALIDATE_EMAIL) !== false ? $normalized : null;
+    }
+}
+
+final class CustomerHistory
+{
+    public const SCAN_LIMIT = 5000;
+    public const ENTRY_LIMIT = 50;
+    private const UUID = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/Di';
+
+    /** @return array<string,mixed> */
+    public static function forLead(PDO $pdo, string $leadId, string $masterKey): array
+    {
+        $leadId = strtolower(trim($leadId));
+        if (preg_match(self::UUID, $leadId) !== 1) {
+            throw new RuntimeException('Lead ID must be a UUID');
+        }
+        $targetQuery = $pdo->prepare(<<<'SQL'
+SELECT lead_id, received_at, form_id, page_path, fields_json, payload_json
+FROM leads
+WHERE lead_id = :lead_id
+SQL);
+        $targetQuery->execute([':lead_id' => $leadId]);
+        $target = $targetQuery->fetch();
+        if (!is_array($target)) {
+            throw new RuntimeException('Lead not found');
+        }
+        $targetFields = self::decodeFields((string)$target['fields_json']);
+        $targetFingerprints = CustomerIdentity::fingerprints($targetFields, $masterKey);
+        if ($targetFingerprints === []) {
+            throw new RuntimeException('Lead has no usable customer identity');
+        }
+
+        $totalRetained = (int)$pdo->query('SELECT count(*) FROM leads')->fetchColumn();
+        $matches = [self::entry($target, $targetFields)];
+        $matchedKinds = [];
+        $scanned = 1;
+
+        $scan = $pdo->prepare(<<<'SQL'
+SELECT lead_id, received_at, form_id, page_path, fields_json, payload_json
+FROM leads
+WHERE lead_id <> :lead_id
+ORDER BY received_at DESC, lead_id DESC
+LIMIT :limit
+SQL);
+        $scan->bindValue(':lead_id', $leadId, PDO::PARAM_STR);
+        $scan->bindValue(':limit', self::SCAN_LIMIT - 1, PDO::PARAM_INT);
+        $scan->execute();
+        while (($row = $scan->fetch()) !== false) {
+            $scanned += 1;
+            try {
+                $fields = self::decodeFields((string)$row['fields_json']);
+            } catch (RuntimeException) {
+                continue;
+            }
+            $candidateFingerprints = CustomerIdentity::fingerprints($fields, $masterKey);
+            $shared = array_intersect_key($candidateFingerprints, $targetFingerprints);
+            if ($shared === []) {
+                continue;
+            }
+            foreach ($shared as $kind) {
+                $matchedKinds[$kind] = true;
+            }
+            $matches[] = self::entry($row, $fields);
+        }
+
+        usort($matches, static function (array $left, array $right): int {
+            return [$left['receivedAt'], $left['leadId']] <=> [$right['receivedAt'], $right['leadId']];
+        });
+        $matchingLeadCount = count($matches);
+        $returned = array_slice($matches, -self::ENTRY_LIMIT);
+        $knownAmountRub = 0;
+        $quoteCount = 0;
+        foreach ($matches as $entry) {
+            if (is_int($entry['amountRub'])) {
+                $knownAmountRub += $entry['amountRub'];
+            }
+            if (is_string($entry['kpNumber'])) {
+                $quoteCount += 1;
+            }
+        }
+        ksort($matchedKinds, SORT_STRING);
+
+        return [
+            'leadId' => $leadId,
+            'limits' => ['scan' => self::SCAN_LIMIT, 'entries' => self::ENTRY_LIMIT],
+            'scan' => [
+                'retainedLeadCount' => $totalRetained,
+                'scannedLeadCount' => $scanned,
+                'truncated' => $totalRetained > $scanned,
+            ],
+            'summary' => [
+                'matchingLeadCount' => $matchingLeadCount,
+                'returnedLeadCount' => count($returned),
+                'entriesTruncated' => $matchingLeadCount > count($returned),
+                'matchedBy' => array_keys($matchedKinds),
+                'firstReceivedAt' => $matches[0]['receivedAt'],
+                'lastReceivedAt' => $matches[$matchingLeadCount - 1]['receivedAt'],
+                'quoteCount' => $quoteCount,
+                'knownAmountRub' => $knownAmountRub,
+            ],
+            'entries' => $returned,
+        ];
+    }
+
+    /** @return array<string,mixed> */
+    private static function decodeFields(string $json): array
+    {
+        try {
+            $fields = json_decode($json, true, 32, JSON_THROW_ON_ERROR);
+        } catch (JsonException $error) {
+            throw new RuntimeException('Lead fields are unreadable', 0, $error);
+        }
+        if (!is_array($fields) || array_is_list($fields)) {
+            throw new RuntimeException('Lead fields are unreadable');
+        }
+        return $fields;
+    }
+
+    /** @param array<string,mixed> $row
+     *  @param array<string,mixed> $fields
+     *  @return array{leadId:string,receivedAt:string,formId:string,pagePath:string,amountRub:?int,kpNumber:?string,viewed:list<array{path:string,title:string,viewedAt:string}>}
+     */
+    private static function entry(array $row, array $fields): array
+    {
+        [$amountRub, $kpNumber] = self::orderDetails($fields);
+        return [
+            'leadId' => (string)$row['lead_id'],
+            'receivedAt' => (string)$row['received_at'],
+            'formId' => (string)$row['form_id'],
+            'pagePath' => (string)$row['page_path'],
+            'amountRub' => $amountRub,
+            'kpNumber' => $kpNumber,
+            'viewed' => self::safeJourney((string)$row['payload_json']),
+        ];
+    }
+
+    /** @param array<string,mixed> $fields
+     *  @return array{0:?int,1:?string}
+     */
+    private static function orderDetails(array $fields): array
+    {
+        $amountRub = null;
+        $kpNumber = null;
+        foreach ($fields as $name => $value) {
+            if (!is_string($name) || !is_string($value)) {
+                continue;
+            }
+            $key = mb_strtolower(trim((string)preg_replace('/\s+/u', ' ', $name)), 'UTF-8');
+            if ($amountRub === null && preg_match('/^(?:итого|сумма(?: (?:заказа|кп))?|total)$/uD', $key) === 1) {
+                $amountRub = self::rubles($value);
+            }
+            if ($kpNumber === null && preg_match('/^(?:№ ?кп|номер кп|кп)$/uD', $key) === 1) {
+                $candidate = trim((string)preg_replace('/[\x00-\x1F\x7F]/u', '', $value));
+                if ($candidate !== '' && mb_strlen($candidate, 'UTF-8') <= 100) {
+                    $kpNumber = $candidate;
+                }
+            }
+        }
+        return [$amountRub, $kpNumber];
+    }
+
+    private static function rubles(string $value): ?int
+    {
+        if (preg_match('/^\s*(\d[\d\s\x{00A0}]*)(?:[,.]00)?\s*(?:₽|руб\.?)?\s*$/uD', $value, $match) !== 1) {
+            return null;
+        }
+        $digits = preg_replace('/\D+/', '', $match[1]) ?? '';
+        if ($digits === '' || strlen($digits) > 12) {
+            return null;
+        }
+        $amount = (int)$digits;
+        return $amount <= 100000000000 ? $amount : null;
+    }
+
+    /** @return list<array{path:string,title:string,viewedAt:string}> */
+    private static function safeJourney(string $payloadJson): array
+    {
+        try {
+            $payload = json_decode($payloadJson, true, 32, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return [];
+        }
+        $journey = is_array($payload) ? ($payload['journey'] ?? null) : null;
+        if (!is_array($journey) || !array_is_list($journey)) {
+            return [];
+        }
+        $safe = [];
+        foreach (array_slice($journey, 0, 20) as $entry) {
+            if (!is_array($entry)
+                || array_is_list($entry)
+                || !is_string($entry['path'] ?? null)
+                || !is_string($entry['title'] ?? null)
+                || !is_string($entry['viewedAt'] ?? null)
+                || !str_starts_with($entry['path'], '/')
+                || str_starts_with($entry['path'], '//')
+                || str_contains($entry['path'], '?')
+                || str_contains($entry['path'], '#')
+                || mb_strlen($entry['path'], 'UTF-8') > 500
+                || mb_strlen($entry['title'], 'UTF-8') > 160
+                || preg_match('/^\d{4}-\d{2}-\d{2}T/uD', $entry['viewedAt']) !== 1
+            ) {
+                continue;
+            }
+            $safe[] = [
+                'path' => $entry['path'],
+                'title' => preg_replace('/\s+/u', ' ', trim($entry['title'])) ?? '',
+                'viewedAt' => $entry['viewedAt'],
+            ];
+        }
+        return $safe;
+    }
+}
+
 final class LeadStore
 {
     /** @param array<string,mixed> $lead
@@ -714,7 +1087,7 @@ final class LeadStore
     public static function accept(PDO $pdo, array $lead, array $settings, string $ipHash): array
     {
         $payloadJson = self::json($lead);
-        $payloadHash = hash('sha256', self::json(self::canonicalize([
+        $hashPayload = [
             'formId' => $lead['formId'],
             'tag' => $lead['tag'],
             'page' => $lead['page'],
@@ -723,7 +1096,12 @@ final class LeadStore
                 'documentUrl' => $lead['consent']['documentUrl'],
             ],
             'fields' => $lead['fields'],
-        ])));
+        ];
+        // Preserve the pre-journey idempotency hash for cached clients retrying an accepted request.
+        if ($lead['journey'] !== []) {
+            $hashPayload['journey'] = $lead['journey'];
+        }
+        $payloadHash = hash('sha256', self::json(self::canonicalize($hashPayload)));
         $pdo->exec('BEGIN IMMEDIATE');
         try {
             $existing = $pdo->prepare('SELECT payload_hash FROM leads WHERE lead_id = :lead_id');
@@ -787,7 +1165,9 @@ SQL);
             ]);
 
             $outboxId = null;
-            if (($settings['relay']['enabled'] ?? false) === true) {
+            if (($settings['relay']['enabled'] ?? false) === true
+                && Settings::isCurrentConsentVersion((string)($lead['consent']['version'] ?? ''))
+            ) {
                 $relayPayload = Relay::payload($lead, $settings['relay']);
                 $outbox = $pdo->prepare(<<<'SQL'
 INSERT INTO outbox (lead_id, mode, payload_json, next_attempt_at, created_at)
@@ -887,14 +1267,16 @@ final class Relay
         if ($mode !== 'full') {
             throw new RuntimeException('Unsupported relay mode');
         }
-        return [
-            '_subject' => 'Новая заявка на сайте EGOE',
-            'ID заявки' => $lead['leadId'],
-            'Форма' => $lead['formId'],
-            'Страница' => $lead['page']['path'],
-            'Время' => $lead['createdAt'],
-            'Данные' => $lead['fields'],
+        $payload = [
+            '_subject' => 'Заявка с сайта EGOE — ' . $lead['tag'],
+            '_source' => $lead['page']['path'],
         ];
+        foreach ($lead['fields'] as $key => $value) {
+            if (!array_key_exists($key, $payload)) {
+                $payload[$key] = $value;
+            }
+        }
+        return $payload;
     }
 
     /** @param array<string,mixed> $settings
@@ -905,6 +1287,12 @@ final class Relay
         if (($settings['relay']['enabled'] ?? false) !== true) {
             return ['sent' => 0, 'failed' => 0];
         }
+        $pdo->prepare(<<<'SQL'
+DELETE FROM outbox
+WHERE lead_id IN (
+  SELECT lead_id FROM leads WHERE consent_version <> :current_consent_version
+)
+SQL)->execute([':current_consent_version' => Settings::CURRENT_CONSENT_VERSION]);
         if (!extension_loaded('curl')) {
             throw new RuntimeException('curl extension is unavailable');
         }
@@ -912,13 +1300,13 @@ final class Relay
         $now = Runtime::utcNow();
         $pdo->prepare("UPDATE outbox SET status = 'failed', last_error = 'stale_claim' WHERE status = 'sending' AND next_attempt_at <= :now")
             ->execute([':now' => $now]);
-        $sql = "SELECT id, payload_json, attempts FROM outbox WHERE status IN ('pending','failed') AND next_attempt_at <= :now";
-        $params = [':now' => $now];
+        $sql = "SELECT outbox.id, outbox.payload_json, outbox.attempts FROM outbox JOIN leads ON leads.lead_id = outbox.lead_id WHERE outbox.status IN ('pending','failed') AND outbox.next_attempt_at <= :now AND leads.consent_version = :current_consent_version";
+        $params = [':now' => $now, ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION];
         if ($onlyId !== null) {
-            $sql .= ' AND id = :id';
+            $sql .= ' AND outbox.id = :id';
             $params[':id'] = $onlyId;
         }
-        $sql .= ' ORDER BY id ASC LIMIT ' . $limit;
+        $sql .= ' ORDER BY outbox.id ASC LIMIT ' . $limit;
         $query = $pdo->prepare($sql);
         $query->execute($params);
         $rows = $query->fetchAll();
@@ -926,8 +1314,12 @@ final class Relay
         foreach ($rows as $row) {
             $id = (int)$row['id'];
             $lease = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->modify('+5 minutes')->format('Y-m-d\TH:i:s.v\Z');
-            $claim = $pdo->prepare("UPDATE outbox SET status = 'sending', attempts = attempts + 1, next_attempt_at = :lease WHERE id = :id AND status IN ('pending','failed')");
-            $claim->execute([':lease' => $lease, ':id' => $id]);
+            $claim = $pdo->prepare("UPDATE outbox SET status = 'sending', attempts = attempts + 1, next_attempt_at = :lease WHERE id = :id AND status IN ('pending','failed') AND EXISTS (SELECT 1 FROM leads WHERE leads.lead_id = outbox.lead_id AND leads.consent_version = :current_consent_version)");
+            $claim->execute([
+                ':lease' => $lease,
+                ':id' => $id,
+                ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
+            ]);
             if ($claim->rowCount() !== 1) {
                 continue;
             }
@@ -982,6 +1374,16 @@ final class Relay
         curl_close($handle);
         if ($response === false || $error !== 0 || $status < 200 || $status >= 300) {
             throw new RuntimeException('Relay delivery failed');
+        }
+        if (($relay['require_json_ok'] ?? true) === true) {
+            try {
+                $decoded = json_decode((string)$response, true, 8, JSON_THROW_ON_ERROR);
+            } catch (JsonException) {
+                throw new RuntimeException('Relay delivery failed');
+            }
+            if (!is_array($decoded) || ($decoded['ok'] ?? null) !== true) {
+                throw new RuntimeException('Relay delivery failed');
+            }
         }
     }
 }

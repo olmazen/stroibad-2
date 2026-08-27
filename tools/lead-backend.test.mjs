@@ -39,6 +39,10 @@ async function freePort() {
 
 function uuid() { return crypto.randomUUID(); }
 
+function sha256(value) {
+  return crypto.createHash('sha256').update(value, 'utf8').digest('hex');
+}
+
 function lead(overrides = {}) {
   const timestamp = new Date().toISOString();
   return {
@@ -49,7 +53,7 @@ function lead(overrides = {}) {
     createdAt: timestamp,
     consent: {
       accepted: true,
-      version: '2026-08-23',
+      version: '2026-08-27',
       acceptedAt: timestamp,
       documentUrl: 'https://www.egoe-life.ru/consent/'
     },
@@ -58,6 +62,10 @@ function lead(overrides = {}) {
       title: 'Тест',
       referrer: 'https://www.egoe-life.ru/source/?email=secret@example.com#fragment'
     },
+    journey: [
+      { path: '/catalog/parkovye-skameyki/', title: 'Парковые скамейки', viewedAt: timestamp },
+      { path: '/test/', title: 'Тест', viewedAt: timestamp }
+    ],
     spamCheck: { website: '', elapsedMs: 1500 },
     fields: { Имя: 'Анна', Телефон: '8 (927) 123-45-67' },
     ...overrides
@@ -69,7 +77,7 @@ function settings(overrides = {}) {
     site_host: 'www.egoe-life.ru',
     allowed_hosts: ['www.egoe-life.ru', 'egoe-life.ru'],
     collection_enabled: false,
-    consent_version: '2026-08-23',
+    consent_version: '2026-08-27',
     ip_hash_key: '0123456789abcdef'.repeat(4),
     minimum_elapsed_ms: 600,
     rate_limit: { max_requests: 20, window_seconds: 600 },
@@ -85,7 +93,9 @@ function settings(overrides = {}) {
       allow_full: false,
       cross_border_confirmed: false,
       timeout_seconds: 2,
-      ca_file: ''
+      ca_file: '',
+      url_sha256: '',
+      require_json_ok: true
     }
   };
   return { ...base, ...overrides, relay: { ...base.relay, ...(overrides.relay || {}) } };
@@ -159,10 +169,56 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   await assert.rejects(run(PHP, [cli, 'health'], { env }), (error) => String(error.stderr).includes('between 1 and 1095'));
   await writeConfig(deployRoot, settings({ retention_days: 30, consent_evidence_days: 90 }));
   assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).ok, true, 'shorter retention must remain configurable');
-  await writeConfig(deployRoot, settings({ relay: { enabled: true, url: 'https://example.invalid/', mode: 'signal' } }));
+
+  const approvedRelayUrl = 'https://example.invalid/relay';
+  const approvedSignalRelay = {
+    enabled: true,
+    url: approvedRelayUrl,
+    url_sha256: sha256(approvedRelayUrl),
+    mode: 'signal',
+    allow_signal: true,
+    cross_border_confirmed: true
+  };
+  await writeConfig(deployRoot, settings({ relay: approvedSignalRelay }));
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, false, 'config alone must not enable relay');
+  const relayApprovalMarker = path.join(deployRoot, 'state/relay-approved');
+  const relaySymlinkTarget = path.join(deployRoot, 'state/not-a-relay-approval');
+  await fs.writeFile(relaySymlinkTarget, 'egoe-life.ru');
+  await fs.symlink(relaySymlinkTarget, relayApprovalMarker);
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, false, 'symlinked relay approval marker must fail closed');
+  await fs.unlink(relayApprovalMarker);
+  await fs.writeFile(relayApprovalMarker, 'egoe-life.ru\n');
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, false, 'relay marker bytes must match exactly');
+  await fs.writeFile(relayApprovalMarker, 'egoe-life.ru');
+  await fs.chmod(relayApprovalMarker, 0o666);
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, false, 'group/world-writable relay marker must fail closed');
+  await fs.chmod(relayApprovalMarker, 0o644);
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, false, 'relay marker must use exact private mode 0600');
+  await fs.chmod(relayApprovalMarker, 0o600);
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, true, 'private relay marker must enable approved config');
+  const relayOwnerMismatchScript = `namespace Egoe\\Leads { function lstat(string $path): array|false { $metadata=\\lstat($path); if (is_array($metadata) && basename($path)==='relay-approved') $metadata['uid']=(int)$metadata['uid']+1; return $metadata; } } namespace { require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $settings=Egoe\\Leads\\Settings::load(getenv('EGOE_DEPLOY_ROOT')); echo $settings['relay']['enabled'] ? 'enabled' : 'disabled'; }`;
+  assert.equal((await run(PHP, ['-r', relayOwnerMismatchScript], { env })).stdout, 'disabled', 'relay marker owner mismatch must fail closed');
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, true, 'a private mode-0600 relay marker must be accepted');
+
+  await writeConfig(deployRoot, settings({ relay: {
+    enabled: true,
+    url: approvedRelayUrl,
+    url_sha256: sha256(approvedRelayUrl),
+    mode: 'signal'
+  } }));
   await assert.rejects(run(PHP, [cli, 'health'], { env }), (error) => String(error.stderr).includes('cross-border approval'));
-  await writeConfig(deployRoot, settings({ relay: { enabled: true, url: 'https://example.invalid/', mode: 'signal', cross_border_confirmed: true } }));
+  await writeConfig(deployRoot, settings({ relay: {
+    enabled: true,
+    url: approvedRelayUrl,
+    url_sha256: sha256(approvedRelayUrl),
+    mode: 'signal',
+    cross_border_confirmed: true
+  } }));
   await assert.rejects(run(PHP, [cli, 'health'], { env }), (error) => String(error.stderr).includes('allow_signal'));
+  await writeConfig(deployRoot, settings({ relay: { ...approvedSignalRelay, url_sha256: sha256(`${approvedRelayUrl}/wrong`) } }));
+  await assert.rejects(run(PHP, [cli, 'health'], { env }), (error) => String(error.stderr).includes('approved SHA-256'));
+  await writeConfig(deployRoot, settings({ relay: { ...approvedSignalRelay, require_json_ok: 'yes' } }));
+  await assert.rejects(run(PHP, [cli, 'health'], { env }), (error) => String(error.stderr).includes('require_json_ok'));
   await writeConfig(deployRoot, settings());
 
   const port = await freePort();
@@ -272,7 +328,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(rejectedStatusHost.response.status, 403);
   assert.equal(rejectedStatusHost.json.code, 'HOST_REJECTED');
 
-  const first = lead();
+  const first = lead({ fields: { Имя: 'Анна', Телефон: '8 (927) 123-45-67', Email: 'Customer@Example.com' } });
   let result = await post(first);
   assert.equal(result.response.status, 201, serverErrors);
   assert.deepEqual(result.json, { ok: true, leadId: first.leadId, duplicate: false });
@@ -280,11 +336,54 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   const firstEvidence = JSON.parse((await run(PHP, ['-r', evidenceScript], { env })).stdout);
   assert.equal(firstEvidence.form_id, 'test:request');
   assert.equal(firstEvidence.page_path, '/test/');
-  assert.equal(firstEvidence.consent_version, '2026-08-23');
+  assert.equal(firstEvidence.consent_version, '2026-08-27');
   assert.equal(firstEvidence.consent_accepted_at, first.consent.acceptedAt);
   assert.equal(firstEvidence.consent_document_url, '/consent/');
   assert.match(firstEvidence.payload_hash, /^[0-9a-f]{64}$/);
   assert.match(firstEvidence.received_at, /^\d{4}-\d{2}-\d{2}T/);
+
+  async function storedConsentVersion(leadId) {
+    const script = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $q=$p->prepare('SELECT consent_version FROM consent_evidence WHERE lead_id=?'); $q->execute(['${leadId}']); echo $q->fetchColumn();`;
+    return (await run(PHP, ['-r', script], { env })).stdout;
+  }
+
+  await writeConfig(deployRoot, activeSettings({ consent_version: '2026-08-23' }));
+  const currentConsentOnLegacyConfig = lead();
+  result = await post(currentConsentOnLegacyConfig);
+  assert.equal(result.response.status, 201, 'current consent must work while production config still names the legacy version');
+  assert.equal(await storedConsentVersion(currentConsentOnLegacyConfig.leadId), '2026-08-27');
+  await run(PHP, [cli, 'delete', currentConsentOnLegacyConfig.leadId, '--with-evidence'], { env });
+
+  await writeConfig(deployRoot, activeSettings());
+  const legacyConsentWithJourney = lead();
+  legacyConsentWithJourney.consent = { ...legacyConsentWithJourney.consent, version: '2026-08-23' };
+  result = await post(legacyConsentWithJourney);
+  assert.equal(result.response.status, 422, 'legacy consent must not authorize storage of a journey');
+  assert.equal(result.json.code, 'JOURNEY_CONSENT_REQUIRED');
+  const legacyJourneyStoredScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $q=$p->prepare('SELECT count(*) FROM leads WHERE lead_id=?'); $q->execute(['${legacyConsentWithJourney.leadId}']); echo $q->fetchColumn();`;
+  assert.equal((await run(PHP, ['-r', legacyJourneyStoredScript], { env })).stdout, '0', 'rejected legacy journey must not reach the database');
+
+  const cachedLegacyConsent = lead();
+  cachedLegacyConsent.consent = { ...cachedLegacyConsent.consent, version: '2026-08-23' };
+  delete cachedLegacyConsent.journey;
+  result = await post(cachedLegacyConsent);
+  assert.equal(result.response.status, 201, 'cached legacy consent without a journey must work after the current config is installed');
+  assert.equal(await storedConsentVersion(cachedLegacyConsent.leadId), '2026-08-23', 'evidence must keep the version actually submitted');
+  await run(PHP, [cli, 'delete', cachedLegacyConsent.leadId, '--with-evidence'], { env });
+
+  const unknownConsent = lead();
+  unknownConsent.consent = { ...unknownConsent.consent, version: '2026-08-22' };
+  result = await post(unknownConsent);
+  assert.equal(result.response.status, 422);
+  assert.equal(result.json.code, 'CONSENT_VERSION_INVALID');
+
+  await writeConfig(deployRoot, activeSettings({ consent_version: '2026-08-22' }));
+  await assert.rejects(
+    run(PHP, [cli, 'health'], { env }),
+    (error) => failureText(error).includes('outside the approved transition allowlist'),
+    'an unknown configured consent version must fail closed'
+  );
+  await writeConfig(deployRoot, activeSettings());
 
   await new Promise((resolve) => setTimeout(resolve, 10));
   const recentTarget = lead({
@@ -335,6 +434,41 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(result.response.status, 422);
   assert.equal(result.json.code, 'CONTACT_REQUIRED');
 
+  const emptyPhone = lead({ fields: { Имя: 'Анна', Телефон: '', Компания: '' } });
+  result = await post(emptyPhone);
+  assert.equal(result.response.status, 422);
+  assert.equal(result.json.code, 'CONTACT_REQUIRED');
+
+  const queryJourney = lead({ journey: [{ path: '/catalog/?secret=yes', title: 'Тест', viewedAt: new Date().toISOString() }] });
+  result = await post(queryJourney);
+  assert.equal(result.response.status, 422);
+  assert.equal(result.json.code, 'JOURNEY_INVALID');
+
+  const duplicateJourney = lead();
+  duplicateJourney.journey = [duplicateJourney.journey[0], { ...duplicateJourney.journey[0] }];
+  result = await post(duplicateJourney);
+  assert.equal(result.response.status, 422);
+  assert.equal(result.json.code, 'JOURNEY_INVALID');
+
+  const oversizedJourney = lead();
+  oversizedJourney.journey = Array.from({ length: 21 }, (_, index) => ({
+    path: `/catalog/${index}/`, title: `Изделие ${index}`, viewedAt: oversizedJourney.createdAt
+  }));
+  result = await post(oversizedJourney);
+  assert.equal(result.response.status, 422);
+  assert.equal(result.json.code, 'JOURNEY_INVALID');
+
+  const legacyWithoutJourney = lead();
+  delete legacyWithoutJourney.journey;
+  result = await post(legacyWithoutJourney);
+  assert.equal(result.response.status, 201, 'cached pre-journey clients must remain accepted during rollout');
+  const legacyRetry = await post(legacyWithoutJourney);
+  assert.equal(legacyRetry.response.status, 200);
+  assert.equal(legacyRetry.json.duplicate, true, 'a cached pre-journey retry must preserve the legacy idempotency contract');
+  const legacyViewed = JSON.parse((await run(PHP, [cli, 'view', legacyWithoutJourney.leadId], { env })).stdout);
+  assert.deepEqual(legacyViewed.journey, []);
+  await run(PHP, [cli, 'delete', legacyWithoutJourney.leadId, '--with-evidence'], { env });
+
   const badTimestamp = lead({ createdAt: new Date(Date.now() - 90000000).toISOString() });
   badTimestamp.consent.acceptedAt = badTimestamp.createdAt;
   result = await post(badTimestamp);
@@ -368,6 +502,96 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(viewed.page.path, '/test/');
   assert.equal(viewed.page.referrer, '/source/');
   assert.equal(JSON.stringify(viewed).includes('secret@example.com'), false);
+  assert.deepEqual(viewed.journey.map((entry) => entry.path), ['/catalog/parkovye-skameyki/', '/test/']);
+
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  const samePhone = lead({
+    formId: 'history:phone',
+    page: { url: 'https://www.egoe-life.ru/catalog/skameyki/', title: 'Каталог', referrer: '' },
+    journey: [{ path: '/catalog/skameyki/', title: 'Скамейки', viewedAt: new Date().toISOString() }],
+    fields: { Имя: 'Другой ввод имени', Телефон: '+7 (927) 123-45-67', Email: 'other@example.com' }
+  });
+  result = await post(samePhone);
+  assert.equal(result.response.status, 201);
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  const sameEmailQuote = lead({
+    formId: 'cart:quote',
+    tag: 'КП',
+    page: { url: 'https://www.egoe-life.ru/cart/', title: 'Корзина', referrer: '' },
+    journey: [
+      { path: '/catalog/parkovye-skameyki/', title: 'Парковые скамейки', viewedAt: new Date().toISOString() },
+      { path: '/cart/', title: 'Корзина', viewedAt: new Date().toISOString() }
+    ],
+    fields: {
+      Имя: 'Ещё один ввод имени',
+      Телефон: '+7 999 111-22-33',
+      Email: 'customer@example.com',
+      Итого: '66 810 ₽',
+      '№ КП': 'КП-HISTORY-001'
+    }
+  });
+  result = await post(sameEmailQuote);
+  assert.equal(result.response.status, 201);
+  const unrelatedHistoryLead = lead({
+    formId: 'history:unrelated',
+    page: { url: 'https://www.egoe-life.ru/contacts/', title: 'Контакты', referrer: '' },
+    fields: { Имя: 'Чужое секретное имя', Телефон: '+7 900 000-00-01', Email: 'stranger@example.com' }
+  });
+  result = await post(unrelatedHistoryLead);
+  assert.equal(result.response.status, 201);
+
+  const historyRun = await run(PHP, [cli, 'customer-history', first.leadId], { env });
+  const history = JSON.parse(historyRun.stdout);
+  assert.deepEqual(history.limits, { scan: 5000, entries: 50 });
+  assert.deepEqual(history.summary.matchedBy, ['email', 'phone']);
+  assert.equal(history.summary.matchingLeadCount, 3);
+  assert.equal(history.summary.returnedLeadCount, 3);
+  assert.equal(history.summary.entriesTruncated, false);
+  assert.equal(history.summary.quoteCount, 1);
+  assert.equal(history.summary.knownAmountRub, 66810);
+  assert.equal(history.scan.retainedLeadCount, 4);
+  assert.equal(history.scan.scannedLeadCount, 4);
+  assert.equal(history.scan.truncated, false);
+  assert.deepEqual(history.entries.map((entry) => entry.leadId), [first.leadId, samePhone.leadId, sameEmailQuote.leadId]);
+  assert.equal(history.entries[2].amountRub, 66810);
+  assert.equal(history.entries[2].kpNumber, 'КП-HISTORY-001');
+  assert.deepEqual(history.entries[2].viewed.map((entry) => entry.path), ['/catalog/parkovye-skameyki/', '/cart/']);
+  for (const entry of history.entries) {
+    assert.deepEqual(
+      Object.keys(entry),
+      ['leadId', 'receivedAt', 'formId', 'pagePath', 'amountRub', 'kpNumber', 'viewed']
+    );
+  }
+  const serializedHistory = JSON.stringify(history);
+  for (const forbidden of ['Customer@Example.com', 'customer@example.com', 'other@example.com', 'stranger@example.com', 'Чужое секретное имя', '79271234567', '79991112233', '79000000001']) {
+    assert.equal(serializedHistory.includes(forbidden), false, `history leaked raw PII: ${forbidden}`);
+  }
+  assert.doesNotMatch(serializedHistory, /[0-9a-f]{64}/i, 'history output must not expose internal identity fingerprints');
+  assert.equal((await run(PHP, [cli, 'customer-history', first.leadId], { env })).stdout, historyRun.stdout, 'history output must be deterministic');
+  await assert.rejects(
+    run(PHP, [cli, 'customer-history', first.leadId, 'extra'], { env }),
+    (error) => failureText(error).includes('exactly one lead UUID')
+  );
+  await assert.rejects(
+    run(PHP, [cli, 'customer-history', 'not-a-uuid'], { env }),
+    (error) => failureText(error).includes('Lead ID must be a UUID')
+  );
+
+  const identityScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $k='${settings().ip_hash_key}'; echo json_encode(['upper'=>Egoe\\Leads\\CustomerIdentity::fingerprints(['Email'=>'Customer@Example.com'],$k),'lower'=>Egoe\\Leads\\CustomerIdentity::fingerprints(['Email'=>'customer@example.com'],$k),'phone'=>Egoe\\Leads\\CustomerIdentity::fingerprints(['Phone'=>'+7 927 123-45-67'],$k)]);`;
+  const fingerprints = JSON.parse((await run(PHP, ['-r', identityScript], { env })).stdout);
+  assert.deepEqual(fingerprints.upper, fingerprints.lower, 'e-mail identity must be case-insensitive');
+  assert.match(Object.keys(fingerprints.upper)[0], /^email:[0-9a-f]{64}$/);
+  assert.match(Object.keys(fingerprints.phone)[0], /^phone:[0-9a-f]{64}$/);
+  assert.equal(JSON.stringify(fingerprints).includes('Customer@Example.com'), false);
+  const schemaTablesScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); echo json_encode(['version'=>(int)$p->query('PRAGMA user_version')->fetchColumn(),'tables'=>$p->query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")->fetchAll(PDO::FETCH_COLUMN)]);`;
+  const schemaTables = JSON.parse((await run(PHP, ['-r', schemaTablesScript], { env })).stdout);
+  assert.equal(schemaTables.version, 2, 'customer history must not bump the production schema');
+  assert.equal(schemaTables.tables.some((name) => /identity|customer/i.test(name)), false, 'identity fingerprints must remain in memory only');
+
+  for (const target of [samePhone, sameEmailQuote, unrelatedHistoryLead]) {
+    const cleanup = await run(PHP, [cli, 'delete', target.leadId, '--with-evidence'], { env });
+    assert.match(cleanup.stdout, /lead=1 evidence=1/);
+  }
 
   const queryScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); echo json_encode(['leads'=>(int)$p->query('SELECT count(*) FROM leads')->fetchColumn(),'evidence'=>(int)$p->query('SELECT count(*) FROM consent_evidence')->fetchColumn(),'outbox'=>(int)$p->query('SELECT count(*) FROM outbox')->fetchColumn()]);`;
   let counts = JSON.parse((await run(PHP, ['-r', queryScript], { env })).stdout);
@@ -392,10 +616,12 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
     '-keyout', relayKey, '-out', relayCertificate,
     '-subj', '/CN=127.0.0.1', '-addext', 'subjectAltName=IP:127.0.0.1'
   ]);
+  const relayUrl = `https://127.0.0.1:${relayPort}/relay`;
   const technicalSettings = activeSettings({
     relay: {
       enabled: true,
-      url: `https://127.0.0.1:${relayPort}/relay`,
+      url: relayUrl,
+      url_sha256: sha256(relayUrl),
       mode: 'technical',
       allow_technical: true,
       cross_border_confirmed: true,
@@ -410,6 +636,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(result.response.status, 201, 'relay outage must not reverse the SQLite commit');
 
   const receivedRelayBodies = [];
+  let relayResponseBody = '{"ok":true}';
   const relayServer = https.createServer({
     key: await fs.readFile(relayKey),
     cert: await fs.readFile(relayCertificate)
@@ -420,7 +647,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
     request.on('end', () => {
       receivedRelayBodies.push(body);
       response.writeHead(200, { 'Content-Type': 'application/json' });
-      response.end('{"ok":true}');
+      response.end(relayResponseBody);
     });
   });
   await new Promise((resolve, reject) => relayServer.once('error', reject).listen(relayPort, '127.0.0.1', resolve));
@@ -437,6 +664,94 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(JSON.stringify(relayed).includes('Анна'), false);
   assert.equal(JSON.stringify(relayed).includes('7927'), false);
   assert.equal(JSON.stringify(relayed).includes('fields'), false);
+
+  const fullSettings = activeSettings({
+    relay: {
+      enabled: true,
+      url: relayUrl,
+      url_sha256: sha256(relayUrl),
+      mode: 'full',
+      allow_full: true,
+      cross_border_confirmed: true,
+      timeout_seconds: 1,
+      ca_file: relayCertificate
+    }
+  });
+  await writeConfig(deployRoot, fullSettings);
+  await run(PHP, ['-r', clearRate], { env });
+  const legacyConsentWithRelayOn = lead({
+    formId: 'test:legacy-consent-relay',
+    consent: { ...lead().consent, version: '2026-08-23' },
+    journey: [],
+    fields: { Имя: 'Локальная старая вкладка', Телефон: '+7 927 333-44-55' }
+  });
+  const receiverCallsBeforeLegacy = receivedRelayBodies.length;
+  result = await post(legacyConsentWithRelayOn);
+  assert.equal(result.response.status, 201, 'legacy consent must still be accepted into the Russian database');
+  assert.equal(receivedRelayBodies.length, receiverCallsBeforeLegacy, 'legacy consent must never call an external relay');
+  const legacyOutboxCountScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $q=$p->prepare('SELECT count(*) FROM outbox WHERE lead_id=?'); $q->execute(['${legacyConsentWithRelayOn.leadId}']); echo $q->fetchColumn();`;
+  assert.equal((await run(PHP, ['-r', legacyOutboxCountScript], { env })).stdout, '0', 'legacy consent must not create an outbox row');
+  const locallyStoredLegacy = JSON.parse((await run(PHP, [cli, 'view', legacyConsentWithRelayOn.leadId], { env })).stdout);
+  assert.equal(locallyStoredLegacy.consent.version, '2026-08-23');
+  assert.equal(await storedConsentVersion(legacyConsentWithRelayOn.leadId), '2026-08-23');
+  const injectForbiddenLegacyOutbox = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $p->prepare('INSERT INTO outbox (lead_id,mode,payload_json,next_attempt_at,created_at) VALUES (?,?,?,?,?)')->execute(['${legacyConsentWithRelayOn.leadId}','full','{"_subject":"must-not-send"}','2000-01-01T00:00:00.000Z','2000-01-01T00:00:00.000Z']);`;
+  await run(PHP, ['-r', injectForbiddenLegacyOutbox], { env });
+  const suppressedRetry = JSON.parse((await run(PHP, [cli, 'retry', '20'], { env })).stdout);
+  assert.deepEqual(suppressedRetry, { sent: 0, failed: 0 }, 'retry must suppress any pre-existing legacy-consent outbox row');
+  assert.equal(receivedRelayBodies.length, receiverCallsBeforeLegacy, 'retry must not send legacy-consent payloads');
+  assert.equal((await run(PHP, ['-r', legacyOutboxCountScript], { env })).stdout, '0', 'retry must purge a forbidden legacy-consent outbox row');
+  await run(PHP, [cli, 'delete', legacyConsentWithRelayOn.leadId, '--with-evidence'], { env });
+
+  const quoteFields = {
+    Имя: 'Екатерина',
+    Телефон: '8 (927) 229-58-28',
+    'E-mail': 'example@egoe-life.ru',
+    Компания: '',
+    Позиции: '• Скамейка стальная «Дуга» (RAL 7016) — 3 шт × 22 270 = 66 810 ₽',
+    Итого: '66 810 ₽',
+    '№ КП': 'КП-2026-0827-123456'
+  };
+  const quoteLead = lead({
+    formId: 'cart:quote',
+    tag: 'КП',
+    page: { url: 'https://www.egoe-life.ru/cart/?secret=drop', title: 'Корзина', referrer: '' },
+    fields: quoteFields
+  });
+  result = await post(quoteLead);
+  assert.equal(result.response.status, 201, 'an optional empty company must not reject a quote');
+  assert.equal(receivedRelayBodies.length, 2);
+  const fullRelayed = JSON.parse(receivedRelayBodies[1]);
+  assert.deepEqual(Object.keys(fullRelayed), ['_subject', '_source', ...Object.keys(quoteFields)]);
+  assert.equal(fullRelayed._subject, 'Заявка с сайта EGOE — КП');
+  assert.equal(fullRelayed._source, '/cart/');
+  assert.equal(fullRelayed.Телефон, '+79272295828');
+  assert.equal(fullRelayed.Компания, '');
+  assert.equal(fullRelayed.Позиции, quoteFields.Позиции);
+  assert.equal(fullRelayed.Итого, quoteFields.Итого);
+  assert.equal(fullRelayed['№ КП'], quoteFields['№ КП']);
+  assert.equal(Object.hasOwn(fullRelayed, 'Данные'), false, 'legacy relay fields must be top-level');
+  assert.equal(Object.hasOwn(fullRelayed, 'ID заявки'), false, 'full relay must preserve the legacy visible template');
+
+  relayResponseBody = '{"ok":false}';
+  const rejectedRelayLead = lead({
+    formId: 'test:relay-response',
+    fields: { Имя: 'Проверка ответа', Телефон: '+7 927 111-22-33' }
+  });
+  result = await post(rejectedRelayLead);
+  assert.equal(result.response.status, 201, 'relay response failure must not reverse the SQLite commit');
+  const outboxStatusScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $q=$p->prepare('SELECT status FROM outbox WHERE lead_id=?'); $q->execute(['${rejectedRelayLead.leadId}']); echo $q->fetchColumn();`;
+  assert.equal((await run(PHP, ['-r', outboxStatusScript], { env })).stdout, 'failed', 'JSON ok=false must be treated as a failed delivery');
+
+  await writeConfig(deployRoot, activeSettings({
+    relay: {
+      ...fullSettings.relay,
+      require_json_ok: false
+    }
+  }));
+  await run(PHP, ['-r', makeDue], { env });
+  const retriedWithoutJsonContract = JSON.parse((await run(PHP, [cli, 'retry', '20'], { env })).stdout);
+  assert.deepEqual(retriedWithoutJsonContract, { sent: 1, failed: 0 });
+  assert.equal((await run(PHP, ['-r', outboxStatusScript], { env })).stdout, 'sent', '2xx may be accepted only when response validation is explicitly disabled');
   await new Promise((resolve) => relayServer.close(resolve));
   await writeConfig(deployRoot, activeSettings());
 

@@ -71,7 +71,9 @@
     "allowedPhpFiles": [
       "api/leads/index.php",
       "api/leads/lib/LeadBackend.php",
-      "api/leads/cli/leads.php"
+      "api/leads/lib/DailyAnalytics.php",
+      "api/leads/cli/leads.php",
+      "api/leads/cli/daily-report.php"
     ]
   },
   "requiredFiles": [
@@ -87,7 +89,9 @@
     "cookies/index.html",
     "api/leads/index.php",
     "api/leads/lib/LeadBackend.php",
+    "api/leads/lib/DailyAnalytics.php",
     "api/leads/cli/leads.php",
+    "api/leads/cli/daily-report.php",
     "tools/dogovor/index.html",
     "assets/css/style.css",
     "assets/js/site.js",
@@ -218,14 +222,15 @@
   "leadDelivery": {
     "script": "assets/js/leads.js",
     "provider": "same-origin-api",
-    "status": "collection-disabled-pending-legal-approval",
+    "status": "collection-active-server-approved",
     "endpoint": "/api/leads/",
     "statusEndpoint": "/api/leads/status/",
     "collectionEnabledDefault": false,
     "collectionApprovalMarker": "state/collection-approved",
     "databaseSchemaVersion": 2,
     "persistentStore": "deploy-shared-leads-sqlite",
-    "relayDefault": "off",
+    "relayDefault": "off-until-separate-server-approval",
+    "relayApprovalMarker": "state/relay-approved",
     "leadRetentionDays": 365,
     "consentEvidenceDays": 1095,
     "backupRetentionDays": 30,
@@ -235,7 +240,7 @@
     "uploadTimeoutMs": 120000,
     "attachmentsEnabled": false,
     "attachmentProviderStatus": "disabled-by-policy",
-    "consentVersion": "2026-08-23",
+    "consentVersion": "2026-08-27",
     "maxFileBytes": 10485760,
     "allowedExtensions": [
       "pdf",

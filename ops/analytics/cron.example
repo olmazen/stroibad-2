@@ -1,0 +1,8 @@
+# Install only after the deployed CLI, private config, GAS response, and receipt
+# idempotency have been reviewed. Pre-create cron-errors.log with mode 0600.
+SHELL=/bin/sh
+PATH=/usr/bin:/bin
+TZ=Europe/Moscow
+CRON_TZ=Europe/Moscow
+
+10 9 * * * umask 077 && /usr/bin/php /var/www/u3602289/data/www/egoe-deploy/current/api/leads/cli/daily-report.php --config /var/www/u3602289/data/www/egoe-deploy/shared/analytics/config.php --send >/dev/null 2>>/var/www/u3602289/data/www/egoe-deploy/shared/analytics/cron-errors.log

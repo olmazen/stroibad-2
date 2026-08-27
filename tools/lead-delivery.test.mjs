@@ -16,6 +16,15 @@ class FakeFormData {
   get(name) { return this.entries.find((entry) => entry[0] === name)?.[1] ?? null; }
 }
 
+function fakeStorage(backing = new Map()) {
+  return {
+    getItem(key) { return backing.has(key) ? backing.get(key) : null; },
+    setItem(key, value) { backing.set(key, String(value)); },
+    removeItem(key) { backing.delete(key); },
+    backing
+  };
+}
+
 function browser(source, overrides = {}) {
   const events = [];
   const domReady = [];
@@ -34,7 +43,9 @@ function browser(source, overrides = {}) {
     location: {
       hostname: 'www.egoe-life.ru',
       href: 'https://www.egoe-life.ru/test/?campaign=1',
-      pathname: '/test/'
+      pathname: '/test/',
+      origin: 'https://www.egoe-life.ru',
+      protocol: 'https:'
     },
     CustomEvent: FakeCustomEvent,
     dispatchEvent(event) { events.push(event); },
@@ -49,6 +60,7 @@ function browser(source, overrides = {}) {
       return leadFetch(url, request);
     },
     localStorage: { removeItem() {} },
+    sessionStorage: fakeStorage(),
     ...overrides.window
   };
   const context = {
@@ -129,8 +141,94 @@ test('same-origin API receives one confirmed multipart envelope with consent and
   assert.equal(payload.consent.accepted, true);
   assert.equal(payload.consent.version, LEADS.consentVersion);
   assert.equal(payload.consent.documentUrl, 'https://www.egoe-life.ru/consent/');
+  assert.equal(payload.journey.length, 1);
+  assert.deepEqual(
+    { path: payload.journey[0].path, title: payload.journey[0].title },
+    { path: '/test/', title: 'Тестовая страница' }
+  );
+  assert.match(payload.journey[0].viewedAt, /^\d{4}-\d{2}-\d{2}T/);
+  assert.equal(JSON.stringify(payload.journey).includes('campaign'), false);
   assert.equal(events.at(-1)?.detail.status, 'success');
   assert.equal(JSON.stringify(events.at(-1)?.detail).includes('7927'), false);
+});
+
+test('current-tab journey is same-origin, day-scoped, deduplicated and capped before consented submit', async () => {
+  const source = await leadSource();
+  const storage = fakeStorage();
+  for (let index = 0; index < 22; index += 1) {
+    const pathname = `/catalog/product-${index}/`;
+    const visit = browser(source, {
+      document: {
+        readyState: 'loading', title: `Изделие ${index}`, referrer: '',
+        addEventListener(type, listener) { if (type === 'DOMContentLoaded') this.ready = listener; }
+      },
+      window: {
+        sessionStorage: storage,
+        location: {
+          hostname: 'www.egoe-life.ru',
+          href: `https://www.egoe-life.ru${pathname}?utm_source=private#drawing`,
+          pathname,
+          origin: 'https://www.egoe-life.ru',
+          protocol: 'https:'
+        }
+      }
+    });
+    visit.root.document.ready?.();
+  }
+
+  const revisitPath = '/catalog/product-5/';
+  const requests = [];
+  const revisitDocument = {
+    readyState: 'loading', title: 'Изделие 5 — снова', referrer: '',
+    addEventListener(type, listener) { if (type === 'DOMContentLoaded') this.ready = listener; }
+  };
+  const revisit = browser(source, {
+    document: revisitDocument,
+    fetch(url, request) {
+      requests.push({ url, request });
+      return Promise.resolve({ ok: true, status: 201, json: () => Promise.resolve({ ok: true, leadId: options().leadId }) });
+    },
+    window: {
+      sessionStorage: storage,
+      location: {
+        hostname: 'www.egoe-life.ru',
+        href: `https://www.egoe-life.ru${revisitPath}?secret=yes#private`,
+        pathname: revisitPath,
+        origin: 'https://www.egoe-life.ru',
+        protocol: 'https:'
+      }
+    }
+  });
+  revisitDocument.ready();
+  assert.equal(requests.length, 0, 'page tracking must stay inside the tab until a form is submitted');
+  await revisit.api.send({ Телефон: '+79270000000' }, 'форма', options());
+  assert.equal(requests.length, 1);
+  const payload = JSON.parse(requests[0].request.body.get('payload'));
+  assert.equal(payload.journey.length, 20);
+  assert.equal(new Set(payload.journey.map((entry) => entry.path)).size, 20);
+  assert.equal(payload.journey.at(-1).path, revisitPath, 'a repeat must move the page to the end instead of duplicating it');
+  assert.equal(payload.journey.at(-1).title, 'Изделие 5 — снова');
+  assert.equal(JSON.stringify(payload.journey).includes('secret'), false);
+  assert.equal(JSON.stringify(payload.journey).includes('#private'), false);
+  assert.equal(JSON.stringify(payload.journey).includes('https://'), false);
+
+  const staleStorage = fakeStorage(new Map([['egoe_lead_journey_v1', JSON.stringify({
+    day: '1900-01-01',
+    entries: [{ path: '/old/', title: 'Прошлый день', viewedAt: '1900-01-01T00:00:00.000Z' }]
+  })]]));
+  const staleRequests = [];
+  const fresh = browser(source, {
+    fetch(url, request) {
+      staleRequests.push({ url, request });
+      return Promise.resolve({ ok: true, status: 201, json: () => Promise.resolve({ ok: true, leadId: options().leadId }) });
+    },
+    window: { sessionStorage: staleStorage }
+  });
+  await fresh.api.send({ Телефон: '+79270000000' }, 'форма', options());
+  const freshPayload = JSON.parse(staleRequests[0].request.body.get('payload'));
+  assert.deepEqual(freshPayload.journey.map((entry) => entry.path), ['/test/'], 'another local day must reset the trail');
+  assert.doesNotMatch(source, /localStorage\.setItem\([^)]*egoe_lead_journey_v1/);
+  assert.match(source, /sessionStorage\.setItem\(JOURNEY_STORAGE_KEY/);
 });
 
 test('consent is mandatory before any request', async () => {

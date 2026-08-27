@@ -1,0 +1,22 @@
+{
+  "hosts": [
+    {
+      "host_id": "https:other.example:443",
+      "ascii_host_url": "https://other.example/",
+      "unicode_host_url": "https://other.example/",
+      "verified": true
+    },
+    {
+      "host_id": "https:egoe-life.ru:443",
+      "ascii_host_url": "https://egoe-life.ru/",
+      "unicode_host_url": "https://egoe-life.ru/",
+      "verified": false
+    },
+    {
+      "host_id": "https:www.egoe-life.ru:443",
+      "ascii_host_url": "https://www.egoe-life.ru/",
+      "unicode_host_url": "https://www.egoe-life.ru/",
+      "verified": true
+    }
+  ]
+}

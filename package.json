@@ -18,6 +18,7 @@
     "test:runtime": "node --test tools/runtime-resilience.test.mjs",
     "test:leads": "node --test tools/lead-delivery.test.mjs",
     "test:backend": "node --test tools/lead-backend.test.mjs",
+    "test:analytics": "node --test tools/analytics-digest.test.mjs",
     "test:rkn": "node --test tools/rkn-public-surface.test.mjs",
     "test:deploy": "node --test tools/deploy-pipeline.test.mjs",
     "check:shell": "npm run test:shell && node tools/sync-site-shell.mjs --check",
@@ -25,6 +26,7 @@
     "check:runtime": "npm run test:runtime && node tools/sync-runtime-assets.mjs --check",
     "check:leads": "npm run test:leads",
     "check:backend": "npm run test:backend",
+    "check:analytics": "npm run test:analytics",
     "check:rkn": "npm run test:rkn",
     "check:deploy": "npm run test:deploy",
     "check:syntax": "node tools/check-javascript-syntax.mjs",
@@ -32,7 +34,7 @@
     "check:artifact": "node tools/verify-public-site.mjs",
     "verify:release": "node tools/verify-current-release.mjs",
     "check:seo": "node tools/run-public-seo-checks.mjs",
-    "check": "npm run check:syntax && npm run check:php && npm run check:shell && npm run check:data && npm run check:runtime && npm run check:leads && npm run check:backend && npm run check:rkn && npm run check:deploy && npm run build && npm run check:artifact && npm run check:seo",
+    "check": "npm run check:syntax && npm run check:php && npm run check:shell && npm run check:data && npm run check:runtime && npm run check:leads && npm run check:backend && npm run check:analytics && npm run check:rkn && npm run check:deploy && npm run build && npm run check:artifact && npm run check:seo",
     "verify": "npm run check"
   }
 }
