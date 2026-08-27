@@ -355,10 +355,19 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   await run(PHP, [cli, 'delete', currentConsentOnLegacyConfig.leadId, '--with-evidence'], { env });
 
   await writeConfig(deployRoot, activeSettings());
+  const legacyConsentWithJourney = lead();
+  legacyConsentWithJourney.consent = { ...legacyConsentWithJourney.consent, version: '2026-08-23' };
+  result = await post(legacyConsentWithJourney);
+  assert.equal(result.response.status, 422, 'legacy consent must not authorize storage of a journey');
+  assert.equal(result.json.code, 'JOURNEY_CONSENT_REQUIRED');
+  const legacyJourneyStoredScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $q=$p->prepare('SELECT count(*) FROM leads WHERE lead_id=?'); $q->execute(['${legacyConsentWithJourney.leadId}']); echo $q->fetchColumn();`;
+  assert.equal((await run(PHP, ['-r', legacyJourneyStoredScript], { env })).stdout, '0', 'rejected legacy journey must not reach the database');
+
   const cachedLegacyConsent = lead();
   cachedLegacyConsent.consent = { ...cachedLegacyConsent.consent, version: '2026-08-23' };
+  delete cachedLegacyConsent.journey;
   result = await post(cachedLegacyConsent);
-  assert.equal(result.response.status, 201, 'cached legacy consent must work after the current config is installed');
+  assert.equal(result.response.status, 201, 'cached legacy consent without a journey must work after the current config is installed');
   assert.equal(await storedConsentVersion(cachedLegacyConsent.leadId), '2026-08-23', 'evidence must keep the version actually submitted');
   await run(PHP, [cli, 'delete', cachedLegacyConsent.leadId, '--with-evidence'], { env });
 
@@ -673,6 +682,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   const legacyConsentWithRelayOn = lead({
     formId: 'test:legacy-consent-relay',
     consent: { ...lead().consent, version: '2026-08-23' },
+    journey: [],
     fields: { Имя: 'Локальная старая вкладка', Телефон: '+7 927 333-44-55' }
   });
   const receiverCallsBeforeLegacy = receivedRelayBodies.length;
