@@ -435,7 +435,9 @@ deploy() {
   validate_lead_health_contract \
     "$lead_health" \
     "$collection_marker_approved" \
-    "$relay_marker_approved"
+    "$relay_marker_approved" \
+    "$telegram_history_marker_approved" \
+    "$telegram_delivery_marker_approved"
 
   [ -L "$deploy_root/current" ] || die "Current baseline symlink is required before production deployment"
   previous_target=$(readlink "$deploy_root/current")

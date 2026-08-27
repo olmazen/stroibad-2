@@ -748,6 +748,11 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(remote, /state\/relay-approved/);
   assert.match(remote, /validate_optional_site_marker "\$relay_marker" "Relay approval marker" 600/);
   assert.match(remote, /\$relayEnabled === false \|\| \$relayApproved/);
+  assert.match(
+    remote,
+    /validate_lead_health_contract \\\n\s+"\$lead_health" \\\n\s+"\$collection_marker_approved" \\\n\s+"\$relay_marker_approved" \\\n\s+"\$telegram_history_marker_approved" \\\n\s+"\$telegram_delivery_marker_approved"/,
+    'candidate activation must pass every approval marker into the health contract'
+  );
   assert.doesNotMatch(remote, /\(\$health\["relayEnabled"\] \?\? null\) === false/);
   assert.match(remote, /schemaVersion"] \?\? null\) === 2/);
   const remotePhpAllowlistBlock = remote.match(/\$allowedPhp = \[(.*?)\];/s)?.[1] || '';
