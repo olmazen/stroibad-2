@@ -39,6 +39,10 @@ async function freePort() {
 
 function uuid() { return crypto.randomUUID(); }
 
+function sha256(value) {
+  return crypto.createHash('sha256').update(value, 'utf8').digest('hex');
+}
+
 function lead(overrides = {}) {
   const timestamp = new Date().toISOString();
   return {
@@ -49,7 +53,7 @@ function lead(overrides = {}) {
     createdAt: timestamp,
     consent: {
       accepted: true,
-      version: '2026-08-23',
+      version: '2026-08-27',
       acceptedAt: timestamp,
       documentUrl: 'https://www.egoe-life.ru/consent/'
     },
@@ -69,7 +73,7 @@ function settings(overrides = {}) {
     site_host: 'www.egoe-life.ru',
     allowed_hosts: ['www.egoe-life.ru', 'egoe-life.ru'],
     collection_enabled: false,
-    consent_version: '2026-08-23',
+    consent_version: '2026-08-27',
     ip_hash_key: '0123456789abcdef'.repeat(4),
     minimum_elapsed_ms: 600,
     rate_limit: { max_requests: 20, window_seconds: 600 },
@@ -85,7 +89,9 @@ function settings(overrides = {}) {
       allow_full: false,
       cross_border_confirmed: false,
       timeout_seconds: 2,
-      ca_file: ''
+      ca_file: '',
+      url_sha256: '',
+      require_json_ok: true
     }
   };
   return { ...base, ...overrides, relay: { ...base.relay, ...(overrides.relay || {}) } };
@@ -159,10 +165,56 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   await assert.rejects(run(PHP, [cli, 'health'], { env }), (error) => String(error.stderr).includes('between 1 and 1095'));
   await writeConfig(deployRoot, settings({ retention_days: 30, consent_evidence_days: 90 }));
   assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).ok, true, 'shorter retention must remain configurable');
-  await writeConfig(deployRoot, settings({ relay: { enabled: true, url: 'https://example.invalid/', mode: 'signal' } }));
+
+  const approvedRelayUrl = 'https://example.invalid/relay';
+  const approvedSignalRelay = {
+    enabled: true,
+    url: approvedRelayUrl,
+    url_sha256: sha256(approvedRelayUrl),
+    mode: 'signal',
+    allow_signal: true,
+    cross_border_confirmed: true
+  };
+  await writeConfig(deployRoot, settings({ relay: approvedSignalRelay }));
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, false, 'config alone must not enable relay');
+  const relayApprovalMarker = path.join(deployRoot, 'state/relay-approved');
+  const relaySymlinkTarget = path.join(deployRoot, 'state/not-a-relay-approval');
+  await fs.writeFile(relaySymlinkTarget, 'egoe-life.ru');
+  await fs.symlink(relaySymlinkTarget, relayApprovalMarker);
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, false, 'symlinked relay approval marker must fail closed');
+  await fs.unlink(relayApprovalMarker);
+  await fs.writeFile(relayApprovalMarker, 'egoe-life.ru\n');
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, false, 'relay marker bytes must match exactly');
+  await fs.writeFile(relayApprovalMarker, 'egoe-life.ru');
+  await fs.chmod(relayApprovalMarker, 0o666);
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, false, 'group/world-writable relay marker must fail closed');
+  await fs.chmod(relayApprovalMarker, 0o644);
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, false, 'relay marker must use exact private mode 0600');
+  await fs.chmod(relayApprovalMarker, 0o600);
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, true, 'private relay marker must enable approved config');
+  const relayOwnerMismatchScript = `namespace Egoe\\Leads { function lstat(string $path): array|false { $metadata=\\lstat($path); if (is_array($metadata) && basename($path)==='relay-approved') $metadata['uid']=(int)$metadata['uid']+1; return $metadata; } } namespace { require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $settings=Egoe\\Leads\\Settings::load(getenv('EGOE_DEPLOY_ROOT')); echo $settings['relay']['enabled'] ? 'enabled' : 'disabled'; }`;
+  assert.equal((await run(PHP, ['-r', relayOwnerMismatchScript], { env })).stdout, 'disabled', 'relay marker owner mismatch must fail closed');
+  assert.equal(JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).relayEnabled, true, 'a private mode-0600 relay marker must be accepted');
+
+  await writeConfig(deployRoot, settings({ relay: {
+    enabled: true,
+    url: approvedRelayUrl,
+    url_sha256: sha256(approvedRelayUrl),
+    mode: 'signal'
+  } }));
   await assert.rejects(run(PHP, [cli, 'health'], { env }), (error) => String(error.stderr).includes('cross-border approval'));
-  await writeConfig(deployRoot, settings({ relay: { enabled: true, url: 'https://example.invalid/', mode: 'signal', cross_border_confirmed: true } }));
+  await writeConfig(deployRoot, settings({ relay: {
+    enabled: true,
+    url: approvedRelayUrl,
+    url_sha256: sha256(approvedRelayUrl),
+    mode: 'signal',
+    cross_border_confirmed: true
+  } }));
   await assert.rejects(run(PHP, [cli, 'health'], { env }), (error) => String(error.stderr).includes('allow_signal'));
+  await writeConfig(deployRoot, settings({ relay: { ...approvedSignalRelay, url_sha256: sha256(`${approvedRelayUrl}/wrong`) } }));
+  await assert.rejects(run(PHP, [cli, 'health'], { env }), (error) => String(error.stderr).includes('approved SHA-256'));
+  await writeConfig(deployRoot, settings({ relay: { ...approvedSignalRelay, require_json_ok: 'yes' } }));
+  await assert.rejects(run(PHP, [cli, 'health'], { env }), (error) => String(error.stderr).includes('require_json_ok'));
   await writeConfig(deployRoot, settings());
 
   const port = await freePort();
@@ -280,7 +332,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   const firstEvidence = JSON.parse((await run(PHP, ['-r', evidenceScript], { env })).stdout);
   assert.equal(firstEvidence.form_id, 'test:request');
   assert.equal(firstEvidence.page_path, '/test/');
-  assert.equal(firstEvidence.consent_version, '2026-08-23');
+  assert.equal(firstEvidence.consent_version, '2026-08-27');
   assert.equal(firstEvidence.consent_accepted_at, first.consent.acceptedAt);
   assert.equal(firstEvidence.consent_document_url, '/consent/');
   assert.match(firstEvidence.payload_hash, /^[0-9a-f]{64}$/);
@@ -332,6 +384,11 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
 
   const noPhone = lead({ fields: { Имя: 'Анна', Email: 'anna@example.com' } });
   result = await post(noPhone);
+  assert.equal(result.response.status, 422);
+  assert.equal(result.json.code, 'CONTACT_REQUIRED');
+
+  const emptyPhone = lead({ fields: { Имя: 'Анна', Телефон: '', Компания: '' } });
+  result = await post(emptyPhone);
   assert.equal(result.response.status, 422);
   assert.equal(result.json.code, 'CONTACT_REQUIRED');
 
@@ -392,10 +449,12 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
     '-keyout', relayKey, '-out', relayCertificate,
     '-subj', '/CN=127.0.0.1', '-addext', 'subjectAltName=IP:127.0.0.1'
   ]);
+  const relayUrl = `https://127.0.0.1:${relayPort}/relay`;
   const technicalSettings = activeSettings({
     relay: {
       enabled: true,
-      url: `https://127.0.0.1:${relayPort}/relay`,
+      url: relayUrl,
+      url_sha256: sha256(relayUrl),
       mode: 'technical',
       allow_technical: true,
       cross_border_confirmed: true,
@@ -410,6 +469,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(result.response.status, 201, 'relay outage must not reverse the SQLite commit');
 
   const receivedRelayBodies = [];
+  let relayResponseBody = '{"ok":true}';
   const relayServer = https.createServer({
     key: await fs.readFile(relayKey),
     cert: await fs.readFile(relayCertificate)
@@ -420,7 +480,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
     request.on('end', () => {
       receivedRelayBodies.push(body);
       response.writeHead(200, { 'Content-Type': 'application/json' });
-      response.end('{"ok":true}');
+      response.end(relayResponseBody);
     });
   });
   await new Promise((resolve, reject) => relayServer.once('error', reject).listen(relayPort, '127.0.0.1', resolve));
@@ -437,6 +497,71 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(JSON.stringify(relayed).includes('Анна'), false);
   assert.equal(JSON.stringify(relayed).includes('7927'), false);
   assert.equal(JSON.stringify(relayed).includes('fields'), false);
+
+  const fullSettings = activeSettings({
+    relay: {
+      enabled: true,
+      url: relayUrl,
+      url_sha256: sha256(relayUrl),
+      mode: 'full',
+      allow_full: true,
+      cross_border_confirmed: true,
+      timeout_seconds: 1,
+      ca_file: relayCertificate
+    }
+  });
+  await writeConfig(deployRoot, fullSettings);
+  await run(PHP, ['-r', clearRate], { env });
+  const quoteFields = {
+    Имя: 'Екатерина',
+    Телефон: '8 (927) 229-58-28',
+    'E-mail': 'example@egoe-life.ru',
+    Компания: '',
+    Позиции: '• Скамейка стальная «Дуга» (RAL 7016) — 3 шт × 22 270 = 66 810 ₽',
+    Итого: '66 810 ₽',
+    '№ КП': 'КП-2026-0827-123456'
+  };
+  const quoteLead = lead({
+    formId: 'cart:quote',
+    tag: 'КП',
+    page: { url: 'https://www.egoe-life.ru/cart/?secret=drop', title: 'Корзина', referrer: '' },
+    fields: quoteFields
+  });
+  result = await post(quoteLead);
+  assert.equal(result.response.status, 201, 'an optional empty company must not reject a quote');
+  assert.equal(receivedRelayBodies.length, 2);
+  const fullRelayed = JSON.parse(receivedRelayBodies[1]);
+  assert.deepEqual(Object.keys(fullRelayed), ['_subject', '_source', ...Object.keys(quoteFields)]);
+  assert.equal(fullRelayed._subject, 'Заявка с сайта EGOE — КП');
+  assert.equal(fullRelayed._source, '/cart/');
+  assert.equal(fullRelayed.Телефон, '+79272295828');
+  assert.equal(fullRelayed.Компания, '');
+  assert.equal(fullRelayed.Позиции, quoteFields.Позиции);
+  assert.equal(fullRelayed.Итого, quoteFields.Итого);
+  assert.equal(fullRelayed['№ КП'], quoteFields['№ КП']);
+  assert.equal(Object.hasOwn(fullRelayed, 'Данные'), false, 'legacy relay fields must be top-level');
+  assert.equal(Object.hasOwn(fullRelayed, 'ID заявки'), false, 'full relay must preserve the legacy visible template');
+
+  relayResponseBody = '{"ok":false}';
+  const rejectedRelayLead = lead({
+    formId: 'test:relay-response',
+    fields: { Имя: 'Проверка ответа', Телефон: '+7 927 111-22-33' }
+  });
+  result = await post(rejectedRelayLead);
+  assert.equal(result.response.status, 201, 'relay response failure must not reverse the SQLite commit');
+  const outboxStatusScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $q=$p->prepare('SELECT status FROM outbox WHERE lead_id=?'); $q->execute(['${rejectedRelayLead.leadId}']); echo $q->fetchColumn();`;
+  assert.equal((await run(PHP, ['-r', outboxStatusScript], { env })).stdout, 'failed', 'JSON ok=false must be treated as a failed delivery');
+
+  await writeConfig(deployRoot, activeSettings({
+    relay: {
+      ...fullSettings.relay,
+      require_json_ok: false
+    }
+  }));
+  await run(PHP, ['-r', makeDue], { env });
+  const retriedWithoutJsonContract = JSON.parse((await run(PHP, [cli, 'retry', '20'], { env })).stdout);
+  assert.deepEqual(retriedWithoutJsonContract, { sent: 1, failed: 0 });
+  assert.equal((await run(PHP, ['-r', outboxStatusScript], { env })).stdout, 'sent', '2xx may be accepted only when response validation is explicitly disabled');
   await new Promise((resolve) => relayServer.close(resolve));
   await writeConfig(deployRoot, activeSettings());
 

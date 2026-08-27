@@ -9,7 +9,7 @@ return [
     'allowed_hosts' => ['www.egoe-life.ru', 'egoe-life.ru'],
     // Fail closed until legal review, any required RKN update and the state marker.
     'collection_enabled' => false,
-    'consent_version' => '2026-08-23',
+    'consent_version' => '2026-08-27',
     'ip_hash_key' => 'REPLACE_WITH_64_HEX_CHARACTERS_OUTSIDE_GIT',
     'minimum_elapsed_ms' => 600,
     'rate_limit' => ['max_requests' => 5, 'window_seconds' => 600],
@@ -17,7 +17,8 @@ return [
     'consent_evidence_days' => 1095,
     'backup_retention_days' => 30,
     'relay' => [
-        // Default is deliberately OFF. No outbox row or network request is made.
+        // Default is deliberately OFF. Enabling also requires state/relay-approved
+        // with the exact bytes "egoe-life.ru", deploy owner and mode 0600.
         'enabled' => false,
         'url' => '',
         'mode' => 'signal',
@@ -27,5 +28,9 @@ return [
         'cross_border_confirmed' => false,
         'timeout_seconds' => 3,
         'ca_file' => '',
+        // SHA-256 of the exact approved relay URL; never place the real URL in Git.
+        'url_sha256' => 'REPLACE_WITH_APPROVED_RELAY_URL_SHA256',
+        // Require the relay response body to be valid JSON with {"ok": true}.
+        'require_json_ok' => true,
     ],
 ];

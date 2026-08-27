@@ -27,6 +27,7 @@ final class Runtime
 {
     private const SITE_MARKER = 'egoe-life.ru';
     private const COLLECTION_MARKER = 'collection-approved';
+    private const RELAY_MARKER = 'relay-approved';
 
     public static function deployRoot(?string $start = null): string
     {
@@ -94,8 +95,18 @@ final class Runtime
 
     public static function collectionApproved(string $deployRoot): bool
     {
+        return self::approvedMarker($deployRoot, self::COLLECTION_MARKER);
+    }
+
+    public static function relayApproved(string $deployRoot): bool
+    {
+        return self::approvedMarker($deployRoot, self::RELAY_MARKER, 0600);
+    }
+
+    private static function approvedMarker(string $deployRoot, string $markerName, ?int $requiredPermissions = null): bool
+    {
         $stateDirectory = $deployRoot . '/state';
-        $marker = $stateDirectory . '/' . self::COLLECTION_MARKER;
+        $marker = $stateDirectory . '/' . $markerName;
         if (!is_dir($stateDirectory) || is_link($stateDirectory) || !is_file($marker) || is_link($marker)) {
             return false;
         }
@@ -117,6 +128,7 @@ final class Runtime
             || ($markerMetadata['uid'] ?? null) !== $owner
             || ($stateMode & 0022) !== 0
             || ($markerMode & 0022) !== 0
+            || ($requiredPermissions !== null && ($markerMode & 0777) !== $requiredPermissions)
         ) {
             return false;
         }
@@ -158,7 +170,7 @@ final class Settings
             'site_host' => 'www.egoe-life.ru',
             'allowed_hosts' => ['www.egoe-life.ru', 'egoe-life.ru'],
             'collection_enabled' => false,
-            'consent_version' => '2026-08-23',
+            'consent_version' => '2026-08-27',
             'minimum_elapsed_ms' => 600,
             'rate_limit' => ['max_requests' => 5, 'window_seconds' => 600],
             'retention_days' => 365,
@@ -174,6 +186,8 @@ final class Settings
                 'cross_border_confirmed' => false,
                 'timeout_seconds' => 3,
                 'ca_file' => '',
+                'url_sha256' => '',
+                'require_json_ok' => true,
             ],
         ];
         $settings = array_replace_recursive($defaults, $loaded);
@@ -230,6 +244,7 @@ final class Settings
         if (!is_array($relay) || !is_bool($relay['enabled'] ?? null)) {
             throw new RuntimeException('Invalid relay configuration');
         }
+        $relay['enabled'] = $relay['enabled'] === true && Runtime::relayApproved($deployRoot);
         if ($relay['enabled']) {
             if (!is_int($relay['timeout_seconds'] ?? null) || $relay['timeout_seconds'] < 1 || $relay['timeout_seconds'] > 10) {
                 throw new RuntimeException('Invalid relay timeout_seconds');
@@ -237,6 +252,18 @@ final class Settings
             $url = $relay['url'] ?? null;
             if (!is_string($url) || !preg_match('~^https://[^\s]+$~D', $url)) {
                 throw new RuntimeException('Enabled relay requires an HTTPS server URL');
+            }
+            $urlSha256 = $relay['url_sha256'] ?? null;
+            if (!is_string($urlSha256) || preg_match('/\A[0-9a-f]{64}\z/i', $urlSha256) !== 1) {
+                throw new RuntimeException('Enabled relay requires an approved URL SHA-256');
+            }
+            $urlSha256 = strtolower($urlSha256);
+            if (!hash_equals($urlSha256, hash('sha256', $url))) {
+                throw new RuntimeException('Relay URL does not match its approved SHA-256');
+            }
+            $relay['url_sha256'] = $urlSha256;
+            if (!is_bool($relay['require_json_ok'] ?? null)) {
+                throw new RuntimeException('Invalid relay require_json_ok flag');
             }
             $caFile = $relay['ca_file'] ?? '';
             if (!is_string($caFile)) {
@@ -248,7 +275,6 @@ final class Settings
                     throw new RuntimeException('Relay CA file is unavailable');
                 }
                 $relay['ca_file'] = $realCa;
-                $settings['relay'] = $relay;
             }
             $mode = $relay['mode'] ?? null;
             if (!in_array($mode, ['signal', 'technical', 'full'], true)) {
@@ -267,6 +293,7 @@ final class Settings
                 throw new RuntimeException('Full relay requires explicit cross-border approval flags');
             }
         }
+        $settings['relay'] = $relay;
 
         return $settings;
     }
@@ -555,25 +582,27 @@ final class Validator
                 throw new HttpFailure(422, 'FIELDS_INVALID', 'Поля заявки должны содержать текст.');
             }
             $cleanKey = self::text($key, 100, 'field name');
-            $cleanValue = self::text($value, 2000, 'field value');
+            $cleanValue = self::optionalText($value, 2000, 'field value');
             $totalBytes += strlen($cleanKey) + strlen($cleanValue);
             if ($totalBytes > 24000) {
                 throw new HttpFailure(413, 'FIELDS_TOO_LARGE', 'Данные заявки слишком большие.');
             }
             if (preg_match('/тел|phone/iu', $cleanKey) === 1) {
-                $digits = preg_replace('/\D+/', '', $cleanValue) ?? '';
-                if (!(strlen($digits) === 10 || (strlen($digits) === 11 && ($digits[0] === '7' || $digits[0] === '8')))) {
-                    throw new HttpFailure(422, 'CONTACT_INVALID', 'Укажите корректный телефон.');
+                if ($cleanValue !== '') {
+                    $digits = preg_replace('/\D+/', '', $cleanValue) ?? '';
+                    if (!(strlen($digits) === 10 || (strlen($digits) === 11 && ($digits[0] === '7' || $digits[0] === '8')))) {
+                        throw new HttpFailure(422, 'CONTACT_INVALID', 'Укажите корректный телефон.');
+                    }
+                    if (strlen($digits) === 10) {
+                        $digits = '7' . $digits;
+                    } elseif ($digits[0] === '8') {
+                        $digits = '7' . substr($digits, 1);
+                    }
+                    $cleanValue = '+' . $digits;
+                    $hasPhone = true;
                 }
-                if (strlen($digits) === 10) {
-                    $digits = '7' . $digits;
-                } elseif ($digits[0] === '8') {
-                    $digits = '7' . substr($digits, 1);
-                }
-                $cleanValue = '+' . $digits;
-                $hasPhone = true;
             }
-            if (preg_match('/почт|e-?mail/iu', $cleanKey) === 1) {
+            if ($cleanValue !== '' && preg_match('/почт|e-?mail/iu', $cleanKey) === 1) {
                 if (filter_var($cleanValue, FILTER_VALIDATE_EMAIL) === false) {
                     throw new HttpFailure(422, 'CONTACT_INVALID', 'Укажите корректную электронную почту.');
                 }
@@ -887,14 +916,16 @@ final class Relay
         if ($mode !== 'full') {
             throw new RuntimeException('Unsupported relay mode');
         }
-        return [
-            '_subject' => 'Новая заявка на сайте EGOE',
-            'ID заявки' => $lead['leadId'],
-            'Форма' => $lead['formId'],
-            'Страница' => $lead['page']['path'],
-            'Время' => $lead['createdAt'],
-            'Данные' => $lead['fields'],
+        $payload = [
+            '_subject' => 'Заявка с сайта EGOE — ' . $lead['tag'],
+            '_source' => $lead['page']['path'],
         ];
+        foreach ($lead['fields'] as $key => $value) {
+            if (!array_key_exists($key, $payload)) {
+                $payload[$key] = $value;
+            }
+        }
+        return $payload;
     }
 
     /** @param array<string,mixed> $settings
@@ -982,6 +1013,16 @@ final class Relay
         curl_close($handle);
         if ($response === false || $error !== 0 || $status < 200 || $status >= 300) {
             throw new RuntimeException('Relay delivery failed');
+        }
+        if (($relay['require_json_ok'] ?? true) === true) {
+            try {
+                $decoded = json_decode((string)$response, true, 8, JSON_THROW_ON_ERROR);
+            } catch (JsonException) {
+                throw new RuntimeException('Relay delivery failed');
+            }
+            if (!is_array($decoded) || ($decoded['ok'] ?? null) !== true) {
+                throw new RuntimeException('Relay delivery failed');
+            }
         }
     }
 }
