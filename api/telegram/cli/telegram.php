@@ -9,6 +9,8 @@ use Egoe\Leads\Runtime;
 use Egoe\Leads\Settings;
 use Egoe\Telegram\CurlBotApi;
 use Egoe\Telegram\TelegramConfig;
+use Egoe\Telegram\TelegramLongPollWorker;
+use Egoe\Telegram\TelegramPollState;
 
 if (PHP_SAPI !== 'cli') {
     http_response_code(404);
@@ -32,7 +34,7 @@ try {
     if (($settings['enabled'] ?? false) !== true) {
         failTelegram('Telegram history is disabled');
     }
-    Database::connect($root);
+    $pdo = Database::connect($root);
     $api = new CurlBotApi((string)$settings['bot_token'], (int)$settings['timeout_seconds']);
     switch ($command) {
         case 'health':
@@ -65,8 +67,46 @@ try {
             ]);
             echo "REGISTERED " . TelegramConfig::WEBHOOK_URL . "\n";
             break;
+        case 'delete-webhook':
+            TelegramLongPollWorker::disableWebhook($api);
+            echo "WEBHOOK_DELETED_PENDING_PRESERVED\n";
+            break;
+        case 'poll':
+            $limitRaw = $argv[2] ?? '10';
+            if (count($argv) > 3
+                || !is_string($limitRaw)
+                || preg_match('/\A(?:[1-9]|[1-9][0-9]|100)\z/D', $limitRaw) !== 1
+            ) {
+                failTelegram('Telegram polling limit must be between 1 and 100');
+            }
+            $state = TelegramPollState::acquire($root);
+            if ($state === null) {
+                echo json_encode([
+                    'ok' => true,
+                    'busy' => true,
+                    'fetched' => 0,
+                    'processed' => 0,
+                    'rejected' => 0,
+                    'ignored' => 0,
+                    'deferred' => 0,
+                ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
+                break;
+            }
+            try {
+                $settings['identity_key'] = $leadSettings['ip_hash_key'];
+                $result = (new TelegramLongPollWorker($settings, $pdo, $api, $state))
+                    ->poll((int)$limitRaw);
+                echo json_encode([
+                    'ok' => true,
+                    'busy' => false,
+                    ...$result,
+                ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
+            } finally {
+                $state->close();
+            }
+            break;
         default:
-            echo "Usage: php api/telegram/cli/telegram.php health|webhook-info|register-webhook [--replace]\n";
+            echo "Usage: php api/telegram/cli/telegram.php health|webhook-info|register-webhook [--replace]|delete-webhook|poll [limit]\n";
             exit($command === 'help' ? 0 : 1);
     }
 } catch (Throwable $error) {

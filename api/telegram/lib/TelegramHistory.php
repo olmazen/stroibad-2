@@ -11,6 +11,7 @@ use Egoe\Leads\OutboxTransport;
 use Egoe\Leads\Runtime;
 use JsonException;
 use PDO;
+use PDOException;
 use RuntimeException;
 use Throwable;
 
@@ -36,6 +37,16 @@ final class BotApiFailure extends RuntimeException
         return $this->errorCode === 400
             && str_contains(mb_strtolower($this->apiDescription, 'UTF-8'), 'message is not modified');
     }
+
+    public function isCallbackNoLongerAnswerable(): bool
+    {
+        if ($this->errorCode !== 400) {
+            return false;
+        }
+        $description = mb_strtolower($this->apiDescription, 'UTF-8');
+        return str_contains($description, 'query is too old')
+            || str_contains($description, 'query id is invalid');
+    }
 }
 
 final class TelegramConfig
@@ -59,18 +70,7 @@ final class TelegramConfig
     /** @return array<string,mixed> */
     public static function load(string $deployRoot): array
     {
-        $sharedRoot = realpath($deployRoot . '/shared');
-        $directoryPath = $deployRoot . '/shared/telegram';
-        $directory = realpath($directoryPath);
-        if (!is_string($sharedRoot)
-            || !is_string($directory)
-            || !is_dir($directory)
-            || is_link($directoryPath)
-            || !str_starts_with($directory . '/', $sharedRoot . '/')
-        ) {
-            throw new RuntimeException('Telegram configuration is unavailable');
-        }
-        self::assertOwnedMode($deployRoot, $directory, 0700, true);
+        $directory = self::privateDirectory($deployRoot);
 
         $configPath = $directory . '/config.php';
         if (!is_file($configPath) || is_link($configPath) || !is_readable($configPath)) {
@@ -136,6 +136,23 @@ final class TelegramConfig
             throw new RuntimeException('Telegram max_history_entries must be between 1 and 20');
         }
         return $settings;
+    }
+
+    public static function privateDirectory(string $deployRoot): string
+    {
+        $sharedRoot = realpath($deployRoot . '/shared');
+        $directoryPath = $deployRoot . '/shared/telegram';
+        $directory = realpath($directoryPath);
+        if (!is_string($sharedRoot)
+            || !is_string($directory)
+            || !is_dir($directory)
+            || is_link($directoryPath)
+            || !str_starts_with($directory . '/', $sharedRoot . '/')
+        ) {
+            throw new RuntimeException('Telegram configuration is unavailable');
+        }
+        self::assertOwnedMode($deployRoot, $directory, 0700, true);
+        return $directory;
     }
 
     /** @return array<string,mixed> */
@@ -564,18 +581,22 @@ SQL);
 
 final class CallbackHandler
 {
+    public const PROCESSED = 'processed';
+    public const REJECTED = 'rejected';
+    public const IGNORED = 'ignored';
+
     /** @param array<string,mixed> $update
      *  @param array<string,mixed> $settings
      */
-    public static function handle(array $update, array $settings, PDO $pdo, BotApi $api): void
+    public static function handle(array $update, array $settings, PDO $pdo, BotApi $api): string
     {
         $callback = $update['callback_query'] ?? null;
         if (!is_array($callback) || array_is_list($callback)) {
-            return;
+            return self::IGNORED;
         }
         $callbackId = $callback['id'] ?? null;
         if (!is_string($callbackId) || $callbackId === '' || strlen($callbackId) > 256) {
-            return;
+            return self::IGNORED;
         }
         $message = $callback['message'] ?? null;
         $from = $callback['from'] ?? null;
@@ -600,14 +621,14 @@ final class CallbackHandler
             || !hash_equals((string)$settings['bot_id'], $authorId)
             || (is_array($messageAuthor) ? ($messageAuthor['is_bot'] ?? null) : null) !== true
         ) {
-            self::answer($api, $callbackId, 'Недостаточно прав.', true);
-            return;
+            self::answerBestEffort($api, $callbackId, 'Недостаточно прав.', true);
+            return self::REJECTED;
         }
 
         $parsed = TelegramText::parseCallback($callback['data'] ?? null);
         if ($parsed === null || !self::messageHasCallback($message, (string)$callback['data'])) {
-            self::answer($api, $callbackId, 'Кнопка устарела. Обновите сообщение.', true);
-            return;
+            self::answerBestEffort($api, $callbackId, 'Кнопка устарела. Обновите сообщение.', true);
+            return self::REJECTED;
         }
 
         try {
@@ -623,9 +644,13 @@ final class CallbackHandler
                 $text = $lead['text'];
                 $markup = $lead['reply_markup'];
             }
+        } catch (PDOException $error) {
+            // SQLite lock/I/O failures are transient. The polling worker must
+            // leave this update unconfirmed so the next run can retry it.
+            throw $error;
         } catch (Throwable) {
-            self::answer($api, $callbackId, 'История для этой заявки недоступна.', true);
-            return;
+            self::answerBestEffort($api, $callbackId, 'История для этой заявки недоступна.', true);
+            return self::REJECTED;
         }
 
         try {
@@ -643,7 +668,17 @@ final class CallbackHandler
                 throw $error;
             }
         }
-        self::answer($api, $callbackId, '', false);
+        try {
+            self::answer($api, $callbackId, '', false);
+        } catch (BotApiFailure $error) {
+            // A crash after a successful edit can make Telegram redeliver an
+            // already answered or expired callback. The message is already in
+            // the requested state, so this exact terminal response is safe.
+            if (!$error->isCallbackNoLongerAnswerable()) {
+                throw $error;
+            }
+        }
+        return self::PROCESSED;
     }
 
     private static function answer(BotApi $api, string $callbackId, string $text, bool $alert): void
@@ -654,6 +689,16 @@ final class CallbackHandler
             $parameters['show_alert'] = $alert;
         }
         $api->call('answerCallbackQuery', $parameters);
+    }
+
+    private static function answerBestEffort(BotApi $api, string $callbackId, string $text, bool $alert): void
+    {
+        try {
+            self::answer($api, $callbackId, $text, $alert);
+        } catch (Throwable) {
+            // Invalid, forged and unauthorized updates must never become a
+            // poison item that blocks all later legitimate callbacks.
+        }
     }
 
     /** @param array<string,mixed> $message */
@@ -694,5 +739,255 @@ final class CallbackHandler
             return $value;
         }
         return null;
+    }
+}
+
+final class TelegramPollState
+{
+    /** @var resource|null */
+    private $lockHandle;
+
+    private function __construct(
+        private readonly string $deployRoot,
+        private readonly string $statePath,
+        $lockHandle,
+        private int $offset
+    ) {
+        $this->lockHandle = $lockHandle;
+    }
+
+    public static function acquire(string $deployRoot): ?self
+    {
+        $directory = TelegramConfig::privateDirectory($deployRoot);
+        [$lockHandle] = self::openPrivateFile($deployRoot, $directory . '/poll.lock');
+        if (!flock($lockHandle, LOCK_EX | LOCK_NB)) {
+            fclose($lockHandle);
+            return null;
+        }
+
+        try {
+            $statePath = $directory . '/poll-offset';
+            [$stateHandle, $created] = self::openPrivateFile($deployRoot, $statePath);
+            if ($created) {
+                self::writeHandle($stateHandle, "0\n");
+            }
+            rewind($stateHandle);
+            $raw = stream_get_contents($stateHandle);
+            fclose($stateHandle);
+            if (!is_string($raw)
+                || preg_match('/\A(?:0|[1-9][0-9]{0,18})\n?\z/D', $raw) !== 1
+            ) {
+                throw new RuntimeException('Telegram polling offset is invalid');
+            }
+            $offset = (int)trim($raw);
+            if ($offset < 0 || $offset >= PHP_INT_MAX) {
+                throw new RuntimeException('Telegram polling offset is invalid');
+            }
+            return new self($deployRoot, $statePath, $lockHandle, $offset);
+        } catch (Throwable $error) {
+            flock($lockHandle, LOCK_UN);
+            fclose($lockHandle);
+            throw $error;
+        }
+    }
+
+    public function offset(): int
+    {
+        return $this->offset;
+    }
+
+    public function commit(int $nextOffset): void
+    {
+        if ($nextOffset < $this->offset || $nextOffset < 0 || $nextOffset >= PHP_INT_MAX) {
+            throw new RuntimeException('Telegram polling offset cannot move backwards');
+        }
+        if ($nextOffset === $this->offset) {
+            return;
+        }
+
+        $temporary = $this->statePath . '.tmp.' . getmypid() . '.' . bin2hex(random_bytes(8));
+        $handle = @fopen($temporary, 'x+b');
+        if (!is_resource($handle)) {
+            throw new RuntimeException('Unable to persist Telegram polling offset');
+        }
+        try {
+            @chmod($temporary, 0600);
+            self::assertPrivateFile($this->deployRoot, $temporary, $handle);
+            self::writeHandle($handle, $nextOffset . "\n");
+            fclose($handle);
+            $handle = null;
+            if (!@rename($temporary, $this->statePath)) {
+                throw new RuntimeException('Unable to persist Telegram polling offset');
+            }
+            clearstatcache(true, $this->statePath);
+            self::assertPrivateFile($this->deployRoot, $this->statePath, null);
+            $this->offset = $nextOffset;
+        } finally {
+            if (is_resource($handle)) {
+                fclose($handle);
+            }
+            if (file_exists($temporary) || is_link($temporary)) {
+                @unlink($temporary);
+            }
+        }
+    }
+
+    public function close(): void
+    {
+        if (is_resource($this->lockHandle)) {
+            flock($this->lockHandle, LOCK_UN);
+            fclose($this->lockHandle);
+            $this->lockHandle = null;
+        }
+    }
+
+    public function __destruct()
+    {
+        $this->close();
+    }
+
+    /** @return array{0:resource,1:bool} */
+    private static function openPrivateFile(string $deployRoot, string $path): array
+    {
+        $created = false;
+        if (!file_exists($path) && !is_link($path)) {
+            $handle = @fopen($path, 'x+b');
+            $created = is_resource($handle);
+        } else {
+            $handle = false;
+        }
+        if (!is_resource($handle)) {
+            self::assertPrivateFile($deployRoot, $path, null);
+            $handle = @fopen($path, 'r+b');
+        }
+        if (!is_resource($handle)) {
+            throw new RuntimeException('Telegram polling state is unavailable');
+        }
+        @chmod($path, 0600);
+        self::assertPrivateFile($deployRoot, $path, $handle);
+        return [$handle, $created];
+    }
+
+    /** @param resource|null $handle */
+    private static function assertPrivateFile(string $deployRoot, string $path, $handle): void
+    {
+        $root = @lstat($deployRoot);
+        $metadata = @lstat($path);
+        $stream = is_resource($handle) ? @fstat($handle) : null;
+        if (!is_array($root)
+            || !is_array($metadata)
+            || (($metadata['mode'] ?? 0) & 0170000) !== 0100000
+            || (($metadata['mode'] ?? 0) & 0777) !== 0600
+            || ($metadata['uid'] ?? null) !== ($root['uid'] ?? null)
+            || (is_array($stream)
+                && (($stream['dev'] ?? null) !== ($metadata['dev'] ?? null)
+                    || ($stream['ino'] ?? null) !== ($metadata['ino'] ?? null)))
+        ) {
+            throw new RuntimeException('Telegram polling state permissions are unsafe');
+        }
+    }
+
+    /** @param resource $handle */
+    private static function writeHandle($handle, string $body): void
+    {
+        if (!ftruncate($handle, 0)
+            || !rewind($handle)
+            || fwrite($handle, $body) !== strlen($body)
+            || !fflush($handle)
+        ) {
+            throw new RuntimeException('Unable to persist Telegram polling offset');
+        }
+        if (function_exists('fsync') && !fsync($handle)) {
+            throw new RuntimeException('Unable to persist Telegram polling offset');
+        }
+    }
+}
+
+final class TelegramLongPollWorker
+{
+    private const RUN_BUDGET_SECONDS = 40;
+
+    /** @param array<string,mixed> $settings */
+    public function __construct(
+        private readonly array $settings,
+        private readonly PDO $pdo,
+        private readonly BotApi $api,
+        private readonly TelegramPollState $state
+    ) {
+    }
+
+    /** @return array{fetched:int,processed:int,rejected:int,ignored:int,deferred:int,offset:int} */
+    public function poll(int $limit): array
+    {
+        if ($limit < 1 || $limit > 100) {
+            throw new RuntimeException('Telegram polling limit must be between 1 and 100');
+        }
+        $started = hrtime(true);
+        $result = $this->api->call('getUpdates', [
+            'offset' => $this->state->offset(),
+            'limit' => $limit,
+            'timeout' => 0,
+            'allowed_updates' => ['callback_query'],
+        ]);
+        if (!is_array($result) || !array_is_list($result) || count($result) > $limit) {
+            throw new RuntimeException('Telegram getUpdates response is invalid');
+        }
+
+        $counts = [
+            CallbackHandler::PROCESSED => 0,
+            CallbackHandler::REJECTED => 0,
+            CallbackHandler::IGNORED => 0,
+        ];
+        $handled = 0;
+        $consumed = 0;
+        $previousUpdateId = null;
+        foreach ($result as $update) {
+            if ($handled > 0 && (hrtime(true) - $started) >= self::RUN_BUDGET_SECONDS * 1_000_000_000) {
+                break;
+            }
+            if (!is_array($update)
+                || array_is_list($update)
+                || !is_int($update['update_id'] ?? null)
+                || $update['update_id'] < 0
+                || $update['update_id'] >= PHP_INT_MAX - 1
+                || ($previousUpdateId !== null && $update['update_id'] <= $previousUpdateId)
+            ) {
+                throw new RuntimeException('Telegram getUpdates response is invalid');
+            }
+            $updateId = $update['update_id'];
+            $previousUpdateId = $updateId;
+            if ($updateId < $this->state->offset()) {
+                $consumed += 1;
+                continue;
+            }
+            $outcome = CallbackHandler::handle($update, $this->settings, $this->pdo, $this->api);
+            if (!array_key_exists($outcome, $counts)) {
+                throw new RuntimeException('Telegram callback outcome is invalid');
+            }
+            $counts[$outcome] += 1;
+            $handled += 1;
+            $this->state->commit($updateId + 1);
+            $consumed += 1;
+        }
+
+        return [
+            'fetched' => count($result),
+            'processed' => $counts[CallbackHandler::PROCESSED],
+            'rejected' => $counts[CallbackHandler::REJECTED],
+            'ignored' => $counts[CallbackHandler::IGNORED],
+            'deferred' => count($result) - $consumed,
+            'offset' => $this->state->offset(),
+        ];
+    }
+
+    public static function disableWebhook(BotApi $api): void
+    {
+        if ($api->call('deleteWebhook', ['drop_pending_updates' => false]) !== true) {
+            throw new RuntimeException('Telegram webhook deletion was not confirmed');
+        }
+        $info = $api->call('getWebhookInfo', []);
+        if (!is_array($info) || ($info['url'] ?? null) !== '') {
+            throw new RuntimeException('Telegram webhook is still active');
+        }
     }
 }

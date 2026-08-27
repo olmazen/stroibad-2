@@ -38,6 +38,21 @@ final class AlreadyModifiedBotApi extends RecordingBotApi
     }
 }
 
+final class AlreadySettledBotApi extends RecordingBotApi
+{
+    public function call(string $method, array $parameters): mixed
+    {
+        $this->calls[] = ['method' => $method, 'parameters' => $parameters];
+        if ($method === 'editMessageText') {
+            throw new BotApiFailure(400, 'Bad Request: message is not modified');
+        }
+        if ($method === 'answerCallbackQuery') {
+            throw new BotApiFailure(400, 'Bad Request: query is too old and response timeout expired');
+        }
+        return true;
+    }
+}
+
 /** @param array<string,string> $fields
  *  @param list<array{path:string,title:string,viewedAt:string}> $journey
  */
@@ -180,6 +195,13 @@ CallbackHandler::handle(
     $pdo,
     $alreadyModifiedApi
 );
+$alreadySettledApi = new AlreadySettledBotApi();
+CallbackHandler::handle(
+    callbackUpdate(TelegramText::historyCallback($second)),
+    $telegramSettings,
+    $pdo,
+    $alreadySettledApi
+);
 
 echo json_encode([
     'history' => $historyApi->calls,
@@ -187,5 +209,6 @@ echo json_encode([
     'unauthorized' => $unauthorizedApi->calls,
     'forged' => $forgedApi->calls,
     'alreadyModified' => $alreadyModifiedApi->calls,
+    'alreadySettled' => $alreadySettledApi->calls,
     'historyCallbackBytes' => strlen(TelegramText::historyCallback($second)),
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
