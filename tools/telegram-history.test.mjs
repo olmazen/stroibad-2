@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFile, execFileSync } from 'node:child_process';
+import { execFile, execFileSync, spawn } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import https from 'node:https';
@@ -119,6 +119,11 @@ test('Telegram history callback edits one bot message and enforces chat/user/but
     result.alreadyModified.map((call) => call.method),
     ['editMessageText', 'answerCallbackQuery'],
     'a safely repeated Telegram update must still clear the callback spinner'
+  );
+  assert.deepEqual(
+    result.alreadySettled.map((call) => call.method),
+    ['editMessageText', 'answerCallbackQuery'],
+    'a crash-replayed edit with an expired callback answer must settle idempotently'
   );
 });
 
@@ -331,4 +336,276 @@ test('direct Telegram sender uses the SQLite outbox, real HTTPS and one atomic c
     { mode: 'telegram', status: 'sent', attempts: 1 },
     { mode: 'telegram', status: 'sent', attempts: 2 }
   ]);
+});
+
+test('Telegram long polling preserves pending callbacks, persists offsets and never duplicates edits', async (t) => {
+  execFileSync(PHP, ['-r', "exit(PHP_VERSION_ID >= 80200 && extension_loaded('pdo_sqlite') && extension_loaded('mbstring') && extension_loaded('curl') ? 0 : 1);"], { stdio: 'ignore' });
+  const temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'egoe-telegram-poll-'));
+  t.after(async () => fs.rm(temporary, { recursive: true, force: true }));
+  const deployRoot = path.join(temporary, 'deploy');
+  await fs.mkdir(path.join(deployRoot, 'state'), { recursive: true, mode: 0o755 });
+  await fs.mkdir(path.join(deployRoot, 'shared'), { recursive: true, mode: 0o755 });
+  await fs.chmod(deployRoot, 0o755);
+  await fs.chmod(path.join(deployRoot, 'state'), 0o755);
+  await fs.writeFile(path.join(deployRoot, 'state/site-hostname'), 'egoe-life.ru\n', { mode: 0o600 });
+  await fs.writeFile(path.join(deployRoot, 'state/telegram-history-approved'), 'egoe-life.ru', { mode: 0o600 });
+  await fs.chmod(path.join(deployRoot, 'state/telegram-history-approved'), 0o600);
+
+  const env = { ...process.env, EGOE_DEPLOY_ROOT: deployRoot };
+  const leadCli = path.join(ROOT, 'api/leads/cli/leads.php');
+  await run(PHP, [leadCli, 'init'], { env });
+  await writePhpConfig(path.join(deployRoot, 'shared/leads/config.php'), {
+    site_host: 'www.egoe-life.ru',
+    allowed_hosts: ['www.egoe-life.ru', 'egoe-life.ru'],
+    collection_enabled: false,
+    consent_version: '2026-08-27',
+    ip_hash_key: '0123456789abcdef'.repeat(4),
+    minimum_elapsed_ms: 600,
+    rate_limit: { max_requests: 5, window_seconds: 600 },
+    retention_days: 365,
+    consent_evidence_days: 1095,
+    backup_retention_days: 30,
+    relay: {
+      enabled: false,
+      url: '',
+      mode: 'signal',
+      allow_signal: false,
+      allow_technical: false,
+      allow_full: false,
+      cross_border_confirmed: false,
+      timeout_seconds: 3,
+      ca_file: '',
+      url_sha256: '',
+      require_json_ok: true
+    }
+  });
+  const telegramDirectory = path.join(deployRoot, 'shared/telegram');
+  await fs.mkdir(telegramDirectory, { mode: 0o700 });
+  await fs.chmod(telegramDirectory, 0o700);
+  const botToken = `123456789:${'A'.repeat(35)}`;
+  await writePhpConfig(path.join(telegramDirectory, 'config.php'), {
+    enabled: true,
+    send_leads: false,
+    bot_token: botToken,
+    webhook_secret: 's'.repeat(48),
+    delivery_chat_id: '',
+    allowed_chat_ids: ['-1001234567890'],
+    allowed_user_ids: ['777000111'],
+    timeout_seconds: 3,
+    max_history_entries: 10
+  });
+
+  const tlsDirectory = path.join(temporary, 'tls');
+  await fs.mkdir(tlsDirectory, { mode: 0o700 });
+  const tlsKey = path.join(tlsDirectory, 'telegram-test.key');
+  const tlsCertificate = path.join(tlsDirectory, 'telegram-test.crt');
+  await run('openssl', [
+    'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
+    '-keyout', tlsKey, '-out', tlsCertificate,
+    '-subj', '/CN=127.0.0.1', '-addext', 'subjectAltName=IP:127.0.0.1'
+  ]);
+
+  const leadId = '55555555-5555-4555-8555-555555555555';
+  const historyData = `ch1:${leadId}`;
+  const leadData = `cl1:${leadId}`;
+  const callbackUpdate = ({ updateId, data, callbackId, userId = 777000111 }) => ({
+    update_id: updateId,
+    callback_query: {
+      id: callbackId,
+      from: { id: userId, is_bot: false },
+      message: {
+        message_id: 901,
+        from: { id: 123456789, is_bot: true },
+        chat: { id: -1001234567890, type: 'supergroup' },
+        reply_markup: { inline_keyboard: [[{ text: 'Кнопка', callback_data: data }]] }
+      },
+      data
+    }
+  });
+  const pending = [callbackUpdate({
+    updateId: 700,
+    data: historyData,
+    callbackId: 'callback-history'
+  })];
+  const requests = [];
+  let failNextEdit = 0;
+  let failUnauthorizedAnswer = false;
+  let webhookUrl = 'https://www.egoe-life.ru/api/telegram/webhook/';
+  const server = https.createServer({
+    key: await fs.readFile(tlsKey),
+    cert: await fs.readFile(tlsCertificate)
+  }, (request, response) => {
+    let body = '';
+    request.setEncoding('utf8');
+    request.on('data', (chunk) => { body += chunk; });
+    request.on('end', () => {
+      const parameters = JSON.parse(body || '{}');
+      const method = request.url?.replace(`/bot${botToken}/`, '') || '';
+      requests.push({ method, parameters });
+      const reply = (value) => {
+        response.writeHead(200, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify(value));
+      };
+      if (method === 'getUpdates') {
+        const offset = Number(parameters.offset || 0);
+        const limit = Number(parameters.limit || 100);
+        reply({ ok: true, result: pending.filter(({ update_id: id }) => id >= offset).slice(0, limit) });
+      } else if (method === 'editMessageText' && failNextEdit > 0) {
+        failNextEdit -= 1;
+        reply({ ok: false, error_code: 500, description: 'synthetic transient failure' });
+      } else if (method === 'editMessageText') {
+        reply({ ok: true, result: { message_id: 901, chat: { id: -1001234567890 } } });
+      } else if (method === 'answerCallbackQuery'
+          && parameters.callback_query_id === 'callback-unauthorized'
+          && failUnauthorizedAnswer) {
+        reply({ ok: false, error_code: 500, description: 'synthetic rejection failure' });
+      } else if (method === 'answerCallbackQuery') {
+        reply({ ok: true, result: true });
+      } else if (method === 'deleteWebhook') {
+        webhookUrl = '';
+        reply({ ok: true, result: true });
+      } else if (method === 'getWebhookInfo') {
+        reply({ ok: true, result: { url: webhookUrl, pending_update_count: pending.length } });
+      } else {
+        reply({ ok: false, error_code: 404, description: 'unexpected test method' });
+      }
+    });
+  });
+  await new Promise((resolve, reject) => server.once('error', reject).listen(0, '127.0.0.1', resolve));
+  t.after(() => { if (server.listening) server.close(); });
+  const address = server.address();
+  assert.equal(typeof address, 'object');
+  const transportEnv = {
+    ...env,
+    EGOE_TELEGRAM_TEST_API_BASE: `https://127.0.0.1:${address.port}`,
+    EGOE_TELEGRAM_TEST_CA: tlsCertificate
+  };
+  const harness = path.join(ROOT, 'tools/telegram-poll-harness.php');
+  await run(PHP, [harness, 'seed', leadId], { env: transportEnv });
+
+  const history = JSON.parse((await run(PHP, [harness, 'poll', '10'], { env: transportEnv })).stdout);
+  assert.deepEqual(history, {
+    ok: true, busy: false, fetched: 1, processed: 1, rejected: 0, ignored: 0, deferred: 0, offset: 701
+  });
+  const firstGet = requests.find(({ method }) => method === 'getUpdates');
+  assert.deepEqual(firstGet.parameters, {
+    offset: 0, limit: 10, timeout: 0, allowed_updates: ['callback_query']
+  });
+  const firstEdit = requests.find(({ method }) => method === 'editMessageText');
+  assert.match(firstEdit.parameters.text, /📚 История клиента/);
+  assert.equal(firstEdit.parameters.reply_markup.inline_keyboard[0][0].callback_data, leadData);
+
+  const offsetPath = path.join(telegramDirectory, 'poll-offset');
+  const lockPath = path.join(telegramDirectory, 'poll.lock');
+  assert.equal((await fs.stat(offsetPath)).mode & 0o777, 0o600);
+  assert.equal((await fs.stat(lockPath)).mode & 0o777, 0o600);
+
+  pending.push(callbackUpdate({ updateId: 701, data: leadData, callbackId: 'callback-back' }));
+  const back = JSON.parse((await run(PHP, [harness, 'poll', '10'], { env: transportEnv })).stdout);
+  assert.equal(back.processed, 1);
+  assert.equal(back.offset, 702);
+  const editsAfterBack = requests.filter(({ method }) => method === 'editMessageText');
+  assert.equal(editsAfterBack.length, 2);
+  assert.match(editsAfterBack[1].parameters.text, /🔔 Заявка с сайта EGOE/);
+  assert.equal(editsAfterBack[1].parameters.reply_markup.inline_keyboard[1][0].callback_data, historyData);
+
+  const restart = JSON.parse((await run(PHP, [harness, 'poll', '10'], { env: transportEnv })).stdout);
+  assert.equal(restart.fetched, 0);
+  assert.equal(requests.filter(({ method }) => method === 'editMessageText').length, 2, 'persisted offset must prevent duplicate edits after restart');
+
+  pending.push(callbackUpdate({ updateId: 702, data: historyData, callbackId: 'callback-retry' }));
+  await assert.rejects(run(PHP, [harness, 'poll-db-failure', '10'], { env: transportEnv }), (error) => {
+    assert.match(String(error.stderr), /Synthetic transient database failure/);
+    return true;
+  });
+  assert.equal((await fs.readFile(offsetPath, 'utf8')).trim(), '702', 'transient SQLite failure must remain pending');
+  assert.equal(
+    requests.filter(({ method }) => method === 'editMessageText').length,
+    2,
+    'a database failure must happen before any message edit'
+  );
+  failNextEdit = 1;
+  await assert.rejects(run(PHP, [harness, 'poll', '10'], { env: transportEnv }), (error) => {
+    assert.match(String(error.stderr), /Telegram Bot API request failed/);
+    const combined = `${error.stdout}\n${error.stderr}`;
+    assert.equal(combined.includes(botToken), false);
+    assert.equal(combined.includes(leadId), false);
+    assert.equal(combined.includes('polling.test@example.invalid'), false);
+    assert.equal(combined.includes('79272295828'), false);
+    return true;
+  });
+  assert.equal((await fs.readFile(offsetPath, 'utf8')).trim(), '702', 'failed edit must remain pending');
+  const retried = JSON.parse((await run(PHP, [harness, 'poll', '10'], { env: transportEnv })).stdout);
+  assert.equal(retried.processed, 1);
+  assert.equal(retried.offset, 703);
+  assert.equal(
+    requests.filter(({ method, parameters }) => method === 'editMessageText' && /📚 История клиента/.test(parameters.text)).length,
+    3,
+    'a failed edit is retried once before its offset advances'
+  );
+
+  pending.push({ update_id: 703, callback_query: { id: '' } });
+  pending.push(callbackUpdate({
+    updateId: 704,
+    data: historyData,
+    callbackId: 'callback-unauthorized',
+    userId: 777000999
+  }));
+  failUnauthorizedAnswer = true;
+  const poison = JSON.parse((await run(PHP, [harness, 'poll', '10'], { env: transportEnv })).stdout);
+  assert.equal(poison.ignored, 1);
+  assert.equal(poison.rejected, 1);
+  assert.equal(poison.offset, 705, 'malformed and unauthorized updates must not poison the queue');
+
+  const holder = spawn(PHP, [harness, 'hold', '700'], { env: transportEnv, stdio: ['ignore', 'pipe', 'pipe'] });
+  let holderStdout = '';
+  let holderStderr = '';
+  holder.stdout.setEncoding('utf8');
+  holder.stderr.setEncoding('utf8');
+  holder.stdout.on('data', (chunk) => { holderStdout += chunk; });
+  holder.stderr.on('data', (chunk) => { holderStderr += chunk; });
+  const holderDone = new Promise((resolve, reject) => {
+    holder.once('error', reject);
+    holder.once('exit', (code) => {
+      if (code === 0 && holderStdout.includes('RELEASED\n')) resolve();
+      else reject(new Error(`lock holder failed (${code}): ${holderStderr}`));
+    });
+  });
+  await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error('lock holder did not become ready')), 3000);
+    const onData = () => {
+      if (!holderStdout.includes('LOCKED\n')) return;
+      clearTimeout(timeout);
+      holder.stdout.off('data', onData);
+      resolve();
+    };
+    holder.stdout.on('data', onData);
+    holder.once('error', (error) => {
+      clearTimeout(timeout);
+      reject(error);
+    });
+    holder.once('exit', (code) => {
+      if (!holderStdout.includes('LOCKED\n')) {
+        clearTimeout(timeout);
+        reject(new Error(`lock holder exited early (${code}): ${holderStderr}`));
+      }
+    });
+  });
+  const concurrent = JSON.parse((await run(PHP, [harness, 'poll', '10'], { env: transportEnv })).stdout);
+  assert.deepEqual(concurrent, { ok: true, busy: true });
+  await holderDone;
+
+  const deletion = await run(PHP, [harness, 'delete-webhook'], { env: transportEnv });
+  assert.equal(deletion.stdout.trim(), 'WEBHOOK_DELETED_PENDING_PRESERVED');
+  const deleteRequest = requests.find(({ method }) => method === 'deleteWebhook');
+  assert.deepEqual(deleteRequest.parameters, { drop_pending_updates: false });
+  assert.equal(webhookUrl, '');
+
+  const savedOffset = `${offsetPath}.saved`;
+  await fs.rename(offsetPath, savedOffset);
+  await fs.symlink(savedOffset, offsetPath);
+  await assert.rejects(run(PHP, [harness, 'offset'], { env: transportEnv }), (error) => {
+    assert.match(String(error.stderr), /permissions are unsafe/);
+    return true;
+  });
 });
