@@ -149,6 +149,15 @@ final class Runtime
 
 final class Settings
 {
+    public const CURRENT_CONSENT_VERSION = '2026-08-27';
+    private const LEGACY_CONSENT_VERSION = '2026-08-23';
+
+    public static function acceptsConsentVersion(string $version): bool
+    {
+        return hash_equals(self::CURRENT_CONSENT_VERSION, $version)
+            || hash_equals(self::LEGACY_CONSENT_VERSION, $version);
+    }
+
     /** @return array<string,mixed> */
     public static function load(string $deployRoot): array
     {
@@ -170,7 +179,7 @@ final class Settings
             'site_host' => 'www.egoe-life.ru',
             'allowed_hosts' => ['www.egoe-life.ru', 'egoe-life.ru'],
             'collection_enabled' => false,
-            'consent_version' => '2026-08-27',
+            'consent_version' => self::CURRENT_CONSENT_VERSION,
             'minimum_elapsed_ms' => 600,
             'rate_limit' => ['max_requests' => 5, 'window_seconds' => 600],
             'retention_days' => 365,
@@ -191,6 +200,10 @@ final class Settings
             ],
         ];
         $settings = array_replace_recursive($defaults, $loaded);
+
+        if (!is_string($settings['consent_version']) || !self::acceptsConsentVersion($settings['consent_version'])) {
+            throw new RuntimeException('consent_version is outside the approved transition allowlist');
+        }
 
         if (!is_bool($settings['collection_enabled'])) {
             throw new RuntimeException('collection_enabled must be boolean');
@@ -539,7 +552,7 @@ final class Validator
             throw new HttpFailure(422, 'CONSENT_REQUIRED', 'Необходимо согласие на обработку персональных данных.');
         }
         $consentVersion = self::text($consent['version'] ?? null, 40, 'consent.version');
-        if (!hash_equals((string)$settings['consent_version'], $consentVersion)) {
+        if (!Settings::acceptsConsentVersion($consentVersion)) {
             throw new HttpFailure(422, 'CONSENT_VERSION_INVALID', 'Версия согласия устарела. Обновите страницу.');
         }
         $acceptedAt = self::timestamp($consent['acceptedAt'] ?? null, 'consent.acceptedAt');

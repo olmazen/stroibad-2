@@ -342,6 +342,40 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.match(firstEvidence.payload_hash, /^[0-9a-f]{64}$/);
   assert.match(firstEvidence.received_at, /^\d{4}-\d{2}-\d{2}T/);
 
+  async function storedConsentVersion(leadId) {
+    const script = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $q=$p->prepare('SELECT consent_version FROM consent_evidence WHERE lead_id=?'); $q->execute(['${leadId}']); echo $q->fetchColumn();`;
+    return (await run(PHP, ['-r', script], { env })).stdout;
+  }
+
+  await writeConfig(deployRoot, activeSettings({ consent_version: '2026-08-23' }));
+  const currentConsentOnLegacyConfig = lead();
+  result = await post(currentConsentOnLegacyConfig);
+  assert.equal(result.response.status, 201, 'current consent must work while production config still names the legacy version');
+  assert.equal(await storedConsentVersion(currentConsentOnLegacyConfig.leadId), '2026-08-27');
+  await run(PHP, [cli, 'delete', currentConsentOnLegacyConfig.leadId, '--with-evidence'], { env });
+
+  await writeConfig(deployRoot, activeSettings());
+  const cachedLegacyConsent = lead();
+  cachedLegacyConsent.consent = { ...cachedLegacyConsent.consent, version: '2026-08-23' };
+  result = await post(cachedLegacyConsent);
+  assert.equal(result.response.status, 201, 'cached legacy consent must work after the current config is installed');
+  assert.equal(await storedConsentVersion(cachedLegacyConsent.leadId), '2026-08-23', 'evidence must keep the version actually submitted');
+  await run(PHP, [cli, 'delete', cachedLegacyConsent.leadId, '--with-evidence'], { env });
+
+  const unknownConsent = lead();
+  unknownConsent.consent = { ...unknownConsent.consent, version: '2026-08-22' };
+  result = await post(unknownConsent);
+  assert.equal(result.response.status, 422);
+  assert.equal(result.json.code, 'CONSENT_VERSION_INVALID');
+
+  await writeConfig(deployRoot, activeSettings({ consent_version: '2026-08-22' }));
+  await assert.rejects(
+    run(PHP, [cli, 'health'], { env }),
+    (error) => failureText(error).includes('outside the approved transition allowlist'),
+    'an unknown configured consent version must fail closed'
+  );
+  await writeConfig(deployRoot, activeSettings());
+
   await new Promise((resolve) => setTimeout(resolve, 10));
   const recentTarget = lead({
     formId: 'test:recent',
