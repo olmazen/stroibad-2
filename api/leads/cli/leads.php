@@ -6,6 +6,7 @@ umask(0077);
 
 use Egoe\Leads\Database;
 use Egoe\Leads\BackupRetention;
+use Egoe\Leads\CustomerHistory;
 use Egoe\Leads\Relay;
 use Egoe\Leads\Runtime;
 use Egoe\Leads\Settings;
@@ -45,7 +46,7 @@ function initialize(): void
             'site_host' => 'www.egoe-life.ru',
             'allowed_hosts' => ['www.egoe-life.ru', 'egoe-life.ru'],
             'collection_enabled' => false,
-            'consent_version' => '2026-08-23',
+            'consent_version' => '2026-08-27',
             'ip_hash_key' => bin2hex(random_bytes(32)),
             'minimum_elapsed_ms' => 600,
             'rate_limit' => ['max_requests' => 5, 'window_seconds' => 600],
@@ -150,6 +151,16 @@ SQL);
     $statement->execute();
     echo json_encode(
         $statement->fetchAll(),
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+    ) . "\n";
+}
+
+/** @param array<string,mixed> $settings */
+function customerHistory(PDO $pdo, array $settings, string $leadId): void
+{
+    $history = CustomerHistory::forLead($pdo, $leadId, (string)$settings['ip_hash_key']);
+    echo json_encode(
+        $history,
         JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
     ) . "\n";
 }
@@ -308,6 +319,12 @@ try {
         case 'recent':
             recentLeads($pdo, (string)($argv[2] ?? '20'));
             break;
+        case 'customer-history':
+            if (count($argv) !== 3) {
+                fail('customer-history requires exactly one lead UUID');
+            }
+            customerHistory($pdo, $settings, (string)$argv[2]);
+            break;
         case 'backup':
             backup($root);
             break;
@@ -318,7 +335,7 @@ try {
             deleteLead($pdo, (string)($argv[2] ?? ''), in_array('--with-evidence', $argv, true));
             break;
         default:
-            echo "Usage: php api/leads/cli/leads.php init|migrate|health|retry [limit]|recent [limit]|view <uuid>|backup|retention|delete <uuid> [--with-evidence]\n";
+            echo "Usage: php api/leads/cli/leads.php init|migrate|health|retry [limit]|recent [limit]|view <uuid>|customer-history <uuid>|backup|retention|delete <uuid> [--with-evidence]\n";
             exit($command === 'help' ? 0 : 1);
     }
 } catch (Throwable $error) {

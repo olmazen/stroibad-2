@@ -62,6 +62,10 @@ function lead(overrides = {}) {
       title: 'Тест',
       referrer: 'https://www.egoe-life.ru/source/?email=secret@example.com#fragment'
     },
+    journey: [
+      { path: '/catalog/parkovye-skameyki/', title: 'Парковые скамейки', viewedAt: timestamp },
+      { path: '/test/', title: 'Тест', viewedAt: timestamp }
+    ],
     spamCheck: { website: '', elapsedMs: 1500 },
     fields: { Имя: 'Анна', Телефон: '8 (927) 123-45-67' },
     ...overrides
@@ -324,7 +328,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(rejectedStatusHost.response.status, 403);
   assert.equal(rejectedStatusHost.json.code, 'HOST_REJECTED');
 
-  const first = lead();
+  const first = lead({ fields: { Имя: 'Анна', Телефон: '8 (927) 123-45-67', Email: 'Customer@Example.com' } });
   let result = await post(first);
   assert.equal(result.response.status, 201, serverErrors);
   assert.deepEqual(result.json, { ok: true, leadId: first.leadId, duplicate: false });
@@ -392,6 +396,36 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(result.response.status, 422);
   assert.equal(result.json.code, 'CONTACT_REQUIRED');
 
+  const queryJourney = lead({ journey: [{ path: '/catalog/?secret=yes', title: 'Тест', viewedAt: new Date().toISOString() }] });
+  result = await post(queryJourney);
+  assert.equal(result.response.status, 422);
+  assert.equal(result.json.code, 'JOURNEY_INVALID');
+
+  const duplicateJourney = lead();
+  duplicateJourney.journey = [duplicateJourney.journey[0], { ...duplicateJourney.journey[0] }];
+  result = await post(duplicateJourney);
+  assert.equal(result.response.status, 422);
+  assert.equal(result.json.code, 'JOURNEY_INVALID');
+
+  const oversizedJourney = lead();
+  oversizedJourney.journey = Array.from({ length: 21 }, (_, index) => ({
+    path: `/catalog/${index}/`, title: `Изделие ${index}`, viewedAt: oversizedJourney.createdAt
+  }));
+  result = await post(oversizedJourney);
+  assert.equal(result.response.status, 422);
+  assert.equal(result.json.code, 'JOURNEY_INVALID');
+
+  const legacyWithoutJourney = lead();
+  delete legacyWithoutJourney.journey;
+  result = await post(legacyWithoutJourney);
+  assert.equal(result.response.status, 201, 'cached pre-journey clients must remain accepted during rollout');
+  const legacyRetry = await post(legacyWithoutJourney);
+  assert.equal(legacyRetry.response.status, 200);
+  assert.equal(legacyRetry.json.duplicate, true, 'a cached pre-journey retry must preserve the legacy idempotency contract');
+  const legacyViewed = JSON.parse((await run(PHP, [cli, 'view', legacyWithoutJourney.leadId], { env })).stdout);
+  assert.deepEqual(legacyViewed.journey, []);
+  await run(PHP, [cli, 'delete', legacyWithoutJourney.leadId, '--with-evidence'], { env });
+
   const badTimestamp = lead({ createdAt: new Date(Date.now() - 90000000).toISOString() });
   badTimestamp.consent.acceptedAt = badTimestamp.createdAt;
   result = await post(badTimestamp);
@@ -425,6 +459,96 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.equal(viewed.page.path, '/test/');
   assert.equal(viewed.page.referrer, '/source/');
   assert.equal(JSON.stringify(viewed).includes('secret@example.com'), false);
+  assert.deepEqual(viewed.journey.map((entry) => entry.path), ['/catalog/parkovye-skameyki/', '/test/']);
+
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  const samePhone = lead({
+    formId: 'history:phone',
+    page: { url: 'https://www.egoe-life.ru/catalog/skameyki/', title: 'Каталог', referrer: '' },
+    journey: [{ path: '/catalog/skameyki/', title: 'Скамейки', viewedAt: new Date().toISOString() }],
+    fields: { Имя: 'Другой ввод имени', Телефон: '+7 (927) 123-45-67', Email: 'other@example.com' }
+  });
+  result = await post(samePhone);
+  assert.equal(result.response.status, 201);
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  const sameEmailQuote = lead({
+    formId: 'cart:quote',
+    tag: 'КП',
+    page: { url: 'https://www.egoe-life.ru/cart/', title: 'Корзина', referrer: '' },
+    journey: [
+      { path: '/catalog/parkovye-skameyki/', title: 'Парковые скамейки', viewedAt: new Date().toISOString() },
+      { path: '/cart/', title: 'Корзина', viewedAt: new Date().toISOString() }
+    ],
+    fields: {
+      Имя: 'Ещё один ввод имени',
+      Телефон: '+7 999 111-22-33',
+      Email: 'customer@example.com',
+      Итого: '66 810 ₽',
+      '№ КП': 'КП-HISTORY-001'
+    }
+  });
+  result = await post(sameEmailQuote);
+  assert.equal(result.response.status, 201);
+  const unrelatedHistoryLead = lead({
+    formId: 'history:unrelated',
+    page: { url: 'https://www.egoe-life.ru/contacts/', title: 'Контакты', referrer: '' },
+    fields: { Имя: 'Чужое секретное имя', Телефон: '+7 900 000-00-01', Email: 'stranger@example.com' }
+  });
+  result = await post(unrelatedHistoryLead);
+  assert.equal(result.response.status, 201);
+
+  const historyRun = await run(PHP, [cli, 'customer-history', first.leadId], { env });
+  const history = JSON.parse(historyRun.stdout);
+  assert.deepEqual(history.limits, { scan: 5000, entries: 50 });
+  assert.deepEqual(history.summary.matchedBy, ['email', 'phone']);
+  assert.equal(history.summary.matchingLeadCount, 3);
+  assert.equal(history.summary.returnedLeadCount, 3);
+  assert.equal(history.summary.entriesTruncated, false);
+  assert.equal(history.summary.quoteCount, 1);
+  assert.equal(history.summary.knownAmountRub, 66810);
+  assert.equal(history.scan.retainedLeadCount, 4);
+  assert.equal(history.scan.scannedLeadCount, 4);
+  assert.equal(history.scan.truncated, false);
+  assert.deepEqual(history.entries.map((entry) => entry.leadId), [first.leadId, samePhone.leadId, sameEmailQuote.leadId]);
+  assert.equal(history.entries[2].amountRub, 66810);
+  assert.equal(history.entries[2].kpNumber, 'КП-HISTORY-001');
+  assert.deepEqual(history.entries[2].viewed.map((entry) => entry.path), ['/catalog/parkovye-skameyki/', '/cart/']);
+  for (const entry of history.entries) {
+    assert.deepEqual(
+      Object.keys(entry),
+      ['leadId', 'receivedAt', 'formId', 'pagePath', 'amountRub', 'kpNumber', 'viewed']
+    );
+  }
+  const serializedHistory = JSON.stringify(history);
+  for (const forbidden of ['Customer@Example.com', 'customer@example.com', 'other@example.com', 'stranger@example.com', 'Чужое секретное имя', '79271234567', '79991112233', '79000000001']) {
+    assert.equal(serializedHistory.includes(forbidden), false, `history leaked raw PII: ${forbidden}`);
+  }
+  assert.doesNotMatch(serializedHistory, /[0-9a-f]{64}/i, 'history output must not expose internal identity fingerprints');
+  assert.equal((await run(PHP, [cli, 'customer-history', first.leadId], { env })).stdout, historyRun.stdout, 'history output must be deterministic');
+  await assert.rejects(
+    run(PHP, [cli, 'customer-history', first.leadId, 'extra'], { env }),
+    (error) => failureText(error).includes('exactly one lead UUID')
+  );
+  await assert.rejects(
+    run(PHP, [cli, 'customer-history', 'not-a-uuid'], { env }),
+    (error) => failureText(error).includes('Lead ID must be a UUID')
+  );
+
+  const identityScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $k='${settings().ip_hash_key}'; echo json_encode(['upper'=>Egoe\\Leads\\CustomerIdentity::fingerprints(['Email'=>'Customer@Example.com'],$k),'lower'=>Egoe\\Leads\\CustomerIdentity::fingerprints(['Email'=>'customer@example.com'],$k),'phone'=>Egoe\\Leads\\CustomerIdentity::fingerprints(['Phone'=>'+7 927 123-45-67'],$k)]);`;
+  const fingerprints = JSON.parse((await run(PHP, ['-r', identityScript], { env })).stdout);
+  assert.deepEqual(fingerprints.upper, fingerprints.lower, 'e-mail identity must be case-insensitive');
+  assert.match(Object.keys(fingerprints.upper)[0], /^email:[0-9a-f]{64}$/);
+  assert.match(Object.keys(fingerprints.phone)[0], /^phone:[0-9a-f]{64}$/);
+  assert.equal(JSON.stringify(fingerprints).includes('Customer@Example.com'), false);
+  const schemaTablesScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); echo json_encode(['version'=>(int)$p->query('PRAGMA user_version')->fetchColumn(),'tables'=>$p->query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")->fetchAll(PDO::FETCH_COLUMN)]);`;
+  const schemaTables = JSON.parse((await run(PHP, ['-r', schemaTablesScript], { env })).stdout);
+  assert.equal(schemaTables.version, 2, 'customer history must not bump the production schema');
+  assert.equal(schemaTables.tables.some((name) => /identity|customer/i.test(name)), false, 'identity fingerprints must remain in memory only');
+
+  for (const target of [samePhone, sameEmailQuote, unrelatedHistoryLead]) {
+    const cleanup = await run(PHP, [cli, 'delete', target.leadId, '--with-evidence'], { env });
+    assert.match(cleanup.stdout, /lead=1 evidence=1/);
+  }
 
   const queryScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); echo json_encode(['leads'=>(int)$p->query('SELECT count(*) FROM leads')->fetchColumn(),'evidence'=>(int)$p->query('SELECT count(*) FROM consent_evidence')->fetchColumn(),'outbox'=>(int)$p->query('SELECT count(*) FROM outbox')->fetchColumn()]);`;
   let counts = JSON.parse((await run(PHP, ['-r', queryScript], { env })).stdout);

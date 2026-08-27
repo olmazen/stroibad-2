@@ -511,7 +511,7 @@ final class Validator
      */
     public static function payload(array $input, array $settings): array
     {
-        self::onlyKeys($input, ['schemaVersion', 'leadId', 'formId', 'tag', 'createdAt', 'consent', 'page', 'spamCheck', 'fields'], 'payload');
+        self::onlyKeys($input, ['schemaVersion', 'leadId', 'formId', 'tag', 'createdAt', 'consent', 'page', 'spamCheck', 'fields', 'journey'], 'payload');
         if (($input['schemaVersion'] ?? null) !== 1) {
             throw new HttpFailure(422, 'SCHEMA_INVALID', 'Неподдерживаемая версия заявки.');
         }
@@ -557,6 +557,7 @@ final class Validator
         $pagePath = self::sameSitePath(self::text($page['url'] ?? null, 1500, 'page.url'), $settings);
         $pageTitle = self::optionalText($page['title'] ?? '', 300, 'page.title');
         $pageReferrer = self::minimizedReferrer(self::optionalText($page['referrer'] ?? '', 1500, 'page.referrer'), $settings);
+        $journey = self::journey($input['journey'] ?? [], $createdTime);
 
         $spam = self::object($input['spamCheck'] ?? null, 'spamCheck');
         self::onlyKeys($spam, ['website', 'elapsedMs'], 'spamCheck');
@@ -630,6 +631,7 @@ final class Validator
                 'title' => $pageTitle,
                 'referrer' => $pageReferrer,
             ],
+            'journey' => $journey,
             'spamCheck' => ['website' => $website, 'elapsedMs' => $elapsedMs],
             'fields' => $normalizedFields,
         ];
@@ -671,6 +673,57 @@ final class Validator
             throw new HttpFailure(422, 'FIELD_INVALID', "Некорректное поле {$name}.");
         }
         return trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $value) ?? '');
+    }
+
+    /** @return list<array{path:string,title:string,viewedAt:string}> */
+    private static function journey(mixed $value, DateTimeImmutable $createdTime): array
+    {
+        if (!is_array($value) || !array_is_list($value) || count($value) > 20) {
+            throw new HttpFailure(422, 'JOURNEY_INVALID', 'Некорректная история просмотра. Обновите страницу.');
+        }
+        $normalized = [];
+        $paths = [];
+        $previousTimestamp = null;
+        foreach ($value as $index => $entryValue) {
+            $entry = self::object($entryValue, "journey.{$index}");
+            self::onlyKeys($entry, ['path', 'title', 'viewedAt'], "journey.{$index}");
+            $path = self::journeyPath($entry['path'] ?? null, "journey.{$index}.path");
+            if (isset($paths[$path])) {
+                throw new HttpFailure(422, 'JOURNEY_INVALID', 'История просмотра содержит повторы. Обновите страницу.');
+            }
+            $paths[$path] = true;
+            $title = self::optionalText($entry['title'] ?? '', 160, "journey.{$index}.title");
+            $title = preg_replace('/\s+/u', ' ', $title) ?? '';
+            $viewedAt = self::timestamp($entry['viewedAt'] ?? null, "journey.{$index}.viewedAt");
+            $viewedTime = new DateTimeImmutable($viewedAt);
+            if ($viewedTime->getTimestamp() > $createdTime->getTimestamp() + 600
+                || $viewedTime->getTimestamp() < $createdTime->getTimestamp() - 86400
+                || ($previousTimestamp !== null && $viewedTime->getTimestamp() < $previousTimestamp)
+            ) {
+                throw new HttpFailure(422, 'JOURNEY_INVALID', 'Время истории просмотра недопустимо. Обновите страницу.');
+            }
+            $previousTimestamp = $viewedTime->getTimestamp();
+            $normalized[] = ['path' => $path, 'title' => $title, 'viewedAt' => $viewedAt];
+        }
+        return $normalized;
+    }
+
+    private static function journeyPath(mixed $value, string $name): string
+    {
+        $path = self::text($value, 500, $name);
+        if (!str_starts_with($path, '/')
+            || str_starts_with($path, '//')
+            || str_contains($path, '?')
+            || str_contains($path, '#')
+            || preg_match('/[\r\n]/u', $path) === 1
+        ) {
+            throw new HttpFailure(422, 'JOURNEY_INVALID', 'История просмотра содержит некорректный адрес.');
+        }
+        $normalized = '/' . ltrim((string)preg_replace('~/+~', '/', $path), '/');
+        if (!hash_equals($normalized, $path)) {
+            throw new HttpFailure(422, 'JOURNEY_INVALID', 'История просмотра содержит некорректный адрес.');
+        }
+        return $path;
     }
 
     private static function timestamp(mixed $value, string $name): string
@@ -734,6 +787,272 @@ final class Validator
     }
 }
 
+final class CustomerIdentity
+{
+    private const KEY_DOMAIN = "egoe/customer-history-key/v1";
+    private const VALUE_DOMAIN = "egoe/customer-history-identity/v1";
+
+    /** @param array<string,mixed> $fields
+     *  @return array<string,string> fingerprint => identity kind
+     */
+    public static function fingerprints(array $fields, string $masterKey): array
+    {
+        if (strlen($masterKey) < 32) {
+            throw new RuntimeException('Customer history hash key is unavailable');
+        }
+        $derivedKey = hash_hmac('sha256', self::KEY_DOMAIN, $masterKey, true);
+        $fingerprints = [];
+        foreach ($fields as $fieldName => $fieldValue) {
+            if (!is_string($fieldName) || !is_string($fieldValue) || trim($fieldValue) === '') {
+                continue;
+            }
+            $kind = null;
+            $normalized = null;
+            if (preg_match('/тел|phone/iu', $fieldName) === 1) {
+                $kind = 'phone';
+                $normalized = self::phone($fieldValue);
+            } elseif (preg_match('/почт|e-?mail/iu', $fieldName) === 1) {
+                $kind = 'email';
+                $normalized = self::email($fieldValue);
+            }
+            if ($kind === null || $normalized === null) {
+                continue;
+            }
+            $message = self::VALUE_DOMAIN . "\0" . $kind . "\0" . $normalized;
+            $fingerprints[$kind . ':' . hash_hmac('sha256', $message, $derivedKey)] = $kind;
+        }
+        ksort($fingerprints, SORT_STRING);
+        return $fingerprints;
+    }
+
+    private static function phone(string $value): ?string
+    {
+        $digits = preg_replace('/\D+/', '', $value) ?? '';
+        if (strlen($digits) === 10) {
+            $digits = '7' . $digits;
+        } elseif (strlen($digits) === 11 && $digits[0] === '8') {
+            $digits = '7' . substr($digits, 1);
+        }
+        return strlen($digits) === 11 && $digits[0] === '7' ? '+' . $digits : null;
+    }
+
+    private static function email(string $value): ?string
+    {
+        $normalized = mb_strtolower(trim($value), 'UTF-8');
+        return filter_var($normalized, FILTER_VALIDATE_EMAIL) !== false ? $normalized : null;
+    }
+}
+
+final class CustomerHistory
+{
+    public const SCAN_LIMIT = 5000;
+    public const ENTRY_LIMIT = 50;
+    private const UUID = '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/Di';
+
+    /** @return array<string,mixed> */
+    public static function forLead(PDO $pdo, string $leadId, string $masterKey): array
+    {
+        $leadId = strtolower(trim($leadId));
+        if (preg_match(self::UUID, $leadId) !== 1) {
+            throw new RuntimeException('Lead ID must be a UUID');
+        }
+        $targetQuery = $pdo->prepare(<<<'SQL'
+SELECT lead_id, received_at, form_id, page_path, fields_json, payload_json
+FROM leads
+WHERE lead_id = :lead_id
+SQL);
+        $targetQuery->execute([':lead_id' => $leadId]);
+        $target = $targetQuery->fetch();
+        if (!is_array($target)) {
+            throw new RuntimeException('Lead not found');
+        }
+        $targetFields = self::decodeFields((string)$target['fields_json']);
+        $targetFingerprints = CustomerIdentity::fingerprints($targetFields, $masterKey);
+        if ($targetFingerprints === []) {
+            throw new RuntimeException('Lead has no usable customer identity');
+        }
+
+        $totalRetained = (int)$pdo->query('SELECT count(*) FROM leads')->fetchColumn();
+        $matches = [self::entry($target, $targetFields)];
+        $matchedKinds = [];
+        $scanned = 1;
+
+        $scan = $pdo->prepare(<<<'SQL'
+SELECT lead_id, received_at, form_id, page_path, fields_json, payload_json
+FROM leads
+WHERE lead_id <> :lead_id
+ORDER BY received_at DESC, lead_id DESC
+LIMIT :limit
+SQL);
+        $scan->bindValue(':lead_id', $leadId, PDO::PARAM_STR);
+        $scan->bindValue(':limit', self::SCAN_LIMIT - 1, PDO::PARAM_INT);
+        $scan->execute();
+        while (($row = $scan->fetch()) !== false) {
+            $scanned += 1;
+            try {
+                $fields = self::decodeFields((string)$row['fields_json']);
+            } catch (RuntimeException) {
+                continue;
+            }
+            $candidateFingerprints = CustomerIdentity::fingerprints($fields, $masterKey);
+            $shared = array_intersect_key($candidateFingerprints, $targetFingerprints);
+            if ($shared === []) {
+                continue;
+            }
+            foreach ($shared as $kind) {
+                $matchedKinds[$kind] = true;
+            }
+            $matches[] = self::entry($row, $fields);
+        }
+
+        usort($matches, static function (array $left, array $right): int {
+            return [$left['receivedAt'], $left['leadId']] <=> [$right['receivedAt'], $right['leadId']];
+        });
+        $matchingLeadCount = count($matches);
+        $returned = array_slice($matches, -self::ENTRY_LIMIT);
+        $knownAmountRub = 0;
+        $quoteCount = 0;
+        foreach ($matches as $entry) {
+            if (is_int($entry['amountRub'])) {
+                $knownAmountRub += $entry['amountRub'];
+            }
+            if (is_string($entry['kpNumber'])) {
+                $quoteCount += 1;
+            }
+        }
+        ksort($matchedKinds, SORT_STRING);
+
+        return [
+            'leadId' => $leadId,
+            'limits' => ['scan' => self::SCAN_LIMIT, 'entries' => self::ENTRY_LIMIT],
+            'scan' => [
+                'retainedLeadCount' => $totalRetained,
+                'scannedLeadCount' => $scanned,
+                'truncated' => $totalRetained > $scanned,
+            ],
+            'summary' => [
+                'matchingLeadCount' => $matchingLeadCount,
+                'returnedLeadCount' => count($returned),
+                'entriesTruncated' => $matchingLeadCount > count($returned),
+                'matchedBy' => array_keys($matchedKinds),
+                'firstReceivedAt' => $matches[0]['receivedAt'],
+                'lastReceivedAt' => $matches[$matchingLeadCount - 1]['receivedAt'],
+                'quoteCount' => $quoteCount,
+                'knownAmountRub' => $knownAmountRub,
+            ],
+            'entries' => $returned,
+        ];
+    }
+
+    /** @return array<string,mixed> */
+    private static function decodeFields(string $json): array
+    {
+        try {
+            $fields = json_decode($json, true, 32, JSON_THROW_ON_ERROR);
+        } catch (JsonException $error) {
+            throw new RuntimeException('Lead fields are unreadable', 0, $error);
+        }
+        if (!is_array($fields) || array_is_list($fields)) {
+            throw new RuntimeException('Lead fields are unreadable');
+        }
+        return $fields;
+    }
+
+    /** @param array<string,mixed> $row
+     *  @param array<string,mixed> $fields
+     *  @return array{leadId:string,receivedAt:string,formId:string,pagePath:string,amountRub:?int,kpNumber:?string,viewed:list<array{path:string,title:string,viewedAt:string}>}
+     */
+    private static function entry(array $row, array $fields): array
+    {
+        [$amountRub, $kpNumber] = self::orderDetails($fields);
+        return [
+            'leadId' => (string)$row['lead_id'],
+            'receivedAt' => (string)$row['received_at'],
+            'formId' => (string)$row['form_id'],
+            'pagePath' => (string)$row['page_path'],
+            'amountRub' => $amountRub,
+            'kpNumber' => $kpNumber,
+            'viewed' => self::safeJourney((string)$row['payload_json']),
+        ];
+    }
+
+    /** @param array<string,mixed> $fields
+     *  @return array{0:?int,1:?string}
+     */
+    private static function orderDetails(array $fields): array
+    {
+        $amountRub = null;
+        $kpNumber = null;
+        foreach ($fields as $name => $value) {
+            if (!is_string($name) || !is_string($value)) {
+                continue;
+            }
+            $key = mb_strtolower(trim((string)preg_replace('/\s+/u', ' ', $name)), 'UTF-8');
+            if ($amountRub === null && preg_match('/^(?:итого|сумма(?: (?:заказа|кп))?|total)$/uD', $key) === 1) {
+                $amountRub = self::rubles($value);
+            }
+            if ($kpNumber === null && preg_match('/^(?:№ ?кп|номер кп|кп)$/uD', $key) === 1) {
+                $candidate = trim((string)preg_replace('/[\x00-\x1F\x7F]/u', '', $value));
+                if ($candidate !== '' && mb_strlen($candidate, 'UTF-8') <= 100) {
+                    $kpNumber = $candidate;
+                }
+            }
+        }
+        return [$amountRub, $kpNumber];
+    }
+
+    private static function rubles(string $value): ?int
+    {
+        if (preg_match('/^\s*(\d[\d\s\x{00A0}]*)(?:[,.]00)?\s*(?:₽|руб\.?)?\s*$/uD', $value, $match) !== 1) {
+            return null;
+        }
+        $digits = preg_replace('/\D+/', '', $match[1]) ?? '';
+        if ($digits === '' || strlen($digits) > 12) {
+            return null;
+        }
+        $amount = (int)$digits;
+        return $amount <= 100000000000 ? $amount : null;
+    }
+
+    /** @return list<array{path:string,title:string,viewedAt:string}> */
+    private static function safeJourney(string $payloadJson): array
+    {
+        try {
+            $payload = json_decode($payloadJson, true, 32, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return [];
+        }
+        $journey = is_array($payload) ? ($payload['journey'] ?? null) : null;
+        if (!is_array($journey) || !array_is_list($journey)) {
+            return [];
+        }
+        $safe = [];
+        foreach (array_slice($journey, 0, 20) as $entry) {
+            if (!is_array($entry)
+                || array_is_list($entry)
+                || !is_string($entry['path'] ?? null)
+                || !is_string($entry['title'] ?? null)
+                || !is_string($entry['viewedAt'] ?? null)
+                || !str_starts_with($entry['path'], '/')
+                || str_starts_with($entry['path'], '//')
+                || str_contains($entry['path'], '?')
+                || str_contains($entry['path'], '#')
+                || mb_strlen($entry['path'], 'UTF-8') > 500
+                || mb_strlen($entry['title'], 'UTF-8') > 160
+                || preg_match('/^\d{4}-\d{2}-\d{2}T/uD', $entry['viewedAt']) !== 1
+            ) {
+                continue;
+            }
+            $safe[] = [
+                'path' => $entry['path'],
+                'title' => preg_replace('/\s+/u', ' ', trim($entry['title'])) ?? '',
+                'viewedAt' => $entry['viewedAt'],
+            ];
+        }
+        return $safe;
+    }
+}
+
 final class LeadStore
 {
     /** @param array<string,mixed> $lead
@@ -743,7 +1062,7 @@ final class LeadStore
     public static function accept(PDO $pdo, array $lead, array $settings, string $ipHash): array
     {
         $payloadJson = self::json($lead);
-        $payloadHash = hash('sha256', self::json(self::canonicalize([
+        $hashPayload = [
             'formId' => $lead['formId'],
             'tag' => $lead['tag'],
             'page' => $lead['page'],
@@ -752,7 +1071,12 @@ final class LeadStore
                 'documentUrl' => $lead['consent']['documentUrl'],
             ],
             'fields' => $lead['fields'],
-        ])));
+        ];
+        // Preserve the pre-journey idempotency hash for cached clients retrying an accepted request.
+        if ($lead['journey'] !== []) {
+            $hashPayload['journey'] = $lead['journey'];
+        }
+        $payloadHash = hash('sha256', self::json(self::canonicalize($hashPayload)));
         $pdo->exec('BEGIN IMMEDIATE');
         try {
             $existing = $pdo->prepare('SELECT payload_hash FROM leads WHERE lead_id = :lead_id');

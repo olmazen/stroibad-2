@@ -5,8 +5,12 @@
   var moduleStartedAt = Date.now();
   var FORM_SELECTOR = 'form[onsubmit*="EGOE_LEADS"], form[onsubmit*="submitLead"], form#kpForm';
   var STATUS_ENDPOINT = '/api/leads/status/';
+  var JOURNEY_STORAGE_KEY = 'egoe_lead_journey_v1';
+  var JOURNEY_LIMIT = 20;
   var collectionState = productionEndpoint() ? 'pending' : 'disabled';
   var collectionPromise = null;
+  var journeyMemory = [];
+  var journeyMemoryDay = '';
 
   function productionEndpoint() {
     var hostname = root.location && String(root.location.hostname || '').toLowerCase();
@@ -21,7 +25,7 @@
     attachmentsEnabled: false,
     maxFileBytes: 10 * 1024 * 1024,
     allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'dwg', 'dxf', 'doc', 'docx', 'xls', 'xlsx', 'zip'],
-    consentVersion: '2026-08-23'
+    consentVersion: '2026-08-27'
   };
 
   var inFlight = typeof WeakMap === 'function' ? new WeakMap() : null;
@@ -233,6 +237,105 @@
     };
   }
 
+  function journeyDay(date) {
+    var value = date || new Date();
+    function two(number) { return String(number).padStart(2, '0'); }
+    return value.getFullYear() + '-' + two(value.getMonth() + 1) + '-' + two(value.getDate());
+  }
+
+  function cleanJourneyTitle(value) {
+    return String(value || '')
+      .replace(/[\x00-\x1f\x7f]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 160);
+  }
+
+  function cleanJourneyPath(value) {
+    var path = String(value || '');
+    if (!path.startsWith('/') || path.startsWith('//') || path.indexOf('?') >= 0 || path.indexOf('#') >= 0) return '';
+    path = '/' + path.replace(/^\/+/, '').replace(/\/{2,}/g, '/');
+    return path.length <= 500 ? path : '';
+  }
+
+  function journeyEntry(context, viewedAt) {
+    try {
+      var current = new URL(root.location && root.location.href || '');
+      var page = new URL(String(context && context.url || current.href), current.href);
+      if (page.origin !== current.origin) return null;
+      var path = cleanJourneyPath(page.pathname || '/');
+      if (!path) return null;
+      return {
+        path: path,
+        title: cleanJourneyTitle(context && context.title),
+        viewedAt: viewedAt || new Date().toISOString()
+      };
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function safeStoredJourney(value, day) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+    var keys = Object.keys(value).sort();
+    if (keys.join(',') !== 'path,title,viewedAt') return null;
+    var path = cleanJourneyPath(value.path);
+    var viewedAt = String(value.viewedAt || '');
+    var viewedTime = Date.parse(viewedAt);
+    if (!path
+      || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$/.test(viewedAt)
+      || !Number.isFinite(viewedTime)
+      || journeyDay(new Date(viewedTime)) !== day
+      || viewedTime < Date.now() - 86400000
+      || viewedTime > Date.now() + 600000
+    ) return null;
+    return { path: path, title: cleanJourneyTitle(value.title), viewedAt: viewedAt };
+  }
+
+  function readJourney(day) {
+    var entries = journeyMemoryDay === day ? journeyMemory.slice() : [];
+    try {
+      if (root.sessionStorage && typeof root.sessionStorage.getItem === 'function') {
+        var parsed = JSON.parse(root.sessionStorage.getItem(JOURNEY_STORAGE_KEY) || 'null');
+        if (parsed && parsed.day === day && Array.isArray(parsed.entries)) {
+          entries = parsed.entries.map(function (entry) { return safeStoredJourney(entry, day); }).filter(Boolean);
+        }
+      }
+    } catch (_) {}
+    var unique = [];
+    entries.slice(-JOURNEY_LIMIT).forEach(function (entry) {
+      unique = unique.filter(function (existing) { return existing.path !== entry.path; });
+      unique.push(entry);
+    });
+    journeyMemoryDay = day;
+    journeyMemory = unique.slice(-JOURNEY_LIMIT);
+    return journeyMemory.slice();
+  }
+
+  function writeJourney(day, entries) {
+    journeyMemoryDay = day;
+    journeyMemory = entries.slice(-JOURNEY_LIMIT);
+    try {
+      if (root.sessionStorage && typeof root.sessionStorage.setItem === 'function') {
+        root.sessionStorage.setItem(JOURNEY_STORAGE_KEY, JSON.stringify({ day: day, entries: journeyMemory }));
+      }
+    } catch (_) {}
+  }
+
+  function recordJourney(context) {
+    var day = journeyDay();
+    var entries = readJourney(day);
+    var entry = journeyEntry(context || pageContext());
+    if (!entry) return entries;
+    entries = entries.filter(function (existing) { return existing.path !== entry.path; });
+    entries.push(entry);
+    entries = entries.slice(-JOURNEY_LIMIT);
+    writeJourney(day, entries);
+    return entries.map(function (item) {
+      return { path: item.path, title: item.title, viewedAt: item.viewedAt };
+    });
+  }
+
   function fileExtension(file) {
     var match = String(file && file.name || '').toLowerCase().match(/\.([a-z0-9]+)$/);
     return match ? match[1] : '';
@@ -285,6 +388,7 @@
         documentUrl: consentUrl
       },
       page: context,
+      journey: recordJourney(context),
       spamCheck: {
         website: String(options.honeypot || ''),
         elapsedMs: Math.max(0, Number(options.elapsedMs) || (Date.now() - moduleStartedAt))
@@ -765,6 +869,7 @@
       root.localStorage.removeItem('sp_leads_v1');
       root.localStorage.removeItem('sp_kp_head_v1');
     } catch (_) {}
+    recordJourney(pageContext());
     prepareForms();
   }
   if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', initialize, { once: true });
