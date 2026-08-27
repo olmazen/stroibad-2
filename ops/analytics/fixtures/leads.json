@@ -1,0 +1,12 @@
+{
+  "leads": [
+    { "received_at": "2026-08-25T20:59:59.999Z", "form_id": "contacts:request-1", "page_path": "/contacts/" },
+    { "received_at": "2026-08-25T21:00:00.000Z", "form_id": "cart:quote", "page_path": "/cart/", "quote_total_rub": "66 810 ₽", "fields": "TEST-SECRET-MUST-NOT-LEAK" },
+    { "received_at": "2026-08-26T01:10:00.000Z", "form_id": "contacts:request-1", "page_path": "/contacts/" },
+    { "received_at": "2026-08-26T08:20:00.000Z", "form_id": "catalog:request-1", "page_path": "/catalog/" },
+    { "received_at": "2026-08-26T12:30:00.000Z", "form_id": "cart:quote", "page_path": "/cart/", "quote_total_rub": 120000 },
+    { "received_at": "2026-08-26T18:40:00.000Z", "form_id": "projects:request-1", "page_path": "/projects/" },
+    { "received_at": "2026-08-26T20:59:59.999Z", "form_id": "contacts:request-2", "page_path": "/contacts/" },
+    { "received_at": "2026-08-26T21:00:00.000Z", "form_id": "cart:quote", "page_path": "/cart/", "quote_total_rub": 999999 }
+  ]
+}

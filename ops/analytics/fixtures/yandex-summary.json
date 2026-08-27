@@ -1,0 +1,11 @@
+{
+  "sqi": 120,
+  "excluded_pages_count": 14,
+  "searchable_pages_count": 306,
+  "site_problems": {
+    "FATAL": 0,
+    "CRITICAL": 1,
+    "POSSIBLE_PROBLEM": 2,
+    "RECOMMENDATION": 3
+  }
+}

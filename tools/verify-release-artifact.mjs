@@ -7,7 +7,9 @@ import path from 'node:path';
 const ALLOWED_PHP_PATHS = new Set([
   'api/leads/index.php',
   'api/leads/lib/leadbackend.php',
-  'api/leads/cli/leads.php'
+  'api/leads/lib/dailyanalytics.php',
+  'api/leads/cli/leads.php',
+  'api/leads/cli/daily-report.php'
 ]);
 
 function fail(message) {

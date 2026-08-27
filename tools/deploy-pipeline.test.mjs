@@ -12,6 +12,7 @@ const execute = promisify(execFile);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VERIFY = path.join(ROOT, 'tools', 'verify-release-artifact.mjs');
 const BOOTSTRAP = path.join(ROOT, 'ops', 'deploy', 'bootstrap-production.sh');
+const REMOTE_RELEASE = path.join(ROOT, 'ops', 'deploy', 'remote-release.sh');
 const PHP = process.env.EGOE_PHP_BIN || 'php';
 const COMMIT = '1234567890abcdef1234567890abcdef12345678';
 const RETRY_COMMIT = 'abcdef1234567890abcdef1234567890abcdef12';
@@ -120,21 +121,76 @@ async function createBootstrapFixture(t, suffix = '') {
   return fixture;
 }
 
+async function createRemotePreflightFixture(t, suffix = '') {
+  const temporary = await fs.mkdtemp(path.join(os.tmpdir(), `egoe-remote-${suffix}`));
+  t.after(() => fs.rm(temporary, { recursive: true, force: true }));
+  const deployRoot = path.join(temporary, 'egoe-deploy');
+  const releaseTarget = 'releases/current-release';
+  const directories = [
+    deployRoot,
+    path.join(deployRoot, 'incoming'),
+    path.join(deployRoot, 'releases'),
+    path.join(deployRoot, 'shared'),
+    path.join(deployRoot, 'shared', 'leads'),
+    path.join(deployRoot, 'state'),
+    path.join(deployRoot, releaseTarget, 'api', 'leads', 'cli')
+  ];
+  for (const directory of directories) await fs.mkdir(directory, { recursive: true, mode: 0o755 });
+  await fs.chmod(path.join(deployRoot, 'shared', 'leads'), 0o700);
+  await fs.chmod(path.join(deployRoot, 'state'), 0o700);
+  await fs.writeFile(path.join(deployRoot, 'state', 'site-hostname'), 'egoe-life.ru\n', { mode: 0o600 });
+  await fs.writeFile(path.join(deployRoot, 'state', 'production-enabled'), 'egoe-life.ru\n', { mode: 0o600 });
+  const leadCli = path.join(deployRoot, releaseTarget, 'api', 'leads', 'cli', 'leads.php');
+  await fs.writeFile(leadCli, `<?php
+if (($argv[1] ?? '') !== 'health') exit(2);
+$schemaVersion = getenv('EGOE_TEST_SCHEMA_VERSION');
+echo json_encode([
+  'ok' => true,
+  'schemaVersion' => $schemaVersion === false || $schemaVersion === '' ? 2 : (int) $schemaVersion,
+  'collectionEnabled' => getenv('EGOE_TEST_COLLECTION_ENABLED') === 'true',
+  'relayEnabled' => getenv('EGOE_TEST_RELAY_ENABLED') === 'true',
+]), "\\n";
+`);
+  await fs.symlink(releaseTarget, path.join(deployRoot, 'current'));
+  const mockBin = path.join(temporary, 'bin');
+  await fs.mkdir(mockBin, { mode: 0o700 });
+  await fs.writeFile(path.join(mockBin, 'flock'), '#!/bin/sh\nexit 0\n', { mode: 0o700 });
+  const env = {
+    ...process.env,
+    EGOE_PHP_BIN: PHP,
+    EGOE_TEST_COLLECTION_ENABLED: 'false',
+    EGOE_TEST_RELAY_ENABLED: 'false',
+    PATH: `${mockBin}:${process.env.PATH || '/usr/bin:/bin'}`
+  };
+  return { temporary, deployRoot, env };
+}
+
+async function runRemotePreflight(fixture, env = {}) {
+  return execute('/bin/sh', [REMOTE_RELEASE, 'preflight', fixture.deployRoot], {
+    cwd: ROOT,
+    env: { ...fixture.env, ...env }
+  });
+}
+
 test('release verifier accepts immutable PHP code but keeps persistent config outside releases', async (t) => {
   const temporaryRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'egoe-release-test-'));
   t.after(() => fs.rm(temporaryRoot, { recursive: true, force: true }));
   await createRelease(temporaryRoot, {
     '.htaccess': 'Options -Indexes\n',
     'api/leads/index.php': '<?php declare(strict_types=1); echo "ok";\n',
+    'api/leads/lib/LeadBackend.php': '<?php declare(strict_types=1);\n',
+    'api/leads/lib/DailyAnalytics.php': '<?php declare(strict_types=1);\n',
+    'api/leads/cli/leads.php': '<?php declare(strict_types=1);\n',
+    'api/leads/cli/daily-report.php': '<?php declare(strict_types=1);\n',
     'index.html': '<!doctype html><title>EGOE</title>\n'
   });
   const result = await verify(temporaryRoot);
   const summary = JSON.parse(result.stdout);
   assert.equal(summary.commit, COMMIT);
-  assert.equal(summary.fileCount, 3);
+  assert.equal(summary.fileCount, 7);
 });
 
-test('release verifier rejects every PHP path outside the three-file backend allowlist', async (t) => {
+test('release verifier rejects every PHP path outside the five-file backend and analytics allowlist', async (t) => {
   const temporaryRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'egoe-release-php-path-test-'));
   t.after(() => fs.rm(temporaryRoot, { recursive: true, force: true }));
   await createRelease(temporaryRoot, {
@@ -498,6 +554,91 @@ test('a new reviewed SHA can resume only from an intact fail-closed rollback sta
   );
 });
 
+test('relay health requires its own exact secure approval marker', async (t) => {
+  const fixture = await createRemotePreflightFixture(t, 'relay-gate-');
+  const state = path.join(fixture.deployRoot, 'state');
+  const relayMarker = path.join(state, 'relay-approved');
+  const collectionMarker = path.join(state, 'collection-approved');
+
+  const disabled = await runRemotePreflight(fixture);
+  assert.match(disabled.stdout, /PREFLIGHT_OK/);
+
+  await assert.rejects(
+    runRemotePreflight(fixture, { EGOE_TEST_SCHEMA_VERSION: '3' }),
+    (error) => {
+      assert.match(String(error.stderr), /schema, collection, or relay approval mismatch/);
+      return true;
+    }
+  );
+
+  await assert.rejects(
+    runRemotePreflight(fixture, { EGOE_TEST_RELAY_ENABLED: 'true' }),
+    (error) => {
+      assert.match(String(error.stderr), /schema, collection, or relay approval mismatch/);
+      return true;
+    }
+  );
+
+  await fs.writeFile(relayMarker, 'egoe-life.ru', { mode: 0o600 });
+  const approved = await runRemotePreflight(fixture, { EGOE_TEST_RELAY_ENABLED: 'true' });
+  assert.match(approved.stdout, /PREFLIGHT_OK/);
+  await assert.rejects(fs.lstat(collectionMarker), { code: 'ENOENT' });
+
+  const approvedButDisabled = await runRemotePreflight(fixture);
+  assert.match(approvedButDisabled.stdout, /PREFLIGHT_OK/);
+
+  await assert.rejects(
+    runRemotePreflight(fixture, {
+      EGOE_TEST_COLLECTION_ENABLED: 'true',
+      EGOE_TEST_RELAY_ENABLED: 'true'
+    }),
+    (error) => {
+      assert.match(String(error.stderr), /schema, collection, or relay approval mismatch/);
+      return true;
+    }
+  );
+  await fs.writeFile(collectionMarker, 'egoe-life.ru', { mode: 0o600 });
+  const independentlyApproved = await runRemotePreflight(fixture, {
+    EGOE_TEST_COLLECTION_ENABLED: 'true',
+    EGOE_TEST_RELAY_ENABLED: 'true'
+  });
+  assert.match(independentlyApproved.stdout, /PREFLIGHT_OK/);
+});
+
+test('relay approval marker rejects content, mode, type and symlink drift', async (t) => {
+  const fixture = await createRemotePreflightFixture(t, 'relay-marker-');
+  const state = path.join(fixture.deployRoot, 'state');
+  const relayMarker = path.join(state, 'relay-approved');
+  const relayEnv = { EGOE_TEST_RELAY_ENABLED: 'true' };
+
+  await fs.writeFile(relayMarker, 'egoe-life.ru\n', { mode: 0o600 });
+  await assert.rejects(runRemotePreflight(fixture, relayEnv), (error) => {
+    assert.match(String(error.stderr), /Invalid Relay approval marker/);
+    return true;
+  });
+
+  await fs.writeFile(relayMarker, 'egoe-life.ru');
+  await fs.chmod(relayMarker, 0o640);
+  await assert.rejects(runRemotePreflight(fixture, relayEnv), (error) => {
+    assert.match(String(error.stderr), /permissions must be exactly 0600/);
+    return true;
+  });
+
+  await fs.unlink(relayMarker);
+  await fs.symlink('site-hostname', relayMarker);
+  await assert.rejects(runRemotePreflight(fixture, relayEnv), (error) => {
+    assert.match(String(error.stderr), /Relay approval marker must not be a symlink/);
+    return true;
+  });
+
+  await fs.unlink(relayMarker);
+  await fs.mkdir(relayMarker, { mode: 0o700 });
+  await assert.rejects(runRemotePreflight(fixture, relayEnv), (error) => {
+    assert.match(String(error.stderr), /Relay approval marker must be a regular file/);
+    return true;
+  });
+});
+
 test('production smoke and remote helper contain rollback hardening', async () => {
   const production = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'deploy-production.yml'), 'utf8');
   const remote = await fs.readFile(path.join(ROOT, 'ops', 'deploy', 'remote-release.sh'), 'utf8');
@@ -520,13 +661,26 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(production, /COLLECTION_DISABLED/);
   assert.match(production, /collectionEnabled/);
   assert.match(production, /state\/collection-approved/);
+  assert.match(production, /relayEnabled/);
+  assert.match(production, /state\/relay-approved/);
+  assert.match(production, /\[\$argv\[7\], 0100000, 0600\]/);
+  assert.match(production, /remote-release\.sh' preflight/);
+  assert.match(production, /\(\$health\["schemaVersion"\] \?\? null\) === 2/);
+  assert.match(production, /health\.schemaVersion !== 2/);
+  assert.match(production, /\$relayEnabled === false \|\| \$relayApproved/);
+  assert.match(production, /no release was uploaded or activated/);
+  assert.doesNotMatch(production, /production was not changed/);
   assert.match(production, /METHOD_NOT_ALLOWED/);
   assert.match(production, /x-content-type-options/);
   assert.match(production, /strict-transport-security/);
   assert.match(production, /api\/leads\/index\.php/);
   assert.match(production, /api\/leads\/index\.php\/anything/);
   assert.match(production, /api\/leads\/lib\/LeadBackend\.php/);
+  assert.match(production, /api\/leads\/lib\/DailyAnalytics\.php/);
+  assert.match(production, /api\/leads\/lib\/DailyAnalytics\.php\/anything/);
   assert.match(production, /api\/leads\/cli\/leads\.php/);
+  assert.match(production, /api\/leads\/cli\/daily-report\.php/);
+  assert.match(production, /api\/leads\/cli\/daily-report\.php\/anything/);
   assert.match(htaccess, /RewriteCond %\{HTTP_HOST\} !\^www\\\.egoe-life\\\.ru\$/);
   assert.match(htaccess, /RewriteCond %\{HTTPS\} !=on\s+RewriteCond %\{HTTP:X-Forwarded-Proto\} !\^https\$/);
   assert.doesNotMatch(htaccess, /RewriteCond %\{HTTPS\} !=on \[OR\]/);
@@ -540,9 +694,22 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(remote, /relayEnabled/);
   assert.match(remote, /collectionEnabled/);
   assert.match(remote, /state\/collection-approved/);
-  assert.match(remote, /Collection approval marker must not be a symlink/);
+  assert.match(remote, /\$marker_label must not be a symlink/);
+  assert.match(remote, /state\/relay-approved/);
+  assert.match(remote, /validate_optional_site_marker "\$relay_marker" "Relay approval marker" 600/);
+  assert.match(remote, /\$relayEnabled === false \|\| \$relayApproved/);
+  assert.doesNotMatch(remote, /\(\$health\["relayEnabled"\] \?\? null\) === false/);
   assert.match(remote, /schemaVersion"] \?\? null\) === 2/);
-  assert.match(remote, /api\/leads\/lib\/leadbackend\.php/);
+  const remotePhpAllowlistBlock = remote.match(/\$allowedPhp = \[(.*?)\];/s)?.[1] || '';
+  const remotePhpAllowlist = [...remotePhpAllowlistBlock.matchAll(/"([^"]+\.php)"/g)]
+    .map((match) => match[1]);
+  assert.deepEqual(remotePhpAllowlist, [
+    'api/leads/index.php',
+    'api/leads/lib/leadbackend.php',
+    'api/leads/lib/dailyanalytics.php',
+    'api/leads/cli/leads.php',
+    'api/leads/cli/daily-report.php'
+  ]);
   assert.match(remote, /str_ends_with\(\$basename, "\.php"\)/);
   assert.match(remote, /Membership is checked below using sorted copies/);
   assert.doesNotMatch(remote, /if \(\$listedPaths !== \$sortedListedPaths\)/);
@@ -556,7 +723,8 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(remote, /Previous release directory must not be a symlink/);
   assert.match(remote, /validate_owned_mode "\$deploy_root" directory "Deploy root"/);
   assert.match(remote, /validate_owned_mode "\$deploy_root\/state" directory/);
-  assert.match(remote, /validate_owned_mode "\$collection_marker" file/);
+  assert.match(remote, /validate_optional_site_marker "\$collection_marker" "Collection approval marker"/);
+  assert.match(remote, /validate_owned_mode "\$marker_path" file "\$marker_label"/);
   assert.match(remote, /trap restore_failed_deploy_switch EXIT HUP INT TERM/);
   assert.match(remote, /previous current symlink restored/);
   assert.match(bootstrap, /trap prepare_abort EXIT HUP INT TERM/);

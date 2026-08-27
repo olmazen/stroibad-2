@@ -244,13 +244,26 @@ jobs:
           test ! -L "$deploy_root/state/production-enabled"
           test "$(cat "$deploy_root/state/production-enabled")" = "egoe-life.ru"
           collection_marker="$deploy_root/state/collection-approved"
+          collection_marker_approved=false
           if test -e "$collection_marker" || test -L "$collection_marker"; then
-            test -f "$collection_marker"
             test ! -L "$collection_marker"
+            test -f "$collection_marker"
             php -r '
               $value = file_get_contents($argv[1]);
               exit($value === "egoe-life.ru" ? 0 : 1);
             ' "$collection_marker"
+            collection_marker_approved=true
+          fi
+          relay_marker="$deploy_root/state/relay-approved"
+          relay_marker_approved=false
+          if test -e "$relay_marker" || test -L "$relay_marker"; then
+            test ! -L "$relay_marker"
+            test -f "$relay_marker"
+            php -r '
+              $value = file_get_contents($argv[1]);
+              exit($value === "egoe-life.ru" ? 0 : 1);
+            ' "$relay_marker"
+            relay_marker_approved=true
           fi
           for directory in incoming releases shared state; do
             test -d "$deploy_root/$directory"
@@ -273,25 +286,28 @@ jobs:
           php -r '
             $expectedUid = (int) $argv[1];
             $paths = [
-              [$argv[2], 0040000],
-              [$argv[3], 0040000],
-              [$argv[4], 0100000],
-              [$argv[5], 0100000],
+              [$argv[2], 0040000, null],
+              [$argv[3], 0040000, null],
+              [$argv[4], 0100000, null],
+              [$argv[5], 0100000, null],
             ];
-            if ($argv[6] !== "") $paths[] = [$argv[6], 0100000];
-            foreach ($paths as [$path, $expectedType]) {
+            if ($argv[6] !== "") $paths[] = [$argv[6], 0100000, null];
+            if ($argv[7] !== "") $paths[] = [$argv[7], 0100000, 0600];
+            foreach ($paths as [$path, $expectedType, $expectedMode]) {
               $stat = lstat($path);
               if (!is_array($stat)
                 || $stat["uid"] !== $expectedUid
                 || ($stat["mode"] & 0170000) !== $expectedType
                 || ($stat["mode"] & 0022) !== 0) exit(1);
+              if ($expectedMode !== null && ($stat["mode"] & 0777) !== $expectedMode) exit(2);
             }
           ' "$current_uid" \
             "$deploy_root" \
             "$deploy_root/state" \
             "$deploy_root/state/site-hostname" \
             "$deploy_root/state/production-enabled" \
-            "$([ -f "$collection_marker" ] && printf '%s' "$collection_marker" || true)"
+            "$([ -f "$collection_marker" ] && printf '%s' "$collection_marker" || true)" \
+            "$([ -f "$relay_marker" ] && printf '%s' "$relay_marker" || true)"
           test -w "$deploy_root/shared/leads"
           test -L "$deploy_root/current"
           current_target=$(readlink "$deploy_root/current")
@@ -300,11 +316,33 @@ jobs:
           case "$current_name" in ''|.|..|*/*|*[!A-Za-z0-9._-]*) exit 22 ;; esac
           test -d "$deploy_root/$current_target"
           test ! -L "$deploy_root/$current_target"
+          current_lead_cli="$deploy_root/current/api/leads/cli/leads.php"
+          if test -e "$current_lead_cli" || test -L "$current_lead_cli"; then
+            test ! -L "$current_lead_cli"
+            test -f "$current_lead_cli"
+            lead_health=$(EGOE_DEPLOY_ROOT="$deploy_root" php "$current_lead_cli" health)
+            printf '%s' "$lead_health" | php -r '
+              $health = json_decode(stream_get_contents(STDIN), true);
+              $collectionApproved = ($argv[1] ?? "false") === "true";
+              $relayApproved = ($argv[2] ?? "false") === "true";
+              $collectionEnabled = $health["collectionEnabled"] ?? null;
+              $relayEnabled = $health["relayEnabled"] ?? null;
+              exit(is_array($health)
+                && ($health["ok"] ?? false) === true
+                && ($health["schemaVersion"] ?? null) === 2
+                && is_bool($collectionEnabled)
+                && ($collectionApproved || $collectionEnabled === false)
+                && is_bool($relayEnabled)
+                && ($relayEnabled === false || $relayApproved) ? 0 : 1);
+            ' "$collection_marker_approved" "$relay_marker_approved"
+          else
+            test "$relay_marker_approved" = false
+          fi
           df -h "$deploy_root"
           REMOTE
       - name: Stop after safe preflight
         if: ${{ inputs.mode == 'preflight' }}
-        run: echo "REG.RU preflight passed; production was not changed."
+        run: echo "REG.RU preflight passed; no release was uploaded or activated."
       - name: Upload release and deployment helper
         if: ${{ inputs.mode == 'deploy' }}
         shell: bash
@@ -377,14 +415,35 @@ jobs:
           if [[ "$release_sha" != "$EXPECTED_SHA" ]]; then
             failed=1
           fi
-          collection_expected=$(ssh -i "$EGOE_SSH_KEY" -p "$REG_SSH_PORT" \
+          ssh -i "$EGOE_SSH_KEY" -p "$REG_SSH_PORT" \
             -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
             -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
             -o UserKnownHostsFile="$EGOE_KNOWN_HOSTS" -o ConnectTimeout=20 \
             "$REG_SSH_USER@$REG_SSH_HOST" \
-            "EGOE_DEPLOY_ROOT='$REG_DEPLOY_ROOT' php '$REG_DEPLOY_ROOT/current/api/leads/cli/leads.php' health" \
-            | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const v=JSON.parse(d).collectionEnabled;if(typeof v!=="boolean")process.exit(1);process.stdout.write(String(v))})')
+            "sh '$REG_DEPLOY_ROOT/incoming/remote-release.sh' preflight '$REG_DEPLOY_ROOT'" \
+            >/dev/null || failed=1
+          lead_health=$(ssh -i "$EGOE_SSH_KEY" -p "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$EGOE_KNOWN_HOSTS" -o ConnectTimeout=20 \
+            "$REG_SSH_USER@$REG_SSH_HOST" \
+            "EGOE_DEPLOY_ROOT='$REG_DEPLOY_ROOT' php '$REG_DEPLOY_ROOT/current/api/leads/cli/leads.php' health")
+          health_contract=$(printf '%s' "$lead_health" | node -e '
+            let data = "";
+            process.stdin.on("data", chunk => data += chunk).on("end", () => {
+              const health = JSON.parse(data);
+              if (health.ok !== true || health.schemaVersion !== 2
+                || typeof health.collectionEnabled !== "boolean"
+                || typeof health.relayEnabled !== "boolean") process.exit(1);
+              process.stdout.write(`${health.collectionEnabled}:${health.relayEnabled}`);
+            });
+          ')
+          collection_expected=${health_contract%%:*}
+          relay_expected=${health_contract#*:}
           if [[ "$collection_expected" != "true" && "$collection_expected" != "false" ]]; then
+            failed=1
+          fi
+          if [[ "$relay_expected" != "true" && "$relay_expected" != "false" ]]; then
             failed=1
           fi
           collection_headers="$RUNNER_TEMP/egoe-collection-headers"
@@ -453,7 +512,11 @@ jobs:
             /api/leads/index.php/anything \
             /api/leads/index \
             /api/leads/lib/LeadBackend.php \
-            /api/leads/cli/leads.php; do
+            /api/leads/lib/DailyAnalytics.php \
+            /api/leads/lib/DailyAnalytics.php/anything \
+            /api/leads/cli/leads.php \
+            /api/leads/cli/daily-report.php \
+            /api/leads/cli/daily-report.php/anything; do
             protected_status=$(curl --silent --show-error --retry 2 --max-time 30 \
               --header 'Cache-Control: no-cache, no-store' \
               --output /dev/null \
