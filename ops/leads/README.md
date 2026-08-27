@@ -44,6 +44,11 @@ Enabling even an anonymous signal requires explicit server-only flags; technical
 or full modes additionally require their dedicated flag. The relay URL belongs
 only in persistent `config.php`.
 
+The preferred notification channel is the separately gated direct Telegram
+transport in `shared/telegram/config.php`; it uses the same `outbox` and
+`leads.php retry` command without Google Apps Script. Legacy relay and direct
+Telegram delivery are mutually exclusive at runtime.
+
 Rotate `ip_hash_key` at least yearly and immediately after suspected disclosure:
 replace it atomically with a new `bin2hex(random_bytes(32))` value and run
 `health`. Existing keyed hashes expire with their lead records and cannot be

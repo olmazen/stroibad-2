@@ -7,9 +7,11 @@ umask(0077);
 use Egoe\Leads\Database;
 use Egoe\Leads\BackupRetention;
 use Egoe\Leads\CustomerHistory;
-use Egoe\Leads\Relay;
+use Egoe\Leads\Outbox;
 use Egoe\Leads\Runtime;
 use Egoe\Leads\Settings;
+use Egoe\Telegram\TelegramConfig;
+use Egoe\Telegram\TelegramLeadTransport;
 
 if (PHP_SAPI !== 'cli') {
     http_response_code(404);
@@ -17,6 +19,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require dirname(__DIR__) . '/lib/LeadBackend.php';
+require dirname(__DIR__, 2) . '/telegram/lib/TelegramHistory.php';
 
 function fail(string $message, int $code = 1): never
 {
@@ -87,6 +90,8 @@ function health(): void
         fail('sqlite3 online backup support is unavailable');
     }
     [$root, $settings, $pdo] = loadRuntime();
+    $telegram = TelegramConfig::loadOptional($root);
+    Outbox::selectTransport($settings, TelegramLeadTransport::production($telegram));
     $directory = Runtime::sharedDirectory($root);
     if (!is_writable($directory)) {
         fail('Persistent lead directory is not writable');
@@ -117,6 +122,8 @@ function health(): void
         'schemaVersion' => $version,
         'collectionEnabled' => ($settings['collection_enabled'] ?? false) === true,
         'relayEnabled' => ($settings['relay']['enabled'] ?? false) === true,
+        'telegramHistoryEnabled' => ($telegram['enabled'] ?? false) === true,
+        'telegramDeliveryEnabled' => ($telegram['send_leads'] ?? false) === true,
     ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
 }
 
@@ -311,7 +318,12 @@ try {
             break;
         case 'retry':
             $limit = isset($argv[2]) ? (int)$argv[2] : 20;
-            echo json_encode(Relay::retry($pdo, $settings, $limit), JSON_THROW_ON_ERROR) . "\n";
+            $telegram = TelegramConfig::loadOptional($root);
+            $transport = Outbox::selectTransport(
+                $settings,
+                TelegramLeadTransport::production($telegram)
+            );
+            echo json_encode(Outbox::retry($pdo, $transport, $limit), JSON_THROW_ON_ERROR) . "\n";
             break;
         case 'view':
             viewLead($pdo, (string)($argv[2] ?? ''));

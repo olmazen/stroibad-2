@@ -99,6 +99,8 @@ test('lead forms require explicit consent and only call the same-origin API', as
   assert.match(source, /lockAllForms\(\)/);
   assert.equal(contract.leadDelivery.collectionEnabledDefault, false);
   assert.equal(contract.leadDelivery.statusEndpoint, '/api/leads/status/');
+  assert.equal(contract.leadDelivery.telegramTransport, 'direct-server-bot-api');
+  assert.equal(contract.leadDelivery.telegramDeliveryDefault, 'off-until-separate-server-approval');
   assert.match(source, /credentials:\s*['"]same-origin['"]/);
   assert.doesNotMatch(source, /formsubmit|tgRelay|script\.google\.com/i);
 });

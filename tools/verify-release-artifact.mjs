@@ -9,7 +9,10 @@ const ALLOWED_PHP_PATHS = new Set([
   'api/leads/lib/leadbackend.php',
   'api/leads/lib/dailyanalytics.php',
   'api/leads/cli/leads.php',
-  'api/leads/cli/daily-report.php'
+  'api/leads/cli/daily-report.php',
+  'api/telegram/index.php',
+  'api/telegram/lib/telegramhistory.php',
+  'api/telegram/cli/telegram.php'
 ]);
 
 function fail(message) {

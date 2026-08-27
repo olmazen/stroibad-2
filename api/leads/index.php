@@ -6,8 +6,12 @@ umask(0077);
 
 use Egoe\Leads\Endpoint;
 use Egoe\Leads\HttpFailure;
+use Egoe\Leads\Runtime;
+use Egoe\Telegram\TelegramConfig;
+use Egoe\Telegram\TelegramLeadTransport;
 
 require __DIR__ . '/lib/LeadBackend.php';
+require dirname(__DIR__) . '/telegram/lib/TelegramHistory.php';
 
 header('Content-Type: application/json; charset=UTF-8');
 header('Cache-Control: no-store, private, max-age=0');
@@ -24,7 +28,17 @@ try {
     if (!$isStatus && !$isLeadEndpoint) {
         throw new HttpFailure(404, 'NOT_FOUND', 'Ресурс не найден.');
     }
-    $result = $isStatus ? Endpoint::status($_SERVER) : Endpoint::handle($_SERVER, $_POST, $_FILES);
+    if ($isStatus) {
+        $result = Endpoint::status($_SERVER);
+    } else {
+        $telegram = TelegramConfig::loadOptional(Runtime::deployRoot());
+        $result = Endpoint::handle(
+            $_SERVER,
+            $_POST,
+            $_FILES,
+            TelegramLeadTransport::production($telegram)
+        );
+    }
     http_response_code($result['status']);
     echo json_encode($result['body'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
 } catch (HttpFailure $error) {

@@ -28,6 +28,8 @@ final class Runtime
     private const SITE_MARKER = 'egoe-life.ru';
     private const COLLECTION_MARKER = 'collection-approved';
     private const RELAY_MARKER = 'relay-approved';
+    private const TELEGRAM_HISTORY_MARKER = 'telegram-history-approved';
+    private const TELEGRAM_DELIVERY_MARKER = 'telegram-delivery-approved';
 
     public static function deployRoot(?string $start = null): string
     {
@@ -101,6 +103,16 @@ final class Runtime
     public static function relayApproved(string $deployRoot): bool
     {
         return self::approvedMarker($deployRoot, self::RELAY_MARKER, 0600);
+    }
+
+    public static function telegramHistoryApproved(string $deployRoot): bool
+    {
+        return self::approvedMarker($deployRoot, self::TELEGRAM_HISTORY_MARKER, 0600);
+    }
+
+    public static function telegramDeliveryApproved(string $deployRoot): bool
+    {
+        return self::approvedMarker($deployRoot, self::TELEGRAM_DELIVERY_MARKER, 0600);
     }
 
     private static function approvedMarker(string $deployRoot, string $markerName, ?int $requiredPermissions = null): bool
@@ -1078,14 +1090,35 @@ SQL);
     }
 }
 
+interface OutboxTransport
+{
+    public function enabled(): bool;
+
+    public function mode(): string;
+
+    /** @param array<string,mixed> $lead
+     *  @return array<string,mixed>
+     */
+    public function payload(array $lead): array;
+
+    public function deliver(PDO $pdo, string $leadId, string $payloadJson): void;
+}
+
 final class LeadStore
 {
     /** @param array<string,mixed> $lead
      *  @param array<string,mixed> $settings
      *  @return array{duplicate:bool,outboxId:?int}
      */
-    public static function accept(PDO $pdo, array $lead, array $settings, string $ipHash): array
+    public static function accept(
+        PDO $pdo,
+        array $lead,
+        array $settings,
+        string $ipHash,
+        ?OutboxTransport $transport = null
+    ): array
     {
+        $transport ??= Relay::transport($settings);
         $payloadJson = self::json($lead);
         $hashPayload = [
             'formId' => $lead['formId'],
@@ -1165,18 +1198,18 @@ SQL);
             ]);
 
             $outboxId = null;
-            if (($settings['relay']['enabled'] ?? false) === true
+            if ($transport->enabled()
                 && Settings::isCurrentConsentVersion((string)($lead['consent']['version'] ?? ''))
             ) {
-                $relayPayload = Relay::payload($lead, $settings['relay']);
+                $deliveryPayload = $transport->payload($lead);
                 $outbox = $pdo->prepare(<<<'SQL'
 INSERT INTO outbox (lead_id, mode, payload_json, next_attempt_at, created_at)
 VALUES (:lead_id, :mode, :payload_json, :next_attempt_at, :created_at)
 SQL);
                 $outbox->execute([
                     ':lead_id' => $lead['leadId'],
-                    ':mode' => $settings['relay']['mode'],
-                    ':payload_json' => self::json($relayPayload),
+                    ':mode' => $transport->mode(),
+                    ':payload_json' => self::json($deliveryPayload),
                     ':next_attempt_at' => $receivedAt,
                     ':created_at' => $receivedAt,
                 ]);
@@ -1240,6 +1273,119 @@ SQL);
     }
 }
 
+final class RelayTransport implements OutboxTransport
+{
+    /** @param array<string,mixed> $settings */
+    public function __construct(private readonly array $settings)
+    {
+    }
+
+    public function enabled(): bool
+    {
+        return ($this->settings['enabled'] ?? false) === true;
+    }
+
+    public function mode(): string
+    {
+        return (string)($this->settings['mode'] ?? 'signal');
+    }
+
+    public function payload(array $lead): array
+    {
+        return Relay::payload($lead, $this->settings);
+    }
+
+    public function deliver(PDO $pdo, string $leadId, string $payloadJson): void
+    {
+        Relay::deliver($this->settings, $payloadJson);
+    }
+}
+
+final class Outbox
+{
+    /** @param array<string,mixed> $settings */
+    public static function selectTransport(array $settings, ?OutboxTransport $preferred = null): OutboxTransport
+    {
+        $relay = Relay::transport($settings);
+        if ($preferred === null || !$preferred->enabled()) {
+            return $relay;
+        }
+        if ($relay->enabled()) {
+            throw new RuntimeException('Only one external lead transport may be enabled');
+        }
+        return $preferred;
+    }
+
+    /** @return array{sent:int,failed:int} */
+    public static function retry(PDO $pdo, OutboxTransport $transport, int $limit = 20, ?int $onlyId = null): array
+    {
+        if (!$transport->enabled()) {
+            return ['sent' => 0, 'failed' => 0];
+        }
+        $pdo->prepare(<<<'SQL'
+DELETE FROM outbox
+WHERE lead_id IN (
+  SELECT lead_id FROM leads WHERE consent_version <> :current_consent_version
+)
+SQL)->execute([':current_consent_version' => Settings::CURRENT_CONSENT_VERSION]);
+        $mode = $transport->mode();
+        if (preg_match('/\A[a-z][a-z0-9_-]{0,31}\z/D', $mode) !== 1) {
+            throw new RuntimeException('Outbox transport mode is invalid');
+        }
+        $limit = max(1, min(100, $limit));
+        $now = Runtime::utcNow();
+        $pdo->prepare("UPDATE outbox SET status = 'failed', last_error = 'stale_claim' WHERE mode = :mode AND status = 'sending' AND next_attempt_at <= :now")
+            ->execute([':mode' => $mode, ':now' => $now]);
+        $sql = "SELECT outbox.id, outbox.lead_id, outbox.payload_json, outbox.attempts FROM outbox JOIN leads ON leads.lead_id = outbox.lead_id WHERE outbox.mode = :mode AND outbox.status IN ('pending','failed') AND outbox.next_attempt_at <= :now AND leads.consent_version = :current_consent_version";
+        $params = [
+            ':mode' => $mode,
+            ':now' => $now,
+            ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
+        ];
+        if ($onlyId !== null) {
+            $sql .= ' AND outbox.id = :id';
+            $params[':id'] = $onlyId;
+        }
+        $sql .= ' ORDER BY outbox.id ASC LIMIT ' . $limit;
+        $query = $pdo->prepare($sql);
+        $query->execute($params);
+        $rows = $query->fetchAll();
+        $result = ['sent' => 0, 'failed' => 0];
+        foreach ($rows as $row) {
+            $id = (int)$row['id'];
+            $lease = (new DateTimeImmutable('now', new DateTimeZone('UTC')))
+                ->modify('+5 minutes')
+                ->format('Y-m-d\TH:i:s.v\Z');
+            $claim = $pdo->prepare("UPDATE outbox SET status = 'sending', attempts = attempts + 1, next_attempt_at = :lease WHERE id = :id AND mode = :mode AND status IN ('pending','failed') AND EXISTS (SELECT 1 FROM leads WHERE leads.lead_id = outbox.lead_id AND leads.consent_version = :current_consent_version)");
+            $claim->execute([
+                ':lease' => $lease,
+                ':id' => $id,
+                ':mode' => $mode,
+                ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
+            ]);
+            if ($claim->rowCount() !== 1) {
+                continue;
+            }
+            try {
+                $transport->deliver($pdo, (string)$row['lead_id'], (string)$row['payload_json']);
+                $pdo->prepare("UPDATE outbox SET status = 'sent', sent_at = :now, last_error = '' WHERE id = :id AND status = 'sending'")
+                    ->execute([':now' => Runtime::utcNow(), ':id' => $id]);
+                $result['sent'] += 1;
+            } catch (Throwable) {
+                $attempts = (int)$row['attempts'] + 1;
+                $delay = min(3600, 30 * (2 ** min(7, $attempts - 1)));
+                $next = (new DateTimeImmutable('now', new DateTimeZone('UTC')))
+                    ->modify("+{$delay} seconds")
+                    ->format('Y-m-d\TH:i:s.v\Z');
+                $pdo->prepare("UPDATE outbox SET status = 'failed', next_attempt_at = :next, last_error = 'delivery_failed' WHERE id = :id AND status = 'sending'")
+                    ->execute([':next' => $next, ':id' => $id]);
+                $result['failed'] += 1;
+            }
+        }
+        return $result;
+    }
+}
+
 final class Relay
 {
     /** @param array<string,mixed> $lead
@@ -1279,69 +1425,23 @@ final class Relay
         return $payload;
     }
 
+    /** @param array<string,mixed> $settings */
+    public static function transport(array $settings): OutboxTransport
+    {
+        $relay = is_array($settings['relay'] ?? null) ? $settings['relay'] : ['enabled' => false];
+        return new RelayTransport($relay);
+    }
+
     /** @param array<string,mixed> $settings
      *  @return array{sent:int,failed:int}
      */
     public static function retry(PDO $pdo, array $settings, int $limit = 20, ?int $onlyId = null): array
     {
-        if (($settings['relay']['enabled'] ?? false) !== true) {
-            return ['sent' => 0, 'failed' => 0];
-        }
-        $pdo->prepare(<<<'SQL'
-DELETE FROM outbox
-WHERE lead_id IN (
-  SELECT lead_id FROM leads WHERE consent_version <> :current_consent_version
-)
-SQL)->execute([':current_consent_version' => Settings::CURRENT_CONSENT_VERSION]);
-        if (!extension_loaded('curl')) {
-            throw new RuntimeException('curl extension is unavailable');
-        }
-        $limit = max(1, min(100, $limit));
-        $now = Runtime::utcNow();
-        $pdo->prepare("UPDATE outbox SET status = 'failed', last_error = 'stale_claim' WHERE status = 'sending' AND next_attempt_at <= :now")
-            ->execute([':now' => $now]);
-        $sql = "SELECT outbox.id, outbox.payload_json, outbox.attempts FROM outbox JOIN leads ON leads.lead_id = outbox.lead_id WHERE outbox.status IN ('pending','failed') AND outbox.next_attempt_at <= :now AND leads.consent_version = :current_consent_version";
-        $params = [':now' => $now, ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION];
-        if ($onlyId !== null) {
-            $sql .= ' AND outbox.id = :id';
-            $params[':id'] = $onlyId;
-        }
-        $sql .= ' ORDER BY outbox.id ASC LIMIT ' . $limit;
-        $query = $pdo->prepare($sql);
-        $query->execute($params);
-        $rows = $query->fetchAll();
-        $result = ['sent' => 0, 'failed' => 0];
-        foreach ($rows as $row) {
-            $id = (int)$row['id'];
-            $lease = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->modify('+5 minutes')->format('Y-m-d\TH:i:s.v\Z');
-            $claim = $pdo->prepare("UPDATE outbox SET status = 'sending', attempts = attempts + 1, next_attempt_at = :lease WHERE id = :id AND status IN ('pending','failed') AND EXISTS (SELECT 1 FROM leads WHERE leads.lead_id = outbox.lead_id AND leads.consent_version = :current_consent_version)");
-            $claim->execute([
-                ':lease' => $lease,
-                ':id' => $id,
-                ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
-            ]);
-            if ($claim->rowCount() !== 1) {
-                continue;
-            }
-            try {
-                self::post($settings['relay'], (string)$row['payload_json']);
-                $pdo->prepare("UPDATE outbox SET status = 'sent', sent_at = :now, last_error = '' WHERE id = :id")
-                    ->execute([':now' => Runtime::utcNow(), ':id' => $id]);
-                $result['sent'] += 1;
-            } catch (Throwable) {
-                $attempts = (int)$row['attempts'] + 1;
-                $delay = min(3600, 30 * (2 ** min(7, $attempts - 1)));
-                $next = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->modify("+{$delay} seconds")->format('Y-m-d\TH:i:s.v\Z');
-                $pdo->prepare("UPDATE outbox SET status = 'failed', next_attempt_at = :next, last_error = 'delivery_failed' WHERE id = :id")
-                    ->execute([':next' => $next, ':id' => $id]);
-                $result['failed'] += 1;
-            }
-        }
-        return $result;
+        return Outbox::retry($pdo, self::transport($settings), $limit, $onlyId);
     }
 
     /** @param array<string,mixed> $relay */
-    private static function post(array $relay, string $body): void
+    public static function deliver(array $relay, string $body): void
     {
         $url = (string)$relay['url'];
         $timeout = (int)$relay['timeout_seconds'];
@@ -1409,7 +1509,12 @@ final class Endpoint
      *  @param array<string,mixed> $files
      *  @return array{status:int,body:array<string,mixed>}
      */
-    public static function handle(array $server, array $post, array $files): array
+    public static function handle(
+        array $server,
+        array $post,
+        array $files,
+        ?OutboxTransport $preferredTransport = null
+    ): array
     {
         if (($server['REQUEST_METHOD'] ?? '') !== 'POST') {
             throw new HttpFailure(405, 'METHOD_NOT_ALLOWED', 'Метод не поддерживается.');
@@ -1460,12 +1565,13 @@ final class Endpoint
         unset($ip);
 
         $pdo = Database::connect($root);
-        $accepted = LeadStore::accept($pdo, $lead, $settings, $ipHash);
+        $transport = Outbox::selectTransport($settings, $preferredTransport);
+        $accepted = LeadStore::accept($pdo, $lead, $settings, $ipHash, $transport);
         if ($accepted['outboxId'] !== null) {
             try {
-                Relay::retry($pdo, $settings, 1, $accepted['outboxId']);
+                Outbox::retry($pdo, $transport, 1, $accepted['outboxId']);
             } catch (Throwable) {
-                // SQLite is authoritative. Relay availability never reverses acceptance.
+                // SQLite is authoritative. Delivery availability never reverses acceptance.
             }
         }
         return [
