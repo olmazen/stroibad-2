@@ -152,9 +152,14 @@ final class Settings
     public const CURRENT_CONSENT_VERSION = '2026-08-27';
     private const LEGACY_CONSENT_VERSION = '2026-08-23';
 
+    public static function isCurrentConsentVersion(string $version): bool
+    {
+        return hash_equals(self::CURRENT_CONSENT_VERSION, $version);
+    }
+
     public static function acceptsConsentVersion(string $version): bool
     {
-        return hash_equals(self::CURRENT_CONSENT_VERSION, $version)
+        return self::isCurrentConsentVersion($version)
             || hash_equals(self::LEGACY_CONSENT_VERSION, $version);
     }
 
@@ -1153,7 +1158,9 @@ SQL);
             ]);
 
             $outboxId = null;
-            if (($settings['relay']['enabled'] ?? false) === true) {
+            if (($settings['relay']['enabled'] ?? false) === true
+                && Settings::isCurrentConsentVersion((string)($lead['consent']['version'] ?? ''))
+            ) {
                 $relayPayload = Relay::payload($lead, $settings['relay']);
                 $outbox = $pdo->prepare(<<<'SQL'
 INSERT INTO outbox (lead_id, mode, payload_json, next_attempt_at, created_at)
@@ -1273,6 +1280,12 @@ final class Relay
         if (($settings['relay']['enabled'] ?? false) !== true) {
             return ['sent' => 0, 'failed' => 0];
         }
+        $pdo->prepare(<<<'SQL'
+DELETE FROM outbox
+WHERE lead_id IN (
+  SELECT lead_id FROM leads WHERE consent_version <> :current_consent_version
+)
+SQL)->execute([':current_consent_version' => Settings::CURRENT_CONSENT_VERSION]);
         if (!extension_loaded('curl')) {
             throw new RuntimeException('curl extension is unavailable');
         }
@@ -1280,13 +1293,13 @@ final class Relay
         $now = Runtime::utcNow();
         $pdo->prepare("UPDATE outbox SET status = 'failed', last_error = 'stale_claim' WHERE status = 'sending' AND next_attempt_at <= :now")
             ->execute([':now' => $now]);
-        $sql = "SELECT id, payload_json, attempts FROM outbox WHERE status IN ('pending','failed') AND next_attempt_at <= :now";
-        $params = [':now' => $now];
+        $sql = "SELECT outbox.id, outbox.payload_json, outbox.attempts FROM outbox JOIN leads ON leads.lead_id = outbox.lead_id WHERE outbox.status IN ('pending','failed') AND outbox.next_attempt_at <= :now AND leads.consent_version = :current_consent_version";
+        $params = [':now' => $now, ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION];
         if ($onlyId !== null) {
-            $sql .= ' AND id = :id';
+            $sql .= ' AND outbox.id = :id';
             $params[':id'] = $onlyId;
         }
-        $sql .= ' ORDER BY id ASC LIMIT ' . $limit;
+        $sql .= ' ORDER BY outbox.id ASC LIMIT ' . $limit;
         $query = $pdo->prepare($sql);
         $query->execute($params);
         $rows = $query->fetchAll();
@@ -1294,8 +1307,12 @@ final class Relay
         foreach ($rows as $row) {
             $id = (int)$row['id'];
             $lease = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->modify('+5 minutes')->format('Y-m-d\TH:i:s.v\Z');
-            $claim = $pdo->prepare("UPDATE outbox SET status = 'sending', attempts = attempts + 1, next_attempt_at = :lease WHERE id = :id AND status IN ('pending','failed')");
-            $claim->execute([':lease' => $lease, ':id' => $id]);
+            $claim = $pdo->prepare("UPDATE outbox SET status = 'sending', attempts = attempts + 1, next_attempt_at = :lease WHERE id = :id AND status IN ('pending','failed') AND EXISTS (SELECT 1 FROM leads WHERE leads.lead_id = outbox.lead_id AND leads.consent_version = :current_consent_version)");
+            $claim->execute([
+                ':lease' => $lease,
+                ':id' => $id,
+                ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
+            ]);
             if ($claim->rowCount() !== 1) {
                 continue;
             }

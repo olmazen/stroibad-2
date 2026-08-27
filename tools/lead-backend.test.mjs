@@ -670,6 +670,28 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   });
   await writeConfig(deployRoot, fullSettings);
   await run(PHP, ['-r', clearRate], { env });
+  const legacyConsentWithRelayOn = lead({
+    formId: 'test:legacy-consent-relay',
+    consent: { ...lead().consent, version: '2026-08-23' },
+    fields: { Имя: 'Локальная старая вкладка', Телефон: '+7 927 333-44-55' }
+  });
+  const receiverCallsBeforeLegacy = receivedRelayBodies.length;
+  result = await post(legacyConsentWithRelayOn);
+  assert.equal(result.response.status, 201, 'legacy consent must still be accepted into the Russian database');
+  assert.equal(receivedRelayBodies.length, receiverCallsBeforeLegacy, 'legacy consent must never call an external relay');
+  const legacyOutboxCountScript = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $q=$p->prepare('SELECT count(*) FROM outbox WHERE lead_id=?'); $q->execute(['${legacyConsentWithRelayOn.leadId}']); echo $q->fetchColumn();`;
+  assert.equal((await run(PHP, ['-r', legacyOutboxCountScript], { env })).stdout, '0', 'legacy consent must not create an outbox row');
+  const locallyStoredLegacy = JSON.parse((await run(PHP, [cli, 'view', legacyConsentWithRelayOn.leadId], { env })).stdout);
+  assert.equal(locallyStoredLegacy.consent.version, '2026-08-23');
+  assert.equal(await storedConsentVersion(legacyConsentWithRelayOn.leadId), '2026-08-23');
+  const injectForbiddenLegacyOutbox = `require '${path.join(release, 'api/leads/lib/LeadBackend.php').replaceAll("'", "\\'")}'; $p=Egoe\\Leads\\Database::connect(getenv('EGOE_DEPLOY_ROOT')); $p->prepare('INSERT INTO outbox (lead_id,mode,payload_json,next_attempt_at,created_at) VALUES (?,?,?,?,?)')->execute(['${legacyConsentWithRelayOn.leadId}','full','{"_subject":"must-not-send"}','2000-01-01T00:00:00.000Z','2000-01-01T00:00:00.000Z']);`;
+  await run(PHP, ['-r', injectForbiddenLegacyOutbox], { env });
+  const suppressedRetry = JSON.parse((await run(PHP, [cli, 'retry', '20'], { env })).stdout);
+  assert.deepEqual(suppressedRetry, { sent: 0, failed: 0 }, 'retry must suppress any pre-existing legacy-consent outbox row');
+  assert.equal(receivedRelayBodies.length, receiverCallsBeforeLegacy, 'retry must not send legacy-consent payloads');
+  assert.equal((await run(PHP, ['-r', legacyOutboxCountScript], { env })).stdout, '0', 'retry must purge a forbidden legacy-consent outbox row');
+  await run(PHP, [cli, 'delete', legacyConsentWithRelayOn.leadId, '--with-evidence'], { env });
+
   const quoteFields = {
     Имя: 'Екатерина',
     Телефон: '8 (927) 229-58-28',
