@@ -45,6 +45,13 @@ DirectoryIndex index.html
   RewriteRule ^api/leads/index/?$ - [R=404,L,NC]
   RewriteRule ^api/leads/status/?$ api/leads/index.php [END]
   RewriteRule ^api/leads/?$ api/leads/index.php [END]
+
+  # Telegram callback: ровно один webhook; библиотека и CLI наружу не видны.
+  RewriteRule ^api/telegram/(?:cli|lib)(?:/|$) - [R=404,L,NC]
+  RewriteCond %{THE_REQUEST} \s/+api/telegram/index\.php(?:[/?\s]) [NC]
+  RewriteRule ^api/telegram/index\.php(?:/.*)?$ - [R=404,L,NC]
+  RewriteRule ^api/telegram/index/?$ - [R=404,L,NC]
+  RewriteRule ^api/telegram/webhook/?$ api/telegram/index.php [END]
 </IfModule>
 
 # Сжатие

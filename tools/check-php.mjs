@@ -12,7 +12,10 @@ const expected = [
   'api/leads/lib/LeadBackend.php',
   'api/leads/lib/DailyAnalytics.php',
   'api/leads/cli/leads.php',
-  'api/leads/cli/daily-report.php'
+  'api/leads/cli/daily-report.php',
+  'api/telegram/index.php',
+  'api/telegram/lib/TelegramHistory.php',
+  'api/telegram/cli/telegram.php'
 ];
 
 function run(args) {

@@ -100,13 +100,23 @@ validate_state_approval_markers() {
   deploy_root=$1
   collection_marker="$deploy_root/state/collection-approved"
   relay_marker="$deploy_root/state/relay-approved"
+  telegram_history_marker="$deploy_root/state/telegram-history-approved"
+  telegram_delivery_marker="$deploy_root/state/telegram-delivery-approved"
   collection_marker_approved=false
   relay_marker_approved=false
+  telegram_history_marker_approved=false
+  telegram_delivery_marker_approved=false
   if validate_optional_site_marker "$collection_marker" "Collection approval marker"; then
     collection_marker_approved=true
   fi
   if validate_optional_site_marker "$relay_marker" "Relay approval marker" 600; then
     relay_marker_approved=true
+  fi
+  if validate_optional_site_marker "$telegram_history_marker" "Telegram history approval marker" 600; then
+    telegram_history_marker_approved=true
+  fi
+  if validate_optional_site_marker "$telegram_delivery_marker" "Telegram delivery approval marker" 600; then
+    telegram_delivery_marker_approved=true
   fi
 }
 
@@ -114,21 +124,31 @@ validate_lead_health_contract() {
   lead_health=$1
   collection_approved=$2
   relay_approved=$3
+  telegram_history_approved=$4
+  telegram_delivery_approved=$5
   printf '%s' "$lead_health" | "$egoe_php_command" -r '
     $health = json_decode(stream_get_contents(STDIN), true);
     $collectionApproved = ($argv[1] ?? "false") === "true";
     $relayApproved = ($argv[2] ?? "false") === "true";
+    $telegramHistoryApproved = ($argv[3] ?? "false") === "true";
+    $telegramDeliveryApproved = ($argv[4] ?? "false") === "true";
     $collectionEnabled = $health["collectionEnabled"] ?? null;
     $relayEnabled = $health["relayEnabled"] ?? null;
+    $telegramHistoryEnabled = $health["telegramHistoryEnabled"] ?? false;
+    $telegramDeliveryEnabled = $health["telegramDeliveryEnabled"] ?? false;
     exit(is_array($health)
       && ($health["ok"] ?? false) === true
       && ($health["schemaVersion"] ?? null) === 2
       && is_bool($collectionEnabled)
       && ($collectionApproved || $collectionEnabled === false)
       && is_bool($relayEnabled)
-      && ($relayEnabled === false || $relayApproved) ? 0 : 1);
-  ' "$collection_approved" "$relay_approved" \
-    || die "Lead backend health contract failed: schema, collection, or relay approval mismatch"
+      && ($relayEnabled === false || $relayApproved)
+      && is_bool($telegramHistoryEnabled)
+      && ($telegramHistoryEnabled === false || $telegramHistoryApproved)
+      && is_bool($telegramDeliveryEnabled)
+      && ($telegramDeliveryEnabled === false || ($telegramDeliveryApproved && $telegramHistoryApproved && $telegramHistoryEnabled && $relayEnabled === false)) ? 0 : 1);
+  ' "$collection_approved" "$relay_approved" "$telegram_history_approved" "$telegram_delivery_approved" \
+    || die "Lead backend health contract failed: collection, relay, or Telegram approval mismatch"
 }
 
 validate_current_lead_health_contract() {
@@ -143,10 +163,14 @@ validate_current_lead_health_contract() {
     validate_lead_health_contract \
       "$current_lead_health" \
       "$collection_marker_approved" \
-      "$relay_marker_approved"
+      "$relay_marker_approved" \
+      "$telegram_history_marker_approved" \
+      "$telegram_delivery_marker_approved"
   else
     [ "$relay_marker_approved" = "false" ] \
-      || die "Relay approval marker requires a deployed lead backend"
+      && [ "$telegram_history_marker_approved" = "false" ] \
+      && [ "$telegram_delivery_marker_approved" = "false" ] \
+      || die "External delivery approval marker requires a deployed lead backend"
   fi
 }
 
@@ -185,6 +209,9 @@ verify_release_tree() {
         "api/leads/lib/dailyanalytics.php",
         "api/leads/cli/leads.php",
         "api/leads/cli/daily-report.php",
+        "api/telegram/index.php",
+        "api/telegram/lib/telegramhistory.php",
+        "api/telegram/cli/telegram.php",
       ];
       if (str_ends_with($basename, ".php") && !in_array($normalizedLower, $allowedPhp, true)) exit(24);
       if ($basename === ".env" || strpos($basename, ".env.") === 0) exit(20);

@@ -149,6 +149,8 @@ echo json_encode([
   'schemaVersion' => $schemaVersion === false || $schemaVersion === '' ? 2 : (int) $schemaVersion,
   'collectionEnabled' => getenv('EGOE_TEST_COLLECTION_ENABLED') === 'true',
   'relayEnabled' => getenv('EGOE_TEST_RELAY_ENABLED') === 'true',
+  'telegramHistoryEnabled' => getenv('EGOE_TEST_TELEGRAM_HISTORY_ENABLED') === 'true',
+  'telegramDeliveryEnabled' => getenv('EGOE_TEST_TELEGRAM_DELIVERY_ENABLED') === 'true',
 ]), "\\n";
 `);
   await fs.symlink(releaseTarget, path.join(deployRoot, 'current'));
@@ -160,6 +162,8 @@ echo json_encode([
     EGOE_PHP_BIN: PHP,
     EGOE_TEST_COLLECTION_ENABLED: 'false',
     EGOE_TEST_RELAY_ENABLED: 'false',
+    EGOE_TEST_TELEGRAM_HISTORY_ENABLED: 'false',
+    EGOE_TEST_TELEGRAM_DELIVERY_ENABLED: 'false',
     PATH: `${mockBin}:${process.env.PATH || '/usr/bin:/bin'}`
   };
   return { temporary, deployRoot, env };
@@ -182,15 +186,18 @@ test('release verifier accepts immutable PHP code but keeps persistent config ou
     'api/leads/lib/DailyAnalytics.php': '<?php declare(strict_types=1);\n',
     'api/leads/cli/leads.php': '<?php declare(strict_types=1);\n',
     'api/leads/cli/daily-report.php': '<?php declare(strict_types=1);\n',
+    'api/telegram/index.php': '<?php declare(strict_types=1); echo "ok";\n',
+    'api/telegram/lib/TelegramHistory.php': '<?php declare(strict_types=1);\n',
+    'api/telegram/cli/telegram.php': '<?php declare(strict_types=1);\n',
     'index.html': '<!doctype html><title>EGOE</title>\n'
   });
   const result = await verify(temporaryRoot);
   const summary = JSON.parse(result.stdout);
   assert.equal(summary.commit, COMMIT);
-  assert.equal(summary.fileCount, 7);
+  assert.equal(summary.fileCount, 10);
 });
 
-test('release verifier rejects every PHP path outside the five-file backend and analytics allowlist', async (t) => {
+test('release verifier rejects every PHP path outside the explicit backend, analytics and Telegram allowlist', async (t) => {
   const temporaryRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'egoe-release-php-path-test-'));
   t.after(() => fs.rm(temporaryRoot, { recursive: true, force: true }));
   await createRelease(temporaryRoot, {
@@ -570,7 +577,7 @@ test('relay health requires its own exact secure approval marker', async (t) => 
   await assert.rejects(
     runRemotePreflight(fixture, { EGOE_TEST_SCHEMA_VERSION: '3' }),
     (error) => {
-      assert.match(String(error.stderr), /schema, collection, or relay approval mismatch/);
+      assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
       return true;
     }
   );
@@ -578,7 +585,7 @@ test('relay health requires its own exact secure approval marker', async (t) => 
   await assert.rejects(
     runRemotePreflight(fixture, { EGOE_TEST_RELAY_ENABLED: 'true' }),
     (error) => {
-      assert.match(String(error.stderr), /schema, collection, or relay approval mismatch/);
+      assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
       return true;
     }
   );
@@ -597,7 +604,7 @@ test('relay health requires its own exact secure approval marker', async (t) => 
       EGOE_TEST_RELAY_ENABLED: 'true'
     }),
     (error) => {
-      assert.match(String(error.stderr), /schema, collection, or relay approval mismatch/);
+      assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
       return true;
     }
   );
@@ -639,6 +646,39 @@ test('relay approval marker rejects content, mode, type and symlink drift', asyn
   await fs.mkdir(relayMarker, { mode: 0o700 });
   await assert.rejects(runRemotePreflight(fixture, relayEnv), (error) => {
     assert.match(String(error.stderr), /Relay approval marker must be a regular file/);
+    return true;
+  });
+});
+
+test('direct Telegram delivery requires both exact approval markers and disables relay', async (t) => {
+  const fixture = await createRemotePreflightFixture(t, 'telegram-gate-');
+  const state = path.join(fixture.deployRoot, 'state');
+  const historyMarker = path.join(state, 'telegram-history-approved');
+  const deliveryMarker = path.join(state, 'telegram-delivery-approved');
+  const telegramEnv = {
+    EGOE_TEST_TELEGRAM_HISTORY_ENABLED: 'true',
+    EGOE_TEST_TELEGRAM_DELIVERY_ENABLED: 'true'
+  };
+
+  await assert.rejects(runRemotePreflight(fixture, telegramEnv), (error) => {
+    assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
+    return true;
+  });
+
+  await fs.writeFile(historyMarker, 'egoe-life.ru', { mode: 0o600 });
+  await assert.rejects(runRemotePreflight(fixture, telegramEnv), (error) => {
+    assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
+    return true;
+  });
+
+  await fs.writeFile(deliveryMarker, 'egoe-life.ru', { mode: 0o600 });
+  assert.match((await runRemotePreflight(fixture, telegramEnv)).stdout, /PREFLIGHT_OK/);
+
+  await assert.rejects(runRemotePreflight(fixture, {
+    ...telegramEnv,
+    EGOE_TEST_RELAY_ENABLED: 'true'
+  }), (error) => {
+    assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
     return true;
   });
 });
@@ -685,6 +725,12 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(production, /api\/leads\/cli\/leads\.php/);
   assert.match(production, /api\/leads\/cli\/daily-report\.php/);
   assert.match(production, /api\/leads\/cli\/daily-report\.php\/anything/);
+  assert.match(production, /api\/telegram\/index\.php/);
+  assert.match(production, /api\/telegram\/index\.php\/anything/);
+  assert.match(production, /api\/telegram\/lib\/TelegramHistory\.php/);
+  assert.match(production, /api\/telegram\/lib\/TelegramHistory\.php\/anything/);
+  assert.match(production, /api\/telegram\/cli\/telegram\.php/);
+  assert.match(production, /api\/telegram\/cli\/telegram\.php\/anything/);
   assert.match(htaccess, /RewriteCond %\{HTTP_HOST\} !\^www\\\.egoe-life\\\.ru\$/);
   assert.match(htaccess, /RewriteCond %\{HTTPS\} !=on\s+RewriteCond %\{HTTP:X-Forwarded-Proto\} !\^https\$/);
   assert.doesNotMatch(htaccess, /RewriteCond %\{HTTPS\} !=on \[OR\]/);
@@ -712,7 +758,10 @@ test('production smoke and remote helper contain rollback hardening', async () =
     'api/leads/lib/leadbackend.php',
     'api/leads/lib/dailyanalytics.php',
     'api/leads/cli/leads.php',
-    'api/leads/cli/daily-report.php'
+    'api/leads/cli/daily-report.php',
+    'api/telegram/index.php',
+    'api/telegram/lib/telegramhistory.php',
+    'api/telegram/cli/telegram.php'
   ]);
   assert.match(remote, /str_ends_with\(\$basename, "\.php"\)/);
   assert.match(remote, /Membership is checked below using sorted copies/);

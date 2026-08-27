@@ -157,7 +157,14 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   assert.match(initialized.stdout, /INITIALIZED schema=2 collection=off relay=off/);
   await writeConfig(deployRoot, settings());
   const health = JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout);
-  assert.deepEqual(health, { ok: true, schemaVersion: 2, collectionEnabled: false, relayEnabled: false });
+  assert.deepEqual(health, {
+    ok: true,
+    schemaVersion: 2,
+    collectionEnabled: false,
+    relayEnabled: false,
+    telegramHistoryEnabled: false,
+    telegramDeliveryEnabled: false
+  });
   assert.equal((await fs.stat(path.join(deployRoot, 'shared/leads'))).mode & 0o777, 0o700);
   assert.equal((await fs.stat(path.join(deployRoot, 'shared/leads/config.php'))).mode & 0o777, 0o600);
   assert.equal((await fs.stat(path.join(deployRoot, 'shared/leads/leads.sqlite3'))).mode & 0o777, 0o600);
