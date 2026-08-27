@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import http from 'node:http';
@@ -9,7 +9,8 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PHP = process.env.EGOE_PHP_BIN || 'php';
+const PHP = process.env.EGOE_PHP_BIN
+  || execFileSync('which', ['php'], { encoding: 'utf8' }).trim();
 const CLI = path.join(ROOT, 'api/leads/cli/daily-report.php');
 const RUNNER = path.join(ROOT, 'ops/analytics/run-daily.sh');
 const FIXTURES = path.join(ROOT, 'ops/analytics/fixtures');
