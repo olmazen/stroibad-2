@@ -274,6 +274,10 @@ test('deployment workflows pin actions and preserve exact staging provenance', a
   assert.match(pages, /GITHUB_REF" != "refs\/heads\/main"/);
   assert.match(pages, /name: egoe-release-\$\{\{ steps\.source\.outputs\.sha \}\}/);
   assert.match(pages, /include-hidden-files: true/);
+  assert.match(pages, /name: Prepare static Pages preview/);
+  assert.match(pages, /find "\$preview_dir" -type f -name '\*\.php' -delete/);
+  assert.match(pages, /path: \$\{\{ env\.EGOE_PAGES_PREVIEW \}\}\//);
+  assert.doesNotMatch(pages, /name: Upload Pages artifact[\s\S]*?path: dist\//);
   assert.match(production, /test "\$EXPECTED_SHA" = "\$GITHUB_SHA"/);
   assert.doesNotMatch(production, /git merge-base --is-ancestor/);
   assert.equal((production.match(/ref: \$\{\{ github\.sha \}\}/g) || []).length, 2);
