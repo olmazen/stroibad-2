@@ -362,6 +362,21 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   await run(PHP, [cli, 'delete', currentConsentOnLegacyConfig.leadId, '--with-evidence'], { env });
 
   await writeConfig(deployRoot, activeSettings());
+  const nextConsentWithJourney = lead();
+  nextConsentWithJourney.consent = { ...nextConsentWithJourney.consent, version: '2026-09-04' };
+  result = await post(nextConsentWithJourney);
+  assert.equal(result.response.status, 201, 'the transition backend must accept the next consent version with its journey');
+  assert.equal(await storedConsentVersion(nextConsentWithJourney.leadId), '2026-09-04');
+  await run(PHP, [cli, 'delete', nextConsentWithJourney.leadId, '--with-evidence'], { env });
+
+  await writeConfig(deployRoot, activeSettings({ consent_version: '2026-09-04' }));
+  assert.equal(
+    JSON.parse((await run(PHP, [cli, 'health'], { env })).stdout).ok,
+    true,
+    'the transition backend must remain healthy after a rollback leaves the next consent version in shared config'
+  );
+  await writeConfig(deployRoot, activeSettings());
+
   const legacyConsentWithJourney = lead();
   legacyConsentWithJourney.consent = { ...legacyConsentWithJourney.consent, version: '2026-08-23' };
   result = await post(legacyConsentWithJourney);
@@ -686,6 +701,18 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   });
   await writeConfig(deployRoot, fullSettings);
   await run(PHP, ['-r', clearRate], { env });
+  const nextConsentWithRelayOn = lead({
+    formId: 'test:next-consent-relay',
+    consent: { ...lead().consent, version: '2026-09-04' },
+    fields: { Имя: 'Проверка отката', Телефон: '+7 927 111-22-33' }
+  });
+  const receiverCallsBeforeNext = receivedRelayBodies.length;
+  result = await post(nextConsentWithRelayOn);
+  assert.equal(result.response.status, 201, 'the transition backend must accept the next-version form after rollback');
+  assert.equal(receivedRelayBodies.length, receiverCallsBeforeNext + 1, 'the next consent version must retain external delivery after rollback');
+  assert.equal(JSON.parse(receivedRelayBodies.at(-1)).Имя, 'Проверка отката');
+  await run(PHP, [cli, 'delete', nextConsentWithRelayOn.leadId, '--with-evidence'], { env });
+
   const legacyConsentWithRelayOn = lead({
     formId: 'test:legacy-consent-relay',
     consent: { ...lead().consent, version: '2026-08-23' },
@@ -724,10 +751,11 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
     page: { url: 'https://www.egoe-life.ru/cart/?secret=drop', title: 'Корзина', referrer: '' },
     fields: quoteFields
   });
+  const quoteRelayIndex = receivedRelayBodies.length;
   result = await post(quoteLead);
   assert.equal(result.response.status, 201, 'an optional empty company must not reject a quote');
-  assert.equal(receivedRelayBodies.length, 2);
-  const fullRelayed = JSON.parse(receivedRelayBodies[1]);
+  assert.equal(receivedRelayBodies.length, quoteRelayIndex + 1);
+  const fullRelayed = JSON.parse(receivedRelayBodies[quoteRelayIndex]);
   assert.deepEqual(Object.keys(fullRelayed), ['_subject', '_source', ...Object.keys(quoteFields)]);
   assert.equal(fullRelayed._subject, 'Заявка с сайта EGOE — КП');
   assert.equal(fullRelayed._source, '/cart/');

@@ -162,6 +162,7 @@ final class Runtime
 final class Settings
 {
     public const CURRENT_CONSENT_VERSION = '2026-08-27';
+    public const NEXT_CONSENT_VERSION = '2026-09-04';
     private const LEGACY_CONSENT_VERSION = '2026-08-23';
 
     public static function isCurrentConsentVersion(string $version): bool
@@ -171,8 +172,19 @@ final class Settings
 
     public static function acceptsConsentVersion(string $version): bool
     {
-        return self::isCurrentConsentVersion($version)
+        return self::allowsDeliveryForConsentVersion($version)
             || hash_equals(self::LEGACY_CONSENT_VERSION, $version);
+    }
+
+    public static function allowsJourneyForConsentVersion(string $version): bool
+    {
+        return self::allowsDeliveryForConsentVersion($version);
+    }
+
+    public static function allowsDeliveryForConsentVersion(string $version): bool
+    {
+        return self::isCurrentConsentVersion($version)
+            || hash_equals(self::NEXT_CONSENT_VERSION, $version);
     }
 
     /** @return array<string,mixed> */
@@ -588,7 +600,7 @@ final class Validator
         $pageTitle = self::optionalText($page['title'] ?? '', 300, 'page.title');
         $pageReferrer = self::minimizedReferrer(self::optionalText($page['referrer'] ?? '', 1500, 'page.referrer'), $settings);
         $journey = self::journey($input['journey'] ?? [], $createdTime);
-        if (!Settings::isCurrentConsentVersion($consentVersion) && $journey !== []) {
+        if (!Settings::allowsJourneyForConsentVersion($consentVersion) && $journey !== []) {
             throw new HttpFailure(
                 422,
                 'JOURNEY_CONSENT_REQUIRED',
@@ -1199,7 +1211,7 @@ SQL);
 
             $outboxId = null;
             if ($transport->enabled()
-                && Settings::isCurrentConsentVersion((string)($lead['consent']['version'] ?? ''))
+                && Settings::allowsDeliveryForConsentVersion((string)($lead['consent']['version'] ?? ''))
             ) {
                 $deliveryPayload = $transport->payload($lead);
                 $outbox = $pdo->prepare(<<<'SQL'
@@ -1325,9 +1337,13 @@ final class Outbox
         $pdo->prepare(<<<'SQL'
 DELETE FROM outbox
 WHERE lead_id IN (
-  SELECT lead_id FROM leads WHERE consent_version <> :current_consent_version
+  SELECT lead_id FROM leads
+  WHERE consent_version NOT IN (:current_consent_version, :next_consent_version)
 )
-SQL)->execute([':current_consent_version' => Settings::CURRENT_CONSENT_VERSION]);
+SQL)->execute([
+            ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
+            ':next_consent_version' => Settings::NEXT_CONSENT_VERSION,
+        ]);
         $mode = $transport->mode();
         if (preg_match('/\A[a-z][a-z0-9_-]{0,31}\z/D', $mode) !== 1) {
             throw new RuntimeException('Outbox transport mode is invalid');
@@ -1336,11 +1352,12 @@ SQL)->execute([':current_consent_version' => Settings::CURRENT_CONSENT_VERSION])
         $now = Runtime::utcNow();
         $pdo->prepare("UPDATE outbox SET status = 'failed', last_error = 'stale_claim' WHERE mode = :mode AND status = 'sending' AND next_attempt_at <= :now")
             ->execute([':mode' => $mode, ':now' => $now]);
-        $sql = "SELECT outbox.id, outbox.lead_id, outbox.payload_json, outbox.attempts FROM outbox JOIN leads ON leads.lead_id = outbox.lead_id WHERE outbox.mode = :mode AND outbox.status IN ('pending','failed') AND outbox.next_attempt_at <= :now AND leads.consent_version = :current_consent_version";
+        $sql = "SELECT outbox.id, outbox.lead_id, outbox.payload_json, outbox.attempts FROM outbox JOIN leads ON leads.lead_id = outbox.lead_id WHERE outbox.mode = :mode AND outbox.status IN ('pending','failed') AND outbox.next_attempt_at <= :now AND leads.consent_version IN (:current_consent_version, :next_consent_version)";
         $params = [
             ':mode' => $mode,
             ':now' => $now,
             ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
+            ':next_consent_version' => Settings::NEXT_CONSENT_VERSION,
         ];
         if ($onlyId !== null) {
             $sql .= ' AND outbox.id = :id';
@@ -1356,12 +1373,13 @@ SQL)->execute([':current_consent_version' => Settings::CURRENT_CONSENT_VERSION])
             $lease = (new DateTimeImmutable('now', new DateTimeZone('UTC')))
                 ->modify('+5 minutes')
                 ->format('Y-m-d\TH:i:s.v\Z');
-            $claim = $pdo->prepare("UPDATE outbox SET status = 'sending', attempts = attempts + 1, next_attempt_at = :lease WHERE id = :id AND mode = :mode AND status IN ('pending','failed') AND EXISTS (SELECT 1 FROM leads WHERE leads.lead_id = outbox.lead_id AND leads.consent_version = :current_consent_version)");
+            $claim = $pdo->prepare("UPDATE outbox SET status = 'sending', attempts = attempts + 1, next_attempt_at = :lease WHERE id = :id AND mode = :mode AND status IN ('pending','failed') AND EXISTS (SELECT 1 FROM leads WHERE leads.lead_id = outbox.lead_id AND leads.consent_version IN (:current_consent_version, :next_consent_version))");
             $claim->execute([
                 ':lease' => $lease,
                 ':id' => $id,
                 ':mode' => $mode,
                 ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
+                ':next_consent_version' => Settings::NEXT_CONSENT_VERSION,
             ]);
             if ($claim->rowCount() !== 1) {
                 continue;
