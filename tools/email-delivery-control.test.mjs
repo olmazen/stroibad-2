@@ -2,6 +2,7 @@
 
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
+import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -27,6 +28,15 @@ function run(args) {
 async function privateWrite(target, contents, mode = 0o600) {
   await fs.writeFile(target, contents, { mode });
   await fs.chmod(target, mode);
+}
+
+async function hasProductionSendmail() {
+  try {
+    await fs.access('/usr/sbin/sendmail', fsConstants.X_OK);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 test('email control is exact-release-bound, atomic, reversible, and preserves private settings', async (context) => {
@@ -78,26 +88,40 @@ return [
   );
   assert.equal((await fs.stat(configPath)).mode & 0o777, 0o600);
 
-  result = JSON.parse((await run(['enable', realDeployRoot, SHA])).stdout);
-  assert.deepEqual(result, {
-    ok: true,
-    schemaVersion: 2,
-    collectionEnabled: false,
-    emailDeliveryEnabled: true,
-    mode: 'enable',
-    markerPresent: true
-  });
-  assert.equal(await fs.readFile(path.join(state, 'email-delivery-approved'), 'utf8'), 'egoe-life.ru');
-  assert.equal((await fs.stat(path.join(state, 'email-delivery-approved'))).mode & 0o777, 0o600);
-  assert.equal((await fs.stat(configPath)).mode & 0o777, 0o600);
-  const enabledConfig = (await fs.readFile(configPath, 'utf8'));
-  assert.match(enabledConfig, /'unrelated_private_setting' => 'preserve-me'/);
-  assert.match(enabledConfig, new RegExp(untouchedSecret));
-  assert.match(enabledConfig, /'recipient' => 'zakaz@egoe-life\.ru'/);
+  if (await hasProductionSendmail()) {
+    result = JSON.parse((await run(['enable', realDeployRoot, SHA])).stdout);
+    assert.deepEqual(result, {
+      ok: true,
+      schemaVersion: 2,
+      collectionEnabled: false,
+      emailDeliveryEnabled: true,
+      mode: 'enable',
+      markerPresent: true
+    });
+    assert.equal(await fs.readFile(path.join(state, 'email-delivery-approved'), 'utf8'), 'egoe-life.ru');
+    assert.equal((await fs.stat(path.join(state, 'email-delivery-approved'))).mode & 0o777, 0o600);
+    assert.equal((await fs.stat(configPath)).mode & 0o777, 0o600);
+    const enabledConfig = (await fs.readFile(configPath, 'utf8'));
+    assert.match(enabledConfig, /'unrelated_private_setting' => 'preserve-me'/);
+    assert.match(enabledConfig, new RegExp(untouchedSecret));
+    assert.match(enabledConfig, /'recipient' => 'zakaz@egoe-life\.ru'/);
 
-  result = JSON.parse((await run(['preflight', realDeployRoot, SHA])).stdout);
-  assert.equal(result.emailDeliveryEnabled, true);
-  assert.equal(result.markerPresent, true);
+    result = JSON.parse((await run(['preflight', realDeployRoot, SHA])).stdout);
+    assert.equal(result.emailDeliveryEnabled, true);
+    assert.equal(result.markerPresent, true);
+  } else {
+    await assert.rejects(
+      run(['enable', realDeployRoot, SHA]),
+      (error) => String(error.stderr).includes('Configured sendmail executable is unavailable')
+    );
+    const rolledBackConfig = await fs.readFile(configPath, 'utf8');
+    assert.match(rolledBackConfig, /'unrelated_private_setting' => 'preserve-me'/);
+    assert.match(rolledBackConfig, new RegExp(untouchedSecret));
+    await assert.rejects(
+      fs.stat(path.join(state, 'email-delivery-approved')),
+      (error) => error.code === 'ENOENT'
+    );
+  }
 
   result = JSON.parse((await run(['disable', realDeployRoot, SHA])).stdout);
   assert.equal(result.emailDeliveryEnabled, false);
