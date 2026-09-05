@@ -1,0 +1,182 @@
+name: Manage REG.RU lead email delivery
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: "Full 40-character production commit SHA"
+        required: true
+        type: string
+      mode:
+        description: "Inspect, enable, or disable corporate email copies"
+        required: true
+        default: preflight
+        type: choice
+        options:
+          - preflight
+          - enable
+          - disable
+      confirmation:
+        description: "Enter ENABLE_EMAIL or DISABLE_EMAIL for a state change"
+        required: false
+        type: string
+
+run-name: "REG.RU lead email: ${{ inputs.mode }} @ ${{ inputs.expected_sha }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: egoe-production
+  cancel-in-progress: false
+
+jobs:
+  email:
+    name: Corporate lead email ${{ inputs.mode }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: ${{ vars.REG_PUBLIC_URL }}
+    steps:
+      - name: Validate immutable production inputs
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          MODE: ${{ inputs.mode }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "::error::Email delivery can be managed only from main"
+            exit 1
+          fi
+          if [[ ! "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]] || [[ "$EXPECTED_SHA" != "$GITHUB_SHA" ]]; then
+            echo "::error::expected_sha must be the exact full SHA of the dispatched main commit"
+            exit 1
+          fi
+          case "$MODE" in
+            preflight) ;;
+            enable) [[ "$CONFIRMATION" == "ENABLE_EMAIL" ]] || { echo "::error::Enable mode requires ENABLE_EMAIL"; exit 1; } ;;
+            disable) [[ "$CONFIRMATION" == "DISABLE_EMAIL" ]] || { echo "::error::Disable mode requires DISABLE_EMAIL"; exit 1; } ;;
+            *) echo "::error::Unsupported mode"; exit 1 ;;
+          esac
+      - name: Checkout exact control helper
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: ops/leads
+      - name: Validate control helper and REG.RU target
+        shell: bash
+        env:
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+          REG_SSH_USER: ${{ vars.REG_SSH_USER }}
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          REG_PUBLIC_URL: ${{ vars.REG_PUBLIC_URL }}
+        run: |
+          php -l ops/leads/email-delivery-control.php
+          node --input-type=module <<'NODE'
+          const env = process.env;
+          const fail = (message) => { throw new Error(message); };
+          if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(env.REG_SSH_HOST || '')) fail('REG_SSH_HOST must be a plain DNS hostname');
+          if (!/^[0-9]{1,5}$/.test(env.REG_SSH_PORT || '')) fail('REG_SSH_PORT must be numeric');
+          const port = Number(env.REG_SSH_PORT);
+          if (!Number.isInteger(port) || port < 1 || port > 65535) fail('REG_SSH_PORT is outside 1..65535');
+          if (!/^[a-z_][a-z0-9._-]{0,63}$/i.test(env.REG_SSH_USER || '')) fail('REG_SSH_USER is unsafe');
+          const root = env.REG_DEPLOY_ROOT || '';
+          if (!/^\/[A-Za-z0-9._/-]+$/.test(root)) fail('REG_DEPLOY_ROOT contains unsafe shell characters');
+          if (root.endsWith('/') || root.includes('//') || root.split('/').some((part) => part === '.' || part === '..')) fail('REG_DEPLOY_ROOT must be normalized');
+          if (new Set(['/', '/bin', '/boot', '/dev', '/etc', '/home', '/root', '/tmp', '/usr', '/var', '/var/www', '/www']).has(root)) fail('REG_DEPLOY_ROOT is too broad');
+          if (env.REG_PUBLIC_URL !== 'https://www.egoe-life.ru') fail('REG_PUBLIC_URL must be the canonical HTTPS origin');
+          NODE
+      - name: Configure isolated SSH credentials
+        shell: bash
+        env:
+          REG_SSH_PRIVATE_KEY: ${{ secrets.REG_SSH_PRIVATE_KEY }}
+          REG_SSH_KNOWN_HOSTS: ${{ secrets.REG_SSH_KNOWN_HOSTS }}
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+        run: |
+          ssh_dir="$RUNNER_TEMP/egoe-email-ssh"
+          install -m 700 -d "$ssh_dir"
+          printf '%s\n' "$REG_SSH_PRIVATE_KEY" > "$ssh_dir/deploy-key"
+          chmod 600 "$ssh_dir/deploy-key"
+          printf '%s\n' "$REG_SSH_KNOWN_HOSTS" > "$ssh_dir/known-hosts"
+          chmod 600 "$ssh_dir/known-hosts"
+          ssh-keygen -y -f "$ssh_dir/deploy-key" >/dev/null
+          known_host="$REG_SSH_HOST"
+          if [[ "$REG_SSH_PORT" != "22" ]]; then known_host="[$REG_SSH_HOST]:$REG_SSH_PORT"; fi
+          ssh-keygen -F "$known_host" -f "$ssh_dir/known-hosts" >/dev/null
+          echo "EGOE_EMAIL_SSH_KEY=$ssh_dir/deploy-key" >> "$GITHUB_ENV"
+          echo "EGOE_EMAIL_KNOWN_HOSTS=$ssh_dir/known-hosts" >> "$GITHUB_ENV"
+      - name: Apply fail-closed email state
+        id: control
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          MODE: ${{ inputs.mode }}
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+          REG_SSH_USER: ${{ vars.REG_SSH_USER }}
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+        run: |
+          result=$(ssh -i "$EGOE_EMAIL_SSH_KEY" -p "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$EGOE_EMAIL_KNOWN_HOSTS" -o ConnectTimeout=20 \
+            "$REG_SSH_USER@$REG_SSH_HOST" \
+            "php -- '$MODE' '$REG_DEPLOY_ROOT' '$EXPECTED_SHA'" \
+            < ops/leads/email-delivery-control.php)
+          printf '%s\n' "$result" > "$RUNNER_TEMP/email-control-result.json"
+          node --input-type=module - "$RUNNER_TEMP/email-control-result.json" "$MODE" <<'NODE'
+          import fs from 'node:fs';
+          const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          const mode = process.argv[3];
+          const expected = mode === 'enable';
+          if (result.ok !== true || result.schemaVersion !== 2 || result.mode !== mode
+            || typeof result.collectionEnabled !== 'boolean'
+            || typeof result.emailDeliveryEnabled !== 'boolean'
+            || typeof result.markerPresent !== 'boolean'
+            || result.emailDeliveryEnabled !== result.markerPresent
+            || (mode !== 'preflight' && result.emailDeliveryEnabled !== expected)) throw new Error('Email control result failed its contract');
+          console.log(`Email delivery effective state: ${result.emailDeliveryEnabled ? 'ON' : 'OFF'}`);
+          NODE
+      - name: Verify production health and public release
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          MODE: ${{ inputs.mode }}
+          REG_SSH_HOST: ${{ vars.REG_SSH_HOST }}
+          REG_SSH_PORT: ${{ vars.REG_SSH_PORT }}
+          REG_SSH_USER: ${{ vars.REG_SSH_USER }}
+          REG_DEPLOY_ROOT: ${{ vars.REG_DEPLOY_ROOT }}
+          REG_PUBLIC_URL: ${{ vars.REG_PUBLIC_URL }}
+        run: |
+          health=$(ssh -i "$EGOE_EMAIL_SSH_KEY" -p "$REG_SSH_PORT" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$EGOE_EMAIL_KNOWN_HOSTS" -o ConnectTimeout=20 \
+            "$REG_SSH_USER@$REG_SSH_HOST" \
+            "EGOE_DEPLOY_ROOT='$REG_DEPLOY_ROOT' php '$REG_DEPLOY_ROOT/current/api/leads/cli/leads.php' health")
+          printf '%s\n' "$health" > "$RUNNER_TEMP/email-health.json"
+          node --input-type=module - "$RUNNER_TEMP/email-health.json" "$MODE" <<'NODE'
+          import fs from 'node:fs';
+          const health = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          const mode = process.argv[3];
+          const expectedEmail = mode === 'enable';
+          if (health.ok !== true || health.schemaVersion !== 2
+            || typeof health.collectionEnabled !== 'boolean'
+            || typeof health.relayEnabled !== 'boolean'
+            || typeof health.telegramHistoryEnabled !== 'boolean'
+            || typeof health.telegramDeliveryEnabled !== 'boolean'
+            || typeof health.emailDeliveryEnabled !== 'boolean'
+            || (mode !== 'preflight' && health.emailDeliveryEnabled !== expectedEmail)) throw new Error('Production health does not match requested email state');
+          if (health.telegramDeliveryEnabled && (health.relayEnabled || !health.telegramHistoryEnabled)) throw new Error('Telegram health invariant failed');
+          console.log(`Collection=${health.collectionEnabled}; Telegram=${health.telegramDeliveryEnabled}; Email=${health.emailDeliveryEnabled}`);
+          NODE
+          release_sha=$(curl --fail --location --silent --show-error --retry 2 --max-time 30 \
+            --header 'Cache-Control: no-cache, no-store' \
+            "$REG_PUBLIC_URL/release.json?egoe_email=$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>console.log(JSON.parse(d).source.commit))')
+          test "$release_sha" = "$EXPECTED_SHA"

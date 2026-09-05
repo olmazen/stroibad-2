@@ -10,6 +10,7 @@ use Egoe\Leads\CustomerHistory;
 use Egoe\Leads\Outbox;
 use Egoe\Leads\Runtime;
 use Egoe\Leads\Settings;
+use Egoe\Email\EmailLeadTransport;
 use Egoe\Telegram\TelegramConfig;
 use Egoe\Telegram\TelegramLeadTransport;
 
@@ -19,6 +20,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require dirname(__DIR__) . '/lib/LeadBackend.php';
+require dirname(__DIR__) . '/lib/EmailDelivery.php';
 require dirname(__DIR__, 2) . '/telegram/lib/TelegramHistory.php';
 
 function fail(string $message, int $code = 1): never
@@ -49,13 +51,21 @@ function initialize(): void
             'site_host' => 'www.egoe-life.ru',
             'allowed_hosts' => ['www.egoe-life.ru', 'egoe-life.ru'],
             'collection_enabled' => false,
-            'consent_version' => '2026-08-27',
+            'consent_version' => Settings::CURRENT_CONSENT_VERSION,
             'ip_hash_key' => bin2hex(random_bytes(32)),
             'minimum_elapsed_ms' => 600,
             'rate_limit' => ['max_requests' => 5, 'window_seconds' => 600],
             'retention_days' => 365,
             'consent_evidence_days' => 1095,
             'backup_retention_days' => 30,
+            'email' => [
+                'enabled' => false,
+                'recipient' => 'zakaz@egoe-life.ru',
+                'sender' => 'zakaz@egoe-life.ru',
+                'sender_name' => 'EGOE — сайт',
+                'sendmail_path' => '/usr/sbin/sendmail',
+                'timeout_seconds' => 10,
+            ],
             'relay' => [
                 'enabled' => false,
                 'url' => '',
@@ -91,7 +101,10 @@ function health(): void
     }
     [$root, $settings, $pdo] = loadRuntime();
     $telegram = TelegramConfig::loadOptional($root);
-    Outbox::selectTransport($settings, TelegramLeadTransport::production($telegram));
+    Outbox::selectTransports($settings, [
+        TelegramLeadTransport::production($telegram),
+        EmailLeadTransport::production($settings['email']),
+    ]);
     $directory = Runtime::sharedDirectory($root);
     if (!is_writable($directory)) {
         fail('Persistent lead directory is not writable');
@@ -116,6 +129,7 @@ function health(): void
     Database::assertSchema($pdo);
     $pdo->query('SELECT 1 FROM leads LIMIT 1');
     $pdo->query('SELECT 1 FROM outbox LIMIT 1');
+    $pdo->query('SELECT 1 FROM email_outbox LIMIT 1');
     $pdo->query('SELECT 1 FROM consent_evidence LIMIT 1');
     echo json_encode([
         'ok' => true,
@@ -124,6 +138,7 @@ function health(): void
         'relayEnabled' => ($settings['relay']['enabled'] ?? false) === true,
         'telegramHistoryEnabled' => ($telegram['enabled'] ?? false) === true,
         'telegramDeliveryEnabled' => ($telegram['send_leads'] ?? false) === true,
+        'emailDeliveryEnabled' => ($settings['email']['enabled'] ?? false) === true,
     ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
 }
 
@@ -319,11 +334,11 @@ try {
         case 'retry':
             $limit = isset($argv[2]) ? (int)$argv[2] : 20;
             $telegram = TelegramConfig::loadOptional($root);
-            $transport = Outbox::selectTransport(
-                $settings,
-                TelegramLeadTransport::production($telegram)
-            );
-            echo json_encode(Outbox::retry($pdo, $transport, $limit), JSON_THROW_ON_ERROR) . "\n";
+            $transports = Outbox::selectTransports($settings, [
+                TelegramLeadTransport::production($telegram),
+                EmailLeadTransport::production($settings['email']),
+            ]);
+            echo json_encode(Outbox::retryAll($pdo, $transports, $limit), JSON_THROW_ON_ERROR) . "\n";
             break;
         case 'view':
             viewLead($pdo, (string)($argv[2] ?? ''));

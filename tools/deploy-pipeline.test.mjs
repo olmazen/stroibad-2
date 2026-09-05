@@ -151,6 +151,7 @@ echo json_encode([
   'relayEnabled' => getenv('EGOE_TEST_RELAY_ENABLED') === 'true',
   'telegramHistoryEnabled' => getenv('EGOE_TEST_TELEGRAM_HISTORY_ENABLED') === 'true',
   'telegramDeliveryEnabled' => getenv('EGOE_TEST_TELEGRAM_DELIVERY_ENABLED') === 'true',
+  'emailDeliveryEnabled' => getenv('EGOE_TEST_EMAIL_DELIVERY_ENABLED') === 'true',
 ]), "\\n";
 `);
   await fs.symlink(releaseTarget, path.join(deployRoot, 'current'));
@@ -164,6 +165,7 @@ echo json_encode([
     EGOE_TEST_RELAY_ENABLED: 'false',
     EGOE_TEST_TELEGRAM_HISTORY_ENABLED: 'false',
     EGOE_TEST_TELEGRAM_DELIVERY_ENABLED: 'false',
+    EGOE_TEST_EMAIL_DELIVERY_ENABLED: 'false',
     PATH: `${mockBin}:${process.env.PATH || '/usr/bin:/bin'}`
   };
   return { temporary, deployRoot, env };
@@ -183,6 +185,7 @@ test('release verifier accepts immutable PHP code but keeps persistent config ou
     '.htaccess': 'Options -Indexes\n',
     'api/leads/index.php': '<?php declare(strict_types=1); echo "ok";\n',
     'api/leads/lib/LeadBackend.php': '<?php declare(strict_types=1);\n',
+    'api/leads/lib/EmailDelivery.php': '<?php declare(strict_types=1);\n',
     'api/leads/lib/DailyAnalytics.php': '<?php declare(strict_types=1);\n',
     'api/leads/cli/leads.php': '<?php declare(strict_types=1);\n',
     'api/leads/cli/daily-report.php': '<?php declare(strict_types=1);\n',
@@ -194,7 +197,7 @@ test('release verifier accepts immutable PHP code but keeps persistent config ou
   const result = await verify(temporaryRoot);
   const summary = JSON.parse(result.stdout);
   assert.equal(summary.commit, COMMIT);
-  assert.equal(summary.fileCount, 10);
+  assert.equal(summary.fileCount, 11);
 });
 
 test('release verifier rejects every PHP path outside the explicit backend, analytics and Telegram allowlist', async (t) => {
@@ -250,6 +253,7 @@ test('deployment workflows pin actions and preserve exact staging provenance', a
   const pages = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'pages.yml'), 'utf8');
   const production = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'deploy-production.yml'), 'utf8');
   const bootstrap = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'bootstrap-production.yml'), 'utf8');
+  const emailControl = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'manage-email-delivery.yml'), 'utf8');
   const prepare = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'prepare-release.yml'), 'utf8');
   const quality = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'site-quality.yml'), 'utf8');
   const trustedPins = new Map([
@@ -266,6 +270,7 @@ test('deployment workflows pin actions and preserve exact staging provenance', a
     ['pages', pages],
     ['production', production],
     ['bootstrap', bootstrap],
+    ['email-control', emailControl],
     ['prepare-release', prepare],
     ['site-quality', quality]
   ]) {
@@ -305,6 +310,15 @@ test('deployment workflows pin actions and preserve exact staging provenance', a
   assert.match(bootstrap, /sh -s -- enable/);
   assert.match(bootstrap, /collection-approved.*remains absent/);
   assert.doesNotMatch(bootstrap, /npm run (?:build|check)/);
+  assert.match(emailControl, /\[\[ "\$EXPECTED_SHA" != "\$GITHUB_SHA" \]\]/);
+  assert.match(emailControl, /environment:\s*\n\s*name: production/);
+  assert.match(emailControl, /group: egoe-production/);
+  assert.match(emailControl, /ENABLE_EMAIL/);
+  assert.match(emailControl, /DISABLE_EMAIL/);
+  assert.match(emailControl, /StrictHostKeyChecking=yes/);
+  assert.match(emailControl, /PasswordAuthentication=no/);
+  assert.match(emailControl, /email-delivery-control\.php/);
+  assert.match(emailControl, /health\.emailDeliveryEnabled !== expectedEmail/);
   assert.ok(
     bootstrap.indexOf('Externally smoke-test safe baseline before enablement')
       < bootstrap.indexOf('Enable the existing production release workflow'),
@@ -315,6 +329,7 @@ test('deployment workflows pin actions and preserve exact staging provenance', a
     ['pages', pages],
     ['production', production],
     ['bootstrap', bootstrap],
+    ['email-control', emailControl],
     ['prepare-release', prepare],
     ['site-quality', quality]
   ]) {
@@ -577,7 +592,7 @@ test('relay health requires its own exact secure approval marker', async (t) => 
   await assert.rejects(
     runRemotePreflight(fixture, { EGOE_TEST_SCHEMA_VERSION: '3' }),
     (error) => {
-      assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
+      assert.match(String(error.stderr), /collection, relay, Telegram, or email approval mismatch/);
       return true;
     }
   );
@@ -585,7 +600,7 @@ test('relay health requires its own exact secure approval marker', async (t) => 
   await assert.rejects(
     runRemotePreflight(fixture, { EGOE_TEST_RELAY_ENABLED: 'true' }),
     (error) => {
-      assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
+      assert.match(String(error.stderr), /collection, relay, Telegram, or email approval mismatch/);
       return true;
     }
   );
@@ -604,7 +619,7 @@ test('relay health requires its own exact secure approval marker', async (t) => 
       EGOE_TEST_RELAY_ENABLED: 'true'
     }),
     (error) => {
-      assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
+      assert.match(String(error.stderr), /collection, relay, Telegram, or email approval mismatch/);
       return true;
     }
   );
@@ -661,13 +676,13 @@ test('direct Telegram delivery requires both exact approval markers and disables
   };
 
   await assert.rejects(runRemotePreflight(fixture, telegramEnv), (error) => {
-    assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
+    assert.match(String(error.stderr), /collection, relay, Telegram, or email approval mismatch/);
     return true;
   });
 
   await fs.writeFile(historyMarker, 'egoe-life.ru', { mode: 0o600 });
   await assert.rejects(runRemotePreflight(fixture, telegramEnv), (error) => {
-    assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
+    assert.match(String(error.stderr), /collection, relay, Telegram, or email approval mismatch/);
     return true;
   });
 
@@ -678,9 +693,36 @@ test('direct Telegram delivery requires both exact approval markers and disables
     ...telegramEnv,
     EGOE_TEST_RELAY_ENABLED: 'true'
   }), (error) => {
-    assert.match(String(error.stderr), /collection, relay, or Telegram approval mismatch/);
+    assert.match(String(error.stderr), /collection, relay, Telegram, or email approval mismatch/);
     return true;
   });
+});
+
+test('email delivery requires its own exact private approval marker', async (t) => {
+  const fixture = await createRemotePreflightFixture(t, 'email-gate-');
+  const marker = path.join(fixture.deployRoot, 'state', 'email-delivery-approved');
+  const emailEnv = { EGOE_TEST_EMAIL_DELIVERY_ENABLED: 'true' };
+
+  await assert.rejects(runRemotePreflight(fixture, emailEnv), (error) => {
+    assert.match(String(error.stderr), /collection, relay, Telegram, or email approval mismatch/);
+    return true;
+  });
+
+  await fs.writeFile(marker, 'egoe-life.ru\n', { mode: 0o600 });
+  await assert.rejects(runRemotePreflight(fixture, emailEnv), (error) => {
+    assert.match(String(error.stderr), /Invalid Email delivery approval marker/);
+    return true;
+  });
+
+  await fs.writeFile(marker, 'egoe-life.ru');
+  await fs.chmod(marker, 0o640);
+  await assert.rejects(runRemotePreflight(fixture, emailEnv), (error) => {
+    assert.match(String(error.stderr), /permissions must be exactly 0600/);
+    return true;
+  });
+
+  await fs.chmod(marker, 0o600);
+  assert.match((await runRemotePreflight(fixture, emailEnv)).stdout, /PREFLIGHT_OK/);
 });
 
 test('production smoke and remote helper contain rollback hardening', async () => {
@@ -708,6 +750,9 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(production, /relayEnabled/);
   assert.match(production, /state\/relay-approved/);
   assert.match(production, /\[\$argv\[7\], 0100000, 0600\]/);
+  assert.match(production, /emailDeliveryEnabled/);
+  assert.match(production, /state\/email-delivery-approved/);
+  assert.match(production, /\[\$argv\[10\], 0100000, 0600\]/);
   assert.match(production, /remote-release\.sh' preflight/);
   assert.match(production, /\(\$health\["schemaVersion"\] \?\? null\) === 2/);
   assert.match(production, /health\.schemaVersion !== 2/);
@@ -720,6 +765,8 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(production, /api\/leads\/index\.php/);
   assert.match(production, /api\/leads\/index\.php\/anything/);
   assert.match(production, /api\/leads\/lib\/LeadBackend\.php/);
+  assert.match(production, /api\/leads\/lib\/EmailDelivery\.php/);
+  assert.match(production, /api\/leads\/lib\/EmailDelivery\.php\/anything/);
   assert.match(production, /api\/leads\/lib\/DailyAnalytics\.php/);
   assert.match(production, /api\/leads\/lib\/DailyAnalytics\.php\/anything/);
   assert.match(production, /api\/leads\/cli\/leads\.php/);
@@ -748,9 +795,13 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.match(remote, /state\/relay-approved/);
   assert.match(remote, /validate_optional_site_marker "\$relay_marker" "Relay approval marker" 600/);
   assert.match(remote, /\$relayEnabled === false \|\| \$relayApproved/);
+  assert.match(remote, /emailDeliveryEnabled/);
+  assert.match(remote, /state\/email-delivery-approved/);
+  assert.match(remote, /validate_optional_site_marker "\$email_delivery_marker" "Email delivery approval marker" 600/);
+  assert.match(remote, /\$emailDeliveryEnabled === false \|\| \$emailDeliveryApproved/);
   assert.match(
     remote,
-    /validate_lead_health_contract \\\n\s+"\$lead_health" \\\n\s+"\$collection_marker_approved" \\\n\s+"\$relay_marker_approved" \\\n\s+"\$telegram_history_marker_approved" \\\n\s+"\$telegram_delivery_marker_approved"/,
+    /validate_lead_health_contract \\\n\s+"\$lead_health" \\\n\s+"\$collection_marker_approved" \\\n\s+"\$relay_marker_approved" \\\n\s+"\$telegram_history_marker_approved" \\\n\s+"\$telegram_delivery_marker_approved" \\\n\s+"\$email_delivery_marker_approved"/,
     'candidate activation must pass every approval marker into the health contract'
   );
   assert.doesNotMatch(remote, /\(\$health\["relayEnabled"\] \?\? null\) === false/);
@@ -761,6 +812,7 @@ test('production smoke and remote helper contain rollback hardening', async () =
   assert.deepEqual(remotePhpAllowlist, [
     'api/leads/index.php',
     'api/leads/lib/leadbackend.php',
+    'api/leads/lib/emaildelivery.php',
     'api/leads/lib/dailyanalytics.php',
     'api/leads/cli/leads.php',
     'api/leads/cli/daily-report.php',

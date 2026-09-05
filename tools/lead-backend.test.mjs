@@ -53,7 +53,7 @@ function lead(overrides = {}) {
     createdAt: timestamp,
     consent: {
       accepted: true,
-      version: '2026-08-27',
+      version: '2026-09-04',
       acceptedAt: timestamp,
       documentUrl: 'https://www.egoe-life.ru/consent/'
     },
@@ -77,7 +77,7 @@ function settings(overrides = {}) {
     site_host: 'www.egoe-life.ru',
     allowed_hosts: ['www.egoe-life.ru', 'egoe-life.ru'],
     collection_enabled: false,
-    consent_version: '2026-08-27',
+    consent_version: '2026-09-04',
     ip_hash_key: '0123456789abcdef'.repeat(4),
     minimum_elapsed_ms: 600,
     rate_limit: { max_requests: 20, window_seconds: 600 },
@@ -109,8 +109,10 @@ async function writeConfig(deployRoot, value) {
   const encoded = Buffer.from(JSON.stringify(value), 'utf8').toString('base64');
   const body = `<?php\ndeclare(strict_types=1);\nreturn json_decode(base64_decode('${encoded}'), true, 512, JSON_THROW_ON_ERROR);\n`;
   const target = path.join(deployRoot, 'shared/leads/config.php');
-  await fs.writeFile(target, body, { mode: 0o600 });
-  await fs.chmod(target, 0o600);
+  const temporary = `${target}.${crypto.randomBytes(8).toString('hex')}.tmp`;
+  await fs.writeFile(temporary, body, { mode: 0o600 });
+  await fs.chmod(temporary, 0o600);
+  await fs.rename(temporary, target);
 }
 
 async function waitForServer(url, child) {
@@ -163,7 +165,8 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
     collectionEnabled: false,
     relayEnabled: false,
     telegramHistoryEnabled: false,
-    telegramDeliveryEnabled: false
+    telegramDeliveryEnabled: false,
+    emailDeliveryEnabled: false
   });
   assert.equal((await fs.stat(path.join(deployRoot, 'shared/leads'))).mode & 0o777, 0o700);
   assert.equal((await fs.stat(path.join(deployRoot, 'shared/leads/config.php'))).mode & 0o777, 0o600);
@@ -343,7 +346,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   const firstEvidence = JSON.parse((await run(PHP, ['-r', evidenceScript], { env })).stdout);
   assert.equal(firstEvidence.form_id, 'test:request');
   assert.equal(firstEvidence.page_path, '/test/');
-  assert.equal(firstEvidence.consent_version, '2026-08-27');
+  assert.equal(firstEvidence.consent_version, '2026-09-04');
   assert.equal(firstEvidence.consent_accepted_at, first.consent.acceptedAt);
   assert.equal(firstEvidence.consent_document_url, '/consent/');
   assert.match(firstEvidence.payload_hash, /^[0-9a-f]{64}$/);
@@ -358,7 +361,7 @@ test('real PHP endpoint and CLI persist, validate, deduplicate, rate-limit and r
   const currentConsentOnLegacyConfig = lead();
   result = await post(currentConsentOnLegacyConfig);
   assert.equal(result.response.status, 201, 'current consent must work while production config still names the legacy version');
-  assert.equal(await storedConsentVersion(currentConsentOnLegacyConfig.leadId), '2026-08-27');
+  assert.equal(await storedConsentVersion(currentConsentOnLegacyConfig.leadId), '2026-09-04');
   await run(PHP, [cli, 'delete', currentConsentOnLegacyConfig.leadId, '--with-evidence'], { env });
 
   await writeConfig(deployRoot, activeSettings());

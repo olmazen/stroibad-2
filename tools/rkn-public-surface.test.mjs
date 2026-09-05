@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
@@ -130,4 +131,42 @@ test('public legal documents and truthful storage notice are present', async () 
   assert.match(runtime, /egoe_cookie_notice_v2/);
   assert.doesNotMatch(runtime, /Продолжая пользоваться сайтом, вы соглашаетесь/);
   assert.match(await read('robots.txt'), /Disallow: \/stroibad-2\//);
+});
+
+test('public legal documents match direct Telegram and corporate REG.RU email delivery', async () => {
+  const privacy = await read('privacy/index.html');
+  const consent = await read('consent/index.html');
+  const cookies = await read('cookies/index.html');
+  for (const [rel, html] of [
+    ['privacy/index.html', privacy],
+    ['consent/index.html', consent],
+    ['cookies/index.html', cookies]
+  ]) {
+    assert.match(html, /версия 2026-09-04/, `${rel} must publish the coordinated legal version`);
+    assert.match(html, /Telegram Bot API/, `${rel} must disclose direct server-side Telegram delivery`);
+    assert.match(html, /Google Apps Script в текущей доставке заявок не участвует/, `${rel} must not present the legacy relay as current`);
+    assert.doesNotMatch(html, /через Google Apps Script в закрытую рабочую группу Telegram/, `${rel} contains the stale relay description`);
+  }
+
+  assert.match(privacy, /локального Exim/);
+  assert.match(consent, /локального Exim/);
+  assert.match(privacy, /zakaz@egoe-life\.ru/);
+  assert.match(consent, /zakaz@egoe-life\.ru/);
+  for (const html of [privacy, consent]) {
+    const text = html.replace(/<[^>]*>/g, ' ');
+    assert.match(html, /не (?:включаются|входят) journey/);
+    assert.match(html, /трекинговых пикселей/);
+    assert.match(html, /Reply-To не задаётся/);
+    assert.match(html, /Date содержит серверное время приёма/);
+    assert.match(text, /2026-08-27[^.]+(?:прямой Telegram|Telegram)/);
+    assert.match(text, /2026-08-23[^.]+(?:только в российской SQLite|только локальная российская запись)/);
+  }
+
+  const snapshots = await read('docs/legal/rkn/consent-version-snapshots.md');
+  const consentSha256 = crypto.createHash('sha256').update(consent).digest('hex');
+  assert.match(snapshots, /\| `2026-09-04` \| 04\.09\.2026 \|/);
+  assert.ok(snapshots.includes(`\`${consentSha256}\``), 'current consent SHA-256 must be recorded');
+  assert.match(snapshots, /`2026-09-04` — российская SQLite, прямой Telegram и корпоративная email-копия REG\.RU/);
+  assert.match(snapshots, /`2026-08-27` — российская SQLite и прямой Telegram без email/);
+  assert.match(snapshots, /`2026-08-23` — только локальная российская запись без journey/);
 });

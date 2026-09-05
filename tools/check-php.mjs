@@ -10,12 +10,16 @@ const PHP = process.env.EGOE_PHP_BIN || 'php';
 const expected = [
   'api/leads/index.php',
   'api/leads/lib/LeadBackend.php',
+  'api/leads/lib/EmailDelivery.php',
   'api/leads/lib/DailyAnalytics.php',
   'api/leads/cli/leads.php',
   'api/leads/cli/daily-report.php',
   'api/telegram/index.php',
   'api/telegram/lib/TelegramHistory.php',
   'api/telegram/cli/telegram.php'
+];
+const support = [
+  'ops/leads/email-delivery-control.php'
 ];
 
 function run(args) {
@@ -42,4 +46,9 @@ for (const rel of expected) {
   process.stdout.write(`${run(['-l', rel])}\n`);
 }
 
-console.log(`PHP runtime and ${expected.length} allowlisted files are valid.`);
+for (const rel of support) {
+  await fs.access(path.join(ROOT, rel));
+  process.stdout.write(`${run(['-l', rel])}\n`);
+}
+
+console.log(`PHP runtime, ${expected.length} allowlisted files, and ${support.length} private control helper are valid.`);

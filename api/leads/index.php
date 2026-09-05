@@ -7,10 +7,13 @@ umask(0077);
 use Egoe\Leads\Endpoint;
 use Egoe\Leads\HttpFailure;
 use Egoe\Leads\Runtime;
+use Egoe\Leads\Settings;
+use Egoe\Email\EmailLeadTransport;
 use Egoe\Telegram\TelegramConfig;
 use Egoe\Telegram\TelegramLeadTransport;
 
 require __DIR__ . '/lib/LeadBackend.php';
+require __DIR__ . '/lib/EmailDelivery.php';
 require dirname(__DIR__) . '/telegram/lib/TelegramHistory.php';
 
 header('Content-Type: application/json; charset=UTF-8');
@@ -31,12 +34,17 @@ try {
     if ($isStatus) {
         $result = Endpoint::status($_SERVER);
     } else {
-        $telegram = TelegramConfig::loadOptional(Runtime::deployRoot());
+        $root = Runtime::deployRoot();
+        $settings = Settings::load($root);
+        $telegram = TelegramConfig::loadOptional($root);
         $result = Endpoint::handle(
             $_SERVER,
             $_POST,
             $_FILES,
-            TelegramLeadTransport::production($telegram)
+            [
+                TelegramLeadTransport::production($telegram),
+                EmailLeadTransport::production($settings['email']),
+            ]
         );
     }
     http_response_code($result['status']);

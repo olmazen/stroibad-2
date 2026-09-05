@@ -9,13 +9,23 @@ return [
     'allowed_hosts' => ['www.egoe-life.ru', 'egoe-life.ru'],
     // Fail closed until legal review, any required RKN update and the state marker.
     'collection_enabled' => false,
-    'consent_version' => '2026-08-27',
+    'consent_version' => '2026-09-04',
     'ip_hash_key' => 'REPLACE_WITH_64_HEX_CHARACTERS_OUTSIDE_GIT',
     'minimum_elapsed_ms' => 600,
     'rate_limit' => ['max_requests' => 5, 'window_seconds' => 600],
     'retention_days' => 365,
     'consent_evidence_days' => 1095,
     'backup_retention_days' => 30,
+    'email' => [
+        // Local REG.RU Exim delivery. Enabling also requires the private
+        // state/email-delivery-approved marker with exact bytes "egoe-life.ru".
+        'enabled' => false,
+        'recipient' => 'zakaz@egoe-life.ru',
+        'sender' => 'zakaz@egoe-life.ru',
+        'sender_name' => 'EGOE — сайт',
+        'sendmail_path' => '/usr/sbin/sendmail',
+        'timeout_seconds' => 10,
+    ],
     'relay' => [
         // Default is deliberately OFF. Enabling also requires state/relay-approved
         // with the exact bytes "egoe-life.ru", deploy owner and mode 0600.

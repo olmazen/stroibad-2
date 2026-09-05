@@ -267,11 +267,14 @@ jobs:
           fi
           telegram_history_marker="$deploy_root/state/telegram-history-approved"
           telegram_delivery_marker="$deploy_root/state/telegram-delivery-approved"
+          email_delivery_marker="$deploy_root/state/email-delivery-approved"
           telegram_history_marker_approved=false
           telegram_delivery_marker_approved=false
+          email_delivery_marker_approved=false
           for marker_record in \
             "telegram_history:$telegram_history_marker" \
-            "telegram_delivery:$telegram_delivery_marker"; do
+            "telegram_delivery:$telegram_delivery_marker" \
+            "email_delivery:$email_delivery_marker"; do
             marker_name=${marker_record%%:*}
             marker_path=${marker_record#*:}
             if test -e "$marker_path" || test -L "$marker_path"; then
@@ -285,6 +288,7 @@ jobs:
               case "$marker_name" in
                 telegram_history) telegram_history_marker_approved=true ;;
                 telegram_delivery) telegram_delivery_marker_approved=true ;;
+                email_delivery) email_delivery_marker_approved=true ;;
                 *) exit 23 ;;
               esac
             fi
@@ -319,6 +323,7 @@ jobs:
             if ($argv[7] !== "") $paths[] = [$argv[7], 0100000, 0600];
             if ($argv[8] !== "") $paths[] = [$argv[8], 0100000, 0600];
             if ($argv[9] !== "") $paths[] = [$argv[9], 0100000, 0600];
+            if ($argv[10] !== "") $paths[] = [$argv[10], 0100000, 0600];
             foreach ($paths as [$path, $expectedType, $expectedMode]) {
               $stat = lstat($path);
               if (!is_array($stat)
@@ -335,7 +340,8 @@ jobs:
             "$([ -f "$collection_marker" ] && printf '%s' "$collection_marker" || true)" \
             "$([ -f "$relay_marker" ] && printf '%s' "$relay_marker" || true)" \
             "$([ -f "$telegram_history_marker" ] && printf '%s' "$telegram_history_marker" || true)" \
-            "$([ -f "$telegram_delivery_marker" ] && printf '%s' "$telegram_delivery_marker" || true)"
+            "$([ -f "$telegram_delivery_marker" ] && printf '%s' "$telegram_delivery_marker" || true)" \
+            "$([ -f "$email_delivery_marker" ] && printf '%s' "$email_delivery_marker" || true)"
           test -w "$deploy_root/shared/leads"
           test -L "$deploy_root/current"
           current_target=$(readlink "$deploy_root/current")
@@ -355,10 +361,12 @@ jobs:
               $relayApproved = ($argv[2] ?? "false") === "true";
               $telegramHistoryApproved = ($argv[3] ?? "false") === "true";
               $telegramDeliveryApproved = ($argv[4] ?? "false") === "true";
+              $emailDeliveryApproved = ($argv[5] ?? "false") === "true";
               $collectionEnabled = $health["collectionEnabled"] ?? null;
               $relayEnabled = $health["relayEnabled"] ?? null;
               $telegramHistoryEnabled = $health["telegramHistoryEnabled"] ?? false;
               $telegramDeliveryEnabled = $health["telegramDeliveryEnabled"] ?? false;
+              $emailDeliveryEnabled = $health["emailDeliveryEnabled"] ?? false;
               exit(is_array($health)
                 && ($health["ok"] ?? false) === true
                 && ($health["schemaVersion"] ?? null) === 2
@@ -369,12 +377,15 @@ jobs:
                 && is_bool($telegramHistoryEnabled)
                 && ($telegramHistoryEnabled === false || $telegramHistoryApproved)
                 && is_bool($telegramDeliveryEnabled)
-                && ($telegramDeliveryEnabled === false || ($telegramDeliveryApproved && $telegramHistoryApproved && $telegramHistoryEnabled && $relayEnabled === false)) ? 0 : 1);
-            ' "$collection_marker_approved" "$relay_marker_approved" "$telegram_history_marker_approved" "$telegram_delivery_marker_approved"
+                && ($telegramDeliveryEnabled === false || ($telegramDeliveryApproved && $telegramHistoryApproved && $telegramHistoryEnabled && $relayEnabled === false))
+                && is_bool($emailDeliveryEnabled)
+                && ($emailDeliveryEnabled === false || $emailDeliveryApproved) ? 0 : 1);
+            ' "$collection_marker_approved" "$relay_marker_approved" "$telegram_history_marker_approved" "$telegram_delivery_marker_approved" "$email_delivery_marker_approved"
           else
             test "$relay_marker_approved" = false
             test "$telegram_history_marker_approved" = false
             test "$telegram_delivery_marker_approved" = false
+            test "$email_delivery_marker_approved" = false
           fi
           df -h "$deploy_root"
           REMOTE
@@ -475,6 +486,7 @@ jobs:
                 || typeof health.relayEnabled !== "boolean"
                 || typeof health.telegramHistoryEnabled !== "boolean"
                 || typeof health.telegramDeliveryEnabled !== "boolean"
+                || typeof health.emailDeliveryEnabled !== "boolean"
                 || (health.telegramDeliveryEnabled && (health.relayEnabled || !health.telegramHistoryEnabled))) process.exit(1);
               process.stdout.write(`${health.collectionEnabled}:${health.relayEnabled}`);
             });
@@ -553,6 +565,8 @@ jobs:
             /api/leads/index.php/anything \
             /api/leads/index \
             /api/leads/lib/LeadBackend.php \
+            /api/leads/lib/EmailDelivery.php \
+            /api/leads/lib/EmailDelivery.php/anything \
             /api/leads/lib/DailyAnalytics.php \
             /api/leads/lib/DailyAnalytics.php/anything \
             /api/leads/cli/leads.php \
