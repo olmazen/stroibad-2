@@ -202,6 +202,16 @@ final class Settings
         return false;
     }
 
+    public static function allowsJourneyForConsentVersion(string $version): bool
+    {
+        return self::isPrimaryDeliveryConsentVersion($version);
+    }
+
+    public static function allowsDeliveryForConsentVersion(string $version): bool
+    {
+        return self::isPrimaryDeliveryConsentVersion($version);
+    }
+
     /** @return array<string,mixed> */
     public static function load(string $deployRoot): array
     {
@@ -684,7 +694,7 @@ final class Validator
         $pageTitle = self::optionalText($page['title'] ?? '', 300, 'page.title');
         $pageReferrer = self::minimizedReferrer(self::optionalText($page['referrer'] ?? '', 1500, 'page.referrer'), $settings);
         $journey = self::journey($input['journey'] ?? [], $createdTime);
-        if (!Settings::isPrimaryDeliveryConsentVersion($consentVersion) && $journey !== []) {
+        if (!Settings::allowsJourneyForConsentVersion($consentVersion) && $journey !== []) {
             throw new HttpFailure(
                 422,
                 'JOURNEY_CONSENT_REQUIRED',
