@@ -18,6 +18,9 @@ const expected = [
   'api/telegram/lib/TelegramHistory.php',
   'api/telegram/cli/telegram.php'
 ];
+const support = [
+  'ops/leads/email-delivery-control.php'
+];
 
 function run(args) {
   const result = spawnSync(PHP, args, { cwd: ROOT, encoding: 'utf8' });
@@ -43,4 +46,9 @@ for (const rel of expected) {
   process.stdout.write(`${run(['-l', rel])}\n`);
 }
 
-console.log(`PHP runtime and ${expected.length} allowlisted files are valid.`);
+for (const rel of support) {
+  await fs.access(path.join(ROOT, rel));
+  process.stdout.write(`${run(['-l', rel])}\n`);
+}
+
+console.log(`PHP runtime, ${expected.length} allowlisted files, and ${support.length} private control helper are valid.`);

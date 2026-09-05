@@ -253,6 +253,7 @@ test('deployment workflows pin actions and preserve exact staging provenance', a
   const pages = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'pages.yml'), 'utf8');
   const production = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'deploy-production.yml'), 'utf8');
   const bootstrap = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'bootstrap-production.yml'), 'utf8');
+  const emailControl = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'manage-email-delivery.yml'), 'utf8');
   const prepare = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'prepare-release.yml'), 'utf8');
   const quality = await fs.readFile(path.join(ROOT, '.github', 'workflows', 'site-quality.yml'), 'utf8');
   const trustedPins = new Map([
@@ -269,6 +270,7 @@ test('deployment workflows pin actions and preserve exact staging provenance', a
     ['pages', pages],
     ['production', production],
     ['bootstrap', bootstrap],
+    ['email-control', emailControl],
     ['prepare-release', prepare],
     ['site-quality', quality]
   ]) {
@@ -308,6 +310,15 @@ test('deployment workflows pin actions and preserve exact staging provenance', a
   assert.match(bootstrap, /sh -s -- enable/);
   assert.match(bootstrap, /collection-approved.*remains absent/);
   assert.doesNotMatch(bootstrap, /npm run (?:build|check)/);
+  assert.match(emailControl, /\[\[ "\$EXPECTED_SHA" != "\$GITHUB_SHA" \]\]/);
+  assert.match(emailControl, /environment:\s*\n\s*name: production/);
+  assert.match(emailControl, /group: egoe-production/);
+  assert.match(emailControl, /ENABLE_EMAIL/);
+  assert.match(emailControl, /DISABLE_EMAIL/);
+  assert.match(emailControl, /StrictHostKeyChecking=yes/);
+  assert.match(emailControl, /PasswordAuthentication=no/);
+  assert.match(emailControl, /email-delivery-control\.php/);
+  assert.match(emailControl, /health\.emailDeliveryEnabled !== expectedEmail/);
   assert.ok(
     bootstrap.indexOf('Externally smoke-test safe baseline before enablement')
       < bootstrap.indexOf('Enable the existing production release workflow'),
@@ -318,6 +329,7 @@ test('deployment workflows pin actions and preserve exact staging provenance', a
     ['pages', pages],
     ['production', production],
     ['bootstrap', bootstrap],
+    ['email-control', emailControl],
     ['prepare-release', prepare],
     ['site-quality', quality]
   ]) {

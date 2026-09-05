@@ -63,6 +63,16 @@ the marker and require `emailDeliveryEnabled: true`. To disable the channel,
 remove the marker first, verify `emailDeliveryEnabled: false`, then set the
 config flag to `false`.
 
+Use the GitHub Actions workflow `Manage REG.RU lead email delivery` for this
+state change. Dispatch it from `main` with the exact 40-character commit that
+is currently live. Run `preflight` without a confirmation string; run `enable`
+with `ENABLE_EMAIL`, or `disable` with `DISABLE_EMAIL`. The workflow uses the
+protected `production` environment, the same production concurrency lock as a
+release, and `ops/leads/email-delivery-control.php` to preserve every unrelated
+private setting while changing the fixed email block and marker atomically.
+It then verifies both CLI health and the public cache-busted release SHA. The
+control action never creates a lead or sends a test message by itself.
+
 New-consent leads create `outbox` and `email_outbox` rows in the same SQLite
 acceptance transaction. The queues claim, retry and complete independently, so
 an Exim failure cannot resend a Telegram notification. The existing

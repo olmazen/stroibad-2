@@ -6,7 +6,7 @@ Backend сохраняет в `consent_evidence` версию согласия �
 |---|---|---|---|---|
 | `2026-08-23` | 23.08.2026 | `a725d1cae8657d1dd8d9c4aa4e73291d749337b4ad63cca52ed04dd5a981a240` | `fe20ea91234cf1ebc5f3c01bde231914babec605` | production release `4a5d627cb75ca290892650c9bb19cc45118a03e5` |
 | `2026-08-27` | 27.08.2026 | `33dee6cc877788aa610e794de2ce1aa52ece873bf099a036dbcc3e6951556bac` | `4b1cc7ac0f097c22798c9bc2df4d9cb3bb79ba6d` | production release `05779e39a27ff27b37eaa67ff2f28eae2dff7fe2`; cached-client compatibility |
-| `2026-09-04` | 04.09.2026 | `7ca07ec97832543ffb542c81f323c4d776230432cdb7f5cc78e4edd8c74431a2` | `aa10407233b177d6daa9252bb7d5a44f42596649` | целевой файл pre-release ветки; итоговый release SHA фиксируется после публикации |
+| `2026-09-04` | 04.09.2026 | `b748a0cd7addac29e5f83772497826a0ed5cf47e117c7efc904348e21f2e971d` | `5bbcc00383712569cf30bb9077625c434547501d` | целевой файл pre-release ветки; итоговый release SHA фиксируется после публикации |
 
 Проверка перед публикацией:
 

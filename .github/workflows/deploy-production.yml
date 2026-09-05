@@ -486,6 +486,7 @@ jobs:
                 || typeof health.relayEnabled !== "boolean"
                 || typeof health.telegramHistoryEnabled !== "boolean"
                 || typeof health.telegramDeliveryEnabled !== "boolean"
+                || typeof health.emailDeliveryEnabled !== "boolean"
                 || (health.telegramDeliveryEnabled && (health.relayEnabled || !health.telegramHistoryEnabled))) process.exit(1);
               process.stdout.write(`${health.collectionEnabled}:${health.relayEnabled}`);
             });
