@@ -49,6 +49,29 @@ transport in `shared/telegram/config.php`; it uses the same `outbox` and
 `leads.php retry` command without Google Apps Script. Legacy relay and direct
 Telegram delivery are mutually exclusive at runtime.
 
+Email duplication is a second, independent channel. It submits a multipart
+text/HTML copy through the local REG.RU `/usr/sbin/sendmail` (Exim) with the
+fixed envelope and headers `zakaz@egoe-life.ru`; user-entered values are never
+used in mail headers. The body contains only the form field names and values.
+Journey, referrer, IP hash, consent evidence and attachments are excluded.
+
+Email is fail-closed unless all fixed values in the private
+`shared/leads/config.php` `email` block are valid, `enabled` is `true`, and the
+regular non-symlink `state/email-delivery-approved` marker has exact bytes
+`egoe-life.ru`, the deploy owner and mode `0600`. Run `health` after creating
+the marker and require `emailDeliveryEnabled: true`. To disable the channel,
+remove the marker first, verify `emailDeliveryEnabled: false`, then set the
+config flag to `false`.
+
+New-consent leads create `outbox` and `email_outbox` rows in the same SQLite
+acceptance transaction. The queues claim, retry and complete independently, so
+an Exim failure cannot resend a Telegram notification. The existing
+`leads.php retry 20` cron services both queues; do not add a separate email
+cron. Schema `user_version` remains `2`, old releases ignore the additional
+table, and migration never backfills earlier leads. A successful sendmail exit
+only confirms that the local MTA accepted the message for delivery, not that it
+reached the inbox.
+
 Rotate `ip_hash_key` at least yearly and immediately after suspected disclosure:
 replace it atomically with a new `bin2hex(random_bytes(32))` value and run
 `health`. Existing keyed hashes expire with their lead records and cannot be

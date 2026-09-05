@@ -10,6 +10,7 @@ const PHP = process.env.EGOE_PHP_BIN || 'php';
 const expected = [
   'api/leads/index.php',
   'api/leads/lib/LeadBackend.php',
+  'api/leads/lib/EmailDelivery.php',
   'api/leads/lib/DailyAnalytics.php',
   'api/leads/cli/leads.php',
   'api/leads/cli/daily-report.php',

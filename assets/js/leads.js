@@ -25,7 +25,7 @@
     attachmentsEnabled: false,
     maxFileBytes: 10 * 1024 * 1024,
     allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'dwg', 'dxf', 'doc', 'docx', 'xls', 'xlsx', 'zip'],
-    consentVersion: '2026-08-27'
+    consentVersion: '2026-09-04'
   };
 
   var inFlight = typeof WeakMap === 'function' ? new WeakMap() : null;

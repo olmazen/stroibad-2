@@ -35,6 +35,7 @@ state/site-hostname       # exactly: egoe-life.ru
 state/production-enabled  # exactly: egoe-life.ru; create only after bootstrap review
 state/collection-approved # optional collection approval; exact content: egoe-life.ru
 state/relay-approved      # optional relay approval; exact content: egoe-life.ru, mode 0600
+state/email-delivery-approved # optional corporate email approval; exact content: egoe-life.ru, mode 0600
 state/bootstrap-plan      # approved SHA and NO_SAFE_PREVIOUS; rotates only after a verified failed-smoke rollback
 legacy/
   physical-docroot-pre-rkn-20260823/  # preserved old physical site; never an automatic release
@@ -57,11 +58,13 @@ Keep the deployment root outside the existing `/www/egoe-life.ru` directory unti
 
 A reviewed release contains PHP application files below `api/leads/`; they remain immutable files in `dist/`, are covered by the same per-file SHA-256 manifest, and receive `php -l` plus a real SQLite health check before activation. Persistent files such as `.env`, `api/config.php`, `api/config/`, `api/state/`, `api/storage/`, and `api/runtime/` are rejected by the artifact verifier. The application resolves its generated `0600` configuration, SQLite, backups and runtime state from `<REG_DEPLOY_ROOT>/shared/leads/` outside the document root.
 
-The server must provide `tar`, `sha256sum`, CLI PHP 8.2 or newer with `pdo_sqlite`, `sqlite3` online-backup support, `mbstring` and `curl`, plus `find` and `flock`. `flock` serializes deploy and rollback operations on the host in addition to the GitHub Actions concurrency group. The RKN release refuses activation when backend health fails, when collection is enabled without `collection-approved`, or when a relay is enabled without `relay-approved`.
+The server must provide `tar`, `sha256sum`, CLI PHP 8.2 or newer with `pdo_sqlite`, `sqlite3` online-backup support, `mbstring` and `curl`, plus `find` and `flock`. Corporate email delivery additionally requires `proc_open`, `proc_get_status`, `proc_terminate`, `proc_close` and an executable local `/usr/sbin/sendmail`. `flock` serializes deploy and rollback operations on the host in addition to the GitHub Actions concurrency group. The RKN release refuses activation when backend health fails, when collection is enabled without `collection-approved`, when a relay is enabled without `relay-approved`, or when effective email delivery lacks `email-delivery-approved`.
 
-The deployment root, `state/`, state markers and optional approval markers must be owned by the deployment account and must not be group- or world-writable. `relay-approved` is stricter: it must be an owned regular non-symlink file with exact mode `0600` and exact contents `egoe-life.ru` without a trailing newline. Bootstrap creates its state and production marker with mode `0600`; the preserved legacy parent uses mode `0700`. A path of the wrong type, a symlink marker or an ownership/mode mismatch fails closed.
+The deployment root, `state/`, state markers and optional approval markers must be owned by the deployment account and must not be group- or world-writable. `relay-approved`, `telegram-history-approved`, `telegram-delivery-approved` and `email-delivery-approved` are stricter: each must be an owned regular non-symlink file with exact mode `0600` and exact contents `egoe-life.ru` without a trailing newline. Bootstrap creates its state and production marker with mode `0600`; the preserved legacy parent uses mode `0700`. A path of the wrong type, a symlink marker or an ownership/mode mismatch fails closed.
 
 Relay approval and collection approval are independent. A valid `relay-approved` marker never enables collection, and relay health may remain disabled with or without the marker. When health reports `relayEnabled=true`, however, both preflight and activation require the valid relay marker. Deploy or remove that marker only as a separate reviewed server operation; the release workflow never creates it.
+
+Corporate email approval is independent from collection, relay and Telegram. Persistent `shared/leads/config.php` must keep the fixed recipient and sender `zakaz@egoe-life.ru`, sender name `EGOE — сайт`, and email disabled until the code release is active. Enablement is a separate server operation: create the exact private marker only after the fixed configuration has been reviewed, then require `emailDeliveryEnabled=true` from `leads.php health`. To disable email without interrupting SQLite or Telegram, remove the marker first and verify health reports `false`; then set the persistent config flag to `false`. Release deployment never creates or deletes this marker and never stores mail credentials in GitHub.
 
 ## One-time bootstrap
 
@@ -89,7 +92,7 @@ If a failed external smoke requires a fix and therefore a new `main` SHA, bootst
 6. After production approval, rerun it with `mode=deploy` and `confirmation=DEPLOY`.
 7. The server extracts into a new release and atomically replaces `current`.
 8. An existing directory for the same SHA is never trusted from its manifest alone: every listed file, size, SHA-256, aggregate hash, extra path, symlink, and PHP syntax is checked again before activation.
-9. The post-activation smoke reruns the server preflight, including collection and relay approval gates, before checking a real product page, the exact API route, collection status and a cache-busted `release.json`. Any failure invokes rollback to the recorded previous immutable release.
+9. The post-activation smoke reruns the server preflight, including collection, relay, Telegram and email approval gates, before checking a real product page, the exact API route, collection status and a cache-busted `release.json`. Any failure invokes rollback to the recorded previous immutable release.
 
 Only `dist/` is published. The workflow never rebuilds after staging and never deploys a working tree or repository root.
 

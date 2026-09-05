@@ -102,10 +102,12 @@ validate_state_approval_markers() {
   relay_marker="$deploy_root/state/relay-approved"
   telegram_history_marker="$deploy_root/state/telegram-history-approved"
   telegram_delivery_marker="$deploy_root/state/telegram-delivery-approved"
+  email_delivery_marker="$deploy_root/state/email-delivery-approved"
   collection_marker_approved=false
   relay_marker_approved=false
   telegram_history_marker_approved=false
   telegram_delivery_marker_approved=false
+  email_delivery_marker_approved=false
   if validate_optional_site_marker "$collection_marker" "Collection approval marker"; then
     collection_marker_approved=true
   fi
@@ -118,6 +120,9 @@ validate_state_approval_markers() {
   if validate_optional_site_marker "$telegram_delivery_marker" "Telegram delivery approval marker" 600; then
     telegram_delivery_marker_approved=true
   fi
+  if validate_optional_site_marker "$email_delivery_marker" "Email delivery approval marker" 600; then
+    email_delivery_marker_approved=true
+  fi
 }
 
 validate_lead_health_contract() {
@@ -126,16 +131,19 @@ validate_lead_health_contract() {
   relay_approved=$3
   telegram_history_approved=$4
   telegram_delivery_approved=$5
+  email_delivery_approved=$6
   printf '%s' "$lead_health" | "$egoe_php_command" -r '
     $health = json_decode(stream_get_contents(STDIN), true);
     $collectionApproved = ($argv[1] ?? "false") === "true";
     $relayApproved = ($argv[2] ?? "false") === "true";
     $telegramHistoryApproved = ($argv[3] ?? "false") === "true";
     $telegramDeliveryApproved = ($argv[4] ?? "false") === "true";
+    $emailDeliveryApproved = ($argv[5] ?? "false") === "true";
     $collectionEnabled = $health["collectionEnabled"] ?? null;
     $relayEnabled = $health["relayEnabled"] ?? null;
     $telegramHistoryEnabled = $health["telegramHistoryEnabled"] ?? false;
     $telegramDeliveryEnabled = $health["telegramDeliveryEnabled"] ?? false;
+    $emailDeliveryEnabled = $health["emailDeliveryEnabled"] ?? false;
     exit(is_array($health)
       && ($health["ok"] ?? false) === true
       && ($health["schemaVersion"] ?? null) === 2
@@ -146,9 +154,11 @@ validate_lead_health_contract() {
       && is_bool($telegramHistoryEnabled)
       && ($telegramHistoryEnabled === false || $telegramHistoryApproved)
       && is_bool($telegramDeliveryEnabled)
-      && ($telegramDeliveryEnabled === false || ($telegramDeliveryApproved && $telegramHistoryApproved && $telegramHistoryEnabled && $relayEnabled === false)) ? 0 : 1);
-  ' "$collection_approved" "$relay_approved" "$telegram_history_approved" "$telegram_delivery_approved" \
-    || die "Lead backend health contract failed: collection, relay, or Telegram approval mismatch"
+      && ($telegramDeliveryEnabled === false || ($telegramDeliveryApproved && $telegramHistoryApproved && $telegramHistoryEnabled && $relayEnabled === false))
+      && is_bool($emailDeliveryEnabled)
+      && ($emailDeliveryEnabled === false || $emailDeliveryApproved) ? 0 : 1);
+  ' "$collection_approved" "$relay_approved" "$telegram_history_approved" "$telegram_delivery_approved" "$email_delivery_approved" \
+    || die "Lead backend health contract failed: collection, relay, Telegram, or email approval mismatch"
 }
 
 validate_current_lead_health_contract() {
@@ -165,11 +175,13 @@ validate_current_lead_health_contract() {
       "$collection_marker_approved" \
       "$relay_marker_approved" \
       "$telegram_history_marker_approved" \
-      "$telegram_delivery_marker_approved"
+      "$telegram_delivery_marker_approved" \
+      "$email_delivery_marker_approved"
   else
     [ "$relay_marker_approved" = "false" ] \
       && [ "$telegram_history_marker_approved" = "false" ] \
       && [ "$telegram_delivery_marker_approved" = "false" ] \
+      && [ "$email_delivery_marker_approved" = "false" ] \
       || die "External delivery approval marker requires a deployed lead backend"
   fi
 }
@@ -206,6 +218,7 @@ verify_release_tree() {
       $allowedPhp = [
         "api/leads/index.php",
         "api/leads/lib/leadbackend.php",
+        "api/leads/lib/emaildelivery.php",
         "api/leads/lib/dailyanalytics.php",
         "api/leads/cli/leads.php",
         "api/leads/cli/daily-report.php",
@@ -437,7 +450,8 @@ deploy() {
     "$collection_marker_approved" \
     "$relay_marker_approved" \
     "$telegram_history_marker_approved" \
-    "$telegram_delivery_marker_approved"
+    "$telegram_delivery_marker_approved" \
+    "$email_delivery_marker_approved"
 
   [ -L "$deploy_root/current" ] || die "Current baseline symlink is required before production deployment"
   previous_target=$(readlink "$deploy_root/current")

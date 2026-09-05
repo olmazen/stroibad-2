@@ -30,6 +30,7 @@ final class Runtime
     private const RELAY_MARKER = 'relay-approved';
     private const TELEGRAM_HISTORY_MARKER = 'telegram-history-approved';
     private const TELEGRAM_DELIVERY_MARKER = 'telegram-delivery-approved';
+    private const EMAIL_DELIVERY_MARKER = 'email-delivery-approved';
 
     public static function deployRoot(?string $start = null): string
     {
@@ -115,6 +116,11 @@ final class Runtime
         return self::approvedMarker($deployRoot, self::TELEGRAM_DELIVERY_MARKER, 0600);
     }
 
+    public static function emailDeliveryApproved(string $deployRoot): bool
+    {
+        return self::approvedMarker($deployRoot, self::EMAIL_DELIVERY_MARKER, 0600);
+    }
+
     private static function approvedMarker(string $deployRoot, string $markerName, ?int $requiredPermissions = null): bool
     {
         $stateDirectory = $deployRoot . '/state';
@@ -161,18 +167,39 @@ final class Runtime
 
 final class Settings
 {
-    public const CURRENT_CONSENT_VERSION = '2026-08-27';
-    private const LEGACY_CONSENT_VERSION = '2026-08-23';
+    public const CURRENT_CONSENT_VERSION = '2026-09-04';
+    public const DELIVERY_LEGACY_CONSENT_VERSION = '2026-08-27';
+    private const LEGACY_CONSENT_VERSIONS = ['2026-08-27', '2026-08-23'];
+    private const EMAIL_MAILBOX = 'zakaz@egoe-life.ru';
+    private const EMAIL_SENDER_NAME = 'EGOE — сайт';
 
     public static function isCurrentConsentVersion(string $version): bool
     {
         return hash_equals(self::CURRENT_CONSENT_VERSION, $version);
     }
 
-    public static function acceptsConsentVersion(string $version): bool
+    public static function isPrimaryDeliveryConsentVersion(string $version): bool
     {
         return self::isCurrentConsentVersion($version)
-            || hash_equals(self::LEGACY_CONSENT_VERSION, $version);
+            || hash_equals(self::DELIVERY_LEGACY_CONSENT_VERSION, $version);
+    }
+
+    public static function isEmailDeliveryConsentVersion(string $version): bool
+    {
+        return self::isCurrentConsentVersion($version);
+    }
+
+    public static function acceptsConsentVersion(string $version): bool
+    {
+        if (self::isCurrentConsentVersion($version)) {
+            return true;
+        }
+        foreach (self::LEGACY_CONSENT_VERSIONS as $legacyVersion) {
+            if (hash_equals($legacyVersion, $version)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** @return array<string,mixed> */
@@ -202,6 +229,14 @@ final class Settings
             'retention_days' => 365,
             'consent_evidence_days' => 1095,
             'backup_retention_days' => 30,
+            'email' => [
+                'enabled' => false,
+                'recipient' => '',
+                'sender' => '',
+                'sender_name' => self::EMAIL_SENDER_NAME,
+                'sendmail_path' => '/usr/sbin/sendmail',
+                'timeout_seconds' => 10,
+            ],
             'relay' => [
                 'enabled' => false,
                 'url' => '',
@@ -270,6 +305,51 @@ final class Settings
             throw new RuntimeException('backup_retention_days must remain exactly 30');
         }
 
+        $email = $settings['email'];
+        if (!is_array($email) || !is_bool($email['enabled'] ?? null)) {
+            throw new RuntimeException('Invalid email delivery configuration');
+        }
+        $emailConfigured = $email['enabled'] === true;
+        if ($emailConfigured) {
+            foreach (['recipient', 'sender'] as $mailboxKey) {
+                $mailbox = $email[$mailboxKey] ?? null;
+                if (!is_string($mailbox)
+                    || !hash_equals(self::EMAIL_MAILBOX, strtolower($mailbox))
+                ) {
+                    throw new RuntimeException("Email {$mailboxKey} must be the approved order mailbox");
+                }
+                $email[$mailboxKey] = self::EMAIL_MAILBOX;
+            }
+            $senderName = $email['sender_name'] ?? null;
+            if (!is_string($senderName)
+                || !hash_equals(self::EMAIL_SENDER_NAME, $senderName)
+            ) {
+                throw new RuntimeException('Email sender_name must match the approved identity');
+            }
+            $email['sender_name'] = self::EMAIL_SENDER_NAME;
+            $sendmailPath = $email['sendmail_path'] ?? null;
+            if (!is_string($sendmailPath)
+                || !str_starts_with($sendmailPath, '/')
+                || basename($sendmailPath) !== 'sendmail'
+                || str_contains($sendmailPath, "\0")
+                || preg_match('/[\r\n]/D', $sendmailPath) === 1
+                || !is_file($sendmailPath)
+                || !is_executable($sendmailPath)
+            ) {
+                throw new RuntimeException('Configured sendmail executable is unavailable');
+            }
+            $realSendmail = realpath($sendmailPath);
+            if (!is_string($realSendmail) || !is_file($realSendmail) || !is_executable($realSendmail)) {
+                throw new RuntimeException('Configured sendmail executable is unavailable');
+            }
+            $timeout = $email['timeout_seconds'] ?? null;
+            if (!is_int($timeout) || $timeout < 1 || $timeout > 20) {
+                throw new RuntimeException('Email timeout_seconds must be between 1 and 20');
+            }
+        }
+        $email['enabled'] = $emailConfigured && Runtime::emailDeliveryApproved($deployRoot);
+        $settings['email'] = $email;
+
         $relay = $settings['relay'];
         if (!is_array($relay) || !is_bool($relay['enabled'] ?? null)) {
             throw new RuntimeException('Invalid relay configuration');
@@ -332,6 +412,7 @@ final class Settings
     {
         return preg_match('/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/D', strtolower($host)) === 1;
     }
+
 }
 
 final class Database
@@ -415,6 +496,20 @@ CREATE TABLE IF NOT EXISTS outbox (
 );
 CREATE INDEX IF NOT EXISTS outbox_due_idx ON outbox(status, next_attempt_at);
 
+CREATE TABLE IF NOT EXISTS email_outbox (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  lead_id TEXT NOT NULL UNIQUE REFERENCES leads(lead_id) ON DELETE CASCADE,
+  mode TEXT NOT NULL CHECK (mode = 'email'),
+  payload_json TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','sending','sent','failed')),
+  attempts INTEGER NOT NULL DEFAULT 0,
+  next_attempt_at TEXT NOT NULL,
+  last_error TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  sent_at TEXT
+);
+CREATE INDEX IF NOT EXISTS email_outbox_due_idx ON email_outbox(status, next_attempt_at);
+
 CREATE TABLE IF NOT EXISTS rate_limits (
   ip_hash TEXT PRIMARY KEY,
   window_started_at INTEGER NOT NULL,
@@ -441,6 +536,7 @@ SQL);
             'leads' => ['lead_id', 'payload_hash', 'form_id', 'page_path', 'fields_json', 'payload_json', 'ip_hash'],
             'consent_evidence' => ['lead_id', 'payload_hash', 'form_id', 'page_path', 'consent_version', 'consent_accepted_at'],
             'outbox' => ['id', 'lead_id', 'mode', 'payload_json', 'status', 'attempts', 'next_attempt_at'],
+            'email_outbox' => ['id', 'lead_id', 'mode', 'payload_json', 'status', 'attempts', 'next_attempt_at'],
             'rate_limits' => ['ip_hash', 'window_started_at', 'request_count'],
         ];
         foreach ($expected as $table => $columns) {
@@ -588,7 +684,7 @@ final class Validator
         $pageTitle = self::optionalText($page['title'] ?? '', 300, 'page.title');
         $pageReferrer = self::minimizedReferrer(self::optionalText($page['referrer'] ?? '', 1500, 'page.referrer'), $settings);
         $journey = self::journey($input['journey'] ?? [], $createdTime);
-        if (!Settings::isCurrentConsentVersion($consentVersion) && $journey !== []) {
+        if (!Settings::isPrimaryDeliveryConsentVersion($consentVersion) && $journey !== []) {
             throw new HttpFailure(
                 422,
                 'JOURNEY_CONSENT_REQUIRED',
@@ -1108,6 +1204,7 @@ final class LeadStore
 {
     /** @param array<string,mixed> $lead
      *  @param array<string,mixed> $settings
+     *  @param OutboxTransport|list<OutboxTransport>|null $transports
      *  @return array{duplicate:bool,outboxId:?int}
      */
     public static function accept(
@@ -1115,10 +1212,15 @@ final class LeadStore
         array $lead,
         array $settings,
         string $ipHash,
-        ?OutboxTransport $transport = null
+        OutboxTransport|array|null $transports = null
     ): array
     {
-        $transport ??= Relay::transport($settings);
+        if ($transports === null) {
+            $transports = [Relay::transport($settings)];
+        } elseif ($transports instanceof OutboxTransport) {
+            $transports = [$transports];
+        }
+        $transports = Outbox::validateTransports($transports);
         $payloadJson = self::json($lead);
         $hashPayload = [
             'formId' => $lead['formId'],
@@ -1198,12 +1300,19 @@ SQL);
             ]);
 
             $outboxId = null;
-            if ($transport->enabled()
-                && Settings::isCurrentConsentVersion((string)($lead['consent']['version'] ?? ''))
-            ) {
+            foreach ($transports as $transport) {
+                if (!$transport->enabled()
+                    || !Outbox::acceptsConsentVersion(
+                        $transport,
+                        (string)($lead['consent']['version'] ?? '')
+                    )
+                ) {
+                    continue;
+                }
                 $deliveryPayload = $transport->payload($lead);
-                $outbox = $pdo->prepare(<<<'SQL'
-INSERT INTO outbox (lead_id, mode, payload_json, next_attempt_at, created_at)
+                $table = Outbox::tableFor($transport);
+                $outbox = $pdo->prepare(<<<SQL
+INSERT INTO {$table} (lead_id, mode, payload_json, next_attempt_at, created_at)
 VALUES (:lead_id, :mode, :payload_json, :next_attempt_at, :created_at)
 SQL);
                 $outbox->execute([
@@ -1213,7 +1322,8 @@ SQL);
                     ':next_attempt_at' => $receivedAt,
                     ':created_at' => $receivedAt,
                 ]);
-                $outboxId = (int)$pdo->lastInsertId();
+                $insertedId = (int)$pdo->lastInsertId();
+                $outboxId ??= $insertedId;
             }
             $pdo->exec('COMMIT');
             return ['duplicate' => false, 'outboxId' => $outboxId];
@@ -1303,6 +1413,30 @@ final class RelayTransport implements OutboxTransport
 
 final class Outbox
 {
+    /** @param list<OutboxTransport> $transports
+     *  @return list<OutboxTransport>
+     */
+    public static function validateTransports(array $transports): array
+    {
+        $validated = [];
+        $modes = [];
+        foreach ($transports as $transport) {
+            if (!$transport instanceof OutboxTransport) {
+                throw new RuntimeException('Invalid outbox transport');
+            }
+            $mode = $transport->mode();
+            if (preg_match('/\A[a-z][a-z0-9_-]{0,31}\z/D', $mode) !== 1) {
+                throw new RuntimeException('Outbox transport mode is invalid');
+            }
+            if (isset($modes[$mode])) {
+                throw new RuntimeException("Duplicate outbox transport mode: {$mode}");
+            }
+            $modes[$mode] = true;
+            $validated[] = $transport;
+        }
+        return $validated;
+    }
+
     /** @param array<string,mixed> $settings */
     public static function selectTransport(array $settings, ?OutboxTransport $preferred = null): OutboxTransport
     {
@@ -1316,37 +1450,90 @@ final class Outbox
         return $preferred;
     }
 
+    /** @param array<string,mixed> $settings
+     *  @param list<OutboxTransport> $preferred
+     *  @return list<OutboxTransport>
+     */
+    public static function selectTransports(array $settings, array $preferred = []): array
+    {
+        $preferred = self::validateTransports($preferred);
+        $email = [];
+        $primary = [];
+        foreach ($preferred as $transport) {
+            if ($transport->mode() === 'email') {
+                $email[] = $transport;
+            } else {
+                $primary[] = $transport;
+            }
+        }
+        if (count($primary) > 1) {
+            throw new RuntimeException('Only one primary external lead transport may be enabled');
+        }
+        $selectedPrimary = self::selectTransport($settings, $primary[0] ?? null);
+        $selected = [];
+        if ($selectedPrimary->enabled()) {
+            $selected[] = $selectedPrimary;
+        }
+        foreach ($email as $transport) {
+            if ($transport->enabled()) {
+                $selected[] = $transport;
+            }
+        }
+        return self::validateTransports($selected);
+    }
+
+    public static function tableFor(OutboxTransport $transport): string
+    {
+        return $transport->mode() === 'email' ? 'email_outbox' : 'outbox';
+    }
+
+    public static function acceptsConsentVersion(OutboxTransport $transport, string $version): bool
+    {
+        return $transport->mode() === 'email'
+            ? Settings::isEmailDeliveryConsentVersion($version)
+            : Settings::isPrimaryDeliveryConsentVersion($version);
+    }
+
     /** @return array{sent:int,failed:int} */
     public static function retry(PDO $pdo, OutboxTransport $transport, int $limit = 20, ?int $onlyId = null): array
     {
         if (!$transport->enabled()) {
             return ['sent' => 0, 'failed' => 0];
         }
-        $pdo->prepare(<<<'SQL'
-DELETE FROM outbox
-WHERE lead_id IN (
-  SELECT lead_id FROM leads WHERE consent_version <> :current_consent_version
-)
-SQL)->execute([':current_consent_version' => Settings::CURRENT_CONSENT_VERSION]);
         $mode = $transport->mode();
         if (preg_match('/\A[a-z][a-z0-9_-]{0,31}\z/D', $mode) !== 1) {
             throw new RuntimeException('Outbox transport mode is invalid');
         }
+        $table = self::tableFor($transport);
+        $legacyVersion = $mode === 'email'
+            ? Settings::CURRENT_CONSENT_VERSION
+            : Settings::DELIVERY_LEGACY_CONSENT_VERSION;
+        $pdo->prepare(<<<SQL
+DELETE FROM {$table}
+WHERE lead_id IN (
+  SELECT lead_id FROM leads
+  WHERE consent_version NOT IN (:current_consent_version, :delivery_legacy_consent_version)
+)
+SQL)->execute([
+            ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
+            ':delivery_legacy_consent_version' => $legacyVersion,
+        ]);
         $limit = max(1, min(100, $limit));
         $now = Runtime::utcNow();
-        $pdo->prepare("UPDATE outbox SET status = 'failed', last_error = 'stale_claim' WHERE mode = :mode AND status = 'sending' AND next_attempt_at <= :now")
+        $pdo->prepare("UPDATE {$table} SET status = 'failed', last_error = 'stale_claim' WHERE mode = :mode AND status = 'sending' AND next_attempt_at <= :now")
             ->execute([':mode' => $mode, ':now' => $now]);
-        $sql = "SELECT outbox.id, outbox.lead_id, outbox.payload_json, outbox.attempts FROM outbox JOIN leads ON leads.lead_id = outbox.lead_id WHERE outbox.mode = :mode AND outbox.status IN ('pending','failed') AND outbox.next_attempt_at <= :now AND leads.consent_version = :current_consent_version";
+        $sql = "SELECT queue.id, queue.lead_id, queue.payload_json, queue.attempts FROM {$table} AS queue JOIN leads ON leads.lead_id = queue.lead_id WHERE queue.mode = :mode AND queue.status IN ('pending','failed') AND queue.next_attempt_at <= :now AND leads.consent_version IN (:current_consent_version, :delivery_legacy_consent_version)";
         $params = [
             ':mode' => $mode,
             ':now' => $now,
             ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
+            ':delivery_legacy_consent_version' => $legacyVersion,
         ];
         if ($onlyId !== null) {
-            $sql .= ' AND outbox.id = :id';
+            $sql .= ' AND queue.id = :id';
             $params[':id'] = $onlyId;
         }
-        $sql .= ' ORDER BY outbox.id ASC LIMIT ' . $limit;
+        $sql .= ' ORDER BY queue.id ASC LIMIT ' . $limit;
         $query = $pdo->prepare($sql);
         $query->execute($params);
         $rows = $query->fetchAll();
@@ -1356,19 +1543,20 @@ SQL)->execute([':current_consent_version' => Settings::CURRENT_CONSENT_VERSION])
             $lease = (new DateTimeImmutable('now', new DateTimeZone('UTC')))
                 ->modify('+5 minutes')
                 ->format('Y-m-d\TH:i:s.v\Z');
-            $claim = $pdo->prepare("UPDATE outbox SET status = 'sending', attempts = attempts + 1, next_attempt_at = :lease WHERE id = :id AND mode = :mode AND status IN ('pending','failed') AND EXISTS (SELECT 1 FROM leads WHERE leads.lead_id = outbox.lead_id AND leads.consent_version = :current_consent_version)");
+            $claim = $pdo->prepare("UPDATE {$table} SET status = 'sending', attempts = attempts + 1, next_attempt_at = :lease WHERE id = :id AND mode = :mode AND status IN ('pending','failed') AND EXISTS (SELECT 1 FROM leads WHERE leads.lead_id = {$table}.lead_id AND leads.consent_version IN (:current_consent_version, :delivery_legacy_consent_version))");
             $claim->execute([
                 ':lease' => $lease,
                 ':id' => $id,
                 ':mode' => $mode,
                 ':current_consent_version' => Settings::CURRENT_CONSENT_VERSION,
+                ':delivery_legacy_consent_version' => $legacyVersion,
             ]);
             if ($claim->rowCount() !== 1) {
                 continue;
             }
             try {
                 $transport->deliver($pdo, (string)$row['lead_id'], (string)$row['payload_json']);
-                $pdo->prepare("UPDATE outbox SET status = 'sent', sent_at = :now, last_error = '' WHERE id = :id AND status = 'sending'")
+                $pdo->prepare("UPDATE {$table} SET status = 'sent', sent_at = :now, last_error = '' WHERE id = :id AND status = 'sending'")
                     ->execute([':now' => Runtime::utcNow(), ':id' => $id]);
                 $result['sent'] += 1;
             } catch (Throwable) {
@@ -1377,10 +1565,39 @@ SQL)->execute([':current_consent_version' => Settings::CURRENT_CONSENT_VERSION])
                 $next = (new DateTimeImmutable('now', new DateTimeZone('UTC')))
                     ->modify("+{$delay} seconds")
                     ->format('Y-m-d\TH:i:s.v\Z');
-                $pdo->prepare("UPDATE outbox SET status = 'failed', next_attempt_at = :next, last_error = 'delivery_failed' WHERE id = :id AND status = 'sending'")
+                $pdo->prepare("UPDATE {$table} SET status = 'failed', next_attempt_at = :next, last_error = 'delivery_failed' WHERE id = :id AND status = 'sending'")
                     ->execute([':next' => $next, ':id' => $id]);
                 $result['failed'] += 1;
             }
+        }
+        return $result;
+    }
+
+    /** @return array{sent:int,failed:int} */
+    public static function retryLead(PDO $pdo, OutboxTransport $transport, string $leadId): array
+    {
+        if (!$transport->enabled()) {
+            return ['sent' => 0, 'failed' => 0];
+        }
+        $table = self::tableFor($transport);
+        $query = $pdo->prepare("SELECT id FROM {$table} WHERE lead_id = :lead_id AND mode = :mode");
+        $query->execute([':lead_id' => $leadId, ':mode' => $transport->mode()]);
+        $id = $query->fetchColumn();
+        return $id === false
+            ? ['sent' => 0, 'failed' => 0]
+            : self::retry($pdo, $transport, 1, (int)$id);
+    }
+
+    /** @param list<OutboxTransport> $transports
+     *  @return array{sent:int,failed:int}
+     */
+    public static function retryAll(PDO $pdo, array $transports, int $limit = 20): array
+    {
+        $result = ['sent' => 0, 'failed' => 0];
+        foreach (self::validateTransports($transports) as $transport) {
+            $channel = self::retry($pdo, $transport, $limit);
+            $result['sent'] += $channel['sent'];
+            $result['failed'] += $channel['failed'];
         }
         return $result;
     }
@@ -1513,7 +1730,7 @@ final class Endpoint
         array $server,
         array $post,
         array $files,
-        ?OutboxTransport $preferredTransport = null
+        OutboxTransport|array|null $preferredTransport = null
     ): array
     {
         if (($server['REQUEST_METHOD'] ?? '') !== 'POST') {
@@ -1565,13 +1782,18 @@ final class Endpoint
         unset($ip);
 
         $pdo = Database::connect($root);
-        $transport = Outbox::selectTransport($settings, $preferredTransport);
-        $accepted = LeadStore::accept($pdo, $lead, $settings, $ipHash, $transport);
+        $preferred = $preferredTransport === null
+            ? []
+            : ($preferredTransport instanceof OutboxTransport ? [$preferredTransport] : $preferredTransport);
+        $transports = Outbox::selectTransports($settings, $preferred);
+        $accepted = LeadStore::accept($pdo, $lead, $settings, $ipHash, $transports);
         if ($accepted['outboxId'] !== null) {
-            try {
-                Outbox::retry($pdo, $transport, 1, $accepted['outboxId']);
-            } catch (Throwable) {
-                // SQLite is authoritative. Delivery availability never reverses acceptance.
+            foreach ($transports as $transport) {
+                try {
+                    Outbox::retryLead($pdo, $transport, (string)$lead['leadId']);
+                } catch (Throwable) {
+                    // SQLite is authoritative. Delivery availability never reverses acceptance.
+                }
             }
         }
         return [
